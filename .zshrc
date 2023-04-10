@@ -131,6 +131,7 @@ alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
 alias vim=nvim
+alias tmxf=tmuxifier
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/olisikh/.sdkman"

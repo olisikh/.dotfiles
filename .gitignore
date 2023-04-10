@@ -1,0 +1,14 @@
+# ignore everything
+*
+
+# but not the following .dotfiles
+!.config/
+!.ssh/
+!.gitconfig
+!.gitignore*
+!.gitmodules
+!.tmux.conf
+!.zshenv
+!.zshrc
+!Brewfile
+
