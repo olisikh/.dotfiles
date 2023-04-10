@@ -8,7 +8,10 @@
 !.gitignore*
 !.gitmodules
 !.tmux.conf
+
+!.zsh/
 !.zshenv
 !.zshrc
+
 !Brewfile
 
