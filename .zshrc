@@ -136,6 +136,8 @@ alias k=kubectl
 alias vim=nvim
 alias tmxf=tmuxifier
 
+alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
+
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/olisikh/.sdkman"
 [[ -s "/Users/olisikh/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/olisikh/.sdkman/bin/sdkman-init.sh"
