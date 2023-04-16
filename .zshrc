@@ -126,7 +126,11 @@ export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
-export PATH="$HOME/.tmuxifier/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/.tmuxifier/bin:$PATH"
+
+# OpenAI API key for https://github.com/Bryley/neoai.nvim
+export OPENAI_API_KEY=$(cat ~/.openai)
+
 eval "$(tmuxifier init -)"
 eval "$(thefuck --alias)"
 
