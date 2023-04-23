@@ -106,10 +106,6 @@ else
   export EDITOR='nvim'
 fi
 
-# Use 256 colors in Terminal & tmux
-export TERM="xterm-256color"
-
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
