@@ -72,9 +72,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
-# Catppuccin theme
-source $HOME/.zsh/catppuccin-mocha.zsh
-
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
@@ -91,6 +88,12 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# Catppuccin syntax highlighting
+source $HOME/.zsh/catppuccin-mocha.zsh
+
+# Setup catppuccin flavour (used in nvim, tmux, etc.)
+export CATPPUCCIN_FLAVOUR="macchiato"
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -103,23 +106,20 @@ else
   export EDITOR='nvim'
 fi
 
+# Use 256 colors in Terminal & tmux
+export TERM="xterm-256color"
+
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Enable nvm
 source ~/.nvm/nvm.sh
+
 
 # Enable pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -130,10 +130,19 @@ export PATH="$HOME/.cargo/bin:$HOME/.tmuxifier/bin:$PATH"
 
 # OpenAI API key for https://github.com/Bryley/neoai.nvim
 export OPENAI_API_KEY=$(cat ~/.openai)
+export LLDB_PATH="$HOME/.vscode/extensions/vadimcn.vscode-lldb-1.9.0"
 
 eval "$(tmuxifier init -)"
 eval "$(thefuck --alias)"
 
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+alias zshconf="vim ~/.zshrc"
+alias ohmyzsh="vim ~/.oh-my-zsh"
 alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
@@ -146,5 +155,3 @@ alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 export SDKMAN_DIR="/Users/olisikh/.sdkman"
 [[ -s "/Users/olisikh/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/olisikh/.sdkman/bin/sdkman-init.sh"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
