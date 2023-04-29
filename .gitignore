@@ -8,6 +8,7 @@
 !.gitignore*
 !.gitmodules
 !.tmux.conf
+!my_keychron.layout.json
 
 !.zsh/
 !.zshenv
