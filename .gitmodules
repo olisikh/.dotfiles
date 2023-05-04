@@ -1,6 +1,0 @@
-[submodule ".config/nvim"]
-	path = .config/nvim
-	url = git@github.com:alisiikh/nvim.git
-[submodule ".tmuxifier"]
-	path = .tmuxifier
-	url = git@github.com:jimeh/tmuxifier.git
