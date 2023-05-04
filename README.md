@@ -1,4 +1,4 @@
-### .dotfiles
+### dotfiles
 
 1. Clone it
 2. Run ./install.sh to install
