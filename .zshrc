@@ -126,7 +126,6 @@ export PATH="$HOME/.cargo/bin:$HOME/.tmuxifier/bin:$PATH"
 
 # OpenAI API key for https://github.com/Bryley/neoai.nvim
 export OPENAI_API_KEY=$(cat ~/.openai)
-export LLDB_PATH="$HOME/.vscode/extensions/vadimcn.vscode-lldb-1.9.0"
 
 eval "$(tmuxifier init -)"
 eval "$(thefuck --alias)"
