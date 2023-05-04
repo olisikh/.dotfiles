@@ -123,12 +123,17 @@ command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 export PATH="$HOME/.cargo/bin:$HOME/.tmuxifier/bin:$PATH"
+# ~/.tmux/plugins
+export PATH=$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
+# ~/.config/tmux/plugins
+export PATH=$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 
 # OpenAI API key for https://github.com/Bryley/neoai.nvim
 export OPENAI_API_KEY=$(cat ~/.openai)
 
 eval "$(tmuxifier init -)"
 eval "$(thefuck --alias)"
+eval "$(zoxide init zsh)"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
