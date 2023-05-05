@@ -1,3 +1,9 @@
 [scala]
 symbol = ' '
 
+[java]
+symbol = ' '
+
+[aws]
+disabled = true
+symbol = '󰸏 '

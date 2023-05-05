@@ -82,7 +82,7 @@ source $ZSH/oh-my-zsh.sh
 # User configuration
 
 # Catppuccin syntax highlighting
-source $HOME/.zsh/catppuccin-mocha.zsh
+source $HOME/.zsh/catppuccin-macchiato.zsh
 
 # Setup catppuccin flavour (used in nvim, tmux, etc.)
 export CATPPUCCIN_FLAVOUR="macchiato"
