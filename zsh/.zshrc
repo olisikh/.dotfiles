@@ -80,12 +80,12 @@ zsh-sdkman
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
-
-# Catppuccin syntax highlighting
-source $HOME/.zsh/catppuccin-macchiato.zsh
-
 # Setup catppuccin flavour (used in nvim, tmux, etc.)
 export CATPPUCCIN_FLAVOUR="macchiato"
+
+# Catppuccin syntax highlighting
+source $HOME/.zsh/catppuccin-$CATPPUCCIN_FLAVOUR.zsh
+
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -130,15 +130,25 @@ eval "$(starship init zsh)"
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zshconf="vim ~/.zshrc"
-alias ohmyzsh="vim ~/.oh-my-zsh"
+alias zconf="vim ~/.zshrc"
 alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
-alias vim=nvim
+alias v=nvim
 alias tmxf=tmuxifier
 
+# git aliases
+alias g=git
+alias gs="git status"
+alias gd="git diff"
+alias gdc="git diff --cached"
+alias gc="git checkout"
+alias gb="git branch"
+
 alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
+
+# overrides for work
+[[ -s ".zshrc-extras" ]] && source ".zshrc-extras"
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/olisikh/.sdkman"
