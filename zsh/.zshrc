@@ -130,7 +130,7 @@ eval "$(starship init zsh)"
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zconf="vim ~/.zshrc"
+alias zconf="nvim ~/.zshrc"
 alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
@@ -142,8 +142,9 @@ alias g=git
 alias gs="git status"
 alias gd="git diff"
 alias gdc="git diff --cached"
-alias gc="git checkout"
+alias gc="git commit"
 alias gb="git branch"
+alias gp="git push"
 
 alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 
