@@ -1,11 +1,12 @@
 #!/usr/bin/env zsh
 
-source init.sh
+# unstow folders
+echo "unstowing .dotfiles"
 
-pushd $DOT_FILES
-for folder in $(echo $STOW_FOLDERS | sed "s/,/ /g")
+for folder in *
 do
-    echo "Removing $folder"
+    [ ! -d $folder ] && continue
+
+    echo "unstowing $folder"
     stow -D $folder
 done
-popd
