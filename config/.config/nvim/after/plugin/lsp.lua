@@ -56,15 +56,16 @@ local mason_lspconfig = require('mason-lspconfig')
 --  Add any additional override configuration in the following tables. They will be passed to
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
+  dockerls = {},
+  bashls = {},
   rust_analyzer = {
     cargo = {
       allFeatures = true,
-    }
+    },
+    checkOnSave = {
+      command = "clippy",
+    },
   },
-  tsserver = {},
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
