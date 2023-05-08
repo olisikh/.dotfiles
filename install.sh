@@ -1,11 +1,10 @@
 #!/usr/bin/env zsh
 
-# 1. install nix
-echo "installing nix"
-if [ ! command -v nix-env &> /dev/null ]; then
-    curl -L https://nixos.org/nix/install | sh
-else
-    echo "nix already installed"
+# 1. verify nix-env avialable
+if ! command -v nix-env &> /dev/null
+then
+    echo "nix-env is not installed, exiting..."
+    exit
 fi
 
 # 2. install nix packages
@@ -31,11 +30,10 @@ nix-env -iA \
     nixpkgs.kubernetes-helm \
     nixpkgs.awscli2 \
     nixpkgs.yarn \
-    nixpkgs.nerdfonts \
-    nixpkgs.rectangle
+    nixpkgs.go
 
 # 3. stow .dotfiles
-echo "stowing .dotfiles"
+echo "running stow in each .dotfiles folder"
 
 for folder in *
 do

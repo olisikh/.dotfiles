@@ -74,7 +74,6 @@ plugins=(
 git
 zsh-syntax-highlighting
 zsh-autosuggestions
-zsh-sdkman
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -86,7 +85,6 @@ export CATPPUCCIN_FLAVOUR="macchiato"
 # Catppuccin syntax highlighting
 source $HOME/.zsh/catppuccin-$CATPPUCCIN_FLAVOUR.zsh
 
-
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -94,32 +92,25 @@ source $HOME/.zsh/catppuccin-$CATPPUCCIN_FLAVOUR.zsh
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
+  export EDITOR='vi'
 else
   export EDITOR='nvim'
 fi
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# Enable nvm
-source ~/.nvm/nvm.sh
-
-# Enable pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
-export PATH="$HOME/.cargo/bin:$HOME/.tmuxifier/bin:$PATH"
 # ~/.tmux/plugins
 export PATH=$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 # ~/.config/tmux/plugins
 export PATH=$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 
-# OpenAI API key for https://github.com/Bryley/neoai.nvim
-export OPENAI_API_KEY=$(cat ~/.openai)
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
 
-eval "$(tmuxifier init -)"
+# Enable pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+# eval "$(pyenv virtual-env -)"
+
 eval "$(thefuck --alias)"
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
@@ -135,7 +126,7 @@ alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
 alias v=nvim
-alias tmxf=tmuxifier
+alias vim=nvim
 
 # git aliases
 alias g=git
@@ -148,10 +139,18 @@ alias gp="git push"
 
 alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 
-# overrides for work
-[[ -s ".zshrc-extras" ]] && source ".zshrc-extras"
+# OpenAI API key for https://github.com/Bryley/neoai.nvim
+export OPENAI_API_KEY=$(cat ~/.openai)
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/Users/olisikh/.sdkman"
-[[ -s "/Users/olisikh/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/olisikh/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+# overrides for work
+[[ -s ".zshrc-extras" ]] && source ".zshrc-extras"
