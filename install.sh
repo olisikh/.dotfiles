@@ -30,7 +30,8 @@ nix-env -iA \
     nixpkgs.kubernetes-helm \
     nixpkgs.awscli2 \
     nixpkgs.yarn \
-    nixpkgs.go
+    nixpkgs.go \
+    nixpkgs.coursier
 
 # 3. stow .dotfiles
 echo "running stow in each .dotfiles folder"

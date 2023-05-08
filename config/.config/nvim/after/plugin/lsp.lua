@@ -136,7 +136,7 @@ vim.api.nvim_create_autocmd("FileType", {
           "akka.stream.javadsl",
           "akka.http.javadsl",
         },
-        fallbackScalaVersion = "2.13.8",
+        fallbackScalaVersion = "2.13.10",
         serverVersion = "latest.snapshot",
       },
       init_options = {
