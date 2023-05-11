@@ -24,34 +24,56 @@ return require('lazy').setup({
   'mbbill/undotree',
 
   -- Github copilot, use :Copilot setup to configure
+  -- {
+  --   'zbirenbaum/copilot.lua',
+  --   cmd = "Copilot",
+  --   event = "InsertEnter",
+  --   config = function()
+  --     require("copilot").setup({
+  --       suggestion = {
+  --         enabled = true,
+  --         auto_trigger = true,
+  --         debounce = 0,
+  --         keymap = {
+  --           accept = "<C-g>",
+  --         }
+  --       },
+  --       filetypes = {
+  --         scala = true,
+  --         lua = true
+  --       }
+  --     })
+  --   end,
+  -- },
+
+  -- Codeium, interactive AI autocomplete
   {
-    'zbirenbaum/copilot.lua',
-    cmd = "Copilot",
-    event = "InsertEnter",
-    config = function()
-      require("copilot").setup({
-        suggestion = {
-          enabled = true,
-          auto_trigger = true,
-          debounce = 0,
-          keymap = {
-            accept = "<C-g>",
-          }
-        },
-        filetypes = {
-          scala = true,
-          lua = true
-        }
-      })
-    end,
+    "jcdickinson/codeium.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "hrsh7th/nvim-cmp",
+    },
+    opts = {}
   },
 
+  -- {
+  --   'Exafunction/codeium.vim',
+  --   config = function()
+  --     -- Change '<C-g>' here to any keycode you like.
+  --     vim.keymap.set('i', '<C-g>', function() return vim.fn['codeium#Accept']() end, { expr = true })
+  --     vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
+  --     vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
+  --     vim.keymap.set('i', '<c-x>', function() return vim.fn['codeium#Clear']() end, { expr = true })
+  --   end
+  -- },
+
+  -- Autocompletion
   {
-    -- Autocompletion
     'hrsh7th/nvim-cmp',
-    -- event = "InsertEnter",
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' }
   },
+  -- Nice icons in cmp
+  'onsails/lspkind-nvim',
 
   -- Scala metals
   {
