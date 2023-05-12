@@ -33,6 +33,10 @@ nix-env -iA \
     nixpkgs.go \
     nixpkgs.coursier
 
+echo "installing antidote, zsh plugin manager"
+git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
+
+
 # 3. stow .dotfiles
 echo "running stow in each .dotfiles folder"
 

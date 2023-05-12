@@ -1,0 +1,9 @@
+ohmyzsh/ohmyzsh path:plugins/git
+
+rupa/z
+zsh-users/zsh-completions
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+
+matthieusb/zsh-sdkman
+
