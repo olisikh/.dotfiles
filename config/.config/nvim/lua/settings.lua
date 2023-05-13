@@ -3,6 +3,10 @@ vim.g.maplocalleader = ' '
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+vim.diagnostic.config({
+  virtual_text = true,
+})
+
 local opt = require('helpers').opt
 
 -- Keep cursor always in the middle when possible
