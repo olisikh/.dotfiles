@@ -114,12 +114,10 @@ return require('lazy').setup({
       },
       {
         'nvim-telescope/telescope-frecency.nvim',
-        config = function()
-          require('telescope').load_extension('frecency')
-        end,
         dependencies = { 'kkharji/sqlite.lua' },
       },
       'nvim-telescope/telescope-dap.nvim',
+      'nvim-telescope/telescope-ui-select.nvim',
     },
   },
 
@@ -212,15 +210,6 @@ return require('lazy').setup({
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
     opts = {
       { use_default_keymaps = false },
-    },
-  },
-
-  -- Scroll bar on the right to show your posiiton in the file
-  {
-    'gen740/SmoothCursor.nvim',
-    opts = {
-      autostart = true,
-      linehl = 'cursorline',
     },
   },
 

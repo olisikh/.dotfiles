@@ -1,8 +1,12 @@
 local nmap = require('helpers').nmap
 
+local telescope = require('telescope')
+local telescope_themes = require('telescope.themes')
+local telescope_builtin = require('telescope.builtin')
+
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
-require('telescope').setup({
+telescope.setup({
   defaults = {
     mappings = {
       i = {
@@ -11,26 +15,28 @@ require('telescope').setup({
       },
     },
   },
+  extensions = {
+    ['ui-select'] = {
+      telescope_themes.get_dropdown({}),
+    },
+  },
 })
 
 -- Enable telescope fzf native, if installed
-pcall(require('telescope').load_extension, 'fzf')
+pcall(telescope.load_extension, 'fzf')
+pcall(telescope.load_extension, 'dap')
+pcall(telescope.load_extension, 'frecency')
+pcall(telescope.load_extension, 'ui-select')
 
--- Telescope
--- See `:help telescope.builtin`
-local telescope_builtin = require('telescope.builtin')
-
+-- Telescope key mappings
 nmap('<leader>?', telescope_builtin.oldfiles, { desc = 'find recently opened files' })
 nmap('<leader><space>', telescope_builtin.buffers, { desc = 'find existing buffers' })
 nmap('<leader>/', function()
-  telescope_builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({
-    winblend = 10,
-    previewer = false,
-  }))
+  telescope_builtin.current_buffer_fuzzy_find(telescope_themes.get_dropdown({ winblend = 10, previewer = false }))
 end, { desc = 'fuzzy find in current buffer' })
 
 nmap('<leader>sf', telescope_builtin.git_files, { desc = '[s]earch [f]iles' })
-nmap('<leader>sr', require('telescope').extensions.frecency.frecency, { desc = '[s]earch [r]ecent files' })
+nmap('<leader>sr', telescope.extensions.frecency.frecency, { desc = '[s]earch [r]ecent files' })
 nmap('<leader>sp', telescope_builtin.find_files, { desc = '[s]earch [p]roject files' })
 nmap('<leader>sh', telescope_builtin.help_tags, { desc = '[s]earch [h]elp' })
 nmap('<leader>sw', telescope_builtin.grep_string, { desc = '[s]earch current [w]ord' })

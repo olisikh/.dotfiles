@@ -17,7 +17,7 @@ M.vmap = function(lhs, rhs, opts)
 end
 
 M.opt = function(scope, key, value)
-  local s = { o = vim.o, b = vim.bo, w = vim.wo }
+  local s = { o = vim.o, opt = vim.opt, b = vim.bo, w = vim.wo }
   s[scope][key] = value
   if scope ~= 'o' then
     s['o'][key] = value

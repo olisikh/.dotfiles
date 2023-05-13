@@ -13,13 +13,13 @@ local function attach_lsp(bufnr)
   nmap('gt', vim.lsp.buf.type_definition, '[g]oto [t]ype definition')
   nmap('gD', vim.lsp.buf.declaration, '[g]oto [d]eclaration')
 
-  nmap('<leader>cds', require('telescope.builtin').lsp_document_symbols, '[d]ocument [s]ymbols')
-  nmap('<leader>cws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[w]orkspace [s]ymbols')
-  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[w]orkspace [a]dd folder')
-  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[w]orkspace [r]emove folder')
-  nmap('<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, '[w]orkspace [l]ist folders')
+  nmap('<leader>ws', require('telescope.builtin').lsp_document_symbols, '[d]ocument [s]ymbols')
+  nmap('<leader>wS', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[w]orkspace [s]ymbols')
+  -- nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[w]orkspace [a]dd folder')
+  -- nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[w]orkspace [r]emove folder')
+  -- nmap('<leader>wl', function()
+  --   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  -- end, '[w]orkspace [l]ist folders')
 
   -- See `:help K` for why this keymap
   nmap('Q', vim.lsp.buf.hover, 'hover documentation')
@@ -39,8 +39,8 @@ local function attach_lsp(bufnr)
   })
 end
 
--- Setup neovim lua configuration
--- require('neodev').setup()
+-- Setup neovim lua configuration, allows peek into plugins code
+require('neodev').setup()
 
 local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
 

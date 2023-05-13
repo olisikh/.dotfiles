@@ -9,10 +9,14 @@ vim.diagnostic.config({
 
 local opt = require('helpers').opt
 
+-- See `:help vim.o`
+-- Highlight cursor line
+opt('o', 'cursorline', true)
+-- Set line width marker at 120 characters per line
+opt('opt', 'colorcolumn', '121')
 -- Keep cursor always in the middle when possible
 opt('o', 'so', 999)
 
--- See `:help vim.o`
 -- Set highlight on search
 opt('o', 'hlsearch', false)
 
