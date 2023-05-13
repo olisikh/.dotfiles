@@ -202,16 +202,7 @@ return require('lazy').setup({
   },
 
   -- Smart join lines in blocks
-  {
-    'Wansmer/treesj',
-    keys = {
-      { 'U', '<cmd>TSJToggle<cr>', desc = 'treesj: toggle' },
-    },
-    dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    opts = {
-      { use_default_keymaps = false },
-    },
-  },
+  'Wansmer/treesj',
 
   -- Useful plugin to show you pending keybinds.
   'folke/which-key.nvim',

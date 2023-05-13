@@ -150,51 +150,51 @@ vim.api.nvim_create_autocmd('FileType', {
         map(
           'v',
           '<leader>mt',
-          [[<Esc><cmd>lua require("metals").type_of_range()<CR>]],
+          [[<Esc><cmd>lua require("metals").type_of_range()<cr>]],
           { desc = 'metals: see type of range' }
         )
         map(
           'n',
           '<leader>mw',
-          [[<cmd>lua require("metals").hover_worksheet({ border = "single" })<CR>]],
+          [[<cmd>lua require("metals").hover_worksheet({ border = "single" })<cr>]],
           { desc = 'metals: hover worksheet' }
         )
         map(
           'n',
           '<leader>mv',
-          [[<cmd>lua require("metals.tvp").toggle_tree_view()<CR>]],
+          [[<cmd>lua require("metals.tvp").toggle_tree_view()<cr>]],
           { desc = 'metals: toggle tree view' }
         )
         map(
           'n',
           '<leader>mr',
-          [[<cmd>lua require("metals.tvp").reveal_in_tree()<CR>]],
+          [[<cmd>lua require("metals.tvp").reveal_in_tree()<cr>]],
           { desc = 'metals: reveal in tree' }
         )
         map(
           'n',
           '<leader>mi',
-          [[<cmd>lua require("metals").toggle_setting("showImplicitArguments")<CR>]],
+          [[<cmd>lua require("metals").toggle_setting("showImplicitArguments")<cr>]],
           { desc = 'metals: show implicit args' }
         )
         map(
           'n',
           '<leader>mo',
-          [[<cmd>lua require("metals").organize_imports()<CR>]],
+          [[<cmd>lua require("metals").organize_imports()<cr>]],
           { desc = 'metals: organize imports' }
         )
-        map('n', '<leader>mg', [[<cmd>lua require("metals").goto_location()<CR>]], { desc = 'metals: goto location' })
+        map('n', '<leader>mg', [[<cmd>lua require("metals").goto_location()<cr>]], { desc = 'metals: goto location' })
         map(
           'n',
           '<leader>md',
-          [[<cmd>lua require("metals").implementation_location()<CR>]],
+          [[<cmd>lua require("metals").implementation_location()<cr>]],
           { desc = 'metals: implementation location' }
         )
-        map('n', '<leader>mi', [[<cmd>lua require("metals").import_build()<CR>]], { desc = 'metals: import build' })
+        map('n', '<leader>mi', [[<cmd>lua require("metals").import_build()<cr>]], { desc = 'metals: import build' })
         map(
           'n',
           '<leader>mc',
-          [[<cmd>lua require("telescope").extensions.metals.commands()<CR>]],
+          [[<cmd>lua require("telescope").extensions.metals.commands()<cr>]],
           { desc = 'metals: open commands' }
         )
 
@@ -282,7 +282,7 @@ rt.setup({
 
       local nmap = require('helpers').nmap
       nmap('<leader>ch', rt.hover_actions.hover_actions, { desc = 'rt: hover actions', buffer = bufnr, noremap = true })
-      nmap('<leader>cd', '<cmd>:RustDebuggables<CR>', { desc = 'rt: show debuggables', buffer = bufnr, noremap = true })
+      nmap('<leader>cd', '<cmd>:RustDebuggables<cr>', { desc = 'rt: show debuggables', buffer = bufnr, noremap = true })
 
       local dap = require('dap')
 
