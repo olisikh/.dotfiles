@@ -1,11 +1,11 @@
 local gsigns = require('gitsigns')
 
-gsigns.setup {
+gsigns.setup({
   signs = {
-    add          = { text = '+' },
-    change       = { text = '~' },
+    add = { text = '+' },
+    change = { text = '~' },
     changedelete = { text = '~' },
-    delete       = { text = '_' },
-    topdelete    = { text = '‾' },
+    delete = { text = '_' },
+    topdelete = { text = '‾' },
   },
-}
+})

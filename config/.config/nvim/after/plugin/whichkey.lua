@@ -1,10 +1,10 @@
 local which_key = require('which-key')
 
-which_key.setup {
+which_key.setup({
   spelling = {
-    enabled = false
+    enabled = false,
   },
   window = {
-    border = 'single'
-  }
-}
+    border = 'single',
+  },
+})

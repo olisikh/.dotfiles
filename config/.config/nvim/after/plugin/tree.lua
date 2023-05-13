@@ -1,13 +1,13 @@
 local tree = require('nvim-tree')
 local api = require('nvim-tree.api')
 
-tree.setup {
+tree.setup({
   git = { enable = true, ignore = false },
   filters = { dotfiles = true },
   on_attach = function(bufnr)
     api.config.mappings.default_on_attach(bufnr)
-  end
-}
+  end,
+})
 
 local nmap = require('helpers').nmap
 

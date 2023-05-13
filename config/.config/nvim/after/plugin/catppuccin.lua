@@ -1,10 +1,10 @@
-local catppuccin_flavour = vim.fn.getenv("CATPPUCCIN_FLAVOUR") or "macchiato"
+local catppuccin_flavour = vim.fn.getenv('CATPPUCCIN_FLAVOUR') or 'macchiato'
 
-require("catppuccin").setup({
-  compile_path = vim.fn.stdpath "cache" .. "/catppuccin",
+require('catppuccin').setup({
+  compile_path = vim.fn.stdpath('cache') .. '/catppuccin',
   flavour = catppuccin_flavour, -- latte, frappe, macchiato, mocha
   background = {
-    light = "latte",
+    light = 'latte',
     dark = catppuccin_flavour,
   },
   no_italic = true,
@@ -24,19 +24,19 @@ require("catppuccin").setup({
     native_lsp = {
       enabled = true,
       virtual_text = {
-        errors = { "italic" },
-        hints = { "italic" },
-        warnings = { "italic" },
-        information = { "italic" },
+        errors = { 'italic' },
+        hints = { 'italic' },
+        warnings = { 'italic' },
+        information = { 'italic' },
       },
       underlines = {
-        errors = { "underline" },
-        hints = { "underline" },
-        warnings = { "underline" },
-        information = { "underline" },
+        errors = { 'underline' },
+        hints = { 'underline' },
+        warnings = { 'underline' },
+        information = { 'underline' },
       },
     },
-  }
+  },
 })
 
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme('catppuccin')

@@ -1,4 +1,4 @@
-local map = require("helpers").map
+local map = require('helpers').map
 
 -- Make sure Space is not mapped to anything, used as leader key
 map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
@@ -30,16 +30,15 @@ map('n', 'n', 'nzzzv', { desc = 'jump to next match item' })
 map('n', 'N', 'Nzzzv', { desc = 'jump to prev match item' })
 
 -- Paste the text and keep it in clipboard while pasting
-map('x', '<leader>p', "\"_dP", { desc = 'paste keeping the clipboard' })
+map('x', '<leader>p', '"_dP', { desc = 'paste keeping the clipboard' })
 
 -- copy into system clipboard, (useful for copying outside of vim context)
-map({ 'n', 'v' }, '<leader>y', "\"+y", { desc = 'copy to blackhole register' })
-map('n', '<leader>Y', "\"+Y", { desc = 'copy line to blackhole register' })
-map({ 'n', 'v' }, '<leader>d', "\"_d", { desc = 'cut to blackhole register' })
-
+map({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'copy to blackhole register' })
+map('n', '<leader>Y', '"+Y', { desc = 'copy line to blackhole register' })
+map({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'cut to blackhole register' })
 
 -- Diagnostic keymaps
-map("n", "[d", vim.diagnostic.goto_prev, { desc = 'diagnostic: prev error msg' })
-map("n", "]d", vim.diagnostic.goto_next, { desc = 'diagnostic: next error msg' })
-map('n', '<leader>E', vim.diagnostic.open_float, { desc = "open floating diagnostic message" })
-map('n', '<leader>q', vim.diagnostic.setloclist, { desc = "open diagnostics list" })
+map('n', '[d', vim.diagnostic.goto_prev, { desc = 'diagnostic: prev error msg' })
+map('n', ']d', vim.diagnostic.goto_next, { desc = 'diagnostic: next error msg' })
+map('n', '<leader>E', vim.diagnostic.open_float, { desc = 'open floating diagnostic message' })
+map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'open diagnostics list' })

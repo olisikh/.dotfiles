@@ -1,8 +1,21 @@
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
-require('nvim-treesitter.configs').setup {
+require('nvim-treesitter.configs').setup({
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'toml', 'scala', 'tsx', 'typescript', 'vimdoc', 'vim' },
+  ensure_installed = {
+    'c',
+    'cpp',
+    'go',
+    'lua',
+    'python',
+    'rust',
+    'toml',
+    'scala',
+    'tsx',
+    'typescript',
+    'vimdoc',
+    'vim',
+  },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
@@ -14,7 +27,7 @@ require('nvim-treesitter.configs').setup {
     keymaps = {
       init_selection = '<C-space>',
       node_incremental = '<C-space>',
-      scope_incremental = '<C-s>',    -- TODO: this is occupied by tmux
+      scope_incremental = '<C-s>', -- TODO: this is occupied by tmux
       node_decremental = '<M-space>', -- TODO: Meta key is used by OSX
     },
   },
@@ -62,4 +75,4 @@ require('nvim-treesitter.configs').setup {
       },
     },
   },
-}
+})
