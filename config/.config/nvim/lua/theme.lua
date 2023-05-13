@@ -9,7 +9,7 @@ require('catppuccin').setup({
   },
   no_italic = false,
   no_bold = false,
-  term_colors = false, -- what is this?
+  term_colors = false,
   dim_inactive = {
     enabled = true,
     shade = 'dark',

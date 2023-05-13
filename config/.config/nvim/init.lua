@@ -17,6 +17,7 @@ vim.opt.rtp:prepend(lazypath)
 -- Note: this file is an entrypoint for neovim
 require('settings')
 require('plugins')
+require('theme')
 require('mappings')
 
 -- [[ Highlight on yank ]]
