@@ -15,7 +15,13 @@ opt('o', 'cursorline', true)
 -- Set line width marker at 120 characters per line
 opt('opt', 'colorcolumn', '121')
 -- Keep cursor always in the middle when possible
-opt('o', 'so', 999)
+opt('o', 'scrolloff', 8)
+
+opt(
+  'opt',
+  'guicursor',
+  'n-v-c:block-Cursor/lCursor-blinkon0,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
+)
 
 -- Set highlight on search
 opt('o', 'hlsearch', false)
@@ -36,7 +42,10 @@ opt('o', 'clipboard', 'unnamedplus')
 opt('o', 'breakindent', true)
 
 -- Save undo history
-opt('o', 'undofile', true)
+opt('opt', 'swapfile', false)
+opt('opt', 'backup', false)
+opt('opt', 'undofile', true)
+opt('opt', 'undodir', os.getenv('HOME') .. '/.vim/undodir')
 
 -- Smart indentation (whitespaces keep their relative indentation)
 opt('o', 'autoindent', true)
