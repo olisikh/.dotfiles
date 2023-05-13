@@ -5,6 +5,14 @@ vim.diagnostic.config {
 local dap = require('dap')
 local dapui = require('dapui')
 local dap_widgets = require('dap.ui.widgets')
+local mason_dap = require('mason-nvim-dap')
+
+mason_dap.setup {
+  ensure_installed = {
+    'codelldb',
+    'js-debug-adapter',
+  },
+}
 
 dapui.setup {}
 
