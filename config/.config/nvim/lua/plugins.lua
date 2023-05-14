@@ -84,14 +84,9 @@ return require('lazy').setup({
     dependencies = {
       { 'theHamsta/nvim-dap-virtual-text', opts = {} },
       { 'rcarriga/nvim-dap-ui' },
-      { 'jbyuki/one-small-step-for-vimkind' },
-      { 'mxsdev/nvim-dap-vscode-js' },
-      {
-        -- "microsoft/vscode-js-debug",
-        -- config = function()
-        -- "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out"
-        -- end
-      },
+      { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
+      { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
+      { 'leoluz/nvim-dap-go' }, -- debug go
     },
   },
 

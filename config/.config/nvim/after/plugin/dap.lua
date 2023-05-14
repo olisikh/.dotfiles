@@ -1,5 +1,5 @@
 local dap = require('dap')
-local dapui = require('dapui')
+local dap_ui = require('dapui')
 local dap_widgets = require('dap.ui.widgets')
 local mason_dap = require('mason-nvim-dap')
 
@@ -7,31 +7,39 @@ mason_dap.setup({
   ensure_installed = {
     'codelldb',
     'js',
+    'delve',
   },
 })
 
-dapui.setup({})
+dap_ui.setup({})
 
 dap.listeners.after.event_initialized['dapui_config'] = function()
-  dapui.open()
+  dap_ui.open()
 end
 dap.listeners.before.event_terminated['dapui_config'] = function()
-  dapui.close()
+  dap_ui.close()
 end
 dap.listeners.before.event_exited['dapui_config'] = function()
-  dapui.close()
+  dap_ui.close()
 end
 
-local map = require('helpers').map
+local nmap = require('helpers').nmap
 
-map('n', '<F4>', dap.toggle_breakpoint, { desc = 'dap: toggle breakpoint' })
-map('n', '<F5>', dap.continue, { desc = 'dap: continue' })
-map('n', '<F6>', dap.step_over, { desc = 'dap: step over' })
-map('n', '<F7>', dap.step_into, { desc = 'dap: step into' })
-map('n', '<F8>', dap.step_out, { desc = 'dap: step out' })
+nmap('<F4>', dap.toggle_breakpoint, { desc = 'dap: toggle breakpoint' })
+nmap('<F5>', dap.continue, { desc = 'dap: continue' })
+nmap('<F6>', dap.step_over, { desc = 'dap: step over' })
+nmap('<F7>', dap.step_into, { desc = 'dap: step into' })
+nmap('<F8>', dap.step_out, { desc = 'dap: step out' })
 
-map('n', '<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
-map('n', '<leader>dK', dap_widgets.hover, { desc = 'dap: hover' })
+nmap('<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
+nmap('<leader>dK', dap_widgets.hover, { desc = 'dap: hover' })
+nmap('<leader>do', dap_ui.toggle, { desc = 'dap-ui: toggle ui' })
+-- nmap('<leader>dr', function()
+--   dap.restart({ terminateDebugee = false })
+-- end, { desc = 'dap: restart dap' })
+-- nmap('<leader>dR', function()
+--   dap.restart({ terminateDebugee = true })
+-- end, { desc = 'dap: terminate & restart dap' })
 
 local sign = vim.fn.sign_define
 
