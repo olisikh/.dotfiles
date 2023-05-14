@@ -30,6 +30,7 @@ return require('lazy').setup({
     'hrsh7th/nvim-cmp',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-nvim-lsp-signature-help',
       'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',
     },
@@ -60,14 +61,15 @@ return require('lazy').setup({
       -- Useful status updates for LSP
       { 'j-hui/fidget.nvim', opts = {} },
 
+      -- Inlay hints
+      { 'lvimuser/lsp-inlayhints.nvim' },
+
       -- Additional lua configuration, makes nvim stuff amazing!
       {
         'folke/neodev.nvim',
         opts = {
           library = {
-            plugins = {
-              'nvim-dap-ui',
-            },
+            plugins = { 'nvim-dap-ui' },
             types = true,
           },
         },
@@ -86,7 +88,7 @@ return require('lazy').setup({
   {
     'mfussenegger/nvim-dap',
     dependencies = {
-      { 'theHamsta/nvim-dap-virtual-text', opts = {} },
+      { 'theHamsta/nvim-dap-virtual-text' },
       { 'rcarriga/nvim-dap-ui' },
       { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
       { 'leoluz/nvim-dap-go' }, -- debug go

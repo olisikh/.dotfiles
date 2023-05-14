@@ -1,11 +1,13 @@
 local nmap = require('helpers').nmap
 
 local telescope_builtin = require('telescope.builtin')
+local ih = require('lsp-inlayhints')
 
-local function attach_lsp(bufnr)
+local function attach_lsp(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
+  nmap('<leader>ci', ih.toggle, { desc = 'inlay-hints: toggle' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
@@ -37,6 +39,9 @@ local function attach_lsp(bufnr)
     pattern = '<buffer>',
     callback = fmt_code,
   })
+
+  -- Enable inlay hints (setup per language server)
+  ih.on_attach(client, bufnr)
 end
 
 -- Setup neovim lua configuration, allows peek into plugins code
@@ -75,13 +80,55 @@ local servers = {
   gopls = {
     settings = {
       experimentalWorkspaceModule = false,
+      gopls = {
+        -- setup inlay hints
+        hints = {
+          assignVariableTypes = true,
+          compositeLiteralFields = true,
+          compositeLiteralTypes = true,
+          constantValues = true,
+          functionTypeParameters = true,
+          parameterNames = true,
+          rangeVariableTypes = true,
+        },
+      },
     },
   },
-  tsserver = {},
+  tsserver = {
+    settings = {
+      javascript = {
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = false,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+        },
+      },
+      typescript = {
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = false,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+        },
+      },
+    },
+  },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
+      hint = {
+        enable = true, -- enable inlay hints
+      },
     },
   },
 }
@@ -94,14 +141,14 @@ mason_lspconfig.setup_handlers({
   function(server_name)
     -- LSP settings.
     --  This function gets run when an LSP connects to a particular buffer.
-    local on_attach = function(_, bufnr)
+    local on_attach = function(client, bufnr)
       -- NOTE: Remember that lua is a real programming language, and as such it is possible
       -- to define small helper and utility functions so you don't have to repeat yourself
       -- many times.
       --
       -- In this case, we create a function that lets us more easily define local mappings specific
       -- for LSP related items. It sets the mode, buffer and description for us each time.
-      attach_lsp(bufnr)
+      attach_lsp(client, bufnr)
     end
 
     require('lspconfig')[server_name].setup({
@@ -206,7 +253,7 @@ vim.api.nvim_create_autocmd('FileType', {
           { desc = 'metals: open commands' }
         )
 
-        attach_lsp(bufnr)
+        attach_lsp(client, bufnr)
 
         vim.api.nvim_create_autocmd('CursorHold', {
           callback = vim.lsp.buf.document_highlight,
@@ -285,8 +332,8 @@ local liblldb_path = codelldb_root .. 'lldb/lib/liblldb.dylib'
 local rt = require('rust-tools')
 rt.setup({
   server = {
-    on_attach = function(_, bufnr)
-      attach_lsp(bufnr)
+    on_attach = function(client, bufnr)
+      attach_lsp(client, bufnr)
 
       nmap('<leader>ch', rt.hover_actions.hover_actions, {
         desc = 'rust-tools: hover actions',
@@ -312,6 +359,9 @@ rt.setup({
   tools = {
     hover_actions = {
       auto_focus = true,
+    },
+    inlay_hints = {
+      auto = false, -- lsp-inlayhints.nvim plugin takes over
     },
   },
 })

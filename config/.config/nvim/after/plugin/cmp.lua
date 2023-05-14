@@ -62,6 +62,7 @@ cmp.setup({
     },
     { name = 'luasnip' },
     { name = 'crates' },
+    { name = 'nvim_lsp_signature_help' },
   },
   formatting = {
     format = lspkind.cmp_format({
