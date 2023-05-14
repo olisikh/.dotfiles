@@ -60,7 +60,10 @@ local mason_registry = require('mason-registry')
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
   dockerls = {},
+  terraformls = {},
   bashls = {},
+  yamlls = {},
+  rnix = {},
   rust_analyzer = {
     cargo = {
       allFeatures = true,
