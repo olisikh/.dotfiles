@@ -1,13 +1,13 @@
 local nmap = require('helpers').nmap
 
 local telescope_builtin = require('telescope.builtin')
-local ih = require('lsp-inlayhints')
+local inlay_hints = require('lsp-inlayhints')
 
 local function attach_lsp(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
-  nmap('<leader>ci', ih.toggle, { desc = 'inlay-hints: toggle' })
+  nmap('<leader>ci', inlay_hints.toggle, { desc = 'inlay-hints: toggle' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
@@ -41,7 +41,7 @@ local function attach_lsp(client, bufnr)
   })
 
   -- Enable inlay hints (setup per language server)
-  ih.on_attach(client, bufnr)
+  inlay_hints.on_attach(client, bufnr)
 end
 
 -- Setup neovim lua configuration, allows peek into plugins code
