@@ -85,8 +85,8 @@ return require('lazy').setup({
       { 'theHamsta/nvim-dap-virtual-text', opts = {} },
       { 'rcarriga/nvim-dap-ui' },
       { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
-      { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
       { 'leoluz/nvim-dap-go' }, -- debug go
+      { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
     },
   },
 

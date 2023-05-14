@@ -32,14 +32,15 @@ nmap('<F7>', dap.step_into, { desc = 'dap: step into' })
 nmap('<F8>', dap.step_out, { desc = 'dap: step out' })
 
 nmap('<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
-nmap('<leader>dK', dap_widgets.hover, { desc = 'dap: hover' })
+nmap('<leader>dh', dap_widgets.hover, { desc = 'dap: hover' })
 nmap('<leader>do', dap_ui.toggle, { desc = 'dap-ui: toggle ui' })
--- nmap('<leader>dr', function()
---   dap.restart({ terminateDebugee = false })
--- end, { desc = 'dap: restart dap' })
--- nmap('<leader>dR', function()
---   dap.restart({ terminateDebugee = true })
--- end, { desc = 'dap: terminate & restart dap' })
+nmap('<leader>dq', dap.terminate, { desc = 'dap: terminate' })
+nmap('<leader>dr', function()
+  dap.restart({ terminateDebugee = false })
+end, { desc = 'dap: restart dap' })
+nmap('<leader>dR', function()
+  dap.restart({ terminateDebugee = true })
+end, { desc = 'dap: terminate & restart dap' })
 
 local sign = vim.fn.sign_define
 

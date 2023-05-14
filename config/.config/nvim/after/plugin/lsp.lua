@@ -1,29 +1,29 @@
+local nmap = require('helpers').nmap
+
+local telescope_builtin = require('telescope.builtin')
+
 local function attach_lsp(bufnr)
-  local function nmap(lhs, rhs, desc)
-    require('helpers').nmap(lhs, rhs, { buffer = bufnr, desc = 'lsp: ' .. desc })
-  end
+  nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
+  nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
+  nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
 
-  nmap('<leader>cr', vim.lsp.buf.rename, '[r]ename')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[c]ode [a]ction')
-  nmap('<leader>cf', vim.lsp.buf.format, '[c]ode [f]ormat')
+  nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
+  nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
+  nmap('gI', vim.lsp.buf.implementation, { desc = 'lsp: [g]oto [i]mplementation' })
+  nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]oto [t]ype definition' })
+  nmap('gD', vim.lsp.buf.declaration, { desc = 'lsp: [g]oto [d]eclaration' })
 
-  nmap('gd', require('telescope.builtin').lsp_definitions, '[g]oto [d]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[g]oto [r]eferences')
-  nmap('gI', vim.lsp.buf.implementation, '[g]oto [i]mplementation')
-  nmap('gt', vim.lsp.buf.type_definition, '[g]oto [t]ype definition')
-  nmap('gD', vim.lsp.buf.declaration, '[g]oto [d]eclaration')
-
-  nmap('<leader>ws', require('telescope.builtin').lsp_document_symbols, '[d]ocument [s]ymbols')
-  nmap('<leader>wS', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[w]orkspace [s]ymbols')
-  -- nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[w]orkspace [a]dd folder')
-  -- nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[w]orkspace [r]emove folder')
+  nmap('<leader>ws', telescope_builtin.lsp_document_symbols, { desc = 'lsp: [d]ocument [s]ymbols' })
+  nmap('<leader>wS', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'lsp: [w]orkspace [s]ymbols' })
+  -- nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, { desc = '[w]orkspace [a]dd folder'})
+  -- nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, { desc= '[w]orkspace [r]emove folder'})
   -- nmap('<leader>wl', function()
   --   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   -- end, '[w]orkspace [l]ist folders')
 
   -- See `:help K` for why this keymap
-  nmap('Q', vim.lsp.buf.hover, 'hover documentation')
-  nmap('K', vim.lsp.buf.signature_help, 'signature documentation')
+  nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover documentation' })
+  nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature documentation' })
 
   local function fmt_code()
     vim.lsp.buf.format({ bufnr = bufnr })
@@ -72,7 +72,11 @@ local servers = {
       command = 'clippy',
     },
   },
-  gopls = {},
+  gopls = {
+    settings = {
+      experimentalWorkspaceModule = false,
+    },
+  },
   tsserver = {},
   lua_ls = {
     Lua = {
@@ -284,7 +288,6 @@ rt.setup({
     on_attach = function(_, bufnr)
       attach_lsp(bufnr)
 
-      local nmap = require('helpers').nmap
       nmap('<leader>ch', rt.hover_actions.hover_actions, { desc = 'rt: hover actions', buffer = bufnr, noremap = true })
       nmap('<leader>cd', '<cmd>:RustDebuggables<cr>', { desc = 'rt: show debuggables', buffer = bufnr, noremap = true })
 
@@ -299,9 +302,8 @@ rt.setup({
             local file = vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
             if vim.fn.len(file) == 0 then
               return
-            else
-              return file
             end
+            return file
           end,
           cwd = '${workspaceFolder}',
           stopOnEntry = true,
@@ -336,6 +338,16 @@ vim.api.nvim_create_autocmd('FileType', {
     })
 
     local dap = require('dap')
+
+    dap.adapters['pwa-node'] = {
+      type = 'server',
+      host = 'localhost',
+      port = '${port}',
+      executable = {
+        command = 'js-debug-adapter',
+        args = { '${port}' }, -- important because of https://github.com/mxsdev/nvim-dap-vscode-js/issues/42
+      },
+    }
 
     -- js and ts debug configs
     for _, language in ipairs({ 'typescript', 'javascript' }) do
@@ -455,5 +467,7 @@ vim.api.nvim_create_autocmd('FileType', {
         port = '${port}',
       },
     })
+
+    nmap('<leader>dt', dap_go.debug_test, { desc = 'dap-go: debug test' })
   end,
 })
