@@ -8,5 +8,8 @@ require('mason-null-ls').setup({
     'rustfmt',
     'gofumpt',
     'goimports',
+    'estlint_d',
+    'jsonlint',
+    'yamllint',
   },
 })
