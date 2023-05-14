@@ -1,6 +1,8 @@
 -- latte, frappe, macchiato, mocha
 local flavour = vim.fn.getenv('CATPPUCCIN_FLAVOUR') or 'macchiato'
 
+
+
 require('catppuccin').setup({
   compile_path = vim.fn.stdpath('cache') .. '/catppuccin',
   flavour = flavour,
@@ -18,7 +20,7 @@ require('catppuccin').setup({
   },
   styles = {
     comments = { 'italic' },
-    conditionals = { 'italic' },
+    conditionals = {},
     loops = {},
     functions = {},
     keywords = {},
