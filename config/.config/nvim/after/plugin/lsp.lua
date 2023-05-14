@@ -288,28 +288,21 @@ rt.setup({
     on_attach = function(_, bufnr)
       attach_lsp(bufnr)
 
-      nmap('<leader>ch', rt.hover_actions.hover_actions, { desc = 'rt: hover actions', buffer = bufnr, noremap = true })
-      nmap('<leader>cd', '<cmd>:RustDebuggables<cr>', { desc = 'rt: show debuggables', buffer = bufnr, noremap = true })
-
-      local dap = require('dap')
-
-      dap.configurations.rust = {
-        {
-          name = 'Rust debug',
-          type = 'rt_lldb',
-          request = 'launch',
-          program = function()
-            local file = vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
-            if vim.fn.len(file) == 0 then
-              return
-            end
-            return file
-          end,
-          cwd = '${workspaceFolder}',
-          stopOnEntry = true,
-          showDisassembly = 'never',
-        },
-      }
+      nmap('<leader>ch', rt.hover_actions.hover_actions, {
+        desc = 'rust-tools: hover actions',
+        buffer = bufnr,
+        noremap = true,
+      })
+      nmap('<leader>cr', rt.runnables.runnables, {
+        desc = 'rust-tools: run runnable',
+        buffer = bufnr,
+        noremap = true,
+      })
+      nmap('<leader>dd', rt.debuggables.debuggables, {
+        desc = 'rust-tools: run debug',
+        buffer = bufnr,
+        noremap = true,
+      })
     end,
   },
   capabilities = capabilities,

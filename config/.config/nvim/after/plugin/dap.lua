@@ -1,3 +1,5 @@
+local nmap = require('helpers').nmap
+
 local dap = require('dap')
 local dap_ui = require('dapui')
 local dap_widgets = require('dap.ui.widgets')
@@ -23,8 +25,11 @@ dap.listeners.before.event_exited['dapui_config'] = function()
   dap_ui.close()
 end
 
-local nmap = require('helpers').nmap
-
+nmap('<F1>', dap_ui.toggle, { desc = 'dap-ui: toggle' })
+nmap('<F2>', dap.set_breakpoint, { desc = 'dap: set breakpoint' })
+nmap('<F3>', function()
+  dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+end, { desc = 'dap: set cond breakpoint' })
 nmap('<F4>', dap.toggle_breakpoint, { desc = 'dap: toggle breakpoint' })
 nmap('<F5>', dap.continue, { desc = 'dap: continue' })
 nmap('<F6>', dap.step_over, { desc = 'dap: step over' })
