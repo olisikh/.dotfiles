@@ -340,7 +340,7 @@ rt.setup({
         buffer = bufnr,
         noremap = true,
       })
-      nmap('<leader>cr', rt.runnables.runnables, {
+      nmap('<leader>dR', rt.runnables.runnables, {
         desc = 'rust-tools: run runnable',
         buffer = bufnr,
         noremap = true,
