@@ -353,20 +353,29 @@ rt.setup({
 
       dap.configurations.rust = {
         {
-          name = 'Launch',
+          name = "Launch",
           type = 'rt_lldb',
           request = 'launch',
-          program = function()
-            local input = vim.fn.input('Path to runnable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
-            if (input == nil or input == '') then
-              return
-            end
-            return input
-          end,
+          program = "${workspaceFolder}/target/debug/${workspaceFolderBasename}",
           cwd = '${workspaceFolder}',
           stopOnEntry = false,
           args = {},
-        }
+        },
+        -- {
+        --   name = 'Launch program',
+        --   type = 'rt_lldb',
+        --   request = 'launch',
+        --   program = function()
+        --     local input = vim.fn.input('Path to runnable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+        --     if (input == nil or input == '') then
+        --       return
+        --     end
+        --     return input
+        --   end,
+        --   cwd = '${workspaceFolder}',
+        --   stopOnEntry = false,
+        --   args = {},
+        -- },
       }
     end,
   },
@@ -526,6 +535,6 @@ vim.api.nvim_create_autocmd('FileType', {
       },
     })
 
-    nmap('<leader>dt', dap_go.debug_test, { desc = 'dap-go: debug test' })
+    -- nmap('<leader>dt', dap_go.debug_test, { desc = 'dap-go: debug test' })
   end,
 })

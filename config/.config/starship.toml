@@ -4,6 +4,12 @@ symbol = ' '
 [java]
 symbol = ' '
 
+# [golang]
+# symbol = ' '
+#
+# [rust]
+# symbol = ' '
+
 [aws]
 disabled = true
-symbol = '󰸏 '
+# symbol = '󰸏 '

@@ -4,24 +4,40 @@ local neotest = require('neotest')
 local neotest_namespace = vim.api.nvim_create_namespace("neotest")
 vim.diagnostic.config({
   virtual_text = {
-    format = function(diagnostic)
-      return diagnostic.message:gsum("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
+    format = function(d)
+      vim.print(d.message)
+      return d.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
     end
   }
 }, neotest_namespace)
 
 neotest.setup({
   adapters = {
-    require("neotest-go"),
+    require("neotest-go") {
+      dap_adapter = "delve"
+    },
     require("neotest-scala"),
     require("neotest-rust") {
       dap_adapter = "rt_lldb",
+      args = { "--no-capture" },
     }
-  }
+  },
+  diagnostic = {
+    enabled = true,
+    -- severity = 1
+  },
+  status = {
+    enabled = true,
+    signs = false,
+    virtual_text = true
+  },
 })
 
-nmap("<leader>rt", neotest.run.run, { desc = "neotest: run nearest test" })
-nmap("<leader>rT", function() neotest.run.run(vim.fn.expand("%")) end, { desc = "neotest: run current file" })
-nmap("<leader>dt", function() neotest.run.run({ strategy = "dap" }) end, { desc = "neotest: debug nearest test" })
-nmap("<leader>rs", neotest.run.stop, { desc = "neotest: stop nearest test" })
-nmap("<leader>ra", neotest.run.attach, { desc = "neotest: attach to nearest test" })
+nmap("<leader>tr", neotest.run.run, { desc = "neotest: run nearest test" })
+nmap("<leader>td", function() neotest.run.run({ strategy = "dap" }) end, { desc = "neotest: debug nearest test" })
+nmap("<leader>tR", function() neotest.run.run(vim.fn.expand("%")) end, { desc = "neotest: run current file" })
+nmap("<leader>tD", function() neotest.run.run({ vim.fn.expand("%"), strategy = 'dap' }) end,
+  { desc = "neotest: debug current file" })
+nmap("<leader>ta", neotest.run.attach, { desc = "neotest: attach to nearest test" })
+nmap("<leader>tS", neotest.summary.toggle, { desc = "neotest: toggle test summary" })
+nmap("<leader>ts", neotest.run.stop, { desc = "neotest: stop nearest test" })

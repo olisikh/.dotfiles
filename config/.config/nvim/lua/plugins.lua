@@ -235,7 +235,7 @@ return require('lazy').setup({
     opts = {},
   },
 
-  'vim-test/vim-test',
+  -- 'vim-test/vim-test',
   {
     -- Neotest framework for running tests
     'nvim-neotest/neotest',
