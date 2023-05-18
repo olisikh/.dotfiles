@@ -40,3 +40,4 @@ nmap("<leader>tD", function() neotest.run.run({ vim.fn.expand("%"), strategy = '
 nmap("<leader>ta", neotest.run.attach, { desc = "neotest: attach to nearest test" })
 nmap("<leader>tS", neotest.summary.toggle, { desc = "neotest: toggle test summary" })
 nmap("<leader>ts", neotest.run.stop, { desc = "neotest: stop nearest test" })
+nmap("<leader>to", neotest.output.open, { desc = "neotest: open test output" })
