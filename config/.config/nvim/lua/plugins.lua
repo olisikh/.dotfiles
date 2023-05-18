@@ -1,6 +1,6 @@
 return require('lazy').setup({
   -- Catppuccin theme
-  { 'catppuccin/nvim', name = 'catppuccin' },
+  { 'catppuccin/nvim',                name = 'catppuccin' },
 
   -- tmux integration plugin
   { 'christoomey/vim-tmux-navigator', lazy = false },
@@ -43,7 +43,7 @@ return require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', opts = {} },
+      { 'williamboman/mason.nvim',          opts = {} },
       { 'williamboman/mason-lspconfig.nvim' },
       {
         'jay-babu/mason-null-ls.nvim',
@@ -59,7 +59,7 @@ return require('lazy').setup({
       },
 
       -- Useful status updates for LSP
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',           opts = {} },
 
       -- Inlay hints
       { 'lvimuser/lsp-inlayhints.nvim' },
@@ -69,7 +69,7 @@ return require('lazy').setup({
         'folke/neodev.nvim',
         opts = {
           library = {
-            plugins = { 'nvim-dap-ui' },
+            plugins = { 'nvim-dap-ui', 'neotest' },
             types = true,
           },
         },
@@ -82,7 +82,7 @@ return require('lazy').setup({
 
   -- Rust tools & others
   { 'simrat39/rust-tools.nvim', ft = 'rust' },
-  { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
+  { 'saecki/crates.nvim',       opts = {},  ft = { 'rust', 'toml' } },
 
   -- Debugging
   {
@@ -91,8 +91,8 @@ return require('lazy').setup({
       { 'theHamsta/nvim-dap-virtual-text' },
       { 'rcarriga/nvim-dap-ui' },
       { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
-      { 'leoluz/nvim-dap-go' }, -- debug go
-      { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
+      { 'leoluz/nvim-dap-go' },                -- debug go
+      { 'mxsdev/nvim-dap-vscode-js' },         -- debug js
     },
   },
 
@@ -236,6 +236,16 @@ return require('lazy').setup({
   },
 
   'vim-test/vim-test',
+  {
+    -- Neotest framework for running tests
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-neotest/neotest-plenary',
+      'nvim-neotest/neotest-go',
+      "stevanmilic/neotest-scala",
+      'rouge8/neotest-rust',
+    }
+  },
 
   -- OpenAI ChatGPT
   {

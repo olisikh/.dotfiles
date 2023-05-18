@@ -3,6 +3,8 @@ local nmap = require('helpers').nmap
 local telescope_builtin = require('telescope.builtin')
 local inlay_hints = require('lsp-inlayhints')
 
+local dap = require('dap')
+
 local function attach_lsp(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
@@ -279,8 +281,6 @@ vim.api.nvim_create_autocmd('FileType', {
         })
 
         -- nvim-dap
-        local dap = require('dap')
-
         dap.configurations.scala = {
           {
             type = 'scala',
@@ -350,6 +350,24 @@ rt.setup({
         buffer = bufnr,
         noremap = true,
       })
+
+      dap.configurations.rust = {
+        {
+          name = 'Launch',
+          type = 'rt_lldb',
+          request = 'launch',
+          program = function()
+            local input = vim.fn.input('Path to runnable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+            if (input == nil or input == '') then
+              return
+            end
+            return input
+          end,
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
+          args = {},
+        }
+      }
     end,
   },
   capabilities = capabilities,
@@ -380,7 +398,6 @@ vim.api.nvim_create_autocmd('FileType', {
       adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- which adapters to register in nvim-dap
     })
 
-    local dap = require('dap')
 
     dap.adapters['pwa-node'] = {
       type = 'server',
@@ -458,8 +475,6 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'lua' },
   group = lua_group,
   callback = function()
-    local dap = require('dap')
-
     dap.configurations.lua = {
       {
         type = 'nlua',

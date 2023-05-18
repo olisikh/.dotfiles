@@ -33,3 +33,12 @@ ih.setup({
   enabled_at_startup = true,
   debug_mode = false,
 })
+
+-- TODO: Change color of the inlay hints, background looks awful
+-- Set up how inlay hints look like
+-- local hl = vim.api.nvim_get_hl_by_name("LspInlayHint", true)
+-- vim.api.nvim_set_hl(0, "MyLspInlayHint", {
+--   background = hl['background'],
+--   foreground = hl['foreground'],
+--   italic = true,
+-- })
