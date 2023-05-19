@@ -35,11 +35,6 @@
           inherit pkgs;
           modules = [ ./home.nix ];
         };
-
-        packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./work.nix ];
-        };
       }
     );
 }
