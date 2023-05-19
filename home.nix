@@ -85,7 +85,7 @@ in
     ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
     ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
 
-    ".config/nvim".source = "${homeDir}/.dotfiles/config/.config/nvim";
+    ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
     ".config/starship.toml".source = "${homeDir}/.dotfiles/config/.config/starship.toml";
 
     # warp terminal
