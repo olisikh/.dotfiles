@@ -77,22 +77,16 @@ in
     };
 
     # zsh
-    ".zsh" = {
-      source = "${homeDir}/.dotfiles/zsh/.zsh";
-      recursive = true;
-    };
+    ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
     ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
     ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
     ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
 
     ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
-    ".config/starship.toml".source = "${homeDir}/.dotfiles/config/.config/starship.toml";
+    ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
 
     # warp terminal
-    ".warp" = {
-      source = "${homeDir}/.dotfiles/warp/.warp";
-
-    };
+    ".warp".source = "${homeDir}/.dotfiles/warp";
 
     # tmux
     ".tmux.conf".source = "${homeDir}/.dotfiles/tmux/.tmux.conf";
