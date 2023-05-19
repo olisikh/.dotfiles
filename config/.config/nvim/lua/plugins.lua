@@ -25,11 +25,13 @@ return require('lazy').setup({
   'theprimeagen/harpoon',
   'mbbill/undotree',
 
-  -- Autocompletion
+  -- Autocompletion (cmp), integration with lsp, ai, snippets, etc.
   {
     'hrsh7th/nvim-cmp',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/vim-vsnip',
+      'hrsh7th/vim-vsnip-integ',
       'hrsh7th/cmp-nvim-lsp-signature-help',
       'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',

@@ -129,7 +129,7 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       hint = {
-        enable = true, -- enable inlay hints
+        enable = false,
       },
     },
   },
