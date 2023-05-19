@@ -1,31 +1,42 @@
 {
-  description = "Home Manager configuration of Oleksii Lisikh";
+  description = "Darwin configuration";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+    };
+
     home-manager = {
-      url = "github:nix-community/home-manager/release-22.11";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, flake-utils, home-manager, ... }:
     let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      homeConfigurations.olisikh = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+      supportedSystems = [
+        "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-linux"
+        "x86_64-darwin"
+      ];
+    in
+    flake-utils.lib.eachSystem supportedSystems (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        formatter = pkgs.alejandra;
 
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
-        modules = [
-          ./home.nix
-        ];
+        packages.homeConfigurations.olisikh = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
 
-        # Optionally use extraSpecialArgs
-        # to pass through arguments to home.nix
-      };
-    };
+          modules = [
+            ./home.nix
+          ];
+        };
+      }
+    );
 }

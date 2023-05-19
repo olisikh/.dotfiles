@@ -1,9 +1,4 @@
 { config, pkgs, ... }:
-
-with import <nixpkgs> { };
-with builtins;
-with lib;
-with import <home-manager/modules/lib/dag.nix> { inherit lib; };
 let
   user = "O.Lisikh";
   homeDir = "/Users/${user}";
@@ -63,13 +58,13 @@ in
   # plain files is through 'home.file'.
   home.file = {
     # install things from Github
-    ".antidote".source = fetchFromGitHub {
+    ".antidote".source = pkgs.fetchFromGitHub {
       owner = "mattmc3";
       repo = "antidote";
       rev = "v1.8.6";
       sha256 = "sha256-CcWEXvz1TB6LFu9qvkVB1LJsa68grK16VqjUTiuVG/c=";
     };
-    ".tmux/plugins/tpm".source = fetchFromGitHub {
+    ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
       rev = "v3.1.0";
