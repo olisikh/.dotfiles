@@ -3,7 +3,7 @@ local api = require('nvim-tree.api')
 
 tree.setup({
   view = {
-    width = 70
+    width = 50
   },
   git = {
     enable = true,

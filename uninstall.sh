@@ -1,12 +1,5 @@
 #!/usr/bin/env zsh
 
-# unstow folders
-echo "unstowing .dotfiles"
+# uninstall home manager and all packages
+home-manager uninstall
 
-for folder in *
-do
-    [ ! -d $folder ] && continue
-
-    echo "unstowing $folder"
-    stow -D $folder
-done

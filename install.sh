@@ -1,55 +1,24 @@
 #!/usr/bin/env zsh
 
-# 1. verify nix-env avialable
+# verify nix installation
 if ! command -v nix-env &> /dev/null
 then
     echo "nix-env is not installed, exiting..."
     exit
 fi
 
-# 2. install nix packages
-echo "installing nix packages"
-nix-env -iA \
-    nixpkgs.zsh \
-    nixpkgs.git \
-    nixpkgs.oh-my-zsh \
-    nixpkgs.starship \
-    nixpkgs.stow \
-    nixpkgs.fd \
-    nixpkgs.fzf \
-    nixpkgs.zoxide \
-    nixpkgs.ripgrep \
-    nixpkgs.lua \
-    nixpkgs.neovim \
-    nixpkgs.tmux \
-    nixpkgs.rustup \
-    nixpkgs.thefuck \
-    nixpkgs.docker \
-    nixpkgs.docker-machine \
-    nixpkgs.minikube \
-    nixpkgs.kubernetes-helm \
-    nixpkgs.awscli2 \
-    nixpkgs.yarn \
-    nixpkgs.go \
-    nixpkgs.coursier
+# copy nix.conf
+mkdir -p ~/.config/nix
+cp -fr nix.conf ~/.config/nix/nix.conf
 
-echo "installing antidote, zsh plugin manager"
-git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
+# install home manager
+nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+nix-channel --update
+nix-shell '<home-manager>' -A install
 
+# overwrite default home.nix
+cp -fr home.nix ~/.config/home-manager/home.nix
 
-# 3. stow .dotfiles
-echo "running stow in each .dotfiles folder"
-
-for folder in *
-do
-    [ ! -d $folder ] && continue
-    echo "stowing $folder"
-    stow -R $folder
-    stow $folder
-done
-
-# 4. install tmux tpm (plugin manager)
-[ ! -d ~/.tmux/plugins/tpm ] && git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-echo "done."
+# install packages
+home-manager switch
 

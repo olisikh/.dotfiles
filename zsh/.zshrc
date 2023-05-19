@@ -65,3 +65,8 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 
 # overrides for work
 [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"
+
+
+# If you do not plan on having Home Manager manage your shell configuration
+# then you must source the file in your shell configuration
+[[ -s "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
