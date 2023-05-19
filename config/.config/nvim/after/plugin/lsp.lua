@@ -1,15 +1,23 @@
 local nmap = require('helpers').nmap
+local map = require('helpers').map
 
 local telescope_builtin = require('telescope.builtin')
-local inlay_hints = require('lsp-inlayhints')
 
 local dap = require('dap')
+
+-- Setup neovim lua configuration, allows peek into plugins code
+require('neodev').setup()
+
+local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
+-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local function attach_lsp(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
-  nmap('<leader>ci', inlay_hints.toggle, { desc = 'inlay-hints: toggle' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
@@ -38,23 +46,33 @@ local function attach_lsp(client, bufnr)
 
   -- Format code before save :w
   vim.api.nvim_create_autocmd('BufWritePre', {
-    pattern = '<buffer>',
     callback = fmt_code,
+    group = lsp_group,
+    buffer = bufnr,
   })
-
-  -- Enable inlay hints (setup per language server)
-  inlay_hints.on_attach(client, bufnr)
+  vim.api.nvim_create_autocmd('CursorHold', {
+    callback = vim.lsp.buf.document_highlight,
+    buffer = bufnr,
+    group = lsp_group,
+  })
+  vim.api.nvim_create_autocmd('CursorMoved', {
+    callback = vim.lsp.buf.clear_references,
+    buffer = bufnr,
+    group = lsp_group,
+  })
+  vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+    callback = vim.lsp.codelens.refresh,
+    buffer = bufnr,
+    group = lsp_group,
+  })
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'dap-repl' },
+    callback = function()
+      require('dap.ext.autocompl').attach()
+    end,
+    group = lsp_group,
+  })
 end
-
--- Setup neovim lua configuration, allows peek into plugins code
-require('neodev').setup()
-
-local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require('mason-lspconfig')
@@ -129,7 +147,7 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       hint = {
-        enable = false,
+        enable = true, -- for some reason ignored by inlay-hints plugin
       },
     },
   },
@@ -168,16 +186,8 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'scala', 'sbt', 'java' },
   group = metals_group,
   callback = function()
-    local function map(mode, lhs, rhs, opts)
-      local options = { noremap = true }
-      if opts then
-        options = vim.tbl_extend('force', options, opts)
-      end
-
-      require('helpers').map(mode, lhs, rhs, options)
-    end
-
     local metals = require('metals')
+    local metals_tvp = require('metals.tvp')
     local metals_config = metals.bare_config()
     metals_config = {
       tvp = {
@@ -204,81 +214,18 @@ vim.api.nvim_create_autocmd('FileType', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
         -- Metals specific mappings
-        map(
-          'v',
-          '<leader>mt',
-          [[<Esc><cmd>lua require("metals").type_of_range()<cr>]],
-          { desc = 'metals: see type of range' }
-        )
-        map(
-          'n',
-          '<leader>mw',
-          [[<cmd>lua require("metals").hover_worksheet({ border = "single" })<cr>]],
-          { desc = 'metals: hover worksheet' }
-        )
-        map(
-          'n',
-          '<leader>mv',
-          [[<cmd>lua require("metals.tvp").toggle_tree_view()<cr>]],
-          { desc = 'metals: toggle tree view' }
-        )
-        map(
-          'n',
-          '<leader>mr',
-          [[<cmd>lua require("metals.tvp").reveal_in_tree()<cr>]],
-          { desc = 'metals: reveal in tree' }
-        )
-        map(
-          'n',
-          '<leader>mi',
-          [[<cmd>lua require("metals").toggle_setting("showImplicitArguments")<cr>]],
-          { desc = 'metals: show implicit args' }
-        )
-        map(
-          'n',
-          '<leader>mo',
-          [[<cmd>lua require("metals").organize_imports()<cr>]],
-          { desc = 'metals: organize imports' }
-        )
-        map('n', '<leader>mg', [[<cmd>lua require("metals").goto_location()<cr>]], { desc = 'metals: goto location' })
-        map(
-          'n',
-          '<leader>md',
-          [[<cmd>lua require("metals").implementation_location()<cr>]],
-          { desc = 'metals: implementation location' }
-        )
-        map('n', '<leader>mi', [[<cmd>lua require("metals").import_build()<cr>]], { desc = 'metals: import build' })
-        map(
-          'n',
-          '<leader>mc',
-          [[<cmd>lua require("telescope").extensions.metals.commands()<cr>]],
-          { desc = 'metals: open commands' }
-        )
+        map('v', '<leader>mt', metals.type_of_range, { desc = 'metals: see type of range' })
+        nmap('<leader>mw', function() metals.hover_worksheet({ border = "single" }) end,
+          { desc = 'metals: hover worksheet' })
+        nmap('<leader>mv', metals_tvp.toggle_tree_view, { desc = 'metals: toggle tree view' })
+        nmap('<leader>mr', metals_tvp.reveal_in_tree, { desc = 'metals: reveal in tree' })
+        nmap('<leader>mi', function() metals.toggle_setting('showImplicitArguments') end,
+          { desc = 'metals: show implicit args' })
+        nmap('<leader>mo', metals.organize_imports { desc = 'metals: organize imports' })
+        nmap('<leader>mi', metals.import_build { desc = 'metals: import build' })
+        nmap('<leader>mc', require('telescope').extensions.metals.commands { desc = 'metals: open commands' })
 
         attach_lsp(client, bufnr)
-
-        vim.api.nvim_create_autocmd('CursorHold', {
-          callback = vim.lsp.buf.document_highlight,
-          buffer = bufnr,
-          group = lsp_group,
-        })
-        vim.api.nvim_create_autocmd('CursorMoved', {
-          callback = vim.lsp.buf.clear_references,
-          buffer = bufnr,
-          group = lsp_group,
-        })
-        vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-          callback = vim.lsp.codelens.refresh,
-          buffer = bufnr,
-          group = lsp_group,
-        })
-        vim.api.nvim_create_autocmd('FileType', {
-          pattern = { 'dap-repl' },
-          callback = function()
-            require('dap.ext.autocompl').attach()
-          end,
-          group = lsp_group,
-        })
 
         -- nvim-dap
         dap.configurations.scala = {
