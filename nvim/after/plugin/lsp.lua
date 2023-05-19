@@ -37,6 +37,9 @@ local function attach_lsp(client, bufnr)
   nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover documentation' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature documentation' })
 
+
+  local cap = client.resolved_capabilities
+
   local function fmt_code()
     vim.lsp.buf.format({ bufnr = bufnr })
   end
@@ -47,29 +50,40 @@ local function attach_lsp(client, bufnr)
   -- Format code before save :w
   vim.api.nvim_create_autocmd('BufWritePre', {
     callback = fmt_code,
-    group = lsp_group,
-    buffer = bufnr,
-  })
-  vim.api.nvim_create_autocmd('CursorHold', {
-    callback = vim.lsp.buf.document_highlight,
     buffer = bufnr,
     group = lsp_group,
   })
-  vim.api.nvim_create_autocmd('CursorMoved', {
-    callback = vim.lsp.buf.clear_references,
-    buffer = bufnr,
-    group = lsp_group,
-  })
-  vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-    callback = vim.lsp.codelens.refresh,
-    buffer = bufnr,
-    group = lsp_group,
-  })
+
+  if cap.document_highlight then
+    vim.api.nvim_create_autocmd('CursorHold', {
+      callback = vim.lsp.buf.document_highlight,
+      buffer = bufnr,
+      group = lsp_group,
+    })
+  end
+
+  if cap.clear_references then
+    vim.api.nvim_create_autocmd('CursorMoved', {
+      callback = vim.lsp.buf.clear_references,
+      buffer = bufnr,
+      group = lsp_group,
+    })
+  end
+
+  if cap.codelens then
+    vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+      callback = vim.lsp.codelens.refresh,
+      buffer = bufnr,
+      group = lsp_group,
+    })
+  end
+
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'dap-repl' },
     callback = function()
       require('dap.ext.autocompl').attach()
     end,
+    buffer = bufnr,
     group = lsp_group,
   })
 end
