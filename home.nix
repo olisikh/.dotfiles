@@ -5,8 +5,8 @@ with builtins;
 with lib;
 with import <home-manager/modules/lib/dag.nix> { inherit lib; };
 let
-  homeDir = "/Users/O.Lisikh";
   user = "O.Lisikh";
+  homeDir = "/Users/${user}";
 in
 {
   # Let Home Manager install and manage itself.
