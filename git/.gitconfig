@@ -4,12 +4,6 @@
 [core]
 	editor = nvim
 	autocrlf = input
-	excludesfile = /Users/olisikh/.gitignore_global
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+	excludesfile = "~/.gitignore_global"
 [submodule]
 	recurse = true
