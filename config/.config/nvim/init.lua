@@ -1,3 +1,6 @@
+-- Note: this file is an entrypoint for neovim
+require('settings')
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -14,8 +17,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Note: this file is an entrypoint for neovim
-require('settings')
 require('plugins')
 require('theme')
 require('mappings')

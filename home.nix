@@ -59,21 +59,6 @@ in
     # '')
   ];
 
-  # Install extra plugins, e.g. download from the internet
-  # plugins = [
-  #   {
-  #     name = "antidote";
-  #     src = "github:mattmc3/antidote";
-  #     dest = ${home.homeDirectory}/.antidote;
-  #     depth = "1";
-  #   }
-  #   {
-  #     name = "tmux-tpm";
-  #     src = "github:tmux-plugins/tpm";
-  #     dest = ${home.homeDirectory}/.tmux/plugins/tpm;
-  #   }
-  # ];
-
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
@@ -100,16 +85,13 @@ in
     ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
     ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
 
-    # config
-    ".config" = {
-      source = "${homeDir}/.dotfiles/config/.config";
-      recursive = true;
-    };
+    ".config/nvim".source = "${homeDir}/.dotfiles/config/.config/nvim";
+    ".config/starship.toml".source = "${homeDir}/.dotfiles/config/.config/starship.toml";
 
     # warp terminal
     ".warp" = {
       source = "${homeDir}/.dotfiles/warp/.warp";
-      recursive = true;
+
     };
 
     # tmux
@@ -118,12 +100,6 @@ in
     # git
     ".gitconfig".source = "${homeDir}/.dotfiles/git/.gitconfig";
     ".gitconfig_global".source = "${homeDir}/.dotfiles/git/.gitignore_global";
-
-    # ssh
-    ".ssh" = {
-      source = "${homeDir}/.dotfiles/ssh/.ssh";
-      recursive = true;
-    };
 
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a

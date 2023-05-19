@@ -147,7 +147,7 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       hint = {
-        enable = true, -- for some reason ignored by inlay-hints plugin
+        enable = false, -- for some reason ignored by inlay-hints plugin
       },
     },
   },
@@ -335,7 +335,7 @@ rt.setup({
       auto_focus = true,
     },
     inlay_hints = {
-      auto = false, -- lsp-inlayhints.nvim plugin takes over
+      auto = true, -- lsp-inlayhints.nvim plugin takes over
     },
   },
 })
