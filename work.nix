@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  user = "olisikh";
+  user = "O.Lisikh";
   homeDir = "/Users/${user}";
 in
 {
