@@ -13,6 +13,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
   outputs = { nixpkgs, flake-utils, home-manager, ... }:
     let
       supportedSystems = [
