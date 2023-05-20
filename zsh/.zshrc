@@ -4,10 +4,13 @@ autoload -U +X compinit && compinit
 # friendly plugins paths
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 
-# Init Antidote zsh plugin manager
+# Lazy-load antidote and generate the static load file only when needed
 source ${ZDOTDIR:-~}/.antidote/antidote.zsh
-# Load plugins
-antidote load
+zsh_plugins=${ZDOTDIR:-~}/.zsh_plugins
+if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
+  antidote bundle <${zsh_plugins}.txt >${zsh_plugins}.zsh
+fi
+source ${zsh_plugins}.zsh
 
 eval "$(thefuck --alias)"
 eval "$(zoxide init zsh)"
@@ -77,7 +80,4 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 # If you do not plan on having Home Manager manage your shell configuration
 # then you must source the file in your shell configuration
 [[ -s "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
-
-# support zsh in nix-shell
-eval "$(direnv hook zsh)"
 
