@@ -4,6 +4,9 @@ symbol = ' '
 [java]
 symbol = ' '
 
+[nix_shell]
+symbol = '❄️ '
+
 # [golang]
 # symbol = ' '
 #
