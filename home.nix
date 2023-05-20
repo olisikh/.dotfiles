@@ -27,6 +27,8 @@ in
       tmux
       rustup
       luarocks
+      nodejs
+      python3
       thefuck
       docker
       docker-machine

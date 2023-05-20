@@ -4,8 +4,6 @@ zsh-users/zsh-completions
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
 
-matthieusb/zsh-sdkman
-
 # bug https://github.com/chisui/zsh-nix-shell/issues/35
 chisui/zsh-nix-shell branch:v0.5.0
 nix-community/nix-zsh-completions
