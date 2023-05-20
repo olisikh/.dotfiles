@@ -224,9 +224,9 @@ vim.api.nvim_create_autocmd('FileType', {
         nmap('<leader>mr', metals_tvp.reveal_in_tree, { desc = 'metals: reveal in tree' })
         nmap('<leader>mi', function() metals.toggle_setting('showImplicitArguments') end,
           { desc = 'metals: show implicit args' })
-        nmap('<leader>mo', metals.organize_imports { desc = 'metals: organize imports' })
-        nmap('<leader>mi', metals.import_build { desc = 'metals: import build' })
-        nmap('<leader>mc', require('telescope').extensions.metals.commands { desc = 'metals: open commands' })
+        nmap('<leader>mo', metals.organize_imports, { desc = 'metals: organize imports' })
+        nmap('<leader>mi', metals.import_build, { desc = 'metals: import build' })
+        nmap('<leader>mc', require('telescope').extensions.metals.commands, { desc = 'metals: open commands' })
 
         attach_lsp(client, bufnr)
 

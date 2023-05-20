@@ -15,6 +15,7 @@ in
     packages = with pkgs; [
       bash
       zsh
+      alacritty
       git
       (nerdfonts.override { fonts = [ "Hack" ]; })
       starship
@@ -38,6 +39,9 @@ in
       yarn
       go
       coursier
+      jdk17
+      sbt
+      scala
 
       # # You can also create simple shell scripts directly inside your
       # # configuration. For example, this adds a command 'my-hello' to your
@@ -75,6 +79,9 @@ in
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
       ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
+
+      # alacritty terminal
+      ".config/alacritty".source = "${homeDir}/.dotfiles/alacritty";
 
       # warp terminal
       ".warp".source = "${homeDir}/.dotfiles/warp";
@@ -121,3 +128,4 @@ in
     enableCompletion = true;
   };
 }
+
