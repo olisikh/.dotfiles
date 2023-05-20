@@ -79,5 +79,5 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 [[ -s "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
 
 # support zsh in nix-shell
-# eval "$(direnv hook zsh)"
+eval "$(direnv hook zsh)"
 
