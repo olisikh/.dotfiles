@@ -38,11 +38,6 @@ export PATH=$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# Enable pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
 # Add rust (cargo) executables
 export CARGO_HOME=$HOME/.cargo
 export PATH="$CARGO_HOME/bin:$PATH"
