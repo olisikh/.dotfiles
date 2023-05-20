@@ -14,6 +14,7 @@ in
     # environment.
     packages = with pkgs; [
       zsh
+      direnv # to support a shell other than bash in nix-shell
       git
       (nerdfonts.override { fonts = [ "Hack" ]; })
       starship
@@ -65,6 +66,12 @@ in
       ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
       ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
       ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
+
+      # nix
+      "default.nix".source = "${homeDir}/.dotfiles/nix/default.nix";
+
+      # direnv
+      ".envrc".source = "${homeDir}/.dotfiles/direnv/.envrc";
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
       ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
