@@ -26,6 +26,7 @@ in
       neovim
       tmux
       rustup
+      luarocks
       thefuck
       docker
       docker-machine

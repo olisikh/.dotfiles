@@ -37,9 +37,6 @@ local function attach_lsp(client, bufnr)
   nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover documentation' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature documentation' })
 
-
-  local cap = client.resolved_capabilities
-
   local function fmt_code()
     vim.lsp.buf.format({ bufnr = bufnr })
   end
@@ -54,29 +51,23 @@ local function attach_lsp(client, bufnr)
     group = lsp_group,
   })
 
-  if cap.document_highlight then
-    vim.api.nvim_create_autocmd('CursorHold', {
-      callback = vim.lsp.buf.document_highlight,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  end
+  vim.api.nvim_create_autocmd('CursorHold', {
+    callback = pcall(vim.lsp.buf.document_highlight),
+    buffer = bufnr,
+    group = lsp_group,
+  })
 
-  if cap.clear_references then
-    vim.api.nvim_create_autocmd('CursorMoved', {
-      callback = vim.lsp.buf.clear_references,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  end
+  vim.api.nvim_create_autocmd('CursorMoved', {
+    callback = pcall(vim.lsp.buf.clear_references),
+    buffer = bufnr,
+    group = lsp_group,
+  })
 
-  if cap.codelens then
-    vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-      callback = vim.lsp.codelens.refresh,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  end
+  vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+    callback = pcall(vim.lsp.codelens.refresh),
+    buffer = bufnr,
+    group = lsp_group,
+  })
 
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'dap-repl' },
@@ -292,7 +283,7 @@ local rt = require('rust-tools')
 rt.setup({
   server = {
     on_attach = function(client, bufnr)
-      attach_lsp(client, bufnr)
+      pcall(attach_lsp, client, bufnr)
 
       nmap('<leader>ch', rt.hover_actions.hover_actions, {
         desc = 'rust-tools: hover actions',
@@ -320,21 +311,21 @@ rt.setup({
           stopOnEntry = false,
           args = {},
         },
-        -- {
-        --   name = 'Launch program',
-        --   type = 'rt_lldb',
-        --   request = 'launch',
-        --   program = function()
-        --     local input = vim.fn.input('Path to runnable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
-        --     if (input == nil or input == '') then
-        --       return
-        --     end
-        --     return input
-        --   end,
-        --   cwd = '${workspaceFolder}',
-        --   stopOnEntry = false,
-        --   args = {},
-        -- },
+        {
+          name = 'Launch (by name)',
+          type = 'rt_lldb',
+          request = 'launch',
+          program = function()
+            local input = vim.fn.input('Path to runnable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+            if (input == nil or input == '') then
+              return
+            end
+            return input
+          end,
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
+          args = {},
+        },
       }
     end,
   },
