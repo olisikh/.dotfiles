@@ -347,7 +347,7 @@ rt.setup({
       auto_focus = true,
     },
     inlay_hints = {
-      auto = true, -- lsp-inlayhints.nvim plugin takes over
+      auto = false, -- lsp-inlayhints.nvim plugin takes over
     },
   },
 })

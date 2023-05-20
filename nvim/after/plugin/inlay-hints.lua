@@ -27,7 +27,7 @@ ih.setup({
     -- padding from the left if max_len_align is true
     max_len_align_padding = 1,
     -- highlight group
-    highlight = 'LspInlayHint',
+    highlight = 'Comment',
     -- virt_text priority
     priority = 0,
   },
@@ -51,12 +51,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
     nmap('<leader>ci', ih.toggle, { desc = 'inlay-hints: toggle' })
   end,
 })
-
--- TODO: Change color of the inlay hints, background looks awful
--- Set up how inlay hints look like
--- local hl = vim.api.nvim_get_hl_by_name("LspInlayHint", true)
--- vim.api.nvim_set_hl(0, "MyLspInlayHint", {
---   background = hl['background'],
---   foreground = hl['foreground'],
---   italic = true,
--- })
