@@ -13,6 +13,7 @@ in
     # The home.packages option allows you to install Nix packages into your
     # environment.
     packages = with pkgs; [
+      nix-prefetch
       bash
       zsh
       alacritty
@@ -82,6 +83,12 @@ in
 
       # alacritty terminal
       ".config/alacritty".source = "${homeDir}/.dotfiles/alacritty";
+      # ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
+      #   owner = "catppuccin";
+      #   repo = "alacritty";
+      #   rev = "main";
+      #   sha256 = null;
+      # };
 
       # warp terminal
       ".warp".source = "${homeDir}/.dotfiles/warp";
