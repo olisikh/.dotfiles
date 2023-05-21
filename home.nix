@@ -82,13 +82,13 @@ in
       ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
 
       # alacritty terminal
-      ".config/alacritty".source = "${homeDir}/.dotfiles/alacritty";
-      # ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
-      #   owner = "catppuccin";
-      #   repo = "alacritty";
-      #   rev = "main";
-      #   sha256 = null;
-      # };
+      ".config/alacritty/alacritty.yml".source = "${homeDir}/.dotfiles/alacritty/alacritty.yml";
+      ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "alacritty";
+        rev = "main";
+        sha256 = "sha256-w9XVtEe7TqzxxGUCDUR9BFkzLZjG8XrplXJ3lX6f+x0=";
+      };
 
       # warp terminal
       ".warp".source = "${homeDir}/.dotfiles/warp";
