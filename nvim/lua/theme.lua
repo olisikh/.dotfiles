@@ -1,8 +1,6 @@
 -- latte, frappe, macchiato, mocha
 local flavour = vim.fn.getenv('CATPPUCCIN_FLAVOUR') or 'macchiato'
 
-
-
 require('catppuccin').setup({
   compile_path = vim.fn.stdpath('cache') .. '/catppuccin',
   flavour = flavour,
@@ -37,8 +35,14 @@ require('catppuccin').setup({
     cmp = true,
     gitsigns = true,
     nvimtree = true,
+    neotest = true,
     treesitter = true,
+    treesitter_context = true,
     telescope = true,
+    lsp_trouble = true,
+    harpoon = true,
+    mason = true,
+    which_key = true,
     dap = {
       enabled = true,
       enable_ui = true,
@@ -59,6 +63,26 @@ require('catppuccin').setup({
       },
     },
   },
+})
+
+local ctp_feline = require('catppuccin.groups.integrations.feline')
+ctp_feline.setup({})
+
+local feline = require('feline')
+feline.setup({
+  components = ctp_feline.get(),
+})
+
+-- Support :colorscheme catppuccin-<flavour> change for statusline too
+vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "*",
+  callback = function()
+    package.loaded["feline"] = nil
+    package.loaded["catppuccin.groups.integrations.feline"] = nil
+    require("feline").setup {
+      components = require("catppuccin.groups.integrations.feline").get(),
+    }
+  end,
 })
 
 vim.cmd.colorscheme('catppuccin')

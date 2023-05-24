@@ -1,6 +1,8 @@
 require('lazy').setup({
   -- Catppuccin theme
   { 'catppuccin/nvim',                name = 'catppuccin' },
+  -- Statusline plugin
+  { 'feline-nvim/feline.nvim' },
 
   -- tmux integration plugin
   { 'christoomey/vim-tmux-navigator', lazy = false },
@@ -61,7 +63,7 @@ require('lazy').setup({
       },
 
       -- Useful status updates for LSP
-      { 'j-hui/fidget.nvim',           opts = {} },
+      { 'j-hui/fidget.nvim',           opts = { window = { blend = 0 } } },
 
       -- Inlay hints
       { 'lvimuser/lsp-inlayhints.nvim' },
@@ -212,9 +214,6 @@ require('lazy').setup({
 
   -- Adds git releated signs to the gutter, as well as utilities for managing changes
   'lewis6991/gitsigns.nvim',
-
-  -- Set lualine as statusline
-  'nvim-lualine/lualine.nvim',
 
   -- Add indentation function/class/etc context lines
   'lukas-reineke/indent-blankline.nvim',
