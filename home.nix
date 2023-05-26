@@ -40,8 +40,8 @@ in
       yarn
       go
       coursier
-      jdk17
-      sbt
+      jdk11
+      (sbt.override { jre = jdk11; })
       scala
 
       # # You can also create simple shell scripts directly inside your

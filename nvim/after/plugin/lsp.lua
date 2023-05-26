@@ -228,7 +228,8 @@ vim.api.nvim_create_autocmd('FileType', {
         nmap('<leader>mi', metals.import_build, { desc = 'metals: import build' })
         nmap('<leader>mc', require('telescope').extensions.metals.commands, { desc = 'metals: open commands' })
 
-        attach_lsp(client, bufnr)
+        -- TODO: investigate why attach_lsp fails for metals
+        pcall(attach_lsp, client, bufnr)
 
         -- nvim-dap
         dap.configurations.scala = {
