@@ -26,6 +26,7 @@ in
       ripgrep
       exa
       bat
+      mc
       lua
       neovim
       tmux
@@ -97,6 +98,14 @@ in
         repo = "bat";
         rev = "main";
         sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
+      };
+
+      ".local/share/mc/ini".source = "${homeDir}/.dotfiles/mc/ini";
+      ".local/share/mc/skins".source = pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "mc";
+        rev = "main";
+        sha256 = "sha256-m6MO0Q35YYkTtVqG1v48U7pHcsuPmieDwU2U1ZzQcjo=";
       };
 
       # warp terminal
