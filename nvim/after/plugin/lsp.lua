@@ -90,7 +90,13 @@ local servers = {
   dockerls = {},
   terraformls = {},
   bashls = {},
-  yamlls = {},
+  yamlls = {
+    settings = {
+      yaml = {
+        keyOrdering = false -- disable alphabetic ordering of keys
+      }
+    }
+  },
   rnix = {},
   rust_analyzer = {
     cargo = {
