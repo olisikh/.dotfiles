@@ -24,6 +24,8 @@ in
       fzf
       zoxide
       ripgrep
+      exa
+      bat
       lua
       neovim
       tmux
@@ -88,6 +90,13 @@ in
         repo = "alacritty";
         rev = "main";
         sha256 = "sha256-w9XVtEe7TqzxxGUCDUR9BFkzLZjG8XrplXJ3lX6f+x0=";
+      };
+
+      ".config/bat/themes".source = pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "bat";
+        rev = "main";
+        sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
       };
 
       # warp terminal

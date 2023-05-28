@@ -19,6 +19,10 @@ eval "$(starship init zsh)"
 # User configuration
 # Setup catppuccin flavour (used in nvim, tmux, etc.)
 export CATPPUCCIN_FLAVOUR="macchiato"
+export BAT_THEME="Catppuccin-$CATPPUCCIN_FLAVOUR"
+
+# Build bat themes if necessary
+bat --list-themes | grep -q "Catppuccin" || bat cache --build
 
 # Catppuccin syntax highlighting
 source $HOME/.zsh/catppuccin-$CATPPUCCIN_FLAVOUR.zsh
@@ -55,7 +59,17 @@ alias k=kubectl
 alias v=nvim
 alias vim=nvim
 
-alias ll="ls -la"
+# replace cd
+alias cd="z"
+alias zz="z -"
+# replace ls
+alias ls="exa"
+alias ll="exa -alh"
+alias tree="exa --tree"
+# replace cat
+alias cat="bat -pp"
+
+# fuzzy find a folder, then open in neovim
 alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 
 # OpenAI API key for https://github.com/Bryley/neoai.nvim
