@@ -132,6 +132,8 @@ require('lazy').setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
       'nvim-treesitter/nvim-treesitter-context',
+      -- LSP enhance plugin
+      { "glepnir/lspsaga.nvim", event = "LspAttach", },
     },
     config = function()
       pcall(require('nvim-treesitter.install').update({ with_sync = true }))
@@ -187,7 +189,7 @@ require('lazy').setup({
   'mg979/vim-visual-multi',
 
   -- Auto add closing bracket or closing quote
-  { 'windwp/nvim-autopairs', opts = {} },
+  { 'windwp/nvim-autopairs',   opts = {} },
 
   -- Surround text objects
   {
@@ -219,14 +221,10 @@ require('lazy').setup({
   'lukas-reineke/indent-blankline.nvim',
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',   opts = {} },
 
   --  comments highlighting and navigation
-  {
-    'folke/todo-comments.nvim',
-    event = 'BufRead',
-    opts = {},
-  },
+  { 'folke/todo-comments.nvim' },
 
   -- 'vim-test/vim-test',
   {
