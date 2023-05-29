@@ -38,44 +38,54 @@ local function attach_lsp(client, bufnr)
   nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover documentation' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature documentation' })
 
-  local function fmt_code()
-    vim.lsp.buf.format({ bufnr = bufnr })
+
+  local caps = client.server_capabilities
+  if caps.documentFormattingProvider then
+    local function fmt_code()
+      vim.lsp.buf.format({ bufnr = bufnr })
+    end
+
+    -- Create a command `:Format` local to the LSP buffer
+    vim.api.nvim_buf_create_user_command(bufnr, 'Format', fmt_code, { desc = 'lsp: format code' })
+    -- Format code before save :w
+    vim.api.nvim_create_autocmd('BufWritePre', {
+      callback = fmt_code,
+      buffer = bufnr,
+      group = lsp_group,
+    })
   end
 
-  -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', fmt_code, { desc = 'lsp: format code' })
+  if caps.documentHighlightProvider then
+    vim.api.nvim_create_autocmd('CursorHold', {
+      callback = vim.lsp.buf.document_highlight,
+      buffer = bufnr,
+      group = lsp_group,
+    })
+  end
 
-  -- Format code before save :w
-  vim.api.nvim_create_autocmd('BufWritePre', {
-    callback = fmt_code,
-    buffer = bufnr,
-    group = lsp_group,
-  })
+  if caps.referencesProvider then
+    vim.api.nvim_create_autocmd('CursorMoved', {
+      callback = vim.lsp.buf.clear_references,
+      buffer = bufnr,
+      group = lsp_group,
+    })
+  end
 
-  vim.api.nvim_create_autocmd('CursorHold', {
-    callback = pcall(vim.lsp.buf.document_highlight),
-    buffer = bufnr,
-    group = lsp_group,
-  })
+  if caps.codeLensProvider then
+    vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+      callback = vim.lsp.codelens.refresh,
+      buffer = bufnr,
+      group = lsp_group,
+    })
+  end
 
-  vim.api.nvim_create_autocmd('CursorMoved', {
-    callback = pcall(vim.lsp.buf.clear_references),
-    buffer = bufnr,
-    group = lsp_group,
-  })
-
-  vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-    callback = pcall(vim.lsp.codelens.refresh),
-    buffer = bufnr,
-    group = lsp_group,
-  })
-
-  vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'dap-repl' },
-    callback = require('dap.ext.autocompl').attach,
-    buffer = bufnr,
-    group = lsp_group,
-  })
+  -- TODO: this is not working for some reason :thinking:
+  -- vim.api.nvim_create_autocmd('FileType', {
+  --   pattern = { 'dap-repl' },
+  --   callback = require('dap.ext.autocomplete').attach,
+  --   buffer = bufnr,
+  --   group = lsp_group,
+  -- })
 end
 
 -- Ensure the servers above are installed
@@ -235,8 +245,7 @@ vim.api.nvim_create_autocmd('FileType', {
         nmap('<leader>mi', metals.import_build, { desc = 'metals: import build' })
         nmap('<leader>mc', require('telescope').extensions.metals.commands, { desc = 'metals: open commands' })
 
-        -- TODO: investigate why attach_lsp fails for metals
-        pcall(attach_lsp, client, bufnr)
+        attach_lsp(client, bufnr)
 
         -- nvim-dap
         dap.configurations.scala = {
@@ -291,7 +300,7 @@ local rt = require('rust-tools')
 rt.setup({
   server = {
     on_attach = function(client, bufnr)
-      pcall(attach_lsp, client, bufnr)
+      attach_lsp(client, bufnr)
 
       nmap('<leader>ch', rt.hover_actions.hover_actions, {
         desc = 'rust-tools: hover actions',
@@ -364,7 +373,6 @@ vim.api.nvim_create_autocmd('FileType', {
       debugger_cmd = { 'js-debug-adapter' },
       adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- which adapters to register in nvim-dap
     })
-
 
     dap.adapters['pwa-node'] = {
       type = 'server',

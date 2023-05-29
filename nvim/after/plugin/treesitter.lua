@@ -31,8 +31,8 @@ require('nvim-treesitter.configs').setup({
     keymaps = {
       init_selection = '<C-space>',
       node_incremental = '<C-space>',
-      scope_incremental = '<C-s>', -- TODO: this is occupied by tmux
-      node_decremental = '<M-space>', -- TODO: Meta key is used by OSX
+      node_decremental = '<C-b>',
+      -- scope_incremental = '<C-b>',
     },
   },
   textobjects = {

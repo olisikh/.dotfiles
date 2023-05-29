@@ -1,6 +1,8 @@
 local nmap = require('helpers').nmap
 
 local dap = require('dap')
+local breakpoints = require('dap.breakpoints')
+local dap_utils = require('dap.utils')
 local dap_ui = require('dapui')
 local dap_widgets = require('dap.ui.widgets')
 local mason_dap = require('mason-nvim-dap')
@@ -16,6 +18,12 @@ mason_dap.setup({
 dap_ui.setup({})
 
 dap.listeners.after.event_initialized['dapui_config'] = function()
+  -- local buf = vim.api.nvim_get_current_buf()
+  -- local bps = breakpoints.get(buf)
+  --
+  -- vim.print(bps)
+  -- vim.print(dap_utils.non_empty(bps))
+
   dap_ui.open()
 end
 dap.listeners.before.event_terminated['dapui_config'] = function()
@@ -66,8 +74,8 @@ require('nvim-dap-virtual-text').setup({
     return ' ' .. variable.name .. ' = ' .. variable.value .. ' '
   end,
   -- experimental features:
-  virt_text_pos = 'eol', -- position of virtual text, see `:h nvim_buf_set_extmark()`
-  all_frames = false, -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
-  virt_lines = false, -- show virtual lines instead of virtual text (will flicker!)
+  virt_text_pos = 'eol',   -- position of virtual text, see `:h nvim_buf_set_extmark()`
+  all_frames = false,      -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
+  virt_lines = false,      -- show virtual lines instead of virtual text (will flicker!)
   virt_text_win_col = nil, -- position the virtual text at a fixed window column (starting from the first text column) ,
 })

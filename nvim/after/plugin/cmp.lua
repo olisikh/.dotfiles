@@ -56,9 +56,9 @@ cmp.setup({
     { name = 'codeium' },
     {
       name = 'nvim_lsp',
-      entry_filter = function(entry, _)
-        return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
-      end,
+      -- entry_filter = function(entry, _)
+      --   return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
+      -- end,
     },
     { name = 'luasnip' },
     { name = 'crates' },
