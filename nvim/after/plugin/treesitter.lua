@@ -15,10 +15,11 @@ require('nvim-treesitter.configs').setup({
     'tsx',
     'typescript',
     'nix',
-    'vimdoc',
-    'vim',
+    'json',
     'yaml',
     'python',
+    'vim',
+    'vimdoc'
   },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)

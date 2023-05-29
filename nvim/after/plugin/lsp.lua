@@ -79,13 +79,11 @@ local function attach_lsp(client, bufnr)
     })
   end
 
-  -- TODO: this is not working for some reason :thinking:
-  -- vim.api.nvim_create_autocmd('FileType', {
-  --   pattern = { 'dap-repl' },
-  --   callback = require('dap.ext.autocomplete').attach,
-  --   buffer = bufnr,
-  --   group = lsp_group,
-  -- })
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'dap-repl' },
+    callback = function() require('dap.ext.autocompl').attach(bufnr) end,
+    group = lsp_group,
+  })
 end
 
 -- Ensure the servers above are installed
