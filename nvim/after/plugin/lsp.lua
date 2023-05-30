@@ -10,13 +10,23 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local function attach_lsp(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
+  -- nmap('<leader>cr', '<cmd>Lspsaga rename ++project<cr>', { desc = 'lsp: [r]ename' })
+
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
+  nmap('<leader>co', '<cmd>Lspsaga outline<cr>', { desc = 'lsp: [c]ode [o]utline' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
   nmap('gI', vim.lsp.buf.implementation, { desc = 'lsp: [g]oto [i]mplementation' })
-  nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]oto [t]ype definition' })
+
+  nmap('gd', '<cmd>Lspsaga goto_definition<cr>', { desc = 'lsp: [g]oto [d]efinition' })
+  nmap('gp', '<cmd>Lspsaga peek_type_definition<cr>', { desc = 'lsp: [p]eek type definition' })
+
+  -- nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]oto [t]ype definition' })
+  nmap('gt', '<cmd>Lspsaga goto_type_definition<cr>', { desc = 'lsp: goto [t]ype definition' })
+
+
   nmap('gD', vim.lsp.buf.declaration, { desc = 'lsp: [g]oto [d]eclaration' })
   map('i', '<C-h>', vim.lsp.buf.signature_help, { desc = 'lsp: signature [h]elp' })
 
@@ -29,8 +39,9 @@ local function attach_lsp(client, bufnr)
   -- end, '[w]orkspace [l]ist folders')
 
   -- See `:help K` for why this keymap
-  nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover documentation' })
-  nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature documentation' })
+  -- nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
+  nmap('Q', '<cmd>Lspsaga hover_doc<CR>', { desc = 'lsp: hover doc' })
+  nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
 
 
   local caps = client.server_capabilities
