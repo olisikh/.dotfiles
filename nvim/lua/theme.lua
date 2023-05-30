@@ -65,14 +65,6 @@ require('catppuccin').setup({
   },
 })
 
-local ctp_feline = require('catppuccin.groups.integrations.feline')
-ctp_feline.setup({})
-
-local feline = require('feline')
-feline.setup({
-  components = ctp_feline.get(),
-})
-
 -- Support :colorscheme catppuccin-<flavour> change for statusline too
 vim.api.nvim_create_autocmd("ColorScheme", {
   pattern = "*",

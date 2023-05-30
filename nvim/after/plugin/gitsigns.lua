@@ -1,5 +1,4 @@
 local gsigns = require('gitsigns')
-
 gsigns.setup({
   signs = {
     add = { text = '+' },
