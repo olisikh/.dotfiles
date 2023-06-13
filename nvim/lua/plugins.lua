@@ -63,7 +63,8 @@ require('lazy').setup({
       },
 
       -- Useful status updates for LSP
-      { 'j-hui/fidget.nvim',           opts = { window = { blend = 0 } } },
+      -- TODO: Upgrade to latest fidget when it's ready
+      { 'j-hui/fidget.nvim',           tag = 'legacy', opts = { window = { blend = 0 } } },
 
       -- Inlay hints
       { 'lvimuser/lsp-inlayhints.nvim' },

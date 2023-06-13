@@ -58,7 +58,6 @@ in
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
     # plain files is through 'home.file'.
     file = {
-      # install things from Github
       ".antidote".source = pkgs.fetchFromGitHub {
         owner = "mattmc3";
         repo = "antidote";
@@ -72,19 +71,17 @@ in
         sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
       };
 
-      # zsh
       ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
       ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
       ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
       ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
 
-      # nix
       "default.nix".source = "${homeDir}/.dotfiles/nix/default.nix";
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
+
       ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
 
-      # alacritty terminal
       ".config/alacritty/alacritty.yml".source = "${homeDir}/.dotfiles/alacritty/alacritty.yml";
       ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
         owner = "catppuccin";
