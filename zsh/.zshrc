@@ -82,3 +82,6 @@ export OPENAI_API_KEY=$(cat ~/.openai)
 # then you must source the file in your shell configuration
 [[ -s "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
 
+# Enable direnv to enable nix-shell when cd into a dir with default.nix file
+eval "$(direnv hook zsh)"
+

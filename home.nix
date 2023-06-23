@@ -14,6 +14,7 @@ in
     # environment.
     packages = with pkgs; [
       nix-prefetch
+      direnv # use nix-shell whenever using cd and default.nix or shell.nix is in path
       bash
       zsh
       alacritty
@@ -32,7 +33,6 @@ in
       tmux
       rustup
       luarocks
-      nodejs
       python3
       thefuck
       docker
@@ -44,8 +44,9 @@ in
       go
       coursier
       jdk11
-      (sbt.override { jre = jdk11; })
-      scala
+      # nodejs
+      # (sbt.override { jre = jdk11; })
+      # scala
 
       # # You can also create simple shell scripts directly inside your
       # # configuration. For example, this adds a command 'my-hello' to your
@@ -75,8 +76,6 @@ in
       ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
       ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
       ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
-
-      "default.nix".source = "${homeDir}/.dotfiles/nix/default.nix";
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
 
