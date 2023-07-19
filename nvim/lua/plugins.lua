@@ -118,10 +118,10 @@ require('lazy').setup({
           return vim.fn.executable('make') == 1
         end,
       },
-      {
-        'nvim-telescope/telescope-frecency.nvim',
-        dependencies = { 'kkharji/sqlite.lua' },
-      },
+      -- {
+      --   'nvim-telescope/telescope-frecency.nvim',
+      --   dependencies = { 'kkharji/sqlite.lua' },
+      -- },
       'nvim-telescope/telescope-dap.nvim',
       'nvim-telescope/telescope-ui-select.nvim',
     },
