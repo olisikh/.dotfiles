@@ -46,6 +46,9 @@ export PATH=$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 export CARGO_HOME=$HOME/.cargo
 export PATH="$CARGO_HOME/bin:$PATH"
 
+# Add java home folder
+export JAVA_HOME=$HOME/.nix-profile/zulu-11.jdk/Contents/Home
+
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
@@ -53,14 +56,13 @@ export PATH="$CARGO_HOME/bin:$PATH"
 #
 # Example aliases
 alias zconf="nvim ~/.zshrc"
-alias aws=awscliv2
+# alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
 alias v=nvim
 alias vim=nvim
 
 # replace cd
-alias cd="z"
 alias zz="z -"
 # replace ls
 alias ls="exa"
