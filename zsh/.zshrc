@@ -60,7 +60,7 @@ alias v=nvim
 alias vim=nvim
 
 # replace cd
-alias cd="z"
+alias cd="cd"
 alias zz="z -"
 # replace ls
 alias ls="exa"
