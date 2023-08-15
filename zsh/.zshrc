@@ -53,14 +53,12 @@ export PATH="$CARGO_HOME/bin:$PATH"
 #
 # Example aliases
 alias zconf="nvim ~/.zshrc"
-alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
 alias v=nvim
 alias vim=nvim
 
 # replace cd
-alias cd="cd"
 alias zz="z -"
 # replace ls
 alias ls="exa"

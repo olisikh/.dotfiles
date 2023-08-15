@@ -44,6 +44,8 @@ in
       go
       coursier
       jdk11
+      awscli2
+      kcat
       # nodejs
       # (sbt.override { jre = jdk11; })
       # scala
