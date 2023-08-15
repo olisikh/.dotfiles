@@ -29,8 +29,7 @@ M.setup = function(capabilities, attach_lsp)
             'akka.stream.javadsl',
             'akka.http.javadsl',
           },
-          fallbackScalaVersion = '2.13.10',
-          serverVersion = 'latest.snapshot',
+          fallbackScalaVersion = '2.13.10'
         },
         init_options = {
           statusBarProvider = 'on',

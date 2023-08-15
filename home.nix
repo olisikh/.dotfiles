@@ -106,9 +106,6 @@ in
         sha256 = "sha256-m6MO0Q35YYkTtVqG1v48U7pHcsuPmieDwU2U1ZzQcjo=";
       };
 
-      # warp terminal
-      ".warp".source = "${homeDir}/.dotfiles/warp";
-
       # tmux
       ".tmux.conf".source = "${homeDir}/.dotfiles/tmux/.tmux.conf";
 
