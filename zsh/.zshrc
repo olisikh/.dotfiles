@@ -60,7 +60,6 @@ export JAVA_HOME=$HOME/.nix-profile/zulu-11.jdk/Contents/Home
 #
 # Example aliases
 alias zconf="nvim ~/.zshrc"
-# alias aws=awscliv2
 alias tf=terraform
 alias k=kubectl
 alias v=nvim

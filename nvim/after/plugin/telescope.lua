@@ -25,7 +25,7 @@ telescope.setup({
 -- Enable telescope fzf native, if installed
 pcall(telescope.load_extension, 'fzf')
 pcall(telescope.load_extension, 'dap')
-pcall(telescope.load_extension, 'frecency')
+-- pcall(telescope.load_extension, 'frecency')
 pcall(telescope.load_extension, 'ui-select')
 
 -- Telescope key mappings
@@ -36,7 +36,7 @@ nmap('<leader>/', function()
 end, { desc = 'fuzzy find in current buffer' })
 
 nmap('<leader>sf', telescope_builtin.git_files, { desc = '[s]earch [f]iles' })
-nmap('<leader>sr', telescope.extensions.frecency.frecency, { desc = '[s]earch [r]ecent files' })
+-- nmap('<leader>sr', telescope.extensions.frecency.frecency, { desc = '[s]earch [r]ecent files' })
 nmap('<leader>sp', telescope_builtin.find_files, { desc = '[s]earch [p]roject files' })
 nmap('<leader>sh', telescope_builtin.help_tags, { desc = '[s]earch [h]elp' })
 nmap('<leader>sw', telescope_builtin.grep_string, { desc = '[s]earch current [w]ord' })

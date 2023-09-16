@@ -45,6 +45,7 @@ in
       coursier
       jdk11
       kafkactl
+      awscli2
       kcat
       bun
       # nodejs
