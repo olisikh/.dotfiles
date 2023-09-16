@@ -15,6 +15,10 @@ source ${zsh_plugins}.zsh
 eval "$(thefuck --alias)"
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
+source <(kafkactl completion bash)
+
+# Enable direnv to enable nix-shell when cd into a dir with default.nix file
+eval "$(direnv hook zsh)"
 
 # User configuration
 # Setup catppuccin flavour (used in nvim, tmux, etc.)
@@ -84,6 +88,4 @@ export OPENAI_API_KEY=$(cat ~/.openai)
 # then you must source the file in your shell configuration
 [[ -s "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
 
-# Enable direnv to enable nix-shell when cd into a dir with default.nix file
-eval "$(direnv hook zsh)"
 
