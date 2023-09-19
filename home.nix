@@ -48,6 +48,8 @@ in
       awscli2
       kcat
       bun
+      stern # kubectl pod log scarping tool
+      htop
       # nodejs
       # (sbt.override { jre = jdk11; })
       # scala
