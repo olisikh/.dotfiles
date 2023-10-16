@@ -50,9 +50,9 @@ in
       bun
       stern # kubectl pod log scarping tool
       htop
-      # nodejs
-      # (sbt.override { jre = jdk11; })
-      # scala
+      nodejs
+      (sbt.override { jre = jdk11; })
+      scala
 
       # # You can also create simple shell scripts directly inside your
       # # configuration. For example, this adds a command 'my-hello' to your

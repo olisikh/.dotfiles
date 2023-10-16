@@ -78,7 +78,9 @@ alias cat="bat -pp"
 alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 
 # OpenAI API key for https://github.com/Bryley/neoai.nvim
-export OPENAI_API_KEY=$(cat ~/.openai)
+# export OPENAI_API_KEY=$(cat ~/.openai)
+
+alias mkhome="nix run .#homeConfigurations.olisikh.activationPackage --impure --show-trace"
 
 # overrides for work
 [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"

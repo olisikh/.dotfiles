@@ -5,7 +5,6 @@ require('mason-null-ls').setup({
   ensure_installed = {
     'prettier',
     'stylua',
-    'rustfmt',
     'gofumpt',
     'goimports',
     'estlint_d',

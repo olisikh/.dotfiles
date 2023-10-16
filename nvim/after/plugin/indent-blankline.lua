@@ -1,8 +1,8 @@
-local p = require('indent_blankline')
+local p = require('ibl')
 
 p.setup {
-  char = '┊',
-  show_trailing_blankline_indent = false,
+  -- char = '┊',
+  -- show_trailing_blankline_indent = false,
 }
 
 -- vim.cmd [[highlight IndentBlanklineIndent1 guifg=#E06C75 gui=nocombine]]
