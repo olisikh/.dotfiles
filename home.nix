@@ -73,12 +73,6 @@ in
         rev = "v1.8.6";
         sha256 = "sha256-CcWEXvz1TB6LFu9qvkVB1LJsa68grK16VqjUTiuVG/c=";
       };
-      ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
-        owner = "tmux-plugins";
-        repo = "tpm";
-        rev = "v3.1.0";
-        sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
-      };
 
       ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
       ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
@@ -134,6 +128,7 @@ in
     # if you don't want to manage your shell through Home Manager.
     sessionVariables = {
       JAVA_HOME = pkgs.jdk11;
+      CATPPUCCIN_FLAVOUR = "macchiato";
     };
   };
 
@@ -155,6 +150,67 @@ in
 
   programs.tmux = {
     enable = true;
+    extraConfig = ''
+      # Set true color
+      set -g default-terminal 'xterm-256color'
+      set -as terminal-overrides ',xterm*:Tc:sitm=\E[3m'
+
+      set -g mouse on
+
+      # change leader key to CTRL+s
+      unbind C-b
+      set -g prefix C-s
+      bind C-s send-prefix
+
+      set -sg escape-time 300
+      set -sg repeat-time 500
+
+      # Start windows and panes at 1, not 0
+      set -g status-position top
+      set -g base-index 1
+      setw -g pane-base-index 1
+      set-window-option -g pane-base-index 1
+      set-option -g renumber-windows on
+
+      bind-key x kill-pane # skip "kill-pane 1? (y/n)" prompt
+      set -g detach-on-destroy off  # don't exit from tmux when closing a session
+
+      unbind r
+      bind-key r source-file ~/.tmux.conf; display-message 'Config reloaded!'
+
+      bind -n M-H previous-window
+      bind -n M-L next-window
+
+      # resize panes
+      bind-key -r K resize-pane -U 2
+      bind-key -r J resize-pane -D 2
+      bind-key -r H resize-pane -L 2
+      bind-key -r L resize-pane -R 2
+
+      # act like vim
+      setw -g mode-keys vi
+
+      bind-key -T copy-mode-vi v send-keys -X begin-selection
+      bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+      bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+
+      # open panes in current dir
+      bind '"' split-window -c "#{pane_current_path}"
+      bind % split-window -h -c "#{pane_current_path}"
+    '';
+
+    plugins = with pkgs; [
+      {
+        plugin = tmuxPlugins.catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavour $CATPPUCCIN_FLAVOUR
+        '';
+      }
+      tmuxPlugins.sensible
+      tmuxPlugins.vim-tmux-navigator
+      tmuxPlugins.yank
+
+    ];
   };
 
   programs.alacritty = {
@@ -183,7 +239,7 @@ in
   };
 
   xdg.configFile = {
-    "tmux/tmux.conf".source = ./tmux/tmux.conf;
+    # "tmux/tmux.conf".source = ./tmux/tmux.conf;
     "alacritty/alacritty.yml".source = ./alacritty/alacritty.yml;
   };
 }
