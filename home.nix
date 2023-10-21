@@ -16,7 +16,6 @@ in
       nix-prefetch
       direnv # use nix-shell whenever using cd and default.nix or shell.nix is in path
       bash
-      zsh
       alacritty
       git
       (nerdfonts.override { fonts = [ "Hack" ]; })
@@ -29,7 +28,6 @@ in
       bat
       mc
       lua
-      # neovim
       tmux
       rustup
       luarocks
@@ -118,10 +116,6 @@ in
       # tmux
       ".tmux.conf".source = "${homeDir}/.dotfiles/tmux/.tmux.conf";
 
-      # git
-      ".gitconfig".source = "${homeDir}/.dotfiles/git/.gitconfig";
-      ".gitconfig_global".source = "${homeDir}/.dotfiles/git/.gitignore_global";
-
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in
       # # the Nix store. Activating the configuration will then make '~/.screenrc' a
       # # symlink to the Nix store copy.
@@ -164,6 +158,28 @@ in
     enable = true;
     viAlias = false;
     vimAlias = true;
+  };
+
+  programs.git = {
+    enable = true;
+    userName = "Oleksii Lisikh";
+    userEmail = "alisiikh@gmail.com";
+
+    extraConfig = {
+      core = {
+        autocrlf = "input";
+        excludesfile = "${homeDir}/.gitignore_global";
+      };
+
+      submodule = {
+        recurse = true;
+      };
+
+      init = {
+        defaultBranch = "main";
+      };
+    };
+
   };
 }
 

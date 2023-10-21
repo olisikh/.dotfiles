@@ -35,6 +35,11 @@
           inherit pkgs;
           modules = [ ./home.nix ];
         };
+
+        home-manager = {
+          useGlobalPkgs = true;
+          useUserPackages = true;
+        };
       }
     );
 }

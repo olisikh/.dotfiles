@@ -76,8 +76,3 @@ alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 # overrides for work
 [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"
 
-# If you do not plan on having Home Manager manage your shell configuration
-# then you must source the file in your shell configuration
-[[ -s "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
-
-
