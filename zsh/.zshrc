@@ -50,9 +50,6 @@ export PATH=$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 export CARGO_HOME=$HOME/.cargo
 export PATH="$CARGO_HOME/bin:$PATH"
 
-# Add java home folder
-export JAVA_HOME=$HOME/.nix-profile/zulu-11.jdk/Contents/Home
-
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
@@ -62,12 +59,11 @@ export JAVA_HOME=$HOME/.nix-profile/zulu-11.jdk/Contents/Home
 alias zconf="nvim ~/.zshrc"
 alias tf=terraform
 alias k=kubectl
-alias v=nvim
-alias vim=nvim
 
-# replace cd
+# smart cd
 alias zz="z -"
-# replace ls
+
+# smart ls
 alias ls="exa"
 alias ll="exa -alh"
 alias tree="exa --tree"
@@ -76,11 +72,6 @@ alias cat="bat -pp"
 
 # fuzzy find a folder, then open in neovim
 alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
-
-# OpenAI API key for https://github.com/Bryley/neoai.nvim
-# export OPENAI_API_KEY=$(cat ~/.openai)
-
-alias mkhome="nix run .#homeConfigurations.olisikh.activationPackage --impure --show-trace"
 
 # overrides for work
 [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"

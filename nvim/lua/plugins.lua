@@ -64,10 +64,8 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- TODO: Upgrade to latest fidget when it's ready
-      { 'j-hui/fidget.nvim',           tag = 'legacy', opts = { window = { blend = 0 } } },
+      { 'j-hui/fidget.nvim', tag = 'legacy', opts = { window = { blend = 0 } } },
 
-      -- Inlay hints
-      { 'lvimuser/lsp-inlayhints.nvim' },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       {
@@ -237,15 +235,6 @@ require('lazy').setup({
       "stevanmilic/neotest-scala",
       'rouge8/neotest-rust',
     }
-  },
-
-  -- OpenAI ChatGPT
-  {
-    'jackMort/ChatGPT.nvim',
-    event = 'VeryLazy',
-    dependencies = {
-      'MunifTanjim/nui.nvim',
-    },
   },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart

@@ -18,3 +18,4 @@ tree.setup({
 local nmap = require('helpers').nmap
 
 nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
+nmap('<leader>O', ':NvimTreeFindFile<cr>', { desc = 'nvim-tree: navigate to file', noremap = true })

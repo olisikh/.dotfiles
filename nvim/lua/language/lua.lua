@@ -5,6 +5,7 @@ local M = {}
 M.setup = function()
   -- setup lua dap
   local lua_group = vim.api.nvim_create_augroup('lua', { clear = true })
+
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'lua' },
     group = lua_group,

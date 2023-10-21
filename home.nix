@@ -25,11 +25,11 @@ in
       fzf
       zoxide
       ripgrep
-      exa
+      eza # exa fork, as original package is not maintained
       bat
       mc
       lua
-      neovim
+      # neovim
       tmux
       rustup
       luarocks
@@ -60,6 +60,11 @@ in
       # (pkgs.writeShellScriptBin "my-hello" ''
       #   echo "Hello, ${config.home.username}!"
       # '')
+
+      (pkgs.writeShellScriptBin "mkhome" ''
+        nix flake update ${homeDir}/.dotfiles && \
+          home-manager switch --flake ${homeDir}/.dotfiles#${user} --impure
+      '')
     ];
 
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -145,11 +150,20 @@ in
   };
 
   # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
+  programs.home-manager = {
+    enable = true;
+  };
 
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+  };
+
+  # TODO: configure neovim using nix
+  programs.neovim = {
+    enable = true;
+    viAlias = false;
+    vimAlias = true;
   };
 }
 

@@ -162,7 +162,7 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       hint = {
-        enable = false, -- for some reason ignored by inlay-hints plugin
+        enable = true
       },
     },
   },
