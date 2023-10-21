@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 let
   user = builtins.getEnv "USER";
   homeDir = "/Users/${user}";
@@ -16,7 +16,6 @@ in
       nix-prefetch
       direnv # use nix-shell whenever using cd and default.nix or shell.nix is in path
       bash
-      alacritty
       git
       (nerdfonts.override { fonts = [ "Hack" ]; })
       starship
@@ -84,13 +83,11 @@ in
       ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
       ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
       ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
-      ".zshenv".source = "${homeDir}/.dotfiles/zsh/.zshenv";
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
 
       ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
 
-      ".config/alacritty/alacritty.yml".source = "${homeDir}/.dotfiles/alacritty/alacritty.yml";
       ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
         owner = "catppuccin";
         repo = "alacritty";
@@ -112,9 +109,6 @@ in
         rev = "main";
         sha256 = "sha256-m6MO0Q35YYkTtVqG1v48U7pHcsuPmieDwU2U1ZzQcjo=";
       };
-
-      # tmux
-      ".tmux.conf".source = "${homeDir}/.dotfiles/tmux/.tmux.conf";
 
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in
       # # the Nix store. Activating the configuration will then make '~/.screenrc' a
@@ -139,7 +133,7 @@ in
     #
     # if you don't want to manage your shell through Home Manager.
     sessionVariables = {
-      # EDITOR = "emacs";
+      JAVA_HOME = pkgs.jdk11;
     };
   };
 
@@ -153,11 +147,18 @@ in
     enableCompletion = true;
   };
 
-  # TODO: configure neovim using nix
   programs.neovim = {
     enable = true;
     viAlias = false;
     vimAlias = true;
+  };
+
+  programs.tmux = {
+    enable = true;
+  };
+
+  programs.alacritty = {
+    enable = true;
   };
 
   programs.git = {
@@ -179,7 +180,11 @@ in
         defaultBranch = "main";
       };
     };
+  };
 
+  xdg.configFile = {
+    "tmux/tmux.conf".source = ./tmux/tmux.conf;
+    "alacritty/alacritty.yml".source = ./alacritty/alacritty.yml;
   };
 }
 
