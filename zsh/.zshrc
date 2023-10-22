@@ -20,28 +20,12 @@ source <(kafkactl completion bash)
 # Enable direnv to enable nix-shell when cd into a dir with default.nix file
 eval "$(direnv hook zsh)"
 
-# User configuration
-# Setup catppuccin flavour (used in nvim, tmux, etc.)
-export CATPPUCCIN_FLAVOUR="macchiato"
-export BAT_THEME="Catppuccin-$CATPPUCCIN_FLAVOUR"
-
-# Build bat themes if necessary
-bat --list-themes | grep -q "Catppuccin" || bat cache --build
-
-# Catppuccin syntax highlighting
-source $HOME/.zsh/catppuccin-$CATPPUCCIN_FLAVOUR.zsh
-
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vi'
 else
   export EDITOR='nvim'
 fi
-
-# ~/.tmux/plugins
-export PATH=$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
-# ~/.config/tmux/plugins
-export PATH=$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -67,11 +51,7 @@ alias zz="z -"
 alias ls="exa"
 alias ll="exa -alh"
 alias tree="exa --tree"
-# replace cat
 alias cat="bat -pp"
-
-# fuzzy find a folder, then open in neovim
-alias nv="fd --type file --exclude .git | fzf-tmux -p --reverse | xargs nvim"
 
 # overrides for work
 [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"

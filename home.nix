@@ -2,6 +2,7 @@
 let
   user = builtins.getEnv "USER";
   homeDir = "/Users/${user}";
+  catppuccinFlavour = "macchiato";
 in
 {
   home = {
@@ -18,13 +19,11 @@ in
       bash
       git
       (nerdfonts.override { fonts = [ "Hack" ]; })
-      starship
       fd
       fzf
       zoxide
       ripgrep
       eza # exa fork, as original package is not maintained
-      bat
       mc
       lua
       tmux
@@ -45,7 +44,7 @@ in
       awscli2
       kcat
       bun
-      stern # kubectl pod log scarping tool
+      stern # kubectl pod log scraping tool
       htop
       nodejs
       (sbt.override { jre = jdk11; })
@@ -80,20 +79,11 @@ in
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
 
-      ".config/starship.toml".source = "${homeDir}/.dotfiles/starship/starship.toml";
-
       ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
         owner = "catppuccin";
         repo = "alacritty";
         rev = "main";
         sha256 = "sha256-w9XVtEe7TqzxxGUCDUR9BFkzLZjG8XrplXJ3lX6f+x0=";
-      };
-
-      ".config/bat/themes".source = pkgs.fetchFromGitHub {
-        owner = "catppuccin";
-        repo = "bat";
-        rev = "main";
-        sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
       };
 
       ".local/share/mc/ini".source = "${homeDir}/.dotfiles/mc/ini";
@@ -128,7 +118,7 @@ in
     # if you don't want to manage your shell through Home Manager.
     sessionVariables = {
       JAVA_HOME = pkgs.jdk11;
-      CATPPUCCIN_FLAVOUR = "macchiato";
+      CATPPUCCIN_FLAVOUR = catppuccinFlavour; # still used by nvim lua files
     };
   };
 
@@ -140,6 +130,35 @@ in
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+
+    initExtra = ''
+      source ${homeDir}/.zsh/catppuccin-${catppuccinFlavour}.zsh
+    '';
+  };
+
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.bat = {
+    enable = true;
+
+    themes = {
+      catppuccin = {
+        src = pkgs.fetchFromGitHub {
+          owner = "catppuccin";
+          repo = "bat";
+          rev = "main";
+          sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
+        };
+        file = "Catppuccin-${catppuccinFlavour}.tmTheme";
+      };
+    };
+
+    config = {
+      theme = "catppuccin";
+    };
   };
 
   programs.neovim = {
@@ -199,17 +218,16 @@ in
       bind % split-window -h -c "#{pane_current_path}"
     '';
 
-    plugins = with pkgs; [
+    plugins = with pkgs.tmuxPlugins; [
       {
-        plugin = tmuxPlugins.catppuccin;
+        plugin = catppuccin;
         extraConfig = ''
-          set -g @catppuccin_flavour $CATPPUCCIN_FLAVOUR
+          set -g @catppuccin_flavour ${catppuccinFlavour}
         '';
       }
-      tmuxPlugins.sensible
-      tmuxPlugins.vim-tmux-navigator
-      tmuxPlugins.yank
-
+      sensible
+      vim-tmux-navigator
+      yank
     ];
   };
 
@@ -239,8 +257,9 @@ in
   };
 
   xdg.configFile = {
-    # "tmux/tmux.conf".source = ./tmux/tmux.conf;
     "alacritty/alacritty.yml".source = ./alacritty/alacritty.yml;
+    "starship.toml".source = ./starship/starship.toml;
   };
 }
+
 
