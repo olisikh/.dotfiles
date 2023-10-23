@@ -169,12 +169,23 @@ in
 
   programs.tmux = {
     enable = true;
+
     extraConfig = ''
       # Set true color
       set -g default-terminal 'xterm-256color'
       set -as terminal-overrides ',xterm*:Tc:sitm=\E[3m'
 
       set -g mouse on
+      set-window-option -g xterm-keys on
+
+      unbind Left
+      unbind Down
+      unbind Up
+      unbind Right
+
+      unbind M-Left
+      unbind M-Right
+
 
       # change leader key to CTRL+s
       unbind C-b

@@ -1,4 +1,5 @@
 # init completions
+fpath+=~/.zfunc
 autoload -U +X compinit && compinit
 
 # friendly plugins paths
