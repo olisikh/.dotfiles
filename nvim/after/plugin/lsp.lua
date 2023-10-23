@@ -103,7 +103,6 @@ local servers = {
       }
     }
   },
-  rnix = {},
   rust_analyzer = {
     cargo = {
       allFeatures = true,
@@ -166,6 +165,14 @@ local servers = {
       },
     },
   },
+  nil_ls = {
+    ['nil'] = {
+      testSetting = 42,
+      formatting = {
+        command = { "nixpkgs-fmt" },
+      },
+    },
+  }
 }
 
 
