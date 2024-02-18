@@ -32,7 +32,6 @@ in
       python3
       thefuck
       docker
-      docker-machine
       minikube
       kubernetes-helm
       awscli2
