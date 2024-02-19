@@ -46,7 +46,7 @@ in
       stern # kubectl pod log scraping tool
       htop
       nodejs
-      (sbt.override { jre = jdk11; })
+      (sbt.override { jre = jdk17; })
       scala
 
       # # You can also create simple shell scripts directly inside your
