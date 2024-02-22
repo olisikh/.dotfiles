@@ -1,5 +1,5 @@
 # init completions
-fpath+=~/.zfunc
+autoload -U +X bashcompinit && bashcompinit
 autoload -U +X compinit && compinit
 
 # friendly plugins paths
@@ -41,7 +41,6 @@ export PATH="$CARGO_HOME/bin:$PATH"
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zconf="nvim ~/.zshrc"
 alias tf=terraform
 alias k=kubectl
 
