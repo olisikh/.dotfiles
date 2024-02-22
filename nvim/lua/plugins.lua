@@ -141,7 +141,11 @@ require('lazy').setup({
 
   -- Unofficial Codeium plugin, interactive AI autocomplete
   {
-    'jcdickinson/codeium.nvim',
+    'Exafunction/codeium.nvim',
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "hrsh7th/nvim-cmp",
+    },
     event = 'InsertEnter',
     opts = {},
   },
