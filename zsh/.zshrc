@@ -16,7 +16,7 @@ source ${zsh_plugins}.zsh
 eval "$(thefuck --alias)"
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
-source <(kafkactl completion bash)
+eval "$(kafkactl completion zsh)"
 
 # Enable direnv to enable nix-shell when cd into a dir with default.nix file
 eval "$(direnv hook zsh)"

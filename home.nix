@@ -38,7 +38,7 @@ in
       yarn
       go
       coursier
-      jdk11
+      jdk17
       kafkactl
       awscli2
       kcat
