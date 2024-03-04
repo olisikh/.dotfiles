@@ -15,9 +15,13 @@ require('lazy').setup({
   'tpope/vim-rhubarb',
 
   -- File tree explorer
-  'nvim-tree/nvim-tree.lua',
-  -- Beautiful nerd font icons in nvim tree
-  'nvim-tree/nvim-web-devicons',
+  {
+    'nvim-tree/nvim-tree.lua',
+    dependencies = {
+      { 'nvim-tree/nvim-web-devicons', opts = {} }
+    }
+  },
+
   -- Beautiful nerd font icons in cmp
   'onsails/lspkind-nvim',
 
