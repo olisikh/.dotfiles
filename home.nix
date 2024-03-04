@@ -3,6 +3,9 @@ let
   user = builtins.getEnv "USER";
   homeDir = "/Users/${user}";
   catppuccinFlavour = "macchiato";
+
+  userName = builtins.getEnv "GIT_NAME";
+  userEmail = builtins.getEnv "GIT_EMAIL";
 in
 {
   home = {
@@ -248,8 +251,8 @@ in
 
   programs.git = {
     enable = true;
-    userName = "Oleksii Lisikh";
-    userEmail = "alisiikh@gmail.com";
+    userName = userName;
+    userEmail = userEmail;
 
     extraConfig = {
       core = {
