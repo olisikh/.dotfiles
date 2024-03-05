@@ -18,14 +18,10 @@ in
     # environment.
     packages = with pkgs; [
       nix-prefetch
-      direnv # use nix-shell whenever using cd and default.nix or shell.nix is in path
       bash
-      git
       (nerdfonts.override { fonts = [ "Hack" ]; })
       fd
       fzf
-      zoxide
-      ripgrep
       eza # exa fork, as original package is not maintained
       mc
       lua
@@ -70,6 +66,7 @@ in
     # plain files is through 'home.file'.
     file = {
       ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
+      ".envrc".text = "use_nix";
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
 
@@ -136,12 +133,7 @@ in
       source ${homeDir}/.zsh/catppuccin-${catppuccinFlavour}.zsh
 
       eval "$(thefuck --alias)"
-      eval "$(zoxide init zsh)"
-      eval "$(starship init zsh)"
       eval "$(kafkactl completion zsh)"
-
-      # Enable direnv to enable nix-shell when cd into a dir with default.nix file
-      eval "$(direnv hook zsh)"
 
       # Preferred editor for local and remote sessions
       if [[ -n $SSH_CONNECTION ]]; then
@@ -167,7 +159,7 @@ in
       alias cat="bat -pp"
 
       # overrides for work
-      [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"
+      [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
     '';
 
     antidote = {
@@ -186,9 +178,38 @@ in
     };
   };
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.ripgrep = {
+    enable = true;
+  };
+
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
+
+    settings = {
+      scala.symbol = " ";
+      java.symbol = " ";
+      nix_shell.symbol = "❄️";
+
+      # [golang]
+      # symbol = ' '
+      # [rust]
+      # symbol = ' '
+
+      aws.disabled = true;
+      # symbol = '󰸏 '
+    };
   };
 
   programs.bat = {
@@ -318,7 +339,6 @@ in
 
   xdg.configFile = {
     "alacritty/alacritty.yml".source = ./alacritty/alacritty.yml;
-    "starship.toml".source = ./starship/starship.toml;
   };
 }
 
