@@ -18,3 +18,12 @@ fi
 # End Nix
 ```
 
+## Nix and Github
+
+Nix downloads packages from Github and you may quickly get rate limited by Github.
+For that not to happen, generate a token in Github and add it to nix.conf file as:
+
+```
+access-tokens = github.com=<your_access_token>
+```
+

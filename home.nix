@@ -69,16 +69,7 @@ in
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
     # plain files is through 'home.file'.
     file = {
-      ".antidote".source = pkgs.fetchFromGitHub {
-        owner = "mattmc3";
-        repo = "antidote";
-        rev = "v1.8.6";
-        sha256 = "sha256-CcWEXvz1TB6LFu9qvkVB1LJsa68grK16VqjUTiuVG/c=";
-      };
-
       ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
-      ".zshrc".source = "${homeDir}/.dotfiles/zsh/.zshrc";
-      ".zsh_plugins.txt".source = "${homeDir}/.dotfiles/zsh/.zsh_plugins.txt";
 
       ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
 
@@ -120,7 +111,7 @@ in
     #
     # if you don't want to manage your shell through Home Manager.
     sessionVariables = {
-      JAVA_HOME = pkgs.jdk11;
+      JAVA_HOME = pkgs.jdk17;
       CATPPUCCIN_FLAVOUR = catppuccinFlavour; # still used by nvim lua files
     };
   };
@@ -133,10 +124,66 @@ in
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+    enableAutosuggestions = true;
+
+    initExtraBeforeCompInit = ''
+      # init completions
+      autoload -U +X bashcompinit && bashcompinit
+      autoload -U +X compinit && compinit
+    '';
 
     initExtra = ''
       source ${homeDir}/.zsh/catppuccin-${catppuccinFlavour}.zsh
+
+      eval "$(thefuck --alias)"
+      eval "$(zoxide init zsh)"
+      eval "$(starship init zsh)"
+      eval "$(kafkactl completion zsh)"
+
+      # Enable direnv to enable nix-shell when cd into a dir with default.nix file
+      eval "$(direnv hook zsh)"
+
+      # Preferred editor for local and remote sessions
+      if [[ -n $SSH_CONNECTION ]]; then
+        export EDITOR='vi'
+      else
+        export EDITOR='nvim'
+      fi
+
+      # Add rust (cargo) executables
+      export CARGO_HOME=$HOME/.cargo
+      export PATH="$CARGO_HOME/bin:$PATH"
+
+      alias tf=terraform
+      alias k=kubectl
+
+      # smart cd
+      alias zz="z -"
+
+      # smart ls
+      alias ls="exa"
+      alias ll="exa -alh"
+      alias tree="exa --tree"
+      alias cat="bat -pp"
+
+      # overrides for work
+      [[ -s "$HOME/.zshrc-extras" ]] && source "$HOME/.zshrc-extras"
     '';
+
+    antidote = {
+      enable = true;
+      useFriendlyNames = true;
+
+      plugins = [
+        "rupa/z"
+        "zsh-users/zsh-completions"
+        "zsh-users/zsh-autosuggestions"
+        "zsh-users/zsh-syntax-highlighting"
+        "chisui/zsh-nix-shell"
+        "nix-community/nix-zsh-completions"
+        "ohmyzsh/ohmyzsh path:plugins/git"
+      ];
+    };
   };
 
   programs.starship = {
@@ -189,7 +236,6 @@ in
       unbind M-Left
       unbind M-Right
 
-
       # change leader key to CTRL+s
       unbind C-b
       set -g prefix C-s
@@ -209,7 +255,7 @@ in
       set -g detach-on-destroy off  # don't exit from tmux when closing a session
 
       unbind r
-      bind-key r source-file ~/.tmux.conf; display-message 'Config reloaded!'
+      bind-key r source-file ~/.config/tmux/tmux.conf; display-message 'Config reloaded!'
 
       bind -n M-H previous-window
       bind -n M-L next-window

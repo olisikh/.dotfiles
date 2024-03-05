@@ -14,4 +14,3 @@ cp -fr ~/.dotfiles/nix/nix.conf ~/.config/nix/nix.conf
 # download the internet and install flake
 nix run .#homeConfigurations.olisikh.activationPackage --impure --show-trace
 
-

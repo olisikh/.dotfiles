@@ -4,6 +4,9 @@ require('lazy').setup({
   -- Statusline plugin
   { 'feline-nvim/feline.nvim' },
 
+  -- icons
+  { 'nvim-tree/nvim-web-devicons',    opts = {} },
+
   -- tmux integration plugin
   { 'christoomey/vim-tmux-navigator', lazy = false },
 
@@ -15,12 +18,7 @@ require('lazy').setup({
   'tpope/vim-rhubarb',
 
   -- File tree explorer
-  {
-    'nvim-tree/nvim-tree.lua',
-    dependencies = {
-      { 'nvim-tree/nvim-web-devicons', opts = {} }
-    }
-  },
+  'nvim-tree/nvim-tree.lua',
 
   -- Beautiful nerd font icons in cmp
   'onsails/lspkind-nvim',
@@ -146,48 +144,9 @@ require('lazy').setup({
   -- Unofficial Codeium plugin, interactive AI autocomplete
   {
     'Exafunction/codeium.nvim',
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "hrsh7th/nvim-cmp",
-    },
     event = 'InsertEnter',
     opts = {},
   },
-
-  -- Github copilot, use :Copilot setup to configure
-  -- {
-  --   'zbirenbaum/copilot.lua',
-  --   cmd = "Copilot",
-  --   event = "InsertEnter",
-  --   config = function()
-  --     require("copilot").setup({
-  --       suggestion = {
-  --         enabled = true,
-  --         auto_trigger = true,
-  --         debounce = 0,
-  --         keymap = {
-  --           accept = "<C-g>",
-  --         }
-  --       },
-  --       filetypes = {
-  --         scala = true,
-  --         lua = true
-  --       }
-  --     })
-  --   end,
-  -- },
-
-  -- Official Codeium plugin, without cmp integration
-  -- {
-  --   'Exafunction/codeium.vim',
-  --   config = function()
-  --     -- Change '<C-g>' here to any keycode you like.
-  --     vim.keymap.set('i', '<C-g>', function() return vim.fn['codeium#Accept']() end, { expr = true })
-  --     vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
-  --     vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
-  --     vim.keymap.set('i', '<c-x>', function() return vim.fn['codeium#Clear']() end, { expr = true })
-  --   end
-  -- },
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
@@ -227,7 +186,7 @@ require('lazy').setup({
   -- Add indentation function/class/etc context lines
   'lukas-reineke/indent-blankline.nvim',
 
-  -- "gc" to comment visual regions/lines
+  -- Comment lines and blocks with 'gcc', 'gbc'
   { 'numToStr/Comment.nvim',   opts = {} },
 
   --  comments highlighting and navigation
