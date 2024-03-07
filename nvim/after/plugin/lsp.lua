@@ -44,14 +44,15 @@ local function attach_lsp(client, bufnr)
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
 
 
-  local caps = client.server_capabilities
-  if caps.documentFormattingProvider then
+  local server_capabilities = client.server_capabilities
+  if server_capabilities.documentFormattingProvider then
     local function fmt_code()
       vim.lsp.buf.format({ bufnr = bufnr })
     end
 
     -- Create a command `:Format` local to the LSP buffer
     vim.api.nvim_buf_create_user_command(bufnr, 'Format', fmt_code, { desc = 'lsp: format code' })
+
     -- Format code before save :w
     vim.api.nvim_create_autocmd('BufWritePre', {
       callback = fmt_code,
@@ -60,7 +61,7 @@ local function attach_lsp(client, bufnr)
     })
   end
 
-  if caps.documentHighlightProvider then
+  if server_capabilities.documentHighlightProvider then
     vim.api.nvim_create_autocmd('CursorHold', {
       callback = vim.lsp.buf.document_highlight,
       buffer = bufnr,
@@ -68,7 +69,7 @@ local function attach_lsp(client, bufnr)
     })
   end
 
-  if caps.referencesProvider then
+  if server_capabilities.referencesProvider then
     vim.api.nvim_create_autocmd('CursorMoved', {
       callback = vim.lsp.buf.clear_references,
       buffer = bufnr,
@@ -76,7 +77,7 @@ local function attach_lsp(client, bufnr)
     })
   end
 
-  if caps.codeLensProvider then
+  if server_capabilities.codeLensProvider then
     vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
       callback = vim.lsp.codelens.refresh,
       buffer = bufnr,
@@ -89,6 +90,13 @@ local function attach_lsp(client, bufnr)
     callback = function() require('dap.ext.autocompl').attach(bufnr) end,
     group = lsp_group,
   })
+
+  if server_capabilities.inlayHintProvider then
+    pcall(function()
+      vim.lsp.inlay_hint.enable(bufnr, true)
+      vim.notify("Inlay hints are finally enabled!")
+    end)
+  end
 end
 
 

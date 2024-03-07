@@ -192,6 +192,14 @@ require('lazy').setup({
   --  comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
 
+  -- nice notifications in vim
+  {
+    'rcarriga/nvim-notify',
+    config = function()
+      vim.notify = require('notify')
+    end
+  },
+
   -- 'vim-test/vim-test',
   {
     -- Neotest framework for running tests

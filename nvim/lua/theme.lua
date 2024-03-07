@@ -10,6 +10,7 @@ require('catppuccin').setup({
   },
   no_italic = false,
   no_bold = false,
+  no_underline = false,
   term_colors = false,
   dim_inactive = {
     enabled = true,
