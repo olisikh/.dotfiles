@@ -16,7 +16,7 @@ cmp.setup({
       scrollbar = '',
     },
   },
-  confirmation = {
+  completion = {
     completeopt = 'menu,menuone,noinsert',
   },
   snippet = {
