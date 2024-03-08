@@ -1,6 +1,7 @@
 require('lazy').setup({
   -- Catppuccin theme
   { 'catppuccin/nvim', name = 'catppuccin' },
+
   -- Statusline plugin
   { 'feline-nvim/feline.nvim' },
 
@@ -13,20 +14,24 @@ require('lazy').setup({
   -- required by most plugins
   'nvim-lua/plenary.nvim',
 
-  -- Git related pluginss
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
+  -- Git plugin
+  {
+    'tpope/vim-fugitive',
+    dependencies = {
+      'tpope/vim-rhubarb',
+    },
+  },
 
   -- File tree explorer
   'nvim-tree/nvim-tree.lua',
 
-  -- Beautiful nerd font icons in cmp
-  'onsails/lspkind-nvim',
-
   -- Traverse diagnostics in a separate window
   'folke/trouble.nvim',
 
+  -- quick navigation between frequently used files
   'theprimeagen/harpoon',
+
+  -- undo tree history
   'mbbill/undotree',
 
   -- Autocompletion (cmp), integration with lsp, ai, snippets, etc.
@@ -39,11 +44,11 @@ require('lazy').setup({
       'hrsh7th/cmp-nvim-lsp-signature-help',
       'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',
+      -- Beautiful nerd font icons in cmp
+      'onsails/lspkind-nvim',
     },
   },
 
-  -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
   {
     -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
@@ -64,10 +69,7 @@ require('lazy').setup({
   },
 
   -- status updates for LSP showing on the right
-  {
-    'j-hui/fidget.nvim',
-    opts = {},
-  },
+  { 'j-hui/fidget.nvim', opts = {} },
 
   -- Additional lua configuration, makes nvim stuff amazing!
   {
@@ -109,8 +111,6 @@ require('lazy').setup({
         -- Only load if `make` is available. Make sure you have the system
         -- requirements installed.
         'nvim-telescope/telescope-fzf-native.nvim',
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
         build = 'make',
         cond = function()
           return vim.fn.executable('make') == 1
@@ -149,27 +149,18 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
-  -- Multi-line selection (do I really need it?) CTRL+N select word
+  -- Multi-cursor selection ctrl+up/down - to add cursor, ctrl+n - select next word, shift-arrow - per char
   'mg979/vim-visual-multi',
 
   -- Auto add closing bracket or closing quote
   { 'windwp/nvim-autopairs', opts = {} },
 
-  -- Surround text objects
+  -- Surround text objects, ys - surround, ds - delete around, cs - change around
   {
     'kylechui/nvim-surround',
     version = '*',
     event = 'VeryLazy',
     opts = {},
-  },
-
-  -- Jump to any char in the buffer using as few keystrokes as possible
-  {
-    'phaazon/hop.nvim',
-    branch = 'v2',
-    opts = {
-      keys = 'etovxqpdygfblzhckisuran',
-    },
   },
 
   -- Smart join lines in blocks
@@ -182,7 +173,7 @@ require('lazy').setup({
   'lewis6991/gitsigns.nvim',
 
   -- Add indentation function/class/etc context lines
-  'lukas-reineke/indent-blankline.nvim',
+  { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 
   -- Comment lines and blocks with 'gcc', 'gbc'
   { 'numToStr/Comment.nvim', opts = {} },
@@ -194,6 +185,7 @@ require('lazy').setup({
   {
     'rcarriga/nvim-notify',
     config = function()
+      -- globally setup nvim-notify to be nvim notifications provider
       vim.notify = require('notify')
     end,
   },
@@ -209,22 +201,6 @@ require('lazy').setup({
       'rouge8/neotest-rust',
     },
   },
-
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
-
-  -- NOTE: The import below automatically adds your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  --
-  --    An additional note is that if you only copied in the `init.lua`, you can just comment this line
-  --    to get rid of the warning telling you that there are not plugins in `lua/custom/plugins/`.
-  -- { import = 'custom.plugins' },
 }, {
   lockfile = vim.fn.stdpath('data') .. '/lazy/lazy-lock.json',
 })

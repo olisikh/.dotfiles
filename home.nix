@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 let
   user = builtins.getEnv "USER";
   homeDir = "/Users/${user}";
@@ -341,5 +341,3 @@ in
     "alacritty/alacritty.yml".source = ./alacritty/alacritty.yml;
   };
 }
-
-
