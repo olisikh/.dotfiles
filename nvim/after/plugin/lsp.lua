@@ -26,7 +26,6 @@ local function attach_lsp(client, bufnr)
   -- nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]oto [t]ype definition' })
   nmap('gt', '<cmd>Lspsaga goto_type_definition<cr>', { desc = 'lsp: goto [t]ype definition' })
 
-
   nmap('gD', vim.lsp.buf.declaration, { desc = 'lsp: [g]oto [d]eclaration' })
   map('i', '<C-h>', vim.lsp.buf.signature_help, { desc = 'lsp: signature [h]elp' })
 
@@ -43,7 +42,6 @@ local function attach_lsp(client, bufnr)
   nmap('Q', '<cmd>Lspsaga hover_doc<CR>', { desc = 'lsp: hover doc' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
 
-
   local server_capabilities = client.server_capabilities
   if server_capabilities.documentFormattingProvider then
     local function fmt_code()
@@ -58,6 +56,16 @@ local function attach_lsp(client, bufnr)
       callback = fmt_code,
       buffer = bufnr,
       group = lsp_group,
+    })
+  else
+    -- Delete trailing whitespace on save at least, if formatter is not available
+    vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+      pattern = '*',
+      callback = function()
+        local cursor = vim.fn.getpos('.')
+        vim.cmd([[%s/\s\+$//e]])
+        vim.fn.setpos('.', cursor)
+      end,
     })
   end
 
@@ -87,18 +95,19 @@ local function attach_lsp(client, bufnr)
 
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'dap-repl' },
-    callback = function() require('dap.ext.autocompl').attach(bufnr) end,
+    callback = function()
+      require('dap.ext.autocompl').attach(bufnr)
+    end,
     group = lsp_group,
   })
 
   if server_capabilities.inlayHintProvider then
     pcall(function()
       vim.lsp.inlay_hint.enable(bufnr, true)
-      vim.notify("Inlay hints are finally enabled!")
+      vim.notify('Inlay hints are finally enabled!')
     end)
   end
 end
-
 
 local servers = {
   dockerls = {},
@@ -107,9 +116,9 @@ local servers = {
   yamlls = {
     settings = {
       yaml = {
-        keyOrdering = false -- disable alphabetic ordering of keys
-      }
-    }
+        keyOrdering = false, -- disable alphabetic ordering of keys
+      },
+    },
   },
   rust_analyzer = {
     cargo = {
@@ -169,20 +178,17 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       hint = {
-        enable = true
+        enable = true,
       },
     },
   },
   nil_ls = {
     ['nil'] = {
+      autostart = true,
       testSetting = 42,
-      formatting = {
-        command = { "nixpkgs-fmt" },
-      },
     },
-  }
+  },
 }
-
 
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup({

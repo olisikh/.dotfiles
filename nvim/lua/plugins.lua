@@ -1,11 +1,11 @@
 require('lazy').setup({
   -- Catppuccin theme
-  { 'catppuccin/nvim',                name = 'catppuccin' },
+  { 'catppuccin/nvim', name = 'catppuccin' },
   -- Statusline plugin
   { 'feline-nvim/feline.nvim' },
 
   -- icons
-  { 'nvim-tree/nvim-web-devicons',    opts = {} },
+  { 'nvim-tree/nvim-web-devicons', opts = {} },
 
   -- tmux integration plugin
   { 'christoomey/vim-tmux-navigator', lazy = false },
@@ -49,26 +49,25 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim',           opts = {} },
+      { 'williamboman/mason.nvim', opts = {} },
       { 'williamboman/mason-lspconfig.nvim', opts = { auto_install = true } },
       {
         'jay-babu/mason-null-ls.nvim',
         event = { 'BufReadPre', 'BufNewFile' },
-        dependencies = { "nvimtools/none-ls.nvim", }
+        dependencies = { 'nvimtools/none-ls.nvim' },
       },
       {
         'jay-babu/mason-nvim-dap.nvim',
-        dependencies = { 'mfussenegger/nvim-dap', },
+        dependencies = { 'mfussenegger/nvim-dap' },
       },
-    }
+    },
   },
 
   -- status updates for LSP showing on the right
   {
     'j-hui/fidget.nvim',
-    opts = {}
+    opts = {},
   },
-
 
   -- Additional lua configuration, makes nvim stuff amazing!
   {
@@ -86,7 +85,7 @@ require('lazy').setup({
 
   -- Rust tools & others
   { 'simrat39/rust-tools.nvim', ft = 'rust' },
-  { 'saecki/crates.nvim',       opts = {},  ft = { 'rust', 'toml' } },
+  { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
 
   -- Debugging
   {
@@ -95,8 +94,8 @@ require('lazy').setup({
       { 'theHamsta/nvim-dap-virtual-text' },
       { 'rcarriga/nvim-dap-ui' },
       { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
-      { 'leoluz/nvim-dap-go' },                -- debug go
-      { 'mxsdev/nvim-dap-vscode-js' },         -- debug js
+      { 'leoluz/nvim-dap-go' }, -- debug go
+      { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
     },
   },
 
@@ -133,7 +132,7 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter-textobjects',
       'nvim-treesitter/nvim-treesitter-context',
       -- LSP enhance plugin
-      { "glepnir/lspsaga.nvim", event = "LspAttach", },
+      { 'glepnir/lspsaga.nvim', event = 'LspAttach' },
     },
     config = function()
       pcall(require('nvim-treesitter.install').update({ with_sync = true }))
@@ -154,7 +153,7 @@ require('lazy').setup({
   'mg979/vim-visual-multi',
 
   -- Auto add closing bracket or closing quote
-  { 'windwp/nvim-autopairs',   opts = {} },
+  { 'windwp/nvim-autopairs', opts = {} },
 
   -- Surround text objects
   {
@@ -186,7 +185,7 @@ require('lazy').setup({
   'lukas-reineke/indent-blankline.nvim',
 
   -- Comment lines and blocks with 'gcc', 'gbc'
-  { 'numToStr/Comment.nvim',   opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
 
   --  comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
@@ -196,7 +195,7 @@ require('lazy').setup({
     'rcarriga/nvim-notify',
     config = function()
       vim.notify = require('notify')
-    end
+    end,
   },
 
   -- 'vim-test/vim-test',
@@ -206,9 +205,9 @@ require('lazy').setup({
     dependencies = {
       'nvim-neotest/neotest-plenary',
       'nvim-neotest/neotest-go',
-      "stevanmilic/neotest-scala",
+      'stevanmilic/neotest-scala',
       'rouge8/neotest-rust',
-    }
+    },
   },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
@@ -227,5 +226,5 @@ require('lazy').setup({
   --    to get rid of the warning telling you that there are not plugins in `lua/custom/plugins/`.
   -- { import = 'custom.plugins' },
 }, {
-  lockfile = vim.fn.stdpath("data") .. "/lazy/lazy-lock.json"
+  lockfile = vim.fn.stdpath('data') .. '/lazy/lazy-lock.json',
 })

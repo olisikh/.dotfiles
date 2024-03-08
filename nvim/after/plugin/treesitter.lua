@@ -21,7 +21,7 @@ require('nvim-treesitter.configs').setup({
     'vim',
     'vimdoc',
     'markdown',
-    'markdown_inline'
+    'markdown_inline',
   },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)

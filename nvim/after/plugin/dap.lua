@@ -35,7 +35,9 @@ end
 
 nmap('<F1>', dap_ui.toggle, { desc = 'dap-ui: toggle' })
 nmap('<F2>', dap.set_breakpoint, { desc = 'dap: set breakpoint' })
-nmap('<F3>', function() dap.set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, { desc = 'dap: cond breakpoint' })
+nmap('<F3>', function()
+  dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+end, { desc = 'dap: cond breakpoint' })
 nmap('<F4>', dap.toggle_breakpoint, { desc = 'dap: breakpoint' })
 nmap('<F5>', dap.continue, { desc = 'dap: continue' })
 nmap('<F6>', dap.step_over, { desc = 'dap: step over' })
@@ -46,8 +48,12 @@ nmap('<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
 nmap('<leader>dh', dap_widgets.hover, { desc = 'dap: hover' })
 nmap('<leader>do', dap_ui.toggle, { desc = 'dap-ui: toggle ui' })
 nmap('<leader>dq', dap.terminate, { desc = 'dap: terminate' })
-nmap('<leader>dr', function() dap.restart({ terminateDebugee = false }) end, { desc = 'dap: restart dap' })
-nmap('<leader>dR', function() dap.restart({ terminateDebugee = true }) end, { desc = 'dap: terminate & restart dap' })
+nmap('<leader>dr', function()
+  dap.restart({ terminateDebugee = false })
+end, { desc = 'dap: restart dap' })
+nmap('<leader>dR', function()
+  dap.restart({ terminateDebugee = true })
+end, { desc = 'dap: terminate & restart dap' })
 
 local sign = vim.fn.sign_define
 
@@ -70,8 +76,8 @@ require('nvim-dap-virtual-text').setup({
     return ' ' .. variable.name .. ' = ' .. variable.value .. ' '
   end,
   -- experimental features:
-  virt_text_pos = 'eol',   -- position of virtual text, see `:h nvim_buf_set_extmark()`
-  all_frames = false,      -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
-  virt_lines = false,      -- show virtual lines instead of virtual text (will flicker!)
+  virt_text_pos = 'eol', -- position of virtual text, see `:h nvim_buf_set_extmark()`
+  all_frames = false, -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
+  virt_lines = false, -- show virtual lines instead of virtual text (will flicker!)
   virt_text_win_col = nil, -- position the virtual text at a fixed window column (starting from the first text column) ,
 })
