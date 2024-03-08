@@ -54,30 +54,29 @@ require('lazy').setup({
       {
         'jay-babu/mason-null-ls.nvim',
         event = { 'BufReadPre', 'BufNewFile' },
-        dependencies = { 'jose-elias-alvarez/null-ls.nvim' },
+        dependencies = { "nvimtools/none-ls.nvim", }
       },
-
       {
         'jay-babu/mason-nvim-dap.nvim',
-        dependencies = {
-          'mfussenegger/nvim-dap',
-        },
+        dependencies = { 'mfussenegger/nvim-dap', },
       },
+    }
+  },
 
-      -- Useful status updates for LSP
-      -- TODO: Upgrade to latest fidget when it's ready
-      { 'j-hui/fidget.nvim', tag = 'legacy', opts = { window = { blend = 0 } } },
+  -- status updates for LSP showing on the right
+  {
+    'j-hui/fidget.nvim',
+    opts = {}
+  },
 
 
-      -- Additional lua configuration, makes nvim stuff amazing!
-      {
-        'folke/neodev.nvim',
-        opts = {
-          library = {
-            plugins = { 'nvim-dap-ui', 'neotest' },
-            types = true,
-          },
-        },
+  -- Additional lua configuration, makes nvim stuff amazing!
+  {
+    'folke/neodev.nvim',
+    opts = {
+      library = {
+        plugins = { 'nvim-dap-ui', 'neotest' },
+        types = true,
       },
     },
   },
