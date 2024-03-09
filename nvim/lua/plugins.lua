@@ -54,7 +54,7 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', opts = {} },
+      { 'williamboman/mason.nvim', opts = { ui = { border = 'rounded' } } },
       { 'williamboman/mason-lspconfig.nvim' },
       {
         'jay-babu/mason-null-ls.nvim',
@@ -203,4 +203,7 @@ require('lazy').setup({
   },
 }, {
   lockfile = vim.fn.stdpath('data') .. '/lazy/lazy-lock.json',
+  ui = {
+    border = 'rounded',
+  },
 })

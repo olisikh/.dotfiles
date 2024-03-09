@@ -3,11 +3,11 @@ local api = require('nvim-tree.api')
 
 tree.setup({
   view = {
-    width = 50
+    width = 50,
   },
   git = {
     enable = true,
-    ignore = true
+    ignore = true,
   },
   filters = { dotfiles = true },
   on_attach = function(bufnr)
