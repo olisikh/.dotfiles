@@ -159,7 +159,6 @@ in
       alias ll="exa -alh"
       alias tree="exa --tree"
       alias cat="bat -pp"
-      alias tmux="TERM=xterm-256color tmux"
 
       # overrides for work
       [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
@@ -246,7 +245,7 @@ in
 
     extraConfig = ''
       # Set true color
-      set -g default-terminal 'screen-256color'
+      set -g default-terminal 'tmux-256color'
       set-option -sa terminal-features ',xterm-256color:RGB'
 
       set -g mouse on
