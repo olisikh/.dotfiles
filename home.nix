@@ -29,6 +29,7 @@ in
       tmux
       rustup
       luarocks
+      tree-sitter
       python3
       thefuck
       docker
