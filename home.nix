@@ -20,7 +20,7 @@ in
       nix-prefetch
       bash
       wget
-      (nerdfonts.override { fonts = [ "Hack" ]; })
+      (nerdfonts.override { fonts = [ "Meslo" "JetBrainsMono" "FiraCode" "Hack" ]; })
       fd
       fzf
       eza # exa fork, as original package is not maintained
@@ -76,7 +76,7 @@ in
         owner = "catppuccin";
         repo = "alacritty";
         rev = "main";
-        sha256 = "sha256-w9XVtEe7TqzxxGUCDUR9BFkzLZjG8XrplXJ3lX6f+x0=";
+        sha256 = "sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=";
       };
 
       ".local/share/mc/ini".source = "${homeDir}/.dotfiles/mc/ini";
@@ -248,8 +248,40 @@ in
       set -g default-terminal 'tmux-256color'
       set-option -sa terminal-features ',xterm-256color:RGB'
 
+      # change leader key to CTRL+s
+      unbind C-b
+      set -g prefix C-s
+      bind C-s send-prefix
+      set -sg escape-time 300
+      set -sg repeat-time 500
+
+      # mouse support
       set -g mouse on
       set-window-option -g xterm-keys on
+
+      # act like vim
+      setw -g mode-keys vi
+      set-window-option -g mode-keys vi
+
+      # open panes in current dir
+      bind '"' split-window -c "#{pane_current_path}"
+      bind % split-window -h -c "#{pane_current_path}"
+
+      # Start windows and panes at 1, not 0
+      set -g status-position top
+      set -g base-index 1
+      setw -g pane-base-index 1
+      set-window-option -g pane-base-index 1
+      set-option -g renumber-windows on
+
+      # skip "kill-pane 1? (y/n)" prompt
+      bind-key x kill-pane
+
+      # don't exit from tmux when closing a session
+      set -g detach-on-destroy off
+
+      unbind r
+      bind-key r source-file ~/.config/tmux/tmux.conf; display-message 'Config reloaded!'
 
       unbind Left
       unbind Down
@@ -259,27 +291,6 @@ in
       unbind M-Left
       unbind M-Right
 
-      # change leader key to CTRL+s
-      unbind C-b
-      set -g prefix C-s
-      bind C-s send-prefix
-
-      set -sg escape-time 300
-      set -sg repeat-time 500
-
-      # Start windows and panes at 1, not 0
-      set -g status-position top
-      set -g base-index 1
-      setw -g pane-base-index 1
-      set-window-option -g pane-base-index 1
-      set-option -g renumber-windows on
-
-      bind-key x kill-pane # skip "kill-pane 1? (y/n)" prompt
-      set -g detach-on-destroy off  # don't exit from tmux when closing a session
-
-      unbind r
-      bind-key r source-file ~/.config/tmux/tmux.conf; display-message 'Config reloaded!'
-
       bind -n M-H previous-window
       bind -n M-L next-window
 
@@ -288,17 +299,6 @@ in
       bind-key -r J resize-pane -D 2
       bind-key -r H resize-pane -L 2
       bind-key -r L resize-pane -R 2
-
-      # act like vim
-      setw -g mode-keys vi
-
-      bind-key -T copy-mode-vi v send-keys -X begin-selection
-      bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
-      bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
-
-      # open panes in current dir
-      bind '"' split-window -c "#{pane_current_path}"
-      bind % split-window -h -c "#{pane_current_path}"
     '';
 
     plugins = with pkgs.tmuxPlugins; [
@@ -316,6 +316,46 @@ in
 
   programs.alacritty = {
     enable = true;
+
+    settings = {
+      env.TERM = "xterm-256color";
+
+      font = {
+        size = 14;
+
+        normal = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Regular";
+        };
+
+        bold = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Regular";
+        };
+
+        italic = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Regular Italic";
+        };
+
+        bold_italic = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Bold Italic";
+        };
+      };
+
+      selection.save_to_clipboard = false;
+      window = {
+        padding = {
+          x = 5;
+          y = 5;
+        };
+      };
+
+      import = [
+        "~/.config/alacritty/catppuccin/catppuccin-${catppuccinFlavour}.toml"
+      ];
+    };
   };
 
   programs.git = {
@@ -337,9 +377,5 @@ in
         defaultBranch = "main";
       };
     };
-  };
-
-  xdg.configFile = {
-    "alacritty/alacritty.yml".source = ./alacritty/alacritty.yml;
   };
 }

@@ -27,3 +27,19 @@ For that not to happen, generate a token in Github and add it to nix.conf file a
 access-tokens = github.com=<your_access_token>
 ```
 
+## Nix fetchFromGithub: how to figure out SHA256 hash of a revision
+
+You may use nix-prefetch with fetchFromGithub command specifying the owner of the repository, 
+name of the repository and revision:
+```
+nix-prefetch fetchFromGitHub --owner catppuccin --repo alacritty --rev main
+The fetcher will be called as follows:
+> fetchFromGitHub {
+>   owner = "catppuccin";
+>   repo = "alacritty";
+>   rev = "main";
+>   sha256 = "sha256:0000000000000000000000000000000000000000000000000000";
+> }
+
+sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=
+```
