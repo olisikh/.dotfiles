@@ -2,6 +2,11 @@ local tree = require('nvim-tree')
 local api = require('nvim-tree.api')
 
 tree.setup({
+  renderer = {
+    icons = {
+      git_placement = 'after',
+    },
+  },
   view = {
     width = 50,
   },
@@ -18,4 +23,4 @@ tree.setup({
 local nmap = require('helpers').nmap
 
 nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
-nmap('<leader>O', ':NvimTreeFindFile<cr>', { desc = 'nvim-tree: navigate to file', noremap = true })
+nmap('<leader>O', ':NvimTreeFindFile<cr>', { desc = 'nvim-tree: locale file in a tree', noremap = true })
