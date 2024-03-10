@@ -23,8 +23,7 @@
         "x86_64-darwin"
       ];
     in
-    flake-utils.lib.eachSystem supportedSystems (
-      system:
+    flake-utils.lib.eachSystem supportedSystems (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
       in
@@ -32,8 +31,18 @@
         formatter = pkgs.alejandra;
 
         packages.homeConfigurations.olisikh = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./home.nix ];
+          pkgs = import nixpkgs {
+            inherit system;
+
+            config = {
+              # all installing packages considered not free by Nix community (e.g. Terraform)
+              allowUnfree = true;
+              allowUnfreePredicate = _: true;
+            };
+          };
+          modules = [
+            ./home.nix
+          ];
         };
 
         home-manager = {

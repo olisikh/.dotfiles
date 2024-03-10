@@ -35,6 +35,7 @@ in
       docker
       minikube
       kubernetes-helm
+      terraform
       awscli2
       yarn
       go
@@ -145,7 +146,7 @@ in
       fi
 
       # Add rust (cargo) executables
-      export CARGO_HOME=$HOME/.cargo
+      export CARGO_HOME=${homeDir}/.cargo
       export PATH="$CARGO_HOME/bin:$PATH"
 
       alias tf=terraform
@@ -161,7 +162,7 @@ in
       alias cat="bat -pp"
 
       # overrides for work
-      [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+      [[ -s "${homeDir}/.zshrc.local" ]] && source "${homeDir}/.zshrc.local"
     '';
 
     antidote = {
@@ -281,7 +282,7 @@ in
       set -g detach-on-destroy off
 
       unbind r
-      bind-key r source-file ~/.config/tmux/tmux.conf; display-message 'Config reloaded!'
+      bind-key r source-file ${homeDir}/.config/tmux/tmux.conf; display-message 'Config reloaded!'
 
       unbind Left
       unbind Down
@@ -353,7 +354,7 @@ in
       };
 
       import = [
-        "~/.config/alacritty/catppuccin/catppuccin-${catppuccinFlavour}.toml"
+        "${homeDir}/.config/alacritty/catppuccin/catppuccin-${catppuccinFlavour}.toml"
       ];
     };
   };

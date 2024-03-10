@@ -1,12 +1,12 @@
 require('lazy').setup({
   -- Catppuccin theme
-  { 'catppuccin/nvim', name = 'catppuccin' },
+  { 'catppuccin/nvim',                name = 'catppuccin' },
 
   -- Statusline plugin
   { 'feline-nvim/feline.nvim' },
 
   -- icons
-  { 'nvim-tree/nvim-web-devicons', opts = {} },
+  { 'nvim-tree/nvim-web-devicons',    opts = {} },
 
   -- tmux integration plugin
   { 'christoomey/vim-tmux-navigator', lazy = false },
@@ -54,7 +54,7 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', opts = { ui = { border = 'rounded' } } },
+      { 'williamboman/mason.nvim',          opts = { ui = { border = 'rounded' } } },
       { 'williamboman/mason-lspconfig.nvim' },
       {
         'jay-babu/mason-null-ls.nvim',
@@ -69,7 +69,7 @@ require('lazy').setup({
   },
 
   -- status updates for LSP showing on the right
-  { 'j-hui/fidget.nvim', opts = {} },
+  { 'j-hui/fidget.nvim',        opts = {} },
 
   -- Additional lua configuration, makes nvim stuff amazing!
   {
@@ -87,7 +87,7 @@ require('lazy').setup({
 
   -- Rust tools & others
   { 'simrat39/rust-tools.nvim', ft = 'rust' },
-  { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
+  { 'saecki/crates.nvim',       opts = {},  ft = { 'rust', 'toml' } },
 
   -- Debugging
   {
@@ -96,8 +96,8 @@ require('lazy').setup({
       { 'theHamsta/nvim-dap-virtual-text' },
       { 'rcarriga/nvim-dap-ui' },
       { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
-      { 'leoluz/nvim-dap-go' }, -- debug go
-      { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
+      { 'leoluz/nvim-dap-go' },                -- debug go
+      { 'mxsdev/nvim-dap-vscode-js' },         -- debug js
     },
   },
 
@@ -122,6 +122,34 @@ require('lazy').setup({
       -- },
       'nvim-telescope/telescope-dap.nvim',
       'nvim-telescope/telescope-ui-select.nvim',
+    },
+  },
+
+  -- Searches NVIM plugins
+  {
+    'roobert/activate.nvim',
+    keys = {
+      {
+        '<leader>P',
+        '<CMD>lua require("activate").list_plugins()<CR>',
+        desc = 'Plugins',
+      },
+    },
+    dependencies = {
+      {
+        'roobert/activate.nvim',
+        keys = {
+          {
+            '<leader>P',
+            '<CMD>lua require("activate").list_plugins()<CR>',
+            desc = 'Plugins',
+          },
+        },
+        dependencies = {
+          { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
+        },
+      },
+      { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
     },
   },
 
@@ -153,7 +181,7 @@ require('lazy').setup({
   'mg979/vim-visual-multi',
 
   -- Auto add closing bracket or closing quote
-  { 'windwp/nvim-autopairs', opts = {} },
+  { 'windwp/nvim-autopairs',               opts = {} },
 
   -- Surround text objects, ys - surround, ds - delete around, cs - change around
   {
@@ -176,7 +204,7 @@ require('lazy').setup({
   { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 
   -- Comment lines and blocks with 'gcc', 'gbc'
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',               opts = {} },
 
   --  comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
