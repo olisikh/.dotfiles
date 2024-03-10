@@ -203,15 +203,17 @@ in
     settings = {
       scala.symbol = " ";
       java.symbol = " ";
-      nix_shell.symbol = "❄️";
-
-      # [golang]
-      # symbol = ' '
-      # [rust]
-      # symbol = ' '
-
-      aws.disabled = true;
-      # symbol = '󰸏 '
+      nix_shell.symbol = " ";
+      nodejs.symbol = " ";
+      npm.symbol = "󰛷";
+      golang.symbol = " ";
+      rust.symbol = " ";
+      docker_context.symbol = " ";
+      haskell.symbol = " ";
+      elixir.symbol = " ";
+      lua.symbol = " ";
+      terraform.symbol = " ";
+      aws.symbol = "  ";
     };
   };
 
