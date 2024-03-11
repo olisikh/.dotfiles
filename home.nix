@@ -327,17 +327,17 @@ in
 
         normal = {
           family = "JetBrainsMono Nerd Font";
-          style = "Regular";
+          style = "Medium";
         };
 
         bold = {
           family = "JetBrainsMono Nerd Font";
-          style = "Regular";
+          style = "Bold";
         };
 
         italic = {
           family = "JetBrainsMono Nerd Font";
-          style = "Regular Italic";
+          style = "Medium Italic";
         };
 
         bold_italic = {
