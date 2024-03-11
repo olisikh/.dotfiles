@@ -205,7 +205,6 @@ in
       java.symbol = " ";
       nix_shell.symbol = " ";
       nodejs.symbol = " ";
-      npm.symbol = "󰛷";
       golang.symbol = " ";
       rust.symbol = " ";
       docker_context.symbol = " ";
