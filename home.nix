@@ -123,7 +123,7 @@ in
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
 
     initExtraBeforeCompInit = ''
       # init completions
@@ -303,10 +303,11 @@ in
     '';
 
     plugins = with pkgs.tmuxPlugins; [
+      sensible
       {
         plugin = catppuccin;
         extraConfig = ''
-          set -g @catppuccin_flavour ${catppuccinFlavour}
+          set -g @catppuccin_flavour "${catppuccinFlavour}"
 
           set -g @catppuccin_window_left_separator ""
           set -g @catppuccin_window_right_separator " "
@@ -319,7 +320,9 @@ in
           set -g @catppuccin_window_current_text "#{b:pane_current_path}"
 
           set -g @catppuccin_status_default "off"
-          set -g @catppuccin_status_modules_right "directory application session"
+          set -g @catppuccin_status_modules "directory application session"
+          # uncomment once plugin is updated
+          # set -g @catppuccin_status_modules_right "directory application session"
           set -g @catppuccin_status_left_separator  " "
           set -g @catppuccin_status_right_separator ""
           set -g @catppuccin_status_right_separator_inverse "no"
@@ -329,7 +332,6 @@ in
           set -g @catppuccin_directory_text "#{pane_current_path}"
         '';
       }
-      sensible
       vim-tmux-navigator
       yank
     ];
@@ -340,6 +342,11 @@ in
 
     settings = {
       env.TERM = "xterm-256color";
+
+      # shell = {
+      # program = "/bin/zsh";
+      # args = [ "-l" "-c" "source ${homeDir}/.zshrc; tmux attach 2> /dev/null || tmux" ];
+      # };
 
       font = {
         size = 14;
@@ -366,6 +373,7 @@ in
       };
 
       selection.save_to_clipboard = false;
+
       window = {
         padding = {
           x = 5;
