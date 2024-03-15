@@ -343,11 +343,6 @@ in
     settings = {
       env.TERM = "xterm-256color";
 
-      # shell = {
-      # program = "/bin/zsh";
-      # args = [ "-l" "-c" "source ${homeDir}/.zshrc; tmux attach 2> /dev/null || tmux" ];
-      # };
-
       font = {
         size = 14;
 
