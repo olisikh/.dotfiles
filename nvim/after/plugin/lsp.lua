@@ -10,36 +10,22 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local function attach_lsp(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
-  -- nmap('<leader>cr', '<cmd>Lspsaga rename ++project<cr>', { desc = 'lsp: [r]ename' })
-
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
-  nmap('<leader>co', '<cmd>Lspsaga outline<cr>', { desc = 'lsp: [c]ode [o]utline' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
-  nmap('gI', vim.lsp.buf.implementation, { desc = 'lsp: [g]oto [i]mplementation' })
-
-  nmap('gd', '<cmd>Lspsaga goto_definition<cr>', { desc = 'lsp: [g]oto [d]efinition' })
-  nmap('gp', '<cmd>Lspsaga peek_type_definition<cr>', { desc = 'lsp: [p]eek type definition' })
-
-  -- nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]oto [t]ype definition' })
-  nmap('gt', '<cmd>Lspsaga goto_type_definition<cr>', { desc = 'lsp: goto [t]ype definition' })
-
-  nmap('gD', vim.lsp.buf.declaration, { desc = 'lsp: [g]oto [d]eclaration' })
-  map('i', '<C-h>', vim.lsp.buf.signature_help, { desc = 'lsp: signature [h]elp' })
+  nmap('gi', vim.lsp.buf.implementation, { desc = 'lsp: [g]oto [i]mplementation' })
+  nmap('gd', vim.lsp.buf.definition, { desc = 'lsp: [g]oto [d]efinition' })
+  nmap('gD', vim.lsp.buf.declaration, { desc = 'lsp: [g]oto [D]eclaration' })
+  nmap('gl', vim.lsp.codelens.run, { desc = 'lsp: [g]o through [l]ens' })
+  nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]o to [t]ype definition' })
 
   nmap('<leader>ws', telescope_builtin.lsp_document_symbols, { desc = 'lsp: [d]ocument [s]ymbols' })
   nmap('<leader>wS', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'lsp: [w]orkspace [s]ymbols' })
-  -- nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, { desc = '[w]orkspace [a]dd folder'})
-  -- nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, { desc= '[w]orkspace [r]emove folder'})
-  -- nmap('<leader>wl', function()
-  --   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  -- end, '[w]orkspace [l]ist folders')
 
   -- See `:help K` for why this keymap
-  -- nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
-  nmap('Q', '<cmd>Lspsaga hover_doc<CR>', { desc = 'lsp: hover doc' })
+  nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
 
   local server_capabilities = client.server_capabilities

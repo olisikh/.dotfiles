@@ -20,6 +20,8 @@ M.setup = function(capabilities, attach_lsp)
         },
       }
       metals_config.settings = {
+        autoImportBuild = 'on',
+        serverVersion = 'latest.snapshot', -- remove for latest stable or set latest.stable
         showImplicitArguments = true,
         showImplicitConversionsAndClasses = true,
         showInferredType = true,
@@ -31,7 +33,7 @@ M.setup = function(capabilities, attach_lsp)
         },
       }
       metals_config.init_options = {
-        statusBarProvider = 'on',
+        statusBarProvider = 'off',
       }
       metals_config.capabilities = capabilities
       metals_config.on_attach = function(client, bufnr)
@@ -45,8 +47,6 @@ M.setup = function(capabilities, attach_lsp)
         nmap('<leader>mi', function()
           metals.toggle_setting('showImplicitArguments')
         end, { desc = 'metals: show implicit args' })
-        nmap('<leader>mo', metals.organize_imports, { desc = 'metals: organize imports' })
-        nmap('<leader>mi', metals.import_build, { desc = 'metals: import build' })
         nmap('<leader>mc', require('telescope').extensions.metals.commands, { desc = 'metals: open commands' })
 
         attach_lsp(client, bufnr)

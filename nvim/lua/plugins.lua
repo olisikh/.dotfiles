@@ -122,8 +122,6 @@ require('lazy').setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
       'nvim-treesitter/nvim-treesitter-context',
-      -- LSP enhance plugin
-      { 'glepnir/lspsaga.nvim', event = 'LspAttach' },
     },
     config = function()
       pcall(require('nvim-treesitter.install').update({ with_sync = true }))

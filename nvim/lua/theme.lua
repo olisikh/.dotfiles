@@ -39,13 +39,11 @@ require('catppuccin').setup({
     neotest = true,
     treesitter = true,
     treesitter_context = true,
-    -- telescope = true,
     telescope = {
       enabled = true,
       -- style = "nvchad"
     },
     lsp_trouble = true,
-    lsp_saga = true,
     harpoon = true,
     mason = true,
     notify = true,
