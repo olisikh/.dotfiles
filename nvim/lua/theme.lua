@@ -39,14 +39,24 @@ require('catppuccin').setup({
     neotest = true,
     treesitter = true,
     treesitter_context = true,
-    telescope = true,
+    -- telescope = true,
+    telescope = {
+      enabled = true,
+      -- style = "nvchad"
+    },
     lsp_trouble = true,
+    lsp_saga = true,
     harpoon = true,
     mason = true,
+    notify = true,
     which_key = true,
-    dap = {
+    dap = true,
+    dap_ui = true,
+    markdown = true,
+    indent_blankline = {
       enabled = true,
-      enable_ui = true,
+      -- scope_color = '', -- catppuccin color (eg. `lavender`) Default: text
+      colored_indent_levels = false,
     },
     native_lsp = {
       enabled = true,
@@ -62,20 +72,17 @@ require('catppuccin').setup({
         warnings = { 'underline' },
         information = { 'underline' },
       },
+      inlay_hints = {
+        background = true,
+      },
     },
   },
 })
 
--- Support :colorscheme catppuccin-<flavour> change for statusline too
-vim.api.nvim_create_autocmd('ColorScheme', {
-  pattern = '*',
-  callback = function()
-    package.loaded['feline'] = nil
-    package.loaded['catppuccin.groups.integrations.feline'] = nil
-    require('feline').setup({
-      components = require('catppuccin.groups.integrations.feline').get(),
-    })
-  end,
+require('lualine').setup({
+  options = {
+    theme = 'catppuccin',
+  },
 })
 
 vim.cmd.colorscheme('catppuccin')
