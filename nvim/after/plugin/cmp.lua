@@ -7,14 +7,8 @@ luasnip.config.setup({})
 
 cmp.setup({
   window = {
-    completion = {
-      border = 'single',
-      scrollbar = '║',
-    },
-    documentation = {
-      border = nil,
-      scrollbar = '',
-    },
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
   },
   completion = {
     completeopt = 'menu,menuone,noinsert',
@@ -54,12 +48,7 @@ cmp.setup({
   }),
   sources = {
     { name = 'codeium' },
-    {
-      name = 'nvim_lsp',
-      -- entry_filter = function(entry, _)
-      --   return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
-      -- end,
-    },
+    { name = 'nvim_lsp' },
     { name = 'luasnip' },
     { name = 'crates' },
     { name = 'nvim_lsp_signature_help' },
