@@ -15,12 +15,7 @@ require('lazy').setup({
   'nvim-lua/plenary.nvim',
 
   -- Git plugin
-  {
-    'tpope/vim-fugitive',
-    dependencies = {
-      'tpope/vim-rhubarb',
-    },
-  },
+  { 'tpope/vim-fugitive', dependencies = { 'tpope/vim-rhubarb' } },
 
   -- File tree explorer
   'nvim-tree/nvim-tree.lua',
@@ -69,7 +64,7 @@ require('lazy').setup({
   },
 
   -- status updates for LSP showing on the right
-  { 'j-hui/fidget.nvim',        opts = {} },
+  { 'j-hui/fidget.nvim',  opts = {} },
 
   -- Additional lua configuration, makes nvim stuff amazing!
   {
@@ -104,7 +99,6 @@ require('lazy').setup({
   -- Fuzzy Finder (files, lsp, etc)
   {
     'nvim-telescope/telescope.nvim',
-    version = '*',
     dependencies = {
       {
         -- Fuzzy Finder Algorithm which requires local dependencies to be built.
@@ -116,40 +110,9 @@ require('lazy').setup({
           return vim.fn.executable('make') == 1
         end,
       },
-      -- {
-      --   'nvim-telescope/telescope-frecency.nvim',
-      --   dependencies = { 'kkharji/sqlite.lua' },
-      -- },
+      'nvim-telescope/telescope-frecency.nvim',
       'nvim-telescope/telescope-dap.nvim',
       'nvim-telescope/telescope-ui-select.nvim',
-    },
-  },
-
-  -- Searches NVIM plugins
-  {
-    'roobert/activate.nvim',
-    keys = {
-      {
-        '<leader>P',
-        '<CMD>lua require("activate").list_plugins()<CR>',
-        desc = 'Plugins',
-      },
-    },
-    dependencies = {
-      {
-        'roobert/activate.nvim',
-        keys = {
-          {
-            '<leader>P',
-            '<CMD>lua require("activate").list_plugins()<CR>',
-            desc = 'Plugins',
-          },
-        },
-        dependencies = {
-          { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
-        },
-      },
-      { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
     },
   },
 

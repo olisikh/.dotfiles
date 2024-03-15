@@ -2,7 +2,7 @@
 let
   user = builtins.getEnv "USER";
   homeDir = "/Users/${user}";
-  catppuccinFlavour = "macchiato";
+  catppuccinFlavour = "mocha";
 
   userName = builtins.getEnv "GIT_NAME";
   userEmail = builtins.getEnv "GIT_EMAIL";
