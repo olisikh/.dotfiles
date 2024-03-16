@@ -1,8 +1,9 @@
 local nmap = require('helpers').nmap
-local map = require('helpers').map
+local has_value = require('helpers').has_value
 
 local telescope_builtin = require('telescope.builtin')
 local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
+
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
@@ -15,7 +16,7 @@ vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.s
   border = 'rounded',
 })
 
-local function attach_lsp(client, bufnr)
+local function attach_lsp_keymaps()
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
@@ -34,19 +35,17 @@ local function attach_lsp(client, bufnr)
   -- See `:help K` for why this keymap
   nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
+end
 
+local function attach_lsp_autocmds(client, bufnr)
   local server_capabilities = client.server_capabilities
+
   if server_capabilities.documentFormattingProvider then
-    local function fmt_code()
-      vim.lsp.buf.format({ bufnr = bufnr })
-    end
-
-    -- Create a command `:Format` local to the LSP buffer
-    vim.api.nvim_buf_create_user_command(bufnr, 'Format', fmt_code, { desc = 'lsp: format code' })
-
     -- Format code before save :w
     vim.api.nvim_create_autocmd('BufWritePre', {
-      callback = fmt_code,
+      callback = function()
+        vim.lsp.buf.format({ bufnr = bufnr })
+      end,
       buffer = bufnr,
       group = lsp_group,
     })
@@ -97,9 +96,13 @@ local function attach_lsp(client, bufnr)
   if server_capabilities.inlayHintProvider then
     pcall(function()
       vim.lsp.inlay_hint.enable(bufnr, true)
-      vim.notify('Inlay hints are finally enabled!')
     end)
   end
+end
+
+local function attach_lsp(client, bufnr)
+  attach_lsp_keymaps()
+  attach_lsp_autocmds(client, bufnr)
 end
 
 local servers = {
@@ -111,14 +114,6 @@ local servers = {
       yaml = {
         keyOrdering = false, -- disable alphabetic ordering of keys
       },
-    },
-  },
-  rust_analyzer = {
-    cargo = {
-      allFeatures = true,
-    },
-    checkOnSave = {
-      command = 'clippy',
     },
   },
   gopls = {
@@ -185,15 +180,19 @@ local servers = {
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup({
   ensure_installed = vim.tbl_keys(servers),
-  automatic_installation = true,
+  automatic_installation = false,
 })
+
+local manually_installed = { 'rust_analyzer' }
 mason_lspconfig.setup_handlers({
   function(server_name)
-    require('lspconfig')[server_name].setup({
-      capabilities = capabilities,
-      on_attach = attach_lsp,
-      settings = servers[server_name],
-    })
+    if not has_value(manually_installed, server_name) then
+      require('lspconfig')[server_name].setup({
+        capabilities = capabilities,
+        on_attach = attach_lsp,
+        settings = servers[server_name],
+      })
+    end
   end,
 })
 

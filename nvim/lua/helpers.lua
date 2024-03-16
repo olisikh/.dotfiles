@@ -24,4 +24,13 @@ M.opt = function(scope, key, value)
   end
 end
 
+M.has_value = function(tab, value)
+  for _, v in ipairs(tab) do
+    if v == value then
+      return true
+    end
+  end
+  return false
+end
+
 return M
