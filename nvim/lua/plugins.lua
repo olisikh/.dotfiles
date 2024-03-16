@@ -81,12 +81,7 @@ require('lazy').setup({
   'scalameta/nvim-metals',
 
   -- Rust support
-  {
-    'mrcjkb/rustaceanvim',
-    version = '^4', -- Recommended
-    ft = { 'rust' },
-  },
-  -- { 'simrat39/rust-tools.nvim', ft = 'rust' },
+  { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },
   { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
 
   -- Debugging
