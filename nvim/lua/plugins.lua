@@ -80,7 +80,7 @@ require('lazy').setup({
   -- Scala metals
   'scalameta/nvim-metals',
   -- My ZIO helper plugin
-  { 'alisiikh/nvim-scala-zio-quickfix', opts = {} },
+  { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
 
   -- Rust support
   { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },
@@ -187,6 +187,7 @@ require('lazy').setup({
     -- Neotest framework for running tests
     'nvim-neotest/neotest',
     dependencies = {
+      'nvim-neotest/nvim-nio',
       'nvim-neotest/neotest-plenary',
       'nvim-neotest/neotest-go',
       'stevanmilic/neotest-scala',
@@ -195,6 +196,9 @@ require('lazy').setup({
   },
 }, {
   lockfile = vim.fn.stdpath('data') .. '/lazy/lazy-lock.json',
+  dev = {
+    path = '~/Develop/nvim-plugins',
+  },
   ui = {
     border = 'rounded',
   },
