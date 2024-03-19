@@ -24,6 +24,7 @@ require('nvim-treesitter.configs').setup({
     'vimdoc',
     'markdown',
     'markdown_inline',
+    'hocon',
   },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
@@ -103,3 +104,10 @@ require('nvim-treesitter.configs').setup({
     },
   },
 })
+
+-- enable HOCON
+local hocon_group = vim.api.nvim_create_augroup('hocon', { clear = true })
+vim.api.nvim_create_autocmd(
+  { 'BufNewFile', 'BufRead' },
+  { group = hocon_group, pattern = '*/resources/*.conf', command = 'set ft=hocon' }
+)
