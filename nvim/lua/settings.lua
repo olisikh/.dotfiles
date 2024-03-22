@@ -30,6 +30,12 @@ opt('o', 'hlsearch', false)
 opt('o', 'number', true)
 opt('o', 'relativenumber', true)
 
+-- indentation
+opt('opt', 'tabstop', 2)
+opt('opt', 'smartindent', true)
+opt('opt', 'shiftwidth', 2)
+opt('opt', 'expandtab', true)
+
 -- Enable mouse mode
 opt('o', 'mouse', 'a')
 
@@ -46,6 +52,7 @@ opt('opt', 'swapfile', false)
 opt('opt', 'backup', false)
 opt('opt', 'undofile', true)
 opt('opt', 'undodir', os.getenv('HOME') .. '/.vim/undodir')
+opt('opt', 'viewdir', os.getenv('HOME') .. '/.vim/viewdir')
 
 -- Smart indentation (whitespaces keep their relative indentation)
 opt('o', 'autoindent', true)

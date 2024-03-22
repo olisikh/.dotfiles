@@ -24,7 +24,15 @@ require('lazy').setup({
   'folke/trouble.nvim',
 
   -- quick navigation between frequently used files
-  'theprimeagen/harpoon',
+  {
+    'letieu/harpoon-lualine',
+    dependencies = {
+      {
+        'ThePrimeagen/harpoon',
+        branch = 'harpoon2',
+      },
+    },
+  },
 
   -- undo tree history
   'mbbill/undotree',
@@ -81,6 +89,15 @@ require('lazy').setup({
   'scalameta/nvim-metals',
   -- My ZIO helper plugin
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
+  -- Cowboy
+  {
+    'alisiikh/nvim-cowboy',
+    dev = true,
+    opts = {},
+    dependencies = {
+      'rcarriga/nvim-notify',
+    },
+  },
 
   -- Rust support
   { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },

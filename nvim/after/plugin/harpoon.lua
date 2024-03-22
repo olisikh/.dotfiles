@@ -1,12 +1,56 @@
-local mark = require('harpoon.mark')
-local ui = require('harpoon.ui')
+local nmap = require('helpers').nmap
 
-local function nmap(lhs, rhs, desc)
-  if desc then desc = 'harpoon: ' .. desc end
-  require('helpers').nmap(lhs, rhs, { desc = desc })
+local harpoon = require('harpoon')
+harpoon:setup({})
+
+-- basic telescope configuration
+local conf = require('telescope.config').values
+local function toggle_telescope(harpoon_files)
+  local file_paths = {}
+  for _, item in ipairs(harpoon_files.items) do
+    table.insert(file_paths, item.value)
+  end
+
+  require('telescope.pickers')
+    .new({}, {
+      prompt_title = 'Harpoon',
+      finder = require('telescope.finders').new_table({
+        results = file_paths,
+      }),
+      previewer = conf.file_previewer({}),
+      sorter = conf.generic_sorter({}),
+    })
+    :find()
 end
 
-nmap('<leader>H', ui.toggle_quick_menu, 'toggle quick menu')
-nmap('<leader>a', mark.add_file, 'add file')
+nmap('<C-e>', function()
+  toggle_telescope(harpoon:list())
+end, { desc = 'harpoon: Open harpoon window' })
 
-for n = 4, 1, -1 do nmap('<leader>' .. n, function() ui.nav_file(n) end, 'jump file ' .. n) end
+nmap('<leader>a', function()
+  harpoon:list():append()
+end, { desc = 'harpoon: Add file to list' })
+nmap('<leader>h', function()
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end)
+
+nmap('<leader>1', function()
+  harpoon:list():select(1)
+end, { desc = 'harpoon: Open file 1' })
+nmap('<leader>2', function()
+  harpoon:list():select(2)
+end, { desc = 'harpoon: Open file 2' })
+nmap('<leader>3', function()
+  harpoon:list():select(3)
+end, { desc = 'harpoon: Open file 3' })
+nmap('<leader>4', function()
+  harpoon:list():select(4)
+end, { desc = 'harpoon: Open file 4' })
+
+-- Toggle previous & next buffers stored within Harpoon list
+nmap('<C-S-P>', function()
+  harpoon:list():prev()
+end, { desc = 'harpoon: Open prev file' })
+nmap('<C-S-N>', function()
+  harpoon:list():next()
+end, { desc = 'harpoon: Open next file' })

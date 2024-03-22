@@ -24,6 +24,7 @@ in
       fd
       fzf
       eza # exa fork, as original package is not maintained
+      jq
       mc
       lua
       tmux
@@ -31,17 +32,15 @@ in
       luarocks
       tree-sitter
       python3
-      thefuck
       docker
       minikube
       kubernetes-helm
       terraform
-      awscli2
       yarn
       go
       jdk17
       kafkactl
-      awscli2
+      # awscli2
       kcat
       bun
       stern # kubectl pod log scraping tool
@@ -134,7 +133,6 @@ in
     initExtra = ''
       source ${homeDir}/.zsh/catppuccin-${catppuccinFlavour}.zsh
 
-      eval "$(thefuck --alias)"
       eval "$(kafkactl completion zsh)"
 
       # Preferred editor for local and remote sessions
