@@ -1,11 +1,11 @@
 require('lazy').setup({
-  -- Catppuccin theme
+  -- catppuccin theme
   { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
 
   -- icons
   { 'nvim-tree/nvim-web-devicons', opts = {} },
 
-  -- Statusline plugin
+  -- statusline plugin
   'nvim-lualine/lualine.nvim',
 
   -- tmux integration plugin
@@ -14,13 +14,13 @@ require('lazy').setup({
   -- required by most plugins
   'nvim-lua/plenary.nvim',
 
-  -- Git plugin
+  -- git plugin
   { 'tpope/vim-fugitive', dependencies = { 'tpope/vim-rhubarb' } },
 
-  -- File tree explorer
+  -- file tree explorer
   'nvim-tree/nvim-tree.lua',
 
-  -- Traverse diagnostics in a separate window
+  -- traverse diagnostics in a separate window
   'folke/trouble.nvim',
 
   -- quick navigation between frequently used files
@@ -36,8 +36,16 @@ require('lazy').setup({
 
   -- undo tree history
   'mbbill/undotree',
+  -- forever undo
+  {
+    'kevinhwang91/nvim-fundo',
+    dependencies = { 'kevinhwang91/promise-async' },
+    config = function()
+      require('fundo').install()
+    end,
+  },
 
-  -- Autocompletion (cmp), integration with lsp, ai, snippets, etc.
+  -- autocompletion (cmp), integration with lsp, ai, snippets, etc.
   {
     'hrsh7th/nvim-cmp',
     dependencies = {
@@ -74,21 +82,21 @@ require('lazy').setup({
   -- Status updates for LSP showing on the right
   { 'j-hui/fidget.nvim', opts = {} },
 
-  -- Additional lua configuration, for lua development
+  -- additional lua configuration, for lua development
   'folke/neodev.nvim',
 
   -- Scala metals
   'scalameta/nvim-metals',
-  -- My ZIO helper plugin
+  -- my ZIO helper plugin
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
-  -- Cowboy
+  -- cowboy
   { 'alisiikh/nvim-cowboy', dev = true, opts = {} },
 
-  -- Rust support
+  -- rust support
   { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },
   { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
 
-  -- Debugging
+  -- debugging
   {
     'mfussenegger/nvim-dap',
     dependencies = {
@@ -100,7 +108,7 @@ require('lazy').setup({
     },
   },
 
-  -- Fuzzy Finder (files, lsp, etc)
+  -- fuzzy Finder (files, lsp, etc)
   {
     'nvim-telescope/telescope.nvim',
     dependencies = {
@@ -120,7 +128,7 @@ require('lazy').setup({
     },
   },
 
-  -- Treesitter: highlight, edit, and navigate code
+  -- treesitter: highlight, edit, and navigate code
   {
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
@@ -133,23 +141,23 @@ require('lazy').setup({
     end,
   },
 
-  -- Unofficial Codeium plugin, interactive AI autocomplete
+  -- unofficial Codeium plugin, interactive AI autocomplete
   {
     'Exafunction/codeium.nvim',
     event = 'InsertEnter',
     opts = {},
   },
 
-  -- Detect tabstop and shiftwidth automatically
+  -- detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
-  -- Multi-cursor selection ctrl+up/down - to add cursor, ctrl+n - select next word, shift-arrow - per char
+  -- multi-cursor selection ctrl+up/down - to add cursor, ctrl+n - select next word, shift-arrow - per char
   'mg979/vim-visual-multi',
 
-  -- Auto add closing bracket or closing quote
+  -- auto add closing bracket or closing quote
   { 'windwp/nvim-autopairs', opts = {} },
 
-  -- Surround text objects, ys - surround, ds - delete around, cs - change around
+  -- surround text objects, ys - surround, ds - delete around, cs - change around
   {
     'kylechui/nvim-surround',
     version = '*',
@@ -157,22 +165,22 @@ require('lazy').setup({
     opts = {},
   },
 
-  -- Smart join lines in blocks
+  -- smart join lines in blocks
   'Wansmer/treesj',
 
-  -- Useful plugin to show you pending keybinds.
+  -- useful plugin to show you pending keybinds.
   'folke/which-key.nvim',
 
-  -- Adds git releated signs to the gutter, as well as utilities for managing changes
+  -- adds git releated signs to the gutter, as well as utilities for managing changes
   'lewis6991/gitsigns.nvim',
 
-  -- Add indentation function/class/etc context lines
+  -- add indentation function/class/etc context lines
   { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 
-  -- Comment lines and blocks with 'gcc', 'gbc'
+  -- comment lines and blocks with 'gcc', 'gbc'
   { 'numToStr/Comment.nvim', opts = {} },
 
-  --  comments highlighting and navigation
+  -- comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
 
   -- nice notifications in vim
@@ -184,9 +192,8 @@ require('lazy').setup({
     end,
   },
 
-  -- 'vim-test/vim-test',
+  -- neotest framework for running tests
   {
-    -- Neotest framework for running tests
     'nvim-neotest/neotest',
     dependencies = {
       'nvim-neotest/nvim-nio',
