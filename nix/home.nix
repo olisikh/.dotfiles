@@ -1,4 +1,4 @@
-{ inputs, pkgs, config, ... }:
+{ pkgs, ... }:
 let
   user = builtins.getEnv "USER";
 
