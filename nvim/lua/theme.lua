@@ -67,7 +67,7 @@ require('catppuccin').setup({
         information = { 'underline' },
       },
       inlay_hints = {
-        background = true,
+        background = false,
       },
     },
   },
