@@ -1,6 +1,6 @@
 local M = {}
 
-M.setup = function(capabilities, attach_lsp)
+M.setup = function(group, capabilities, attach_lsp)
   local nmap = require('helpers').nmap
 
   -- Setup rust and debugging
@@ -10,7 +10,7 @@ M.setup = function(capabilities, attach_lsp)
   local liblldb_path = codelldb_root .. 'lldb/lib/liblldb.dylib'
 
   vim.g.rustaceanvim = function()
-    local cfg = require('rustaceanvim.config')
+    local config = require('rustaceanvim.config')
 
     return {
       -- LSP configuration
@@ -42,7 +42,7 @@ M.setup = function(capabilities, attach_lsp)
       },
       -- DAP configuration
       dap = {
-        adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+        adapter = config.get_codelldb_adapter(codelldb_path, liblldb_path),
       },
     }
   end

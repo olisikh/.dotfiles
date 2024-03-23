@@ -5,8 +5,7 @@ local telescope_builtin = require('telescope.builtin')
 local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
@@ -25,7 +24,7 @@ local function format_buf(bufnr)
   })
 end
 
-local function attach_lsp_keymaps()
+local function setup_keymaps()
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', function()
@@ -48,29 +47,27 @@ local function attach_lsp_keymaps()
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
 end
 
-local function attach_lsp_autocmds(client, bufnr)
+local function setup_auto_commands(client, bufnr)
   local server_capabilities = client.server_capabilities
 
-  if server_capabilities.documentFormattingProvider then
-    -- Format code before save :w
-    vim.api.nvim_create_autocmd('BufWritePre', {
-      callback = function()
-        format_buf(bufnr)
-      end,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  else
-    -- Delete trailing whitespace on save at least, if formatter is not available
-    vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
-      pattern = '*',
-      callback = function()
-        local cursor = vim.fn.getpos('.')
-        vim.cmd([[%s/\s\+$//e]])
-        vim.fn.setpos('.', cursor)
-      end,
-    })
-  end
+  -- Format code before save :w
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    callback = function()
+      format_buf(bufnr)
+    end,
+    buffer = bufnr,
+    group = lsp_group,
+  })
+
+  --   -- Delete trailing whitespace on save at least, if formatter is not available
+  --   vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+  --     pattern = '*',
+  --     callback = function()
+  --       local cursor = vim.fn.getpos('.')
+  --       vim.cmd([[%s/\s\+$//e]])
+  --       vim.fn.setpos('.', cursor)
+  --     end,
+  --   })
 
   if server_capabilities.documentHighlightProvider then
     vim.api.nvim_create_autocmd('CursorHold', {
@@ -112,8 +109,8 @@ local function attach_lsp_autocmds(client, bufnr)
 end
 
 local function attach_lsp(client, bufnr)
-  attach_lsp_keymaps()
-  attach_lsp_autocmds(client, bufnr)
+  setup_keymaps()
+  setup_auto_commands(client, bufnr)
 end
 
 local servers = {
@@ -122,8 +119,10 @@ local servers = {
   bashls = {},
   yamlls = {
     settings = {
-      yaml = {
-        keyOrdering = false, -- disable alphabetic ordering of keys
+      settings = {
+        yaml = {
+          keyOrdering = false, -- disable alphabetic ordering of keys
+        },
       },
     },
   },
@@ -140,53 +139,89 @@ local servers = {
           parameterNames = true,
           rangeVariableTypes = true,
         },
+        analyses = {
+          unusedparams = false,
+        },
       },
     },
   },
   tsserver = {
     settings = {
-      javascript = {
-        inlayHints = {
-          includeInlayEnumMemberValueHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayVariableTypeHints = false,
-          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+      settings = {
+        javascript = {
+          inlayHints = {
+            enumMemberValues = {
+              enabled = true,
+            },
+            functionLikeReturnTypes = {
+              enabled = true,
+            },
+            propertyDeclarationTypes = {
+              enabled = true,
+            },
+            parameterTypes = {
+              enabled = true,
+              suppressWhenArgumentMatchesName = true,
+            },
+            variableTypes = {
+              enabled = true,
+            },
+          },
         },
-      },
-      typescript = {
-        inlayHints = {
-          includeInlayEnumMemberValueHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayVariableTypeHints = false,
-          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+        typescript = {
+          inlayHints = {
+            enumMemberValues = {
+              enabled = true,
+            },
+            functionLikeReturnTypes = {
+              enabled = true,
+            },
+            propertyDeclarationTypes = {
+              enabled = true,
+            },
+            parameterTypes = {
+              enabled = true,
+              suppressWhenArgumentMatchesName = true,
+            },
+            variableTypes = {
+              enabled = true,
+            },
+          },
         },
       },
     },
   },
   lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-      hint = {
-        enable = true,
+    settings = {
+      Lua = {
+        workspace = {
+          checkThirdParty = false,
+        },
+        telemetry = {
+          enable = false,
+        },
+        hint = {
+          enable = true,
+        },
       },
     },
   },
   nil_ls = {
-    ['nil'] = {
-      autostart = true,
-      testSetting = 42,
+    settings = {
+      ['nil'] = {
+        autostart = true,
+        testSetting = 42,
+      },
     },
   },
 }
+
+-- neodev must be setup before lspconfig
+require('neodev').setup({
+  library = {
+    plugins = { 'nvim-dap-ui', 'neotest' },
+  },
+})
 
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup({
@@ -194,22 +229,25 @@ mason_lspconfig.setup({
   automatic_installation = false,
 })
 
+-- rust LSP is setup by rust plugin
 local manually_installed = { 'rust_analyzer' }
 mason_lspconfig.setup_handlers({
   function(server_name)
     if not has_value(manually_installed, server_name) then
+      local server_config = servers[server_name]
+
       require('lspconfig')[server_name].setup({
         capabilities = capabilities,
         on_attach = attach_lsp,
-        settings = servers[server_name],
+        settings = server_config.settings or {},
       })
     end
   end,
 })
 
 -- Languages are at ${workspaceDir}/lua/language folder
-require('language.js').setup()
-require('language.lua').setup()
-require('language.go').setup()
-require('language.scala').setup(capabilities, attach_lsp)
-require('language.rust').setup(capabilities, attach_lsp)
+require('language.js').setup(lsp_group)
+require('language.lua').setup(lsp_group)
+require('language.go').setup(lsp_group)
+require('language.scala').setup(lsp_group, capabilities, attach_lsp)
+require('language.rust').setup(lsp_group, capabilities, attach_lsp)

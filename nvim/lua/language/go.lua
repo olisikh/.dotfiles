@@ -1,10 +1,9 @@
 local M = {}
 
-M.setup = function()
-  local go_group = vim.api.nvim_create_augroup('go', { clear = true })
+M.setup = function(group)
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'go' },
-    group = go_group,
+    group = group,
     callback = function()
       local dap_go = require('dap-go')
 

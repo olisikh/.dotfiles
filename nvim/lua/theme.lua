@@ -82,6 +82,7 @@ require('lualine').setup({
   },
   sections = {
     lualine_x = { 'encoding', 'filetype' },
+    lualine_c = { 'harpoon2' },
   },
 })
 

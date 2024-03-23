@@ -4,11 +4,10 @@ local dap = require('dap')
 
 local M = {}
 
-M.setup = function(capabilities, attach_lsp)
-  local metals_group = vim.api.nvim_create_augroup('metals', { clear = true })
+M.setup = function(group, capabilities, attach_lsp)
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'scala', 'sbt', 'java' },
-    group = metals_group,
+    group = group,
     callback = function()
       local metals = require('metals')
       local metals_tvp = require('metals.tvp')

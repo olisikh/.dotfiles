@@ -3,13 +3,13 @@ local mason_registry = require('mason-registry')
 
 local M = {}
 
-M.setup = function()
+M.setup = function(group)
   -- Setup javascript & typescript (mostly dap)
   local js_debugger = mason_registry.get_package('js-debug-adapter'):get_install_path()
-  local js_group = vim.api.nvim_create_augroup('javascript', { clear = true })
+
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
-    group = js_group,
+    group = group,
     callback = function()
       require('dap-vscode-js').setup({
         node_path = 'node',

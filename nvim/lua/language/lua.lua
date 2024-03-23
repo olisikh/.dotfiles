@@ -2,13 +2,11 @@ local dap = require('dap')
 
 local M = {}
 
-M.setup = function()
+M.setup = function(group)
   -- setup lua dap
-  local lua_group = vim.api.nvim_create_augroup('lua', { clear = true })
-
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'lua' },
-    group = lua_group,
+    group = group,
     callback = function()
       dap.configurations.lua = {
         {

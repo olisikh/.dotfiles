@@ -71,33 +71,18 @@ require('lazy').setup({
     },
   },
 
-  -- status updates for LSP showing on the right
+  -- Status updates for LSP showing on the right
   { 'j-hui/fidget.nvim', opts = {} },
 
-  -- Additional lua configuration, makes nvim stuff amazing!
-  {
-    'folke/neodev.nvim',
-    opts = {
-      library = {
-        plugins = { 'nvim-dap-ui', 'neotest' },
-        types = true,
-      },
-    },
-  },
+  -- Additional lua configuration, for lua development
+  'folke/neodev.nvim',
 
   -- Scala metals
   'scalameta/nvim-metals',
   -- My ZIO helper plugin
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
   -- Cowboy
-  {
-    'alisiikh/nvim-cowboy',
-    dev = true,
-    opts = {},
-    dependencies = {
-      'rcarriga/nvim-notify',
-    },
-  },
+  { 'alisiikh/nvim-cowboy', dev = true, opts = {} },
 
   -- Rust support
   { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },
