@@ -1,4 +1,4 @@
-{ inputs, lib, config, pkgs, ... }:
+{ pkgs, ... }:
 {
   home.file = {
     ".config/nvim".source = ~/.dotfiles/nvim;

@@ -5,10 +5,16 @@ let
 in
 {
   imports = [
-    (import ./shell (catppuccinFlavour))
+    (import ./zsh (catppuccinFlavour))
     ./git
-    ./neovim
-    (import ./terminal (catppuccinFlavour))
+    ./ripgrep
+    (import ./bat (catppuccinFlavour))
+    ./direnv
+    ./starship
+    ./zoxide
+    (import ./alacritty (catppuccinFlavour))
+    ./nvim
+    (import ./alacritty (catppuccinFlavour))
     (import ./tmux (catppuccinFlavour))
     ./mc
   ];

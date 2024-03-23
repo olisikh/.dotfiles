@@ -9,6 +9,10 @@ catppuccinFlavour: { pkgs, ... }:
         sha256 = "sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=";
       };
     };
+
+    packages = with pkgs; [
+      alacritty
+    ];
   };
 
   programs.alacritty = {

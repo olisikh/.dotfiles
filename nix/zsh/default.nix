@@ -10,6 +10,11 @@ catppuccinFlavour: { inputs, lib, config, pkgs, ... }:
     };
   };
 
+  home.packages = with pkgs; [
+    zsh
+    antidote
+  ];
+
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -66,61 +71,6 @@ catppuccinFlavour: { inputs, lib, config, pkgs, ... }:
         "nix-community/nix-zsh-completions"
         "ohmyzsh/ohmyzsh path:plugins/git"
       ];
-    };
-  };
-
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.ripgrep = {
-    enable = true;
-  };
-
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-
-    settings = {
-      scala.symbol = " ";
-      java.symbol = " ";
-      nix_shell.symbol = " ";
-      nodejs.symbol = " ";
-      golang.symbol = " ";
-      rust.symbol = " ";
-      docker_context.symbol = " ";
-      haskell.symbol = " ";
-      elixir.symbol = " ";
-      lua.symbol = " ";
-      terraform.symbol = " ";
-      aws.symbol = "  ";
-    };
-  };
-
-  programs.bat = {
-    enable = true;
-
-    themes = {
-      catppuccin = {
-        src = pkgs.fetchFromGitHub {
-          owner = "catppuccin";
-          repo = "bat";
-          rev = "main";
-          sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
-        };
-        file = "Catppuccin-${catppuccinFlavour}.tmTheme";
-      };
-    };
-
-    config = {
-      theme = "catppuccin";
     };
   };
 }
