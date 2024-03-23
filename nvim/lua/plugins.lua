@@ -200,7 +200,6 @@ require('lazy').setup({
       'nvim-neotest/neotest-plenary',
       'nvim-neotest/neotest-go',
       'stevanmilic/neotest-scala',
-      'rouge8/neotest-rust',
     },
   },
 }, {
