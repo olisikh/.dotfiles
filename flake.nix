@@ -40,7 +40,7 @@
             };
           };
           modules = [
-            ./home.nix
+            ./nix/home.nix
           ];
         };
 

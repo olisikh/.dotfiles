@@ -1,76 +1,76 @@
-{ pkgs, ... }:
+{ inputs, pkgs, config, ... }:
 let
   user = builtins.getEnv "USER";
-  homeDir = "/Users/${user}";
   catppuccinFlavour = "mocha";
-
-  userName = builtins.getEnv "GIT_NAME";
-  userEmail = builtins.getEnv "GIT_EMAIL";
 in
 {
+  imports = [
+    (import ./shell.nix (catppuccinFlavour))
+    ./git.nix
+    ./neovim.nix
+  ];
+
   home = {
     username = user;
-    homeDirectory = homeDir;
+    homeDirectory = "/Users/${user}";
 
     stateVersion = "22.11";
 
     # The home.packages option allows you to install Nix packages into your
     # environment.
-    packages = with pkgs; [
-      nix-prefetch
-      bash
-      wget
-      (nerdfonts.override { fonts = [ "Meslo" "JetBrainsMono" "FiraCode" "Hack" ]; })
-      fd
-      fzf
-      eza # exa fork, as original package is not maintained
-      jq
-      mc
-      lua
-      tmux
-      rustup
-      luarocks
-      tree-sitter
-      python3
-      docker
-      minikube
-      kubernetes-helm
-      terraform
-      yarn
-      go
-      jdk17
-      kafkactl
-      # awscli2
-      kcat
-      bun
-      stern # kubectl pod log scraping tool
-      htop
-      nodejs
-      (sbt.override { jre = jdk17; })
-      coursier
-      scala
+    packages = with pkgs;
+      [
+        nix-prefetch
+        bash
+        wget
+        (nerdfonts.override {
+          fonts = [ "Meslo" "JetBrainsMono" "FiraCode" "Hack" ];
+        })
+        fd
+        fzf
+        eza # exa fork, as original package is not maintained
+        jq
+        mc
+        lua
+        tmux
+        rustup
+        luarocks
+        tree-sitter
+        python3
+        docker
+        minikube
+        kubernetes-helm
+        terraform
+        yarn
+        go
+        jdk17
+        kafkactl
+        # awscli2
+        kcat
+        bun
+        stern # kubectl pod log scraping tool
+        htop
+        nodejs
+        (sbt.override {
+          jre = jdk17;
+        })
+        coursier
+        scala
 
-      # # You can also create simple shell scripts directly inside your
-      # # configuration. For example, this adds a command 'my-hello' to your
-      # # environment:
-      # (pkgs.writeShellScriptBin "my-hello" ''
-      #   echo "Hello, ${config.home.username}!"
-      # '')
-
-      (pkgs.writeShellScriptBin "mkhome" ''
-        nix flake update ${homeDir}/.dotfiles && \
-          home-manager switch --flake ${homeDir}/.dotfiles#${user} --impure
-      '')
-    ];
+        (pkgs.writeShellScriptBin "home-make" ''
+          home-manager switch --flake ~/.dotfiles#${user} --impure
+        '')
+        (pkgs.writeShellScriptBin "home-update" ''
+          nix flake update ~/.dotfiles
+        '')
+        (pkgs.writeShellScriptBin "home-upgrade" ''
+          home-update && home-make
+        '')
+      ];
 
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
     # plain files is through 'home.file'.
     file = {
-      ".zsh".source = "${homeDir}/.dotfiles/zsh/.zsh";
-      ".envrc".text = "use_nix";
-
-      ".config/nvim".source = "${homeDir}/.dotfiles/nvim";
-
       ".config/alacritty/catppuccin".source = pkgs.fetchFromGitHub {
         owner = "catppuccin";
         repo = "alacritty";
@@ -78,7 +78,7 @@ in
         sha256 = "sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=";
       };
 
-      ".local/share/mc/ini".source = "${homeDir}/.dotfiles/mc/ini";
+      ".local/share/mc/ini".source = ~/.dotfiles/mc/ini;
       ".local/share/mc/skins".source = pkgs.fetchFromGitHub {
         owner = "catppuccin";
         repo = "mc";
@@ -117,126 +117,6 @@ in
   # Let Home Manager install and manage itself.
   programs.home-manager = {
     enable = true;
-  };
-
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-
-    initExtraBeforeCompInit = ''
-      # init completions
-      autoload -U +X bashcompinit && bashcompinit
-      autoload -U +X compinit && compinit
-    '';
-
-    initExtra = ''
-      source ${homeDir}/.zsh/catppuccin-${catppuccinFlavour}.zsh
-
-      eval "$(kafkactl completion zsh)"
-
-      # Preferred editor for local and remote sessions
-      if [[ -n $SSH_CONNECTION ]]; then
-        export EDITOR='vi'
-      else
-        export EDITOR='nvim'
-      fi
-
-      # Add rust (cargo) executables
-      export CARGO_HOME=${homeDir}/.cargo
-      export PATH="$CARGO_HOME/bin:$PATH"
-
-      alias tf=terraform
-      alias k=kubectl
-
-      # smart cd
-      alias zz="z -"
-
-      # smart ls
-      alias ls="exa"
-      alias ll="exa -alh"
-      alias tree="exa --tree"
-      alias cat="bat -pp"
-
-      # overrides for work
-      [[ -s "${homeDir}/.zshrc.local" ]] && source "${homeDir}/.zshrc.local"
-    '';
-
-    antidote = {
-      enable = true;
-      useFriendlyNames = true;
-
-      plugins = [
-        "rupa/z"
-        "zsh-users/zsh-completions"
-        "zsh-users/zsh-autosuggestions"
-        "zsh-users/zsh-syntax-highlighting"
-        "chisui/zsh-nix-shell"
-        "nix-community/nix-zsh-completions"
-        "ohmyzsh/ohmyzsh path:plugins/git"
-      ];
-    };
-  };
-
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.ripgrep = {
-    enable = true;
-  };
-
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-
-    settings = {
-      scala.symbol = " ";
-      java.symbol = " ";
-      nix_shell.symbol = " ";
-      nodejs.symbol = " ";
-      golang.symbol = " ";
-      rust.symbol = " ";
-      docker_context.symbol = " ";
-      haskell.symbol = " ";
-      elixir.symbol = " ";
-      lua.symbol = " ";
-      terraform.symbol = " ";
-      aws.symbol = "  ";
-    };
-  };
-
-  programs.bat = {
-    enable = true;
-
-    themes = {
-      catppuccin = {
-        src = pkgs.fetchFromGitHub {
-          owner = "catppuccin";
-          repo = "bat";
-          rev = "main";
-          sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
-        };
-        file = "Catppuccin-${catppuccinFlavour}.tmTheme";
-      };
-    };
-
-    config = {
-      theme = "catppuccin";
-    };
-  };
-
-  programs.neovim = {
-    enable = true;
-    viAlias = false;
-    vimAlias = true;
   };
 
   programs.tmux = {
@@ -280,7 +160,7 @@ in
       set -g detach-on-destroy off
 
       unbind r
-      bind-key r source-file ${homeDir}/.config/tmux/tmux.conf; display-message 'Config reloaded!'
+      bind-key r source-file ~/.config/tmux/tmux.conf; display-message 'Config reloaded!'
 
       unbind Left
       unbind Down
@@ -375,29 +255,9 @@ in
       };
 
       import = [
-        "${homeDir}/.config/alacritty/catppuccin/catppuccin-${catppuccinFlavour}.toml"
+        "~/.config/alacritty/catppuccin/catppuccin-${catppuccinFlavour}.toml"
       ];
     };
   };
 
-  programs.git = {
-    enable = true;
-    userName = userName;
-    userEmail = userEmail;
-
-    extraConfig = {
-      core = {
-        autocrlf = "input";
-        excludesfile = "${homeDir}/.gitignore_global";
-      };
-
-      submodule = {
-        recurse = true;
-      };
-
-      init = {
-        defaultBranch = "main";
-      };
-    };
-  };
 }

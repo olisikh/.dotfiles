@@ -16,10 +16,21 @@ vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.s
   border = 'rounded',
 })
 
+local function format_buf(bufnr)
+  vim.lsp.buf.format({
+    bufnr = bufnr,
+    filter = function(client)
+      return client.name == 'null-ls' or client.name == 'metals'
+    end,
+  })
+end
+
 local function attach_lsp_keymaps()
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
-  nmap('<leader>cf', vim.lsp.buf.format, { desc = 'lsp: [c]ode [f]ormat' })
+  nmap('<leader>cf', function()
+    format_buf(vim.api.nvim_get_current_buf())
+  end, { desc = 'lsp: [c]ode [f]ormat' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
@@ -44,7 +55,7 @@ local function attach_lsp_autocmds(client, bufnr)
     -- Format code before save :w
     vim.api.nvim_create_autocmd('BufWritePre', {
       callback = function()
-        vim.lsp.buf.format({ bufnr = bufnr })
+        format_buf(bufnr)
       end,
       buffer = bufnr,
       group = lsp_group,
