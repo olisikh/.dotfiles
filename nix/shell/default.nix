@@ -1,8 +1,13 @@
 catppuccinFlavour: { inputs, lib, config, pkgs, ... }:
 {
-  home. file = {
-    ".zsh".source = ~/.dotfiles/zsh;
+  home.file = {
     ".envrc".text = "use_nix";
+    ".config/zsh/catppuccin".source = pkgs.fetchFromGitHub {
+      "owner" = "catppuccin";
+      "repo" = "zsh-syntax-highlighting";
+      "rev" = "main";
+      "sha256" = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
+    };
   };
 
   programs.zsh = {
@@ -17,7 +22,7 @@ catppuccinFlavour: { inputs, lib, config, pkgs, ... }:
     '';
 
     initExtra = ''
-      source ~/.zsh/catppuccin-${catppuccinFlavour}.zsh
+      source $HOME/.config/zsh/catppuccin/themes/catppuccin_${catppuccinFlavour}-zsh-syntax-highlighting.zsh
 
       eval "$(kafkactl completion zsh)"
 
@@ -45,7 +50,7 @@ catppuccinFlavour: { inputs, lib, config, pkgs, ... }:
       alias cat="bat -pp"
 
       # overrides for work
-      [[ -s "~/.zshrc.local" ]] && source "~/.zshrc.local"
+      [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
     '';
 
     antidote = {

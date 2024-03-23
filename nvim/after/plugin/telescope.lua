@@ -19,6 +19,10 @@ telescope.setup({
     ['ui-select'] = {
       telescope_themes.get_dropdown({}),
     },
+    frecency = {
+      db_safe_mode = false,
+      auto_validate = true,
+    },
   },
 })
 
