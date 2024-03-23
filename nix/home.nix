@@ -1,23 +1,26 @@
 { inputs, pkgs, config, ... }:
 let
   user = builtins.getEnv "USER";
-  catppuccinFlavour = "mocha";
+
+  userInputs = {
+    catppuccinFlavour = "mocha";
+  };
 in
 {
-  imports = [
-    (import ./zsh (catppuccinFlavour))
+  imports = (map (module: import module userInputs) [
+    ./zsh
     ./git
     ./ripgrep
-    (import ./bat (catppuccinFlavour))
+    ./bat
     ./direnv
     ./starship
     ./zoxide
-    (import ./alacritty (catppuccinFlavour))
+    ./alacritty
     ./nvim
-    (import ./alacritty (catppuccinFlavour))
-    (import ./tmux (catppuccinFlavour))
+    ./alacritty
+    ./tmux
     ./mc
-  ];
+  ]);
 
   home = {
     username = user;
@@ -77,7 +80,7 @@ in
 
     sessionVariables = {
       JAVA_HOME = pkgs.jdk17;
-      CATPPUCCIN_FLAVOUR = catppuccinFlavour; # still used by nvim lua files
+      CATPPUCCIN_FLAVOUR = userInputs.catppuccinFlavour; # still used by nvim lua files
     };
   };
 

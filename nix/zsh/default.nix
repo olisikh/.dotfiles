@@ -1,4 +1,4 @@
-catppuccinFlavour: { inputs, lib, config, pkgs, ... }:
+{ catppuccinFlavour, ... }: { inputs, lib, config, pkgs, ... }:
 {
   home.file = {
     ".envrc".text = "use_nix";

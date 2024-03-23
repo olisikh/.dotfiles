@@ -1,4 +1,4 @@
-catppuccinFlavour: { pkgs, ... }:
+{ catppuccinFlavour, ... }: { pkgs, ... }:
 {
 
   home.packages = with pkgs; [
