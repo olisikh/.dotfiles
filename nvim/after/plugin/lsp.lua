@@ -150,44 +150,69 @@ local servers = {
       settings = {
         javascript = {
           inlayHints = {
-            enumMemberValues = {
-              enabled = true,
-            },
-            functionLikeReturnTypes = {
-              enabled = true,
-            },
-            propertyDeclarationTypes = {
-              enabled = true,
-            },
-            parameterTypes = {
-              enabled = true,
-              suppressWhenArgumentMatchesName = true,
-            },
-            variableTypes = {
-              enabled = true,
-            },
+            includeInlayEnumMemberValueHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayVariableTypeHints = false,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
           },
         },
         typescript = {
           inlayHints = {
-            enumMemberValues = {
-              enabled = true,
-            },
-            functionLikeReturnTypes = {
-              enabled = true,
-            },
-            propertyDeclarationTypes = {
-              enabled = true,
-            },
-            parameterTypes = {
-              enabled = true,
-              suppressWhenArgumentMatchesName = true,
-            },
-            variableTypes = {
-              enabled = true,
-            },
+            includeInlayEnumMemberValueHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayVariableTypeHints = false,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
           },
         },
+
+        -- javascript = {
+        --   inlayHints = {
+        --     enumMemberValues = {
+        --       enabled = true,
+        --     },
+        --     functionLikeReturnTypes = {
+        --       enabled = true,
+        --     },
+        --     propertyDeclarationTypes = {
+        --       enabled = true,
+        --     },
+        --     parameterTypes = {
+        --       enabled = true,
+        --       suppressWhenArgumentMatchesName = true,
+        --     },
+        --     variableTypes = {
+        --       enabled = true,
+        --     },
+        --   },
+        -- },
+        -- typescript = {
+        --   inlayHints = {
+        --     enumMemberValues = {
+        --       enabled = true,
+        --     },
+        --     functionLikeReturnTypes = {
+        --       enabled = true,
+        --     },
+        --     propertyDeclarationTypes = {
+        --       enabled = true,
+        --     },
+        --     parameterTypes = {
+        --       enabled = true,
+        --       suppressWhenArgumentMatchesName = true,
+        --     },
+        --     variableTypes = {
+        --       enabled = true,
+        --     },
+        --   },
+        -- },
       },
     },
   },

@@ -5,6 +5,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-22.11";
 
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+
     flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
@@ -13,7 +15,7 @@
     };
   };
 
-  outputs = { nixpkgs, flake-utils, home-manager, ... }:
+  outputs = { nixpkgs, flake-utils, home-manager, ... } @ inputs:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -25,6 +27,9 @@
     flake-utils.lib.eachSystem supportedSystems (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        overlays = [
+          inputs.neovim-nightly-overlay.overlay
+        ];
       in
       {
         formatter = pkgs.alejandra;
@@ -32,6 +37,8 @@
         packages.homeConfigurations.olisikh = home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs {
             inherit system;
+
+            overlays = overlays;
 
             config = {
               # all installing packages considered not free by Nix community (e.g. Terraform)
