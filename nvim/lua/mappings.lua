@@ -1,4 +1,5 @@
 local map = require('helpers').map
+local nmap = require('helpers').nmap
 
 -- Make sure Space is not mapped to anything, used as leader key
 map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
@@ -42,3 +43,8 @@ map('n', '[d', vim.diagnostic.goto_prev, { desc = 'diagnostic: prev error msg' }
 map('n', ']d', vim.diagnostic.goto_next, { desc = 'diagnostic: next error msg' })
 map('n', '<leader>E', vim.diagnostic.open_float, { desc = 'open floating diagnostic message' })
 map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'open diagnostics list' })
+
+nmap('=', [[<cmd>vertical resize +5<cr>]])
+nmap('-', [[<cmd>vertical resize -5<cr>]])
+nmap('+', [[<cmd>horizontal resize +2<cr>]])
+nmap('_', [[<cmd>horizontal resize -2<cr>]])

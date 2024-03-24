@@ -17,7 +17,6 @@ in
     ./zoxide
     ./alacritty
     ./nvim
-    ./alacritty
     ./tmux
     ./mc
   ]);
@@ -55,7 +54,7 @@ in
         go
         jdk17
         kafkactl
-        # awscli2
+        # awscli2 # broken, hence commented, install unstable or freeze the version
         kcat
         bun
         stern # kubectl pod log scraping tool
@@ -67,14 +66,56 @@ in
         coursier
         scala
 
-        (pkgs.writeShellScriptBin "home-make" ''
-          home-manager switch --flake ~/.dotfiles#${user} --impure
-        '')
-        (pkgs.writeShellScriptBin "home-update" ''
-          nix flake update ~/.dotfiles
-        '')
-        (pkgs.writeShellScriptBin "home-upgrade" ''
-          home-update && home-make
+        (pkgs.writeShellScriptBin "home" ''
+          #!/bin/bash
+
+          # Function to display help message
+          display_help() {
+              echo "Usage: home {make|update|upgrade}"
+              echo
+              echo "Commands:"
+              echo "  make    : Rebuild dotfiles"
+              echo "  update  : Update dotfiles"
+              echo "  upgrade : Rebuild and updade dotfiles"
+          }
+
+          # Function to perform 'home make'
+          home_make() {
+              home-manager switch --flake ~/.dotfiles#${user} --impure
+          }
+
+          # Function to perform 'home update'
+          home_update() {
+              nix flake update ~/.dotfiles
+          }
+
+          # Function to perform 'home upgrade'
+          home_upgrade() {
+              home_update
+              home_make
+          }
+
+          # Main function to handle input and execute corresponding action
+          main() {
+              case "$1" in
+                  make)
+                      home_make
+                      ;;
+                  update)
+                      home_update
+                      ;;
+                  upgrade)
+                      home_upgrade
+                      ;;
+                  *)
+                      display_help
+                      exit 1
+                      ;;
+              esac
+          }
+
+          # Execute main function with provided arguments
+          main "$@"
         '')
       ];
 
