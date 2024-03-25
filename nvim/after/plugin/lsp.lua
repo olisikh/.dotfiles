@@ -142,9 +142,6 @@ local servers = {
           parameterNames = true,
           rangeVariableTypes = true,
         },
-        analyses = {
-          unusedparams = false,
-        },
       },
     },
   },
