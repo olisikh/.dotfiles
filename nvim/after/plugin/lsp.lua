@@ -103,12 +103,6 @@ local function setup_auto_commands(client, bufnr)
     end,
     group = lsp_group,
   })
-
-  if server_capabilities.inlayHintProvider then
-    pcall(function()
-      vim.lsp.inlay_hint.enable(bufnr, true)
-    end)
-  end
 end
 
 local function attach_lsp(client, bufnr)

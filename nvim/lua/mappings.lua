@@ -44,7 +44,8 @@ map('n', ']d', vim.diagnostic.goto_next, { desc = 'diagnostic: next error msg' }
 map('n', '<leader>E', vim.diagnostic.open_float, { desc = 'open floating diagnostic message' })
 map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'open diagnostics list' })
 
-nmap('=', [[<cmd>vertical resize +5<cr>]])
-nmap('-', [[<cmd>vertical resize -5<cr>]])
-nmap('+', [[<cmd>horizontal resize +2<cr>]])
-nmap('_', [[<cmd>horizontal resize -2<cr>]])
+-- Increase speed of window resize commande
+nmap('<C-w>>', ':vertical resize +10<cr>', { noremap = true, silent = true })
+nmap('<C-w><', ':vertical resize -10<cr>', { noremap = true, silent = true })
+nmap('<C-w>+', ':horizontal resize +5<cr>', { noremap = true, silent = true })
+nmap('<C-w>-', ':horizontal resize -5<cr>', { noremap = true, silent = true })
