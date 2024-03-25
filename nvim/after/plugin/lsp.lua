@@ -117,9 +117,9 @@ local function attach_lsp(client, bufnr)
 end
 
 local servers = {
-  dockerls = { settings = {} },
-  terraformls = { settings = {} },
-  bashls = { settings = {} },
+  dockerls = {},
+  terraformls = {},
+  bashls = {},
   yamlls = {
     settings = {
       settings = {
