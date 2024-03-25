@@ -34,7 +34,27 @@
       {
         formatter = pkgs.alejandra;
 
+        # personal
         packages.homeConfigurations.olisikh = home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            inherit system;
+
+            overlays = overlays;
+
+            config = {
+              # all installing packages considered not free by Nix community (e.g. Terraform)
+              allowUnfree = true;
+              allowUnfreePredicate = _: true;
+            };
+          };
+          modules = [
+            ./nix/home.nix
+          ];
+        };
+
+
+        # work
+        packages.homeConfigurations."O.Lisikh" = home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs {
             inherit system;
 

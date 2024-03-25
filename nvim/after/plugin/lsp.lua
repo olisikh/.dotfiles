@@ -136,9 +136,6 @@ local servers = {
           parameterNames = true,
           rangeVariableTypes = true,
         },
-        analyses = {
-          unusedparams = false,
-        },
       },
     },
   },
@@ -257,12 +254,13 @@ mason_lspconfig.setup_handlers({
   function(server_name)
     if not has_value(manually_installed, server_name) then
       local server_config = servers[server_name]
-
-      require('lspconfig')[server_name].setup({
-        capabilities = capabilities,
-        on_attach = attach_lsp,
-        settings = server_config.settings or {},
-      })
+      if server_config then
+        require('lspconfig')[server_name].setup({
+          capabilities = capabilities,
+          on_attach = attach_lsp,
+          settings = server_config.settings or {},
+        })
+      end
     end
   end,
 })
