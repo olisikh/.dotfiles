@@ -89,8 +89,6 @@ require('lazy').setup({
   'scalameta/nvim-metals',
   -- my ZIO helper plugin
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
-  -- cowboy
-  { 'alisiikh/nvim-cowboy', dev = true, opts = {} },
 
   -- rust support
   { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },
@@ -182,15 +180,6 @@ require('lazy').setup({
 
   -- comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
-
-  -- nice notifications in vim
-  {
-    'rcarriga/nvim-notify',
-    config = function()
-      -- globally setup nvim-notify to be nvim notifications provider
-      vim.notify = require('notify')
-    end,
-  },
 
   -- neotest framework for running tests
   {

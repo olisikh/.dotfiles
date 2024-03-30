@@ -54,17 +54,14 @@ in
         go
         jdk17
         kafkactl
-        # awscli2 # broken, hence commented, install unstable or freeze the version
+        # awscli2
+        # localstack
         kcat
         bun
         stern # kubectl pod log scraping tool
         htop
         nodejs
-        (sbt.override {
-          jre = jdk17;
-        })
-        coursier
-        scala
+        coursier # install scala via coursier: cs setup
 
         (pkgs.writeShellScriptBin "home" ''
           #!/bin/bash
