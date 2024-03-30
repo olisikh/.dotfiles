@@ -181,6 +181,16 @@ require('lazy').setup({
   -- comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
 
+  -- markdown plugin
+  {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    ft = { 'markdown' },
+    build = function()
+      vim.fn['mkdp#util#install']()
+    end,
+  },
+
   -- neotest framework for running tests
   {
     'nvim-neotest/neotest',
