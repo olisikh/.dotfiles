@@ -146,6 +146,13 @@ require('lazy').setup({
     opts = {},
   },
 
+  -- discipline
+  {
+    'm4xshen/hardtime.nvim',
+    dependencies = { 'MunifTanjim/nui.nvim', 'nvim-lua/plenary.nvim' },
+    opts = {},
+  },
+
   -- detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
