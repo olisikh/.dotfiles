@@ -9,8 +9,8 @@ map('n', '<esc>', '<nop>', { silent = true })
 map('n', 'Q', '<nop>')
 
 -- Remap for dealing with word wrap
-map('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-map('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+map('n', 'k', "v:count == 0 ? 'gk' : 'kzz'", { expr = true, silent = true })
+map('n', 'j', "v:count == 0 ? 'gj' : 'jzz'", { expr = true, silent = true })
 
 -- Join lines together
 map('n', 'J', 'mzJ`z', { desc = 'join lines' })
