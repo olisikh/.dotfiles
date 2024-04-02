@@ -14,25 +14,23 @@ local function toggle_telescope(harpoon_files)
   require('telescope.pickers')
     .new({}, {
       prompt_title = 'Harpoon',
-      finder = require('telescope.finders').new_table({
-        results = file_paths,
-      }),
+      finder = require('telescope.finders').new_table({ results = file_paths }),
       previewer = conf.file_previewer({}),
       sorter = conf.generic_sorter({}),
     })
     :find()
 end
 
-nmap('<C-e>', function()
+nmap('<leader>H', function()
   toggle_telescope(harpoon:list())
 end, { desc = 'harpoon: Open harpoon window' })
+nmap('<leader>h', function()
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end, { desc = 'harpoon: Toggle quick menu' })
 
 nmap('<leader>a', function()
   harpoon:list():append()
 end, { desc = 'harpoon: Add file to list' })
-nmap('<leader>h', function()
-  harpoon.ui:toggle_quick_menu(harpoon:list())
-end)
 
 nmap('<leader>1', function()
   harpoon:list():select(1)
@@ -46,11 +44,3 @@ end, { desc = 'harpoon: Open file 3' })
 nmap('<leader>4', function()
   harpoon:list():select(4)
 end, { desc = 'harpoon: Open file 4' })
-
--- Toggle previous & next buffers stored within Harpoon list
-nmap('<C-S-P>', function()
-  harpoon:list():prev()
-end, { desc = 'harpoon: Open prev file' })
-nmap('<C-S-N>', function()
-  harpoon:list():next()
-end, { desc = 'harpoon: Open next file' })

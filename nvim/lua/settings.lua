@@ -72,7 +72,7 @@ opt('o', 'timeout', true)
 opt('o', 'timeoutlen', 300)
 
 -- Set completeopt to have a better completion experience
-opt('o', 'completeopt', 'menuone,noinsert,noselect')
+-- opt('o', 'completeopt', 'menuone,noinsert,noselect')
 
 -- NOTE: You should make sure your terminal supports this
 opt('o', 'termguicolors', true)

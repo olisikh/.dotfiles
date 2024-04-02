@@ -146,6 +146,8 @@ require('lazy').setup({
     opts = {},
   },
 
+  'github/copilot.vim',
+
   -- discipline
   {
     'm4xshen/hardtime.nvim',
