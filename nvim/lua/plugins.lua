@@ -139,14 +139,19 @@ require('lazy').setup({
     end,
   },
 
-  -- unofficial Codeium plugin, interactive AI autocomplete
+  -- unofficial Codeium plugin
   {
     'Exafunction/codeium.nvim',
     event = 'InsertEnter',
     opts = {},
   },
-
-  'github/copilot.vim',
+  -- unofficial Copilot plugin
+  {
+    'zbirenbaum/copilot-cmp',
+    event = 'InsertEnter',
+    opts = {},
+    dependencies = { 'zbirenbaum/copilot.lua', opts = {} },
+  },
 
   -- discipline
   {
