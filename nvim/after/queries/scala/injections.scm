@@ -1,4 +1,4 @@
-; Inject embedded languages into scala code
+;; extends
 
 ; sql"""SELECT * FROM user"""
 (interpolated_string_expression

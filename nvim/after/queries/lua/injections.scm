@@ -1,4 +1,6 @@
-;a string passed as an argument to a function with a comment on top
+;; extends
+
+;string passed as an argument to a function with a comment on top
 (_
   (comment content: (comment_content) @injection.language) 
   (string (string_content) @injection.content)
@@ -21,7 +23,7 @@
   )
 )
 
-;a field of table with a comment on top
+;field of table with a comment on top
 (table_constructor
   (comment content: (comment_content) @injection.language)
   (field name: (_) value: (string (string_content) @injection.content))
