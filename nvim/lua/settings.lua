@@ -18,7 +18,7 @@ opt('o', 'cursorline', true)
 -- Set line width marker at 120 characters per line
 opt('opt', 'colorcolumn', '121')
 -- Keep cursor always in the middle when possible
-opt('o', 'scrolloff', 999)
+opt('o', 'scrolloff', 8)
 
 opt(
   'opt',
