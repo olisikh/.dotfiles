@@ -76,8 +76,8 @@
 
       set -g @catppuccin_flavour "${catppuccinFlavour}"
 
-      set -g @catppuccin_window_left_separator ""
-      set -g @catppuccin_window_right_separator " "
+      # set -g @catppuccin_window_left_separator ""
+      # set -g @catppuccin_window_right_separator " "
       set -g @catppuccin_window_middle_separator "█ "
       set -g @catppuccin_window_number_position "left"
 
@@ -87,10 +87,11 @@
       set -g @catppuccin_window_current_text "#{b:pane_current_path}"
 
       set -g @catppuccin_status_default "on"
-      set -g @catppuccin_status_modules_right "load cpu battery directory application"
+      # set -g @catppuccin_status_modules_right "load cpu battery directory application"
+      set -g @catppuccin_status_modules_right "load application"
 
-      set -g @catppuccin_status_left_separator  " "
-      set -g @catppuccin_status_right_separator ""
+      # set -g @catppuccin_status_left_separator  " "
+      # set -g @catppuccin_status_right_separator ""
       set -g @catppuccin_status_right_separator_inverse "no"
       set -g @catppuccin_status_fill "icon"
       set -g @catppuccin_status_connect_separator "no"

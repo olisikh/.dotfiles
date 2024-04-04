@@ -115,10 +115,8 @@ local servers = {
   bashls = {},
   yamlls = {
     settings = {
-      settings = {
-        yaml = {
-          keyOrdering = false, -- disable alphabetic ordering of keys
-        },
+      yaml = {
+        keyOrdering = false, -- disable alphabetic ordering of keys
       },
     },
   },
@@ -140,72 +138,29 @@ local servers = {
   },
   tsserver = {
     settings = {
-      settings = {
-        javascript = {
-          inlayHints = {
-            includeInlayEnumMemberValueHints = true,
-            includeInlayFunctionLikeReturnTypeHints = true,
-            includeInlayFunctionParameterTypeHints = true,
-            includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
-            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-            includeInlayPropertyDeclarationTypeHints = true,
-            includeInlayVariableTypeHints = false,
-            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-          },
+      javascript = {
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = false,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
         },
-        typescript = {
-          inlayHints = {
-            includeInlayEnumMemberValueHints = true,
-            includeInlayFunctionLikeReturnTypeHints = true,
-            includeInlayFunctionParameterTypeHints = true,
-            includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
-            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-            includeInlayPropertyDeclarationTypeHints = true,
-            includeInlayVariableTypeHints = false,
-            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-          },
+      },
+      typescript = {
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = false,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
         },
-
-        -- javascript = {
-        --   inlayHints = {
-        --     enumMemberValues = {
-        --       enabled = true,
-        --     },
-        --     functionLikeReturnTypes = {
-        --       enabled = true,
-        --     },
-        --     propertyDeclarationTypes = {
-        --       enabled = true,
-        --     },
-        --     parameterTypes = {
-        --       enabled = true,
-        --       suppressWhenArgumentMatchesName = true,
-        --     },
-        --     variableTypes = {
-        --       enabled = true,
-        --     },
-        --   },
-        -- },
-        -- typescript = {
-        --   inlayHints = {
-        --     enumMemberValues = {
-        --       enabled = true,
-        --     },
-        --     functionLikeReturnTypes = {
-        --       enabled = true,
-        --     },
-        --     propertyDeclarationTypes = {
-        --       enabled = true,
-        --     },
-        --     parameterTypes = {
-        --       enabled = true,
-        --       suppressWhenArgumentMatchesName = true,
-        --     },
-        --     variableTypes = {
-        --       enabled = true,
-        --     },
-        --   },
-        -- },
       },
     },
   },
