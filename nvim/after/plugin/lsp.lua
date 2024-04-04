@@ -24,15 +24,26 @@ local function format_buf(bufnr)
   })
 end
 
+local function toggle_inlay_hints(bufnr, enable)
+  vim.lsp.inlay_hint.enable(bufnr, enable)
+end
+
+vim.api.nvim_create_user_command('ToggleInlayHints', function()
+  vim.g.inlayhints = not vim.g.inlayhints
+  toggle_inlay_hints(0, vim.g.inlayhints)
+end, { desc = 'Toggle inlay hints globally' })
+
 local function setup_keymaps()
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', function()
     format_buf(vim.api.nvim_get_current_buf())
   end, { desc = 'lsp: [c]ode [f]ormat' })
+
   nmap('<leader>ci', function()
-    vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
+    toggle_inlay_hints(0, not vim.lsp.inlay_hint.is_enabled())
   end, { desc = 'lsp: toggle inlay hints (buffer)' })
+  nmap('<leader>cI', ':ToggleInlayHints<cr>', { desc = 'lsp: toggle inlay hints (global)' })
 
   nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
   nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
@@ -94,6 +105,8 @@ local function setup_auto_commands(client, bufnr)
       group = lsp_group,
     })
   end
+
+  toggle_inlay_hints(0, vim.g.inlayhints)
 
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'dap-repl' },
