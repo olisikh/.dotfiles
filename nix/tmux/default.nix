@@ -106,10 +106,11 @@
       set -g status-left-style NONE
       set -g status-right-style NONE
 
-      set -g status-left "#[fg=#15161e,bg=#7aa2f7,bold] #S #[fg=#7aa2f7,bg=#16161e,nobold,nounderscore,noitalics]"
-      set -g status-right "#[fg=#16161e,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#16161e] #{prefix_highlight} #[fg=#3b4261,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#3b4261] %Y-%m-%d  %I:%M %p #[fg=#7aa2f7,bg=#3b4261,nobold,nounderscore,noitalics]#[fg=#15161e,bg=#7aa2f7,bold] #{load_full} "
+      set -g status-left "#[fg=#15161e,bg=#7aa2f7,bold] #W #[fg=#7aa2f7,bg=#16161e,nobold,nounderscore,noitalics]"
+      set -g status-right "#{load_full} "
+
       if-shell '[ "$(tmux show-option -gqv "clock-mode-style")" == "24" ]' {
-        set -g status-right "#[fg=#16161e,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#16161e] #{prefix_highlight} #[fg=#3b4261,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#3b4261] %Y-%m-%d  %H:%M #[fg=#7aa2f7,bg=#3b4261,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#3b4261,bold] #{load_full} "
+        set -g status-right "#{load_full} "
       }
 
       setw -g window-status-activity-style "underscore,fg=#a9b1d6,bg=#16161e"
@@ -130,9 +131,6 @@
 
         set -g @catppuccin_flavour "${themeStyle}"
 
-        # set -g @catppuccin_window_left_separator ""
-        # set -g @catppuccin_window_right_separator " "
-        set -g @catppuccin_window_middle_separator "█ "
         set -g @catppuccin_window_number_position "left"
 
         set -g @catppuccin_window_default_fill "number"
@@ -141,24 +139,20 @@
         set -g @catppuccin_window_current_text "#{b:pane_current_path}"
 
         set -g @catppuccin_status_default "on"
-        # set -g @catppuccin_status_modules_right "load cpu battery directory application"
-        set -g @catppuccin_status_modules_right "load application"
+        set -g @catppuccin_status_modules_right "load"
+        set -g @catppuccin_status_modules_left "application"
 
-        # set -g @catppuccin_status_left_separator  " "
-        # set -g @catppuccin_status_right_separator ""
+        set -g @catppuccin_status_left_separator "█"
+        set -g @catppuccin_status_right_separator "█"
         set -g @catppuccin_status_right_separator_inverse "no"
         set -g @catppuccin_status_fill "icon"
         set -g @catppuccin_status_connect_separator "no"
-
-        set -g @catppuccin_directory_text "#{pane_current_path}"
       ''
     else if theme == "tokyonight" then ""
     else "") +
 
     ''
       # install cpu, batter and load avg
-      set -g @plugin 'tmux-plugins/tmux-cpu'
-      set -g @plugin 'tmux-plugins/tmux-battery'
       set -g @plugin 'jamesoff/tmux-loadavg'
 
       # install utility plugins
