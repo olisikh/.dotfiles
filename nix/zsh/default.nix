@@ -40,8 +40,7 @@
       eval "$(kafkactl completion zsh)"
 
       # Preferred editor for local and remote sessions
-      if [[ -n $SSH_CONNECTION ]];
-      then
+      if [[ -n $SSH_CONNECTION ]]; then
         export EDITOR = 'vi'
       else
         export EDITOR='nvim'
@@ -61,7 +60,6 @@
       alias ls="exa"
       alias ll="exa -alh"
       alias tree="exa --tree"
-      alias cat="bat -pp"
 
       # overrides for work
       [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

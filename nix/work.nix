@@ -13,7 +13,6 @@ in
     ./zsh
     ./git
     ./ripgrep
-    ./bat
     ./direnv
     ./starship
     ./zoxide

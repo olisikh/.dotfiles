@@ -1,8 +1,6 @@
 { pkgs, ... }:
 let
   user = "olisikh";
-  # theme = "tokyonight";
-  # themeStyle = "night";
   theme = "tokyonight";
   themeStyle = "night";
 in
@@ -15,7 +13,6 @@ in
     ./zsh
     ./git
     ./ripgrep
-    ./bat
     ./direnv
     ./starship
     ./zoxide
