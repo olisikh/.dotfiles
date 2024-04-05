@@ -2,7 +2,7 @@
 {
   home = {
     file = {
-      ".config/tmux/plugins/tokyonight".source = (pkgs.fetchFromGitHub
+      ".config/tmux/themes/tokyonight".source = (pkgs.fetchFromGitHub
         {
           owner = "folke";
           repo = "tokyonight.nvim";
@@ -114,7 +114,7 @@
         set -g @catppuccin_directory_text "#{pane_current_path}"
       ''
     else if theme == "tokyonight" then ''
-      run '~/.config/tmux/plugins/tokyonight/tokyonight_${themeStyle}.tmux' 
+      source-file ~/.config/tmux/themes/tokyonight/tokyonight_${themeStyle}.tmux
     ''
     else "") +
 
