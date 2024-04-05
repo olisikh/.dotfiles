@@ -1,4 +1,4 @@
-{ catppuccinFlavour, ... }: { pkgs, ... }:
+{ theme, themeStyle, ... }: { pkgs, ... }:
 {
   home = {
     file = {
@@ -8,6 +8,13 @@
         rev = "main";
         sha256 = "sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=";
       };
+      ".config/alacritty/tokyonight".source = (pkgs.fetchFromGitHub
+        {
+          owner = "folke";
+          repo = "tokyonight.nvim";
+          rev = "main";
+          sha256 = "sha256-ItCmSUMMTe8iQeneIJLuWedVXsNgm+FXNtdrrdJ/1oE=";
+        } + "/extras/alacritty");
     };
 
     packages = with pkgs; [
@@ -54,9 +61,10 @@
         };
       };
 
-      import = [
-        "~/.config/alacritty/catppuccin/catppuccin-${catppuccinFlavour}.toml"
-      ];
+      import =
+        if theme == "catppuccin" then [ "~/.config/alacritty/catppuccin/catppuccin-${themeStyle}.toml" ]
+        else if theme == "tokyonight" then [ "~/.config/alacritty/tokyonight/tokyonight_${themeStyle}.toml" ]
+        else [ ];
     };
   };
 }

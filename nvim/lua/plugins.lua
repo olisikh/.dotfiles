@@ -1,6 +1,10 @@
 require('lazy').setup({
   -- catppuccin theme
-  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
+  { 'catppuccin/nvim', name = 'catppuccin', lazy = false, priority = 1000 },
+  -- eldritch theme
+  { 'eldritch-theme/eldritch.nvim', lazy = false, priority = 1000 },
+  -- tokyo night theme
+  { 'folke/tokyonight.nvim', lazy = false, priority = 1000 },
 
   -- icons
   { 'nvim-tree/nvim-web-devicons', opts = {} },

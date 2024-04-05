@@ -1,4 +1,12 @@
-{ catppuccinFlavour, ... }: { pkgs, ... }:
+{ theme, themeStyle, ... }: { pkgs, ... }:
+let
+  catppuccinPkg = pkgs.fetchFromGitHub {
+    owner = "catppuccin";
+    repo = "bat";
+    rev = "main";
+    sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
+  };
+in
 {
   home.packages = with pkgs; [
     bat
@@ -8,19 +16,35 @@
     enable = true;
 
     themes = {
-      catppuccin = {
+      catppuccin-mocha = {
+        src = catppuccinPkg;
+        file = "Catppuccin-mocha.tmTheme";
+      };
+      catppuccin-macchiato = {
+        src = catppuccinPkg;
+        file = "Catppuccin-macchiato.tmTheme";
+      };
+      catppuccin-frappe = {
+        src = catppuccinPkg;
+        file = "Catppuccin-frappe.tmTheme";
+      };
+      catppuccin-latte = {
+        src = catppuccinPkg;
+        file = "Catppuccin-latte.tmTheme";
+      };
+      eldritch = {
         src = pkgs.fetchFromGitHub {
-          owner = "catppuccin";
+          owner = "eldritch-theme";
           repo = "bat";
           rev = "main";
-          sha256 = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
+          sha256 = "sha256-cNov24rTc8qzNUzT1X1M7wN570PmU6D8JsSd/FO22TY=";
         };
-        file = "Catppuccin-${catppuccinFlavour}.tmTheme";
+        file = "Eldritch.tmTheme";
       };
     };
 
     config = {
-      theme = "catppuccin";
+      theme = if themeStyle != "" then "${theme}-${themeStyle}" else theme;
     };
   };
 }

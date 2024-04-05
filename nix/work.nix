@@ -1,10 +1,8 @@
 { pkgs, ... }:
 let
-  user = "olisikh";
-  # theme = "tokyonight";
-  # themeStyle = "night";
-  theme = "tokyonight";
-  themeStyle = "night";
+  user = "O.Lisikh";
+  theme = "catppuccin";
+  themeStyle = "mocha";
 in
 {
   imports = (map
@@ -122,6 +120,8 @@ in
 
     sessionVariables = {
       JAVA_HOME = pkgs.jdk17;
+      THEME_STYLE = themeStyle; # still used by nvim lua files
+      THEME = theme;
     };
   };
 

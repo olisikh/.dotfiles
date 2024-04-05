@@ -1,4 +1,4 @@
-{ catppuccinFlavour, ... }: { inputs, lib, config, pkgs, ... }:
+{ theme, themeStyle, ... }: { inputs, lib, config, pkgs, ... }:
 {
   home.file = {
     ".envrc".text = "use_nix";
@@ -24,16 +24,25 @@
       # init completions
       autoload -U +X bashcompinit && bashcompinit
       autoload -U +X compinit && compinit
+
+      export THEME_STYLE="${themeStyle}";
+      export THEME="${theme}";
     '';
 
-    initExtra = ''
-      source $HOME/.config/zsh/catppuccin/themes/catppuccin_${catppuccinFlavour}-zsh-syntax-highlighting.zsh
-
+    initExtra = (
+      if theme == "catppuccin" then ''
+        source $HOME/.config/zsh/catppuccin/themes/catppuccin_${themeStyle}-zsh-syntax-highlighting.zsh
+      ''
+      else if theme == "tokyonight" then ""
+      else ""
+    ) +
+    ''
       eval "$(kafkactl completion zsh)"
 
       # Preferred editor for local and remote sessions
-      if [[ -n $SSH_CONNECTION ]]; then
-        export EDITOR='vi'
+      if [[ -n $SSH_CONNECTION ]];
+      then
+        export EDITOR = 'vi'
       else
         export EDITOR='nvim'
       fi
