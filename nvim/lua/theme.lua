@@ -173,7 +173,7 @@ require('lualine').setup({
       'encoding',
       'filetype',
     },
-    lualine_c = { 'harpoon2' },
+    lualine_c = { 'filename', 'harpoon2' },
   },
 })
 
