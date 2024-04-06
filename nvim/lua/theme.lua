@@ -141,6 +141,24 @@ require('tokyonight').setup({
   -- on_highlights = function(highlights, colors) end,
 })
 
+local function copilot_status()
+  return require('copilot_status').status_string()
+end
+
+local function codeium_status()
+  local codeium = require('cmp').core:get_sources(function(source)
+    return source.name == 'codeium'
+  end)[1]
+
+  if codeium == nil then
+    return ' '
+  elseif codeium.status == 2 then
+    return ' '
+  else
+    return '󰘦 '
+  end
+end
+
 require('lualine').setup({
   options = {
     theme = theme,
@@ -149,7 +167,12 @@ require('lualine').setup({
     -- component_separators = { left = '', right = '' },
   },
   sections = {
-    lualine_x = { 'encoding', 'filetype' },
+    lualine_x = {
+      codeium_status,
+      copilot_status,
+      'encoding',
+      'filetype',
+    },
     lualine_c = { 'harpoon2' },
   },
 })

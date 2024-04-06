@@ -153,8 +153,12 @@ require('lazy').setup({
     'zbirenbaum/copilot-cmp',
     event = 'InsertEnter',
     opts = {},
-    dependencies = { 'zbirenbaum/copilot.lua', opts = {} },
+    dependencies = {
+      { 'zbirenbaum/copilot.lua', opts = {} },
+    },
   },
+  -- lualine copilot status
+  { 'jonahgoldwastaken/copilot-status.nvim', lazy = true, event = 'BufReadPost' },
 
   -- discipline
   {

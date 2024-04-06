@@ -60,7 +60,7 @@ cmp.setup({
       maxwidth = 70, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
       ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
       symbol_map = {
-        Codeium = '',
+        Codeium = '󰘦',
         Copilot = '',
       },
       show_labelDetails = true, -- show labelDetails in menu. Disabled by default
@@ -73,3 +73,17 @@ cmp.setup({
     }),
   },
 })
+
+local cached_codeium = nil
+vim.api.nvim_create_user_command('CodeiumToggle', function(_)
+  local codeium = cmp.core:get_sources(function(source)
+    return source.name == 'codeium'
+  end)[1]
+
+  if codeium ~= nil then
+    cmp.core:unregister_source(codeium.id)
+    cached_codeium = codeium
+  else
+    cmp.core:register_source(cached_codeium)
+  end
+end, { nargs = 0 })
