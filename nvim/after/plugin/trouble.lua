@@ -29,7 +29,7 @@ vim.keymap.set(
 )
 vim.keymap.set(
   'n',
-  'gR',
+  '<leader>xr',
   '<cmd>TroubleToggle lsp_references<cr>',
   { silent = true, noremap = true, desc = 'trouble: lsp references' }
 )

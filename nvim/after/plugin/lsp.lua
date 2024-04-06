@@ -1,5 +1,7 @@
-local nmap = require('helpers').nmap
-local has_value = require('helpers').has_value
+local helpers = require('helpers')
+local nmap = helpers.nmap
+local map = helpers.map
+local has_value = helpers.has_value
 
 local telescope_builtin = require('telescope.builtin')
 local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
@@ -52,11 +54,11 @@ local function setup_keymaps()
   nmap('gl', vim.lsp.codelens.run, { desc = 'lsp: [g]o through [l]ens' })
   nmap('gt', vim.lsp.buf.type_definition, { desc = 'lsp: [g]o to [t]ype definition' })
 
-  nmap('<leader>ws', telescope_builtin.lsp_document_symbols, { desc = 'lsp: [d]ocument [s]ymbols' })
-  nmap('<leader>wS', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'lsp: [w]orkspace [s]ymbols' })
+  nmap('<leader>sD', telescope_builtin.lsp_document_symbols, { desc = 'lsp: [d]ocument [s]ymbols' })
+  nmap('<leader>sW', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'lsp: [w]orkspace [s]ymbols' })
 
   -- See `:help K` for why this keymap
-  nmap('Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
+  map({ 'n', 'v' }, 'Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
   nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
 end
 
