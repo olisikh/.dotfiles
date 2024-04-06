@@ -19,6 +19,7 @@ in
     ./alacritty
     ./nvim
     ./tmux
+    ./fzf
     ./mc
   ]);
 
@@ -39,7 +40,6 @@ in
           fonts = [ "Meslo" "JetBrainsMono" "FiraCode" "Hack" ];
         })
         fd
-        fzf
         eza # exa fork, as original package is not maintained
         jq
         lua

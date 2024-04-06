@@ -154,7 +154,7 @@ require('lualine').setup({
   },
 })
 
-if themeStyle ~= '' then
+if themeStyle ~= vim.NIL then
   vim.cmd.colorscheme(theme .. '-' .. themeStyle)
 else
   vim.cmd.colorscheme(theme)

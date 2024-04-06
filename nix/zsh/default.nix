@@ -10,11 +10,6 @@
     };
   };
 
-  home.packages = with pkgs; [
-    zsh
-    antidote
-  ];
-
   programs.zsh = {
     enable = true;
     enableCompletion = true;

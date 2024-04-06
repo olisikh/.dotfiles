@@ -10,10 +10,6 @@
           sha256 = "sha256-ItCmSUMMTe8iQeneIJLuWedVXsNgm+FXNtdrrdJ/1oE=";
         } + "/extras/tmux");
     };
-
-    packages = with pkgs; [
-      tmux
-    ];
   };
 
   programs.tmux = {
