@@ -1,8 +1,8 @@
 { pkgs, ... }:
 let
   user = "olisikh";
-  theme = "catppuccin";
-  themeStyle = "mocha";
+  theme = "tokyonight";
+  themeStyle = "night";
 in
 {
   imports = (map
