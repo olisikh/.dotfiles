@@ -2,34 +2,10 @@ local trouble = require('trouble')
 
 trouble.setup({})
 
-vim.keymap.set('n', '<leader>xx', '<cmd>TroubleToggle<cr>', { silent = true, noremap = true, desc = 'trouble: toggle' })
-vim.keymap.set(
-  'n',
-  '<leader>xw',
-  '<cmd>TroubleToggle workspace_diagnostics<cr>',
-  { silent = true, noremap = true, desc = 'trouble: workspace diagnostics' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>xd',
-  '<cmd>TroubleToggle document_diagnostics<cr>',
-  { silent = true, noremap = true, desc = 'trouble: document diagnostics' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>xl',
-  '<cmd>TroubleToggle loclist<cr>',
-  { silent = true, noremap = true, desc = 'trouble: loclist' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>xq',
-  '<cmd>TroubleToggle quickfix<cr>',
-  { silent = true, noremap = true, desc = 'trouble: quickfix' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>xr',
-  '<cmd>TroubleToggle lsp_references<cr>',
-  { silent = true, noremap = true, desc = 'trouble: lsp references' }
-)
+local nmap = require('helpers').nmap
+
+nmap('<leader>xx', ':TroubleToggle<cr>', { desc = 'trouble: toggle' })
+nmap('<leader>xw', ':TroubleToggle workspace_diagnostics<cr>', { desc = 'trouble: [w]orkspace diagnostics' })
+nmap('<leader>xd', ':TroubleToggle document_diagnostics<cr>', { desc = 'trouble: [d]ocument diagnostics' })
+nmap('<leader>xl', ':TroubleToggle loclist<cr>', { desc = 'trouble: [l]oclist' })
+nmap('<leader>xq', ':TroubleToggle quickfix<cr>', { desc = 'trouble: [q]uickfix' })

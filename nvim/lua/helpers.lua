@@ -16,14 +16,6 @@ M.vmap = function(lhs, rhs, opts)
   M.map('v', lhs, rhs, opts)
 end
 
-M.opt = function(scope, key, value)
-  local s = { o = vim.o, opt = vim.opt, b = vim.bo, w = vim.wo }
-  s[scope][key] = value
-  if scope ~= 'o' then
-    s['o'][key] = value
-  end
-end
-
 M.has_value = function(tab, value)
   for _, v in ipairs(tab) do
     if v == value then

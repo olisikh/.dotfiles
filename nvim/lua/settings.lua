@@ -10,7 +10,13 @@ vim.diagnostic.config({
   virtual_text = true,
 })
 
-local opt = require('helpers').opt
+local opt = function(scope, key, value)
+  local s = { o = vim.o, opt = vim.opt, b = vim.bo, w = vim.wo }
+  s[scope][key] = value
+  if scope ~= 'o' then
+    s['o'][key] = value
+  end
+end
 
 -- See `:help vim.o`
 -- Highlight cursor line
@@ -77,7 +83,6 @@ opt('o', 'timeoutlen', 300)
 -- Set completeopt to have a better completion experience
 -- opt('o', 'completeopt', 'menuone,noinsert,noselect')
 
--- NOTE: You should make sure your terminal supports this
 opt('o', 'termguicolors', true)
 
 -- avoid excessive messages
