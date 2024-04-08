@@ -35,7 +35,7 @@
         formatter = pkgs.alejandra;
 
         # personal
-        packages.homeConfigurations.olisikh = home-manager.lib.homeManagerConfiguration {
+        packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs {
             inherit system;
 
@@ -54,7 +54,7 @@
 
 
         # work
-        packages.homeConfigurations."O.Lisikh" = home-manager.lib.homeManagerConfiguration {
+        packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs {
             inherit system;
 
@@ -67,7 +67,7 @@
             };
           };
           modules = [
-            ./nix/home.nix
+            ./nix/work.nix
           ];
         };
 

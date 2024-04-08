@@ -79,7 +79,7 @@ in
 
           # Function to perform 'home make'
           home_make() {
-              home-manager switch --flake ~/.dotfiles#${user} --impure
+              home-manager switch --flake ~/.dotfiles#home --impure
           }
 
           # Function to perform 'home update'
