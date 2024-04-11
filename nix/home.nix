@@ -56,7 +56,7 @@ in
         go
         jdk17
         kafkactl
-        # awscli2
+        awscli2
         # localstack
         kcat
         bun
@@ -71,12 +71,14 @@ in
 
           # Function to display help message
           display_help() {
-              echo "Usage: home {make|update|upgrade}"
+              echo "Usage: home <command>"
               echo
               echo "Commands:"
-              echo "  make    : Rebuild dotfiles"
-              echo "  update  : Update dotfiles"
-              echo "  upgrade : Rebuild and updade dotfiles"
+              echo "  make     : Rebuild dotfiles"
+              echo "  update   : Update dotfiles"
+              echo "  upgrade  : Rebuild and updade dotfiles"
+              echo "  rollback : Rollback to previous generation (use if things go wrong)"
+              echo "  direnv   : Create ~/.envrc file for direnv"
           }
 
           # Function to perform 'home make'
@@ -95,6 +97,13 @@ in
               home_make
           }
 
+          home_rollback() {
+            # Extract the store path from the latest generation line
+            store_path=$(home-manager generations | sed -n '2p' | awk '{print $NF}')
+            # Run the activate script
+            $store_path/activate
+          }
+
           # Main function to handle input and execute corresponding action
           main() {
               case "$1" in
@@ -106,6 +115,9 @@ in
                       ;;
                   upgrade)
                       home_upgrade
+                      ;;
+                  rollback)
+                      home_rollback
                       ;;
                   direnv)
                       echo "use_nix" > ~/.envrc
