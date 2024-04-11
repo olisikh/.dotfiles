@@ -61,6 +61,7 @@ in
         bun
         stern # kubectl pod log scraping tool
         htop
+        pngpaste
         nodejs
         coursier # install scala via coursier: cs setup
 
@@ -104,6 +105,9 @@ in
                       ;;
                   upgrade)
                       home_upgrade
+                      ;;
+                  direnv)
+                      echo "use_nix" > ~/.envrc
                       ;;
                   *)
                       display_help

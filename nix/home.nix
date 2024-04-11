@@ -3,6 +3,7 @@ let
   user = "olisikh";
   theme = "catppuccin";
   themeStyle = "mocha";
+  obsidianVault = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
 in
 {
   imports = (map
@@ -61,6 +62,7 @@ in
         bun
         stern # kubectl pod log scraping tool
         htop
+        pngpaste
         nodejs
         coursier # install scala via coursier: cs setup
 
@@ -105,6 +107,9 @@ in
                   upgrade)
                       home_upgrade
                       ;;
+                  direnv)
+                      echo "use_nix" > ~/.envrc
+                      ;;
                   *)
                       display_help
                       exit 1
@@ -119,6 +124,7 @@ in
 
     sessionVariables = {
       JAVA_HOME = pkgs.jdk17;
+      OBSIDIAN_VAULT = obsidianVault;
     };
   };
 

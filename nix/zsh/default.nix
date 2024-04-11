@@ -1,7 +1,6 @@
 { theme, themeStyle, ... }: { inputs, lib, config, pkgs, ... }:
 {
   home.file = {
-    ".envrc".text = "use_nix";
     ".config/zsh/catppuccin".source = pkgs.fetchFromGitHub {
       "owner" = "catppuccin";
       "repo" = "zsh-syntax-highlighting";
