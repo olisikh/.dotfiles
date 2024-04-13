@@ -65,6 +65,7 @@ in
         pngpaste
         nodejs
         coursier # install scala via coursier: cs setup
+        xdg-utils # open apps from console/neovim
 
         (pkgs.writeShellScriptBin "home" ''
           #!/bin/bash

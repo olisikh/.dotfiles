@@ -146,7 +146,9 @@ require('lazy').setup({
   {
     'Exafunction/codeium.nvim',
     event = 'InsertEnter',
-    opts = {},
+    opts = {
+      enable_chat = true,
+    },
   },
   -- unofficial Copilot plugin
   {
