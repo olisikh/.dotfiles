@@ -88,7 +88,7 @@ local function setup_auto_commands(client, bufnr)
   vim.api.nvim_create_autocmd('CursorHold', {
     callback = function()
       if server_capabilities.documentHighlightProvider then
-        vim.lsp.buf.document_highlight()
+        pcall(vim.lsp.buf.document_highlight)
       end
     end,
     group = lsp_group,
@@ -97,7 +97,7 @@ local function setup_auto_commands(client, bufnr)
   vim.api.nvim_create_autocmd('CursorMoved', {
     callback = function()
       if server_capabilities.referencesProvider then
-        vim.lsp.buf.clear_references()
+        pcall(vim.lsp.buf.clear_references)
       end
     end,
     group = lsp_group,
@@ -106,7 +106,7 @@ local function setup_auto_commands(client, bufnr)
   vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
     callback = function()
       if server_capabilities.codeLensProvider then
-        vim.lsp.codelens.refresh()
+        pcall(vim.lsp.codelens.refresh)
       end
     end,
     group = lsp_group,
