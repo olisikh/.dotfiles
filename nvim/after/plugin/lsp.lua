@@ -27,7 +27,9 @@ local function format_buf(bufnr)
 end
 
 local function toggle_inlay_hints(bufnr, enable)
-  vim.lsp.inlay_hint.enable(bufnr, enable)
+  vim.lsp.inlay_hint.enable(enable, {
+    bufnr = bufnr,
+  })
 end
 
 vim.api.nvim_create_user_command('ToggleInlayHints', function()
@@ -70,7 +72,6 @@ local function setup_auto_commands(client, bufnr)
     callback = function()
       format_buf(bufnr)
     end,
-    buffer = bufnr,
     group = lsp_group,
   })
 
@@ -84,30 +85,34 @@ local function setup_auto_commands(client, bufnr)
   --     end,
   --   })
 
-  if server_capabilities.documentHighlightProvider then
-    vim.api.nvim_create_autocmd('CursorHold', {
-      callback = vim.lsp.buf.document_highlight,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  end
+  vim.api.nvim_create_autocmd('CursorHold', {
+    callback = function()
+      if server_capabilities.documentHighlightProvider then
+        vim.lsp.buf.document_highlight()
+      end
+    end,
+    group = lsp_group,
+  })
 
-  if server_capabilities.referencesProvider then
-    vim.api.nvim_create_autocmd('CursorMoved', {
-      callback = vim.lsp.buf.clear_references,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  end
+  vim.api.nvim_create_autocmd('CursorMoved', {
+    callback = function()
+      if server_capabilities.referencesProvider then
+        vim.lsp.buf.clear_references()
+      end
+    end,
+    group = lsp_group,
+  })
 
-  if server_capabilities.codeLensProvider then
-    vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-      callback = vim.lsp.codelens.refresh,
-      buffer = bufnr,
-      group = lsp_group,
-    })
-  end
+  vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+    callback = function()
+      if server_capabilities.codeLensProvider then
+        vim.lsp.codelens.refresh()
+      end
+    end,
+    group = lsp_group,
+  })
 
+  -- disable inlay hints by default
   toggle_inlay_hints(0, vim.g.inlayhints)
 
   vim.api.nvim_create_autocmd('FileType', {
