@@ -16,8 +16,8 @@ map('n', 'j', "v:count == 0 ? 'gj' : 'jzz'", { expr = true, silent = true })
 map('n', 'J', 'mzJ`z', { desc = 'join lines' })
 
 -- Move things between statements
-map('v', 'J', ":m '>+1<cr>gv=gv", { desc = 'move selection down btw statements' })
-map('v', 'K', ":m '<-2<cr>gv=gv", { desc = 'move selection up btw statements' })
+map('v', 'J', ":m '>+1<cr>gv=gv", { desc = 'move selection down between statements' })
+map('v', 'K', ":m '<-2<cr>gv=gv", { desc = 'move selection up between statements' })
 
 -- Keep cursor in the middle when moving half page up/down
 -- map('n', '<C-d>', '<C-d>zz', { desc = 'jump half page down' })
