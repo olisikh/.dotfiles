@@ -19,7 +19,7 @@ M.setup = function(group, capabilities, attach_lsp)
         },
       }
       metals_config.settings = {
-        defaultBspToBuildTool = false, -- use BSP, bloop sucks
+        defaultBspToBuildTool = true, -- use BSP, bloop sucks
         autoImportBuild = 'on',
         serverVersion = 'latest.snapshot', -- remove for latest stable or set latest.stable
         showImplicitArguments = true,
