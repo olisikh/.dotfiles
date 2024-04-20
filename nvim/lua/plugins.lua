@@ -6,9 +6,6 @@ require('lazy').setup({
   -- tokyo night theme
   { 'folke/tokyonight.nvim', lazy = false, priority = 1000 },
 
-  -- icons
-  { 'nvim-tree/nvim-web-devicons', opts = {} },
-
   -- statusline plugin
   'nvim-lualine/lualine.nvim',
 
@@ -22,7 +19,10 @@ require('lazy').setup({
   { 'tpope/vim-fugitive', dependencies = { 'tpope/vim-rhubarb' } },
 
   -- file tree explorer
-  'nvim-tree/nvim-tree.lua',
+  { 'nvim-tree/nvim-tree.lua', dependencies = { 'nvim-tree/nvim-web-devicons' } },
+
+  -- file system management within neovim buffer
+  { 'stevearc/oil.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
 
   -- traverse diagnostics in a separate window
   'folke/trouble.nvim',
