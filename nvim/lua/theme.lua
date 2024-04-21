@@ -167,13 +167,16 @@ require('lualine').setup({
     -- component_separators = { left = '', right = '' },
   },
   sections = {
+    lualine_c = {
+      'filename',
+    },
     lualine_x = {
+      'harpoon2',
       codeium_status,
       copilot_status,
       'encoding',
       'filetype',
     },
-    lualine_c = { 'filename', 'harpoon2' },
   },
 })
 
