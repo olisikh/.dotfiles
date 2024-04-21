@@ -5,17 +5,14 @@ local has_value = helpers.has_value
 
 local telescope_builtin = require('telescope.builtin')
 local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
+local cmp_lsp = require('cmp_nvim_lsp')
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-  border = 'rounded',
-})
-vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-  border = 'rounded',
-})
+vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded' })
+vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = 'rounded' })
 
 local function format_buf(bufnr)
   vim.lsp.buf.format({
@@ -37,15 +34,15 @@ vim.api.nvim_create_user_command('ToggleInlayHints', function()
   toggle_inlay_hints(0, vim.g.inlayhints)
 end, { desc = 'Toggle inlay hints globally' })
 
-local function setup_keymaps()
+local function setup_keymaps(client, bufnr)
   nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
   nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   nmap('<leader>cf', function()
-    format_buf(vim.api.nvim_get_current_buf())
+    format_buf(bufnr)
   end, { desc = 'lsp: [c]ode [f]ormat' })
 
   nmap('<leader>ci', function()
-    toggle_inlay_hints(0, not vim.lsp.inlay_hint.is_enabled())
+    toggle_inlay_hints(bufnr, not vim.lsp.inlay_hint.is_enabled(bufnr))
   end, { desc = 'lsp: toggle inlay hints (buffer)' })
   nmap('<leader>cI', ':ToggleInlayHints<cr>', { desc = 'lsp: toggle inlay hints (global)' })
 
@@ -72,48 +69,44 @@ local function setup_auto_commands(client, bufnr)
     callback = function()
       format_buf(bufnr)
     end,
+    buffer = bufnr,
     group = lsp_group,
   })
-
-  --   -- Delete trailing whitespace on save at least, if formatter is not available
-  --   vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
-  --     pattern = '*',
-  --     callback = function()
-  --       local cursor = vim.fn.getpos('.')
-  --       vim.cmd([[%s/\s\+$//e]])
-  --       vim.fn.setpos('.', cursor)
-  --     end,
-  --   })
 
   vim.api.nvim_create_autocmd('CursorHold', {
     callback = function()
       if server_capabilities.documentHighlightProvider then
-        pcall(vim.lsp.buf.document_highlight)
+        vim.lsp.buf.document_highlight()
       end
     end,
+    buffer = bufnr,
     group = lsp_group,
   })
 
   vim.api.nvim_create_autocmd('CursorMoved', {
     callback = function()
       if server_capabilities.referencesProvider then
-        pcall(vim.lsp.buf.clear_references)
+        vim.lsp.buf.clear_references()
       end
     end,
+    buffer = bufnr,
     group = lsp_group,
   })
 
   vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
     callback = function()
       if server_capabilities.codeLensProvider then
-        pcall(vim.lsp.codelens.refresh)
+        vim.lsp.codelens.refresh({ bufnr = bufnr })
       end
     end,
+    buffer = bufnr,
     group = lsp_group,
   })
 
   -- disable inlay hints by default
-  toggle_inlay_hints(0, vim.g.inlayhints)
+  if server_capabilities.inlayHintProvider then
+    toggle_inlay_hints(0, vim.g.inlayhints)
+  end
 
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'dap-repl' },
@@ -124,10 +117,16 @@ local function setup_auto_commands(client, bufnr)
   })
 end
 
-local function attach_lsp(client, bufnr)
-  setup_keymaps()
-  setup_auto_commands(client, bufnr)
-end
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = lsp_group,
+  callback = function(opts)
+    local bufnr = opts.buf
+    local client = vim.lsp.get_client_by_id(opts.data.client_id)
+
+    setup_keymaps(client, bufnr)
+    setup_auto_commands(client, bufnr)
+  end,
+})
 
 local servers = {
   dockerls = {},
@@ -231,7 +230,6 @@ mason_lspconfig.setup_handlers({
       if server_config then
         require('lspconfig')[server_name].setup({
           capabilities = capabilities,
-          on_attach = attach_lsp,
           settings = server_config.settings or {},
         })
       end
@@ -243,5 +241,5 @@ mason_lspconfig.setup_handlers({
 require('language.js').setup(lsp_group)
 require('language.lua').setup(lsp_group)
 require('language.go').setup(lsp_group)
-require('language.scala').setup(lsp_group, capabilities, attach_lsp)
-require('language.rust').setup(lsp_group, capabilities, attach_lsp)
+require('language.scala').setup(lsp_group, capabilities)
+require('language.rust').setup(lsp_group, capabilities)

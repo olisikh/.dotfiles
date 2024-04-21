@@ -4,7 +4,7 @@ local dap = require('dap')
 
 local M = {}
 
-M.setup = function(group, capabilities, attach_lsp)
+M.setup = function(group, capabilities)
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'scala', 'sbt', 'java' },
     group = group,
@@ -48,8 +48,6 @@ M.setup = function(group, capabilities, attach_lsp)
           metals.toggle_setting('showImplicitArguments')
         end, { desc = 'metals: show implicit args' })
         nmap('<leader>mc', require('telescope').extensions.metals.commands, { desc = 'metals: open commands' })
-
-        attach_lsp(client, bufnr)
 
         -- nvim-dap
         dap.configurations.scala = {

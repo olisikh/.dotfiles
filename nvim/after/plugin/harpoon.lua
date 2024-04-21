@@ -29,7 +29,7 @@ nmap('<leader>h', function()
 end, { desc = 'harpoon: Toggle quick menu' })
 
 nmap('<leader>a', function()
-  harpoon:list():append()
+  harpoon:list():add()
 end, { desc = 'harpoon: Add file to list' })
 
 nmap('<leader>1', function()

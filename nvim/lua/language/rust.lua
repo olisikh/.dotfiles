@@ -1,6 +1,6 @@
 local M = {}
 
-M.setup = function(group, capabilities, attach_lsp)
+M.setup = function(group, capabilities)
   local nmap = require('helpers').nmap
 
   -- Setup rust and debugging
@@ -15,9 +15,8 @@ M.setup = function(group, capabilities, attach_lsp)
     return {
       -- LSP configuration
       server = {
+        capabilitis = capabilities,
         on_attach = function(client, bufnr)
-          attach_lsp(client, bufnr)
-
           -- you can also put keymaps in here
           nmap('<leader>ra', function()
             vim.cmd.RustLsp({ 'hover', 'actions' })
