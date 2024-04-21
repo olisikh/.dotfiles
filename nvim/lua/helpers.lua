@@ -16,7 +16,7 @@ M.vmap = function(lhs, rhs, opts)
   M.map('v', lhs, rhs, opts)
 end
 
-M.has_value = function(tab, value)
+M.contains = function(tab, value)
   for _, v in ipairs(tab) do
     if v == value then
       return true

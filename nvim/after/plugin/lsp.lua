@@ -1,10 +1,10 @@
 local helpers = require('helpers')
 local nmap = helpers.nmap
 local map = helpers.map
-local has_value = helpers.has_value
+local contains = helpers.contains
 
 local telescope_builtin = require('telescope.builtin')
-local lsp_group = vim.api.nvim_create_augroup('lsp', { clear = true })
+local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
 local cmp_lsp = require('cmp_nvim_lsp')
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
@@ -133,77 +133,67 @@ local servers = {
   terraformls = {},
   bashls = {},
   yamlls = {
-    settings = {
-      yaml = {
-        keyOrdering = false, -- disable alphabetic ordering of keys
-      },
+    yaml = {
+      keyOrdering = false, -- disable alphabetic ordering of keys
     },
   },
   gopls = {
-    settings = {
-      gopls = {
-        -- setup inlay hints
-        hints = {
-          assignVariableTypes = true,
-          compositeLiteralFields = true,
-          compositeLiteralTypes = true,
-          constantValues = true,
-          functionTypeParameters = true,
-          parameterNames = true,
-          rangeVariableTypes = true,
-        },
+    gopls = {
+      -- setup inlay hints
+      hints = {
+        assignVariableTypes = true,
+        compositeLiteralFields = true,
+        compositeLiteralTypes = true,
+        constantValues = true,
+        functionTypeParameters = true,
+        parameterNames = true,
+        rangeVariableTypes = true,
       },
     },
   },
   tsserver = {
-    settings = {
-      javascript = {
-        inlayHints = {
-          includeInlayEnumMemberValueHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayVariableTypeHints = false,
-          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-        },
+    javascript = {
+      inlayHints = {
+        includeInlayEnumMemberValueHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayVariableTypeHints = false,
+        includeInlayVariableTypeHintsWhenTypeMatchesName = false,
       },
-      typescript = {
-        inlayHints = {
-          includeInlayEnumMemberValueHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayVariableTypeHints = false,
-          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-        },
+    },
+    typescript = {
+      inlayHints = {
+        includeInlayEnumMemberValueHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayVariableTypeHints = false,
+        includeInlayVariableTypeHintsWhenTypeMatchesName = false,
       },
     },
   },
   lua_ls = {
-    settings = {
-      Lua = {
-        workspace = {
-          checkThirdParty = false,
-        },
-        telemetry = {
-          enable = false,
-        },
-        hint = {
-          enable = true,
-        },
+    Lua = {
+      workspace = {
+        checkThirdParty = false,
+      },
+      telemetry = {
+        enable = false,
+      },
+      hint = {
+        enable = true,
       },
     },
   },
   nil_ls = {
-    settings = {
-      ['nil'] = {
-        autostart = true,
-        testSetting = 42,
-      },
+    ['nil'] = {
+      autostart = true,
+      testSetting = 42,
     },
   },
 }
@@ -222,17 +212,16 @@ mason_lspconfig.setup({
 })
 
 -- rust LSP is setup by rust plugin
-local manually_installed = { 'rust_analyzer' }
+local plugin_managed_servers = { 'rust_analyzer' }
+
 mason_lspconfig.setup_handlers({
   function(server_name)
-    if not has_value(manually_installed, server_name) then
-      local server_config = servers[server_name]
-      if server_config then
-        require('lspconfig')[server_name].setup({
-          capabilities = capabilities,
-          settings = server_config.settings or {},
-        })
-      end
+    if not contains(plugin_managed_servers, server_name) then
+      local settings = servers[server_name] or {}
+      require('lspconfig')[server_name].setup({
+        capabilities = capabilities,
+        settings = settings,
+      })
     end
   end,
 })
