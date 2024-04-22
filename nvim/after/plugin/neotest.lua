@@ -12,13 +12,19 @@ vim.diagnostic.config({
 
 neotest.setup({
   adapters = {
-    require('neotest-go')({ dap_adapter = 'delve' }),
-    require('neotest-scala'),
+    require('neotest-go')({
+      dap_adapter = 'delve',
+    }),
+    require('neotest-scala')({
+      runner = 'bloop', -- or sbt
+      extra_args = { '--no-color' },
+      framework = 'specs2', -- one of scalatest, munit, utest, specs2
+    }),
     require('rustaceanvim.neotest'),
   },
   diagnostic = {
     enabled = true,
-    -- severity = 1
+    severity = vim.diagnostic.severity.ERROR, -- show as errors
   },
   status = {
     enabled = true,
