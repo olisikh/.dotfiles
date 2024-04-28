@@ -98,10 +98,12 @@ in
           }
 
           home_rollback() {
-            # Extract the store path from the latest generation line
-            store_path=$(home-manager generations | sed -n '2p' | awk '{print $NF}')
-            # Run the activate script
-            $store_path/activate
+            store_path=$(home-manager generations | fzf | awk '{print $NF}')
+            if [[ -z ''${store_path:+x} ]]; then
+              echo "No generation selected, rollback aborted."
+            else
+              $store_path/activate
+            fi
           }
 
           # Main function to handle input and execute corresponding action
