@@ -47,7 +47,12 @@ in
         rustup
         luarocks
         tree-sitter
-        python3
+        (python3.withPackages (p: with p; [
+          pyaes
+          python-jose
+          python-dateutil
+          tabulate
+        ]))
         docker
         minikube
         kubernetes-helm
@@ -57,7 +62,6 @@ in
         jdk17
         kafkactl
         awscli2
-        # localstack
         kcat
         bun
         stern # kubectl pod log scraping tool

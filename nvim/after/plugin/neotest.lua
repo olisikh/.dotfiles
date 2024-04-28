@@ -16,8 +16,8 @@ neotest.setup({
       dap_adapter = 'delve',
     }),
     require('neotest-scala')({
-      runner = 'bloop', -- or sbt
-      extra_args = { '--no-color' },
+      runner = 'sbt', -- or sbt
+      extra_args = { '--no-colors' },
       framework = 'specs2', -- one of scalatest, munit, utest, specs2
     }),
     require('rustaceanvim.neotest'),

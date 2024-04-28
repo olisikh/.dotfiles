@@ -241,7 +241,7 @@ require('lazy').setup({
       'nvim-neotest/nvim-nio',
       'nvim-neotest/neotest-plenary',
       'nvim-neotest/neotest-go',
-      { 'stevanmilic/neotest-scala', dev = true },
+      { 'stevanmilic/neotest-scala', dev = true, dependencies = { 'nvim-neotest/nvim-nio' } },
     },
   },
 }, {
