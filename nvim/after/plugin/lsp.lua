@@ -18,7 +18,13 @@ local function format_buf(bufnr)
   vim.lsp.buf.format({
     bufnr = bufnr,
     filter = function(client)
-      return client.name == 'null-ls' or client.name == 'metals'
+      local sources = {
+        ['null-ls'] = {},
+        metals = {},
+        terraformls = {},
+      }
+
+      return sources[client.name] ~= nil
     end,
   })
 end
