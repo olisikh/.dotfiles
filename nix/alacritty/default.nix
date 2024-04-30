@@ -33,7 +33,7 @@
 
         normal = {
           family = "JetBrainsMono Nerd Font";
-          style = "Regular";
+          style = "Light";
         };
 
         bold = {
@@ -43,7 +43,7 @@
 
         italic = {
           family = "JetBrainsMono Nerd Font";
-          style = "Regular Italic";
+          style = "Light Italic";
         };
 
         bold_italic = {
