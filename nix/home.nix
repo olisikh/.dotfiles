@@ -18,6 +18,7 @@ in
     ./starship
     ./zoxide
     ./alacritty
+    ./wezterm
     ./nvim
     ./tmux
     ./fzf

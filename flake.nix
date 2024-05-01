@@ -45,6 +45,9 @@
               # all installing packages considered not free by Nix community (e.g. Terraform)
               allowUnfree = true;
               allowUnfreePredicate = _: true;
+
+              # allows package installation even if it claims system is not supported (sometimes it's a lie)
+              # allowUnsupportedSystem = true;
             };
           };
           modules = [
