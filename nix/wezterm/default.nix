@@ -9,12 +9,11 @@
 
   programs.wezterm = {
     enable = true;
-
-    # TODO: Make theme configurable, derive from theme and themeStyle
     extraConfig =
       # lua
       ''
         return {
+          -- TODO: Capitalize the first letter of the theme and themeStyle instead 
           color_scheme = "Catppuccin Mocha", -- or Macchiato, Frappe, Latte
           keys = {
             -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word

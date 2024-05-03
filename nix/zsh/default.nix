@@ -14,50 +14,48 @@
     enableCompletion = true;
     autosuggestion.enable = true;
 
-    initExtraBeforeCompInit = ''
-      # init completions
-      autoload -U +X bashcompinit && bashcompinit
-      autoload -U +X compinit && compinit
-
-      export THEME_STYLE="${themeStyle}";
-      export THEME="${theme}";
-    '';
-
-    initExtra = (
-      if theme == "catppuccin" then ''
-        source $HOME/.config/zsh/catppuccin/themes/catppuccin_${themeStyle}-zsh-syntax-highlighting.zsh
+    initExtraBeforeCompInit =
+      #bash
       ''
-      else if theme == "tokyonight" then ""
-      else ""
-    ) +
-    ''
-      eval "$(kafkactl completion zsh)"
+        # init completions
+        autoload -U +X bashcompinit && bashcompinit
+        autoload -U +X compinit && compinit
 
-      # Preferred editor for local and remote sessions
-      if [[ -n $SSH_CONNECTION ]]; then
-        export EDITOR = 'vi'
-      else
-        export EDITOR='nvim'
-      fi
+        export THEME_STYLE="${themeStyle}";
+        export THEME="${theme}";
+      '';
 
-      # Add rust (cargo) executables
-      export CARGO_HOME=$HOME/.cargo
-      export PATH="$CARGO_HOME/bin:$PATH"
+    initExtra =
+      #bash
+      ''
+        source $HOME/.config/zsh/catppuccin/themes/catppuccin_${themeStyle}-zsh-syntax-highlighting.zsh
+        eval "$(kafkactl completion zsh)"
 
-      alias tf=terraform
-      alias k=kubectl
+        # Preferred editor for local and remote sessions
+        if [[ -n $SSH_CONNECTION ]]; then
+          export EDITOR = 'vi'
+        else
+          export EDITOR='nvim'
+        fi
 
-      # smart cd
-      alias zz="z -"
+        # Add rust (cargo) executables
+        export CARGO_HOME=$HOME/.cargo
+        export PATH="$CARGO_HOME/bin:$PATH"
 
-      # smart ls
-      alias ls="exa"
-      alias ll="exa -alh"
-      alias tree="exa --tree"
+        alias tf=terraform
+        alias k=kubectl
 
-      # overrides for work
-      [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-    '';
+        # smart cd
+        alias zz="z -"
+
+        # smart ls
+        alias ls="exa"
+        alias ll="exa -alh"
+        alias tree="exa --tree"
+
+        # overrides for work
+        [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+      '';
 
     antidote = {
       enable = true;
