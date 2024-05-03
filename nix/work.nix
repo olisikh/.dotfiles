@@ -16,10 +16,8 @@ in
     ./direnv
     ./starship
     ./zoxide
-    ./alacritty
     ./wezterm
     ./nvim
-    ./tmux
     ./fzf
     ./mc
   ]);

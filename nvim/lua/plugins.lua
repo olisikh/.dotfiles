@@ -5,8 +5,30 @@ require('lazy').setup({
   -- statusline plugin
   'nvim-lualine/lualine.nvim',
 
-  -- tmux integration plugin
-  { 'christoomey/vim-tmux-navigator', lazy = false },
+  -- for wezterm
+  {
+    'mrjones2014/smart-splits.nvim',
+    lazy = false,
+    config = function()
+      local s = require('smart-splits')
+
+      vim.keymap.set('n', '<A-h>', s.resize_left)
+      vim.keymap.set('n', '<A-j>', s.resize_down)
+      vim.keymap.set('n', '<A-k>', s.resize_up)
+      vim.keymap.set('n', '<A-l>', s.resize_right)
+      -- moving between splits
+      vim.keymap.set('n', '<C-h>', s.move_cursor_left)
+      vim.keymap.set('n', '<C-j>', s.move_cursor_down)
+      vim.keymap.set('n', '<C-k>', s.move_cursor_up)
+      vim.keymap.set('n', '<C-l>', s.move_cursor_right)
+      vim.keymap.set('n', '<C-\\>', s.move_cursor_previous)
+      -- swapping buffers between windows
+      vim.keymap.set('n', '<leader><leader>h', s.swap_buf_left)
+      vim.keymap.set('n', '<leader><leader>j', s.swap_buf_down)
+      vim.keymap.set('n', '<leader><leader>k', s.swap_buf_up)
+      vim.keymap.set('n', '<leader><leader>l', s.swap_buf_right)
+    end,
+  },
 
   -- required by most plugins
   'nvim-lua/plenary.nvim',
