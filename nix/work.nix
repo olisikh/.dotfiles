@@ -62,7 +62,8 @@ in
         htop
         pngpaste
         nodejs
-        coursier # install scala via coursier: cs setup
+        (sbt.override { jre = jdk17; })
+        metals
         xdg-utils # open apps from console/neovim
 
         (pkgs.writeShellScriptBin "home" ''

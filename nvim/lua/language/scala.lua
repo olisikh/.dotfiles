@@ -20,10 +20,12 @@ M.setup = function(group, capabilities)
       }
       metals_config.settings = {
         defaultBspToBuildTool = true, -- use BSP, bloop sucks
+        useGlobalExecutable = true,
         autoImportBuild = 'on',
         serverVersion = 'latest.snapshot', -- remove for latest stable or set latest.stable
         showImplicitArguments = true,
         showImplicitConversionsAndClasses = true,
+        superMethodLensesEnabled = true,
         showInferredType = true,
         excludedPackages = {
           'akka.actor.typed.javadsl',
