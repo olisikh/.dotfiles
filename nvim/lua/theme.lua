@@ -4,28 +4,8 @@ local themeStyle = vim.fn.getenv('THEME_STYLE')
 
 require('catppuccin').setup({
   compile_path = vim.fn.stdpath('cache') .. '/catppuccin',
-  no_italic = false,
-  no_bold = false,
-  no_underline = false,
-  term_colors = false,
   dim_inactive = {
-    enabled = false,
-    -- shade = 'dark',
-    -- percentage = 0.01,
-  },
-  styles = {
-    comments = { 'italic' },
-    -- conditionals = {},
-    -- loops = {},
-    -- functions = {},
-    -- keywords = {},
-    -- strings = {},
-    -- variables = {},
-    -- numbers = {},
-    -- booleans = {},
-    -- properties = {},
-    -- types = {},
-    -- operators = {},
+    enabled = true,
   },
   integrations = {
     fidget = true,
@@ -37,7 +17,6 @@ require('catppuccin').setup({
     treesitter_context = true,
     telescope = {
       enabled = true,
-      -- style = "nvchad"
     },
     lsp_trouble = true,
     harpoon = true,
@@ -49,7 +28,6 @@ require('catppuccin').setup({
     markdown = true,
     indent_blankline = {
       enabled = true,
-      -- scope_color = '', -- catppuccin color (eg. `lavender`) Default: text
       colored_indent_levels = false,
     },
     native_lsp = {
@@ -94,9 +72,6 @@ end
 require('lualine').setup({
   options = {
     theme = theme,
-
-    -- section_separators = { left = '', right = '' },
-    -- component_separators = { left = '', right = '' },
   },
   sections = {
     lualine_c = {
