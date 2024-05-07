@@ -104,7 +104,8 @@ require('lazy').setup({
   -- Status updates for LSP showing on the right
   { 'j-hui/fidget.nvim', opts = {} },
 
-  -- additional lua configuration, for lua development
+  -- additional lua configuration, for plugins development
+  'folke/neoconf.nvim',
   'folke/neodev.nvim',
 
   -- Scala metals
@@ -113,7 +114,7 @@ require('lazy').setup({
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
 
   -- rust support
-  { 'mrcjkb/rustaceanvim', version = '^4', ft = { 'rust' } },
+  { 'mrcjkb/rustaceanvim', version = '^4', lazy = false, ft = { 'rust' } },
   { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
 
   -- debugging
@@ -156,7 +157,7 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter-context',
     },
     config = function()
-      pcall(require('nvim-treesitter.install').update)
+      require('nvim-treesitter.install').update()
     end,
   },
 

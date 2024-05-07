@@ -205,11 +205,8 @@ local servers = {
 }
 
 -- neodev must be setup before lspconfig
-require('neodev').setup({
-  library = {
-    plugins = { 'nvim-dap-ui', 'neotest' },
-  },
-})
+require('neoconf').setup({})
+require('neodev').setup({})
 
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup({
