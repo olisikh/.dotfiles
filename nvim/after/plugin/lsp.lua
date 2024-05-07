@@ -48,7 +48,7 @@ local function setup_keymaps(client, bufnr)
   end, { desc = 'lsp: [c]ode [f]ormat' })
 
   nmap('<leader>ci', function()
-    toggle_inlay_hints(bufnr, not vim.lsp.inlay_hint.is_enabled(bufnr))
+    toggle_inlay_hints(bufnr, not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }))
   end, { desc = 'lsp: toggle inlay hints (buffer)' })
   nmap('<leader>cI', ':ToggleInlayHints<cr>', { desc = 'lsp: toggle inlay hints (global)' })
 

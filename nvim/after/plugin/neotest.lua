@@ -5,7 +5,8 @@ local neotest_namespace = vim.api.nvim_create_namespace('neotest')
 vim.diagnostic.config({
   virtual_text = {
     format = function(d)
-      return d.message:gsub('\n', ' '):gsub('\t', ' '):gsub('%s+', ' '):gsub('^%s+', '')
+      local v = d.message:gsub('\n', ' '):gsub('\t', ' '):gsub('%s+', ' '):gsub('^%s+', '')
+      return v
     end,
   },
 }, neotest_namespace)
