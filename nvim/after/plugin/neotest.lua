@@ -18,7 +18,6 @@ neotest.setup({
     }),
     require('neotest-scala')({
       runner = 'sbt', -- or bloop
-      args = { '--no-colors' },
       framework = 'specs2', -- one of scalatest, munit, utest, specs2
     }),
     require('rustaceanvim.neotest'),
