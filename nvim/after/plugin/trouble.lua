@@ -2,7 +2,7 @@ local trouble = require('trouble')
 
 trouble.setup({})
 
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 
 nmap('<leader>xx', ':TroubleToggle<cr>', { desc = 'trouble: toggle' })
 nmap('<leader>xw', ':TroubleToggle workspace_diagnostics<cr>', { desc = 'trouble: [w]orkspace diagnostics' })

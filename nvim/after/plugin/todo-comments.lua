@@ -8,6 +8,6 @@ for type, icon in pairs(signs) do
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 nmap('<leader>st', ':TodoTelescope<cr>', { desc = 'todo: [s]earch [t]odos' })
 nmap('<leader>xt', ':TodoTrouble<cr>', { desc = 'trouble: [t]odos' })

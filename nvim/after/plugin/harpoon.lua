@@ -1,4 +1,4 @@
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 
 local harpoon = require('harpoon')
 harpoon:setup({})

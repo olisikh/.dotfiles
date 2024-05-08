@@ -20,7 +20,7 @@ tree.setup({
   end,
 })
 
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 
 nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
 nmap('<leader>O', ':NvimTreeFindFile<cr>', { desc = 'nvim-tree: locale file in a tree', noremap = true })

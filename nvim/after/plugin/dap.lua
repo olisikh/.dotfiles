@@ -1,4 +1,4 @@
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 
 local dap = require('dap')
 local breakpoints = require('dap.breakpoints')

@@ -1,9 +1,9 @@
 -- Note: this file is an entrypoint for neovim
-require('settings')
+require('options')
 require('packager')
 require('plugins')
 require('theme')
-require('mappings')
+require('keymaps')
 require('auto')
 
 -- The line beneath this is called `modeline`. See `:help modeline`

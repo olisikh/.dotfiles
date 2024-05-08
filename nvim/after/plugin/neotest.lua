@@ -1,4 +1,4 @@
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 local neotest = require('neotest')
 
 local neotest_namespace = vim.api.nvim_create_namespace('neotest')

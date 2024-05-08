@@ -1,4 +1,4 @@
-local nmap = require('helpers').nmap
+local nmap = require('utils').nmap
 
 local telescope = require('telescope')
 local telescope_themes = require('telescope.themes')

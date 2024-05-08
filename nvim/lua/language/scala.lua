@@ -1,5 +1,5 @@
-local nmap = require('helpers').nmap
-local map = require('helpers').map
+local nmap = require('utils').nmap
+local map = require('utils').map
 local dap = require('dap')
 
 local M = {}

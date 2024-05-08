@@ -1,7 +1,6 @@
-local helpers = require('helpers')
-local nmap = helpers.nmap
-local map = helpers.map
-local contains = helpers.contains
+local nmap = require('utils').nmap
+local map = require('utils').map
+local contains = require('utils').contains
 
 local telescope_builtin = require('telescope.builtin')
 local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })

@@ -1,5 +1,5 @@
-local map = require('helpers').map
-local nmap = require('helpers').nmap
+local map = require('utils').map
+local nmap = require('utils').nmap
 
 -- Make sure Space is not mapped to anything, used as leader key
 map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })

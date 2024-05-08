@@ -1,8 +1,8 @@
+local nmap = require('utils').nmap
+
 local M = {}
 
 M.setup = function(group, capabilities)
-  local nmap = require('helpers').nmap
-
   -- Setup rust and debugging
   local mason_registry = require('mason-registry')
   local codelldb_root = mason_registry.get_package('codelldb'):get_install_path() .. '/extension/'
