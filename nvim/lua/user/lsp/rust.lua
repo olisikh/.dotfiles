@@ -1,4 +1,4 @@
-local nmap = require('utils').nmap
+local nmap = require('user.utils').nmap
 
 local M = {}
 

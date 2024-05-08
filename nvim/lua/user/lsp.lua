@@ -1,6 +1,6 @@
-local nmap = require('utils').nmap
-local map = require('utils').map
-local contains = require('utils').contains
+local uu = require('user.utils')
+local nmap = uu.nmap
+local map = uu.map
 
 local telescope_builtin = require('telescope.builtin')
 local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
@@ -203,9 +203,8 @@ local servers = {
   },
 }
 
--- neodev must be setup before lspconfig
-require('neoconf').setup({})
-require('neodev').setup({})
+-- rust LSP is setup by rust plugin
+local plugin_managed_servers = { 'rust_analyzer' }
 
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup({
@@ -213,24 +212,29 @@ mason_lspconfig.setup({
   automatic_installation = false,
 })
 
--- rust LSP is setup by rust plugin
-local plugin_managed_servers = { 'rust_analyzer' }
-
 mason_lspconfig.setup_handlers({
   function(server_name)
-    if not contains(plugin_managed_servers, server_name) then
-      local settings = servers[server_name] or {}
+    if not vim.list_contains(plugin_managed_servers, server_name) then
+      local settings = servers[server_name]
+
+      if settings == nil then
+        vim.print('Missing configuration for LSP server ' .. server_name)
+        settings = {}
+      end
+
       require('lspconfig')[server_name].setup({
         capabilities = capabilities,
         settings = settings,
       })
+    else
+      vim.print('LSP server ' .. server_name .. ' is managed by plugin, skipped LSP server configuration')
     end
   end,
 })
 
 -- Languages are at ${workspaceDir}/lua/language folder
-require('language.js').setup(lsp_group)
-require('language.lua').setup(lsp_group)
-require('language.go').setup(lsp_group)
-require('language.scala').setup(lsp_group, capabilities)
-require('language.rust').setup(lsp_group, capabilities)
+require('user.lsp.js').setup(lsp_group)
+require('user.lsp.lua').setup(lsp_group)
+require('user.lsp.go').setup(lsp_group)
+require('user.lsp.scala').setup(lsp_group, capabilities)
+require('user.lsp.rust').setup(lsp_group, capabilities)

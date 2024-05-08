@@ -105,8 +105,8 @@ require('lazy').setup({
   { 'j-hui/fidget.nvim', opts = {} },
 
   -- additional lua configuration, for plugins development
-  'folke/neoconf.nvim',
-  'folke/neodev.nvim',
+  { 'folke/neoconf.nvim', opts = {} },
+  { 'folke/neodev.nvim', opts = {} },
 
   -- Scala metals
   'scalameta/nvim-metals',

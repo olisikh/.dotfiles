@@ -34,6 +34,6 @@ treesj.setup({
   },
 })
 
-local nmap = require('utils').nmap
+local nmap = require('user.utils').nmap
 
 nmap('U', treesj.toggle, { desc = 'treesj: toggle block' })

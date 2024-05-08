@@ -1,4 +1,4 @@
-local nmap = require('utils').nmap
+local nmap = require('user.utils').nmap
 local neotest = require('neotest')
 
 local neotest_namespace = vim.api.nvim_create_namespace('neotest')
@@ -17,8 +17,8 @@ neotest.setup({
       dap_adapter = 'delve',
     }),
     require('neotest-scala')({
-      runner = 'sbt', -- or sbt
-      extra_args = { '--no-colors' },
+      runner = 'sbt', -- or bloop
+      args = { '--no-colors' },
       framework = 'specs2', -- one of scalatest, munit, utest, specs2
     }),
     require('rustaceanvim.neotest'),

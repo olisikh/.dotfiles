@@ -1,5 +1,7 @@
-local nmap = require('utils').nmap
-local map = require('utils').map
+local uu = require('user.utils')
+local nmap = uu.nmap
+local map = uu.map
+
 local dap = require('dap')
 
 local M = {}
