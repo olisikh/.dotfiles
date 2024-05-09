@@ -23,6 +23,25 @@
   )
 )
 
+;variable string with a comment on top of a block
+(
+  (comment
+    content: (comment_content) @injection.language
+  )
+  (block 
+    (variable_declaration
+      (assignment_statement
+        (_)
+        (expression_list
+          value: (string
+            content: (string_content) @injection.content
+          )
+        )
+      )
+    )
+  )
+)
+
 ;field of table with a comment on top
 (table_constructor
   (comment content: (comment_content) @injection.language)

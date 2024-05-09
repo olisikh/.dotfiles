@@ -17,8 +17,10 @@ neotest.setup({
       dap_adapter = 'delve',
     }),
     require('neotest-scala')({
-      runner = 'sbt', -- or bloop
-      framework = 'specs2', -- one of scalatest, munit, utest, specs2
+      args = function(opts)
+        vim.print(vim.inspect(opts))
+        return {}
+      end,
     }),
     require('rustaceanvim.neotest'),
   },
