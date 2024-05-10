@@ -136,6 +136,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 local servers = {
   dockerls = {},
   terraformls = {},
+  rnix = {},
   bashls = {},
   yamlls = {
     yaml = {
