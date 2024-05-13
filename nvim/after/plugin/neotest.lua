@@ -18,7 +18,6 @@ neotest.setup({
     }),
     require('neotest-scala')({
       args = function(opts)
-        vim.print(vim.inspect(opts))
         return {}
       end,
     }),
