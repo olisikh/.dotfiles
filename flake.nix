@@ -26,53 +26,47 @@
     in
     flake-utils.lib.eachSystem supportedSystems (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        overlays = [
-          inputs.neovim-nightly-overlay.overlay
+        pkgs = import nixpkgs {
+          inherit system;
 
-          # TODO: why this is not working?
+          config = {
+            # all installing packages considered not free by Nix community (e.g. Terraform)
+            allowUnfree = true;
+            allowUnfreePredicate = _: true;
+          };
 
-          # set $JAVA_OPTS to metals
-          (self: super: {
-            metals = super.metals.overrideAttrs (prev: {
-              extraJavaOpts = prev.extraJavaOpts + " $JAVA_HOME";
-            });
-          })
-        ];
-        config = {
-          # all installing packages considered not free by Nix community (e.g. Terraform)
-          allowUnfree = true;
-          allowUnfreePredicate = _: true;
+          overlays = [
+            # adds $METALS_OPTS to pass extra JVM args to metals 
+            (final: prev: {
+              metals = prev.metals.overrideAttrs (oldAttrs: {
+                installPhase = ''
+                  mkdir -p $out/bin
+                  makeWrapper ${prev.jre}/bin/java $out/bin/metals \
+                    --add-flags "${oldAttrs.extraJavaOpts} \$METALS_OPTS -cp $CLASSPATH scala.meta.metals.Main"
+                '';
+              });
+            })
+
+            inputs.neovim-nightly-overlay.overlay
+          ];
         };
       in
       {
-        formatter = pkgs.alejandra;
-
-        # personal
-        packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration
-          {
-            pkgs = import nixpkgs {
-              inherit system;
-              overlays = overlays;
-              config = config;
-            };
-            modules = [ ./nix/home.nix ];
-          };
-
-
-        # work
-        packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = overlays;
-            config = config;
-          };
-          modules = [ ./nix/work.nix ];
-        };
-
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;
+        };
+
+        # personal
+        packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgs;
+          modules = [ ./nix/home.nix ];
+        };
+
+        # work
+        packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgs;
+          modules = [ ./nix/work.nix ];
         };
       }
     );
