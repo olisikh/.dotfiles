@@ -63,7 +63,7 @@ in
         pngpaste
         nodejs
         (sbt.override { jre = jdk17; })
-        metals
+        (metals.override { jre = jdk17; })
         xdg-utils # open apps from console/neovim
 
         (pkgs.writeShellScriptBin "home" ''
