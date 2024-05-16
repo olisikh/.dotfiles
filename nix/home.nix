@@ -2,7 +2,6 @@
 let
   user = "olisikh";
   themeStyle = "mocha";
-  obsidianVault = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
 in
 {
   imports = [
@@ -148,7 +147,7 @@ in
 
     sessionVariables = {
       JAVA_HOME = pkgs.jdk17;
-      OBSIDIAN_VAULT = obsidianVault;
+      OBSIDIAN_VAULT = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
     };
   };
 

@@ -1,4 +1,4 @@
-{ themeStyle, ... }: { pkgs, ... }:
+{ themeStyle, ... }: { ... }:
 let
   colors =
     if themeStyle == "latte" then [
