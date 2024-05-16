@@ -1,4 +1,4 @@
-{ theme, themeStyle, ... }: { inputs, lib, config, pkgs, ... }:
+{ themeStyle, ... }: { lib, config, pkgs, ... }:
 {
   home.file = {
     ".config/zsh/catppuccin".source = pkgs.fetchFromGitHub {
@@ -22,7 +22,7 @@
         autoload -U +X compinit && compinit
 
         export THEME_STYLE="${themeStyle}";
-        export THEME="${theme}";
+        export THEME="${themeStyle}";
       '';
 
     initExtra =
@@ -33,7 +33,7 @@
 
         # Preferred editor for local and remote sessions
         if [[ -n $SSH_CONNECTION ]]; then
-          export EDITOR = 'vi'
+          export EDITOR='vi'
         else
           export EDITOR='nvim'
         fi

@@ -1,4 +1,4 @@
-{ theme, themeStyle, ... }: { pkgs, ... }:
+{ pkgs, ... }:
 {
   home = {
     packages = with pkgs; [

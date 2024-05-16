@@ -1,32 +1,32 @@
 { pkgs, ... }:
 let
   user = "olisikh";
-  theme = "catppuccin";
   themeStyle = "mocha";
   obsidianVault = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
 in
 {
-  imports = (map
-    (module: import module {
-      themeStyle = themeStyle;
-      theme = theme;
-    }) [
-    ./zsh
-    ./git
-    ./ripgrep
-    ./direnv
-    ./starship
+  imports = [
+    (import ./zsh {
+      inherit themeStyle;
+    })
+    (import ./fzf {
+      inherit themeStyle;
+    })
     ./zoxide
     ./wezterm
+    ./ripgrep
+    ./starship
+    ./git
     ./nvim
-    ./fzf
     ./mc
-  ]);
+    ./direnv
+  ];
 
   home = {
     username = user;
     homeDirectory = "/Users/${user}";
 
+    # don't ever change the stateVersion value, it will break the state
     stateVersion = "22.11";
 
     # The home.packages option allows you to install Nix packages into your
@@ -69,6 +69,7 @@ in
       (sbt.override { jre = jdk17; })
       (metals.override { jre = jdk17; })
       xdg-utils # open apps from console/neovim
+      arc-browser
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash

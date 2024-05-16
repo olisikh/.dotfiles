@@ -59,13 +59,13 @@
 
         # personal
         packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgs;
+          inherit pkgs;
           modules = [ ./nix/home.nix ];
         };
 
         # work
         packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgs;
+          inherit pkgs;
           modules = [ ./nix/work.nix ];
         };
       }

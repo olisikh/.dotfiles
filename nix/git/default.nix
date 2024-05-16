@@ -1,4 +1,4 @@
-{ ... }: { pkgs, ... }:
+{ pkgs, ... }:
 let
   userName = builtins.getEnv "GIT_NAME";
   userEmail = builtins.getEnv "GIT_EMAIL";

@@ -1,26 +1,25 @@
 { pkgs, ... }:
 let
   user = "O.Lisikh";
-  theme = "catppuccin";
   themeStyle = "mocha";
 in
 {
-  imports = (map
-    (module: import module {
-      themeStyle = themeStyle;
-      theme = theme;
-    }) [
-    ./zsh
-    ./git
-    ./ripgrep
-    ./direnv
-    ./starship
+  imports = [
+    (import ./zsh {
+      inherit themeStyle;
+    })
+    (import ./fzf {
+      inherit themeStyle;
+    })
     ./zoxide
     ./wezterm
+    ./ripgrep
+    ./starship
+    ./git
     ./nvim
-    ./fzf
     ./mc
-  ]);
+    ./direnv
+  ];
 
   home = {
     username = user;
@@ -137,8 +136,6 @@ in
 
     sessionVariables = {
       JAVA_HOME = pkgs.jdk17;
-      THEME_STYLE = themeStyle; # still used by nvim lua files
-      THEME = theme;
     };
   };
 

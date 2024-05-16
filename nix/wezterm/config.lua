@@ -1,3 +1,5 @@
+local themeStyle = os.getenv("THEME_STYLE")
+
 local w = require("wezterm")
 
 local function is_vim(pane)
@@ -43,16 +45,16 @@ return {
 	hide_tab_bar_if_only_one_tab = true,
 
 	-- TODO: Read from THEME and THEME_STYLE env vars?
-	color_scheme = "Catppuccin Mocha", -- or Macchiato, Frappe, Latte
+	color_scheme = "catppuccin " .. themeStyle, -- or Macchiato, Frappe, Latte
 	keys = {
 		-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
-		{ mods = "OPT", key = "LeftArrow", action = w.action({ SendString = "\x1bb" }) },
+		{ mods = "OPT",    key = "LeftArrow",  action = w.action({ SendString = "\x1bb" }) },
 		-- Make Option-Right equivalent to Alt-f; forward-word
-		{ mods = "OPT", key = "RightArrow", action = w.action({ SendString = "\x1bf" }) },
+		{ mods = "OPT",    key = "RightArrow", action = w.action({ SendString = "\x1bf" }) },
 
 		-- split window
-		{ mods = "LEADER", key = '"', action = w.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
-		{ mods = "LEADER", key = "%", action = w.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+		{ mods = "LEADER", key = '"',          action = w.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+		{ mods = "LEADER", key = "%",          action = w.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 
 		-- move between split panes
 		split_nav("move", "h"),
@@ -67,28 +69,28 @@ return {
 		split_nav("resize", "l"),
 
 		-- zoom into split
-		{ mods = "LEADER", key = "z", action = w.action.TogglePaneZoomState },
+		{ mods = "LEADER", key = "z",             action = w.action.TogglePaneZoomState },
 
 		-- swap splits
-		{ mods = "LEADER", key = "Space", action = w.action.PaneSelect({ mode = "SwapWithActive" }) },
+		{ mods = "LEADER", key = "Space",         action = w.action.PaneSelect({ mode = "SwapWithActive" }) },
 
 		-- activate copy mode or vim mode
-		{ key = "[", mods = "LEADER", action = w.action.ActivateCopyMode },
+		{ key = "[",       mods = "LEADER",       action = w.action.ActivateCopyMode },
 
-		{ key = "1", mods = "LEADER", action = w.action({ ActivateTab = 0 }) },
-		{ key = "2", mods = "LEADER", action = w.action({ ActivateTab = 1 }) },
-		{ key = "3", mods = "LEADER", action = w.action({ ActivateTab = 2 }) },
-		{ key = "4", mods = "LEADER", action = w.action({ ActivateTab = 3 }) },
-		{ key = "5", mods = "LEADER", action = w.action({ ActivateTab = 4 }) },
-		{ key = "6", mods = "LEADER", action = w.action({ ActivateTab = 5 }) },
-		{ key = "7", mods = "LEADER", action = w.action({ ActivateTab = 6 }) },
-		{ key = "8", mods = "LEADER", action = w.action({ ActivateTab = 7 }) },
-		{ key = "9", mods = "LEADER", action = w.action({ ActivateTab = 8 }) },
+		{ key = "1",       mods = "LEADER",       action = w.action({ ActivateTab = 0 }) },
+		{ key = "2",       mods = "LEADER",       action = w.action({ ActivateTab = 1 }) },
+		{ key = "3",       mods = "LEADER",       action = w.action({ ActivateTab = 2 }) },
+		{ key = "4",       mods = "LEADER",       action = w.action({ ActivateTab = 3 }) },
+		{ key = "5",       mods = "LEADER",       action = w.action({ ActivateTab = 4 }) },
+		{ key = "6",       mods = "LEADER",       action = w.action({ ActivateTab = 5 }) },
+		{ key = "7",       mods = "LEADER",       action = w.action({ ActivateTab = 6 }) },
+		{ key = "8",       mods = "LEADER",       action = w.action({ ActivateTab = 7 }) },
+		{ key = "9",       mods = "LEADER",       action = w.action({ ActivateTab = 8 }) },
 
-		{ key = "c", mods = "LEADER", action = w.action({ SpawnTab = "CurrentPaneDomain" }) },
-		{ key = "&", mods = "LEADER|SHIFT", action = w.action({ CloseCurrentTab = { confirm = true } }) },
-		{ key = "d", mods = "LEADER", action = w.action({ CloseCurrentPane = { confirm = true } }) },
-		{ key = "x", mods = "LEADER", action = w.action({ CloseCurrentPane = { confirm = true } }) },
+		{ key = "c",       mods = "LEADER",       action = w.action({ SpawnTab = "CurrentPaneDomain" }) },
+		{ key = "&",       mods = "LEADER|SHIFT", action = w.action({ CloseCurrentTab = { confirm = true } }) },
+		{ key = "d",       mods = "LEADER",       action = w.action({ CloseCurrentPane = { confirm = true } }) },
+		{ key = "x",       mods = "LEADER",       action = w.action({ CloseCurrentPane = { confirm = true } }) },
 
 		{
 			key = "E",

@@ -1,5 +1,5 @@
 -- latte, frappe, macchiato, mocha
-local theme = vim.fn.getenv('THEME')
+local theme = 'catppuccin'
 local themeStyle = vim.fn.getenv('THEME_STYLE')
 
 require('catppuccin').setup({
