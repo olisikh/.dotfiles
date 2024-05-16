@@ -39,18 +39,21 @@ in
         fonts = [ "Meslo" "JetBrainsMono" "FiraCode" "Hack" ];
       })
       fd
-      eza # exa fork, as original package is not maintained
+      eza
       jq
       zoxide
-      lua
-      rustup
-      luarocks
+      rustc
       tree-sitter
-      (python3.withPackages (pypkgs: with pypkgs; [
+      (lua.withPackages (p: with p; [
+        jsregexp
+      ]))
+      (python3.withPackages (p: with p; [
+        pip
         pyaes
         python-jose
         python-dateutil
         tabulate
+        localstack
       ]))
       docker
       minikube
