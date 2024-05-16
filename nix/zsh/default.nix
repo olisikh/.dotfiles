@@ -22,7 +22,6 @@
         autoload -U +X compinit && compinit
 
         export THEME_STYLE="${themeStyle}";
-        export THEME="${themeStyle}";
       '';
 
     initExtra =

@@ -1,4 +1,8 @@
-local themeStyle = os.getenv("THEME_STYLE")
+local function capitalize(s)
+	return s:sub(1, 1):upper() .. s:sub(2):lower()
+end
+
+local themeStyle = capitalize(os.getenv("THEME_STYLE") or "Mocha")
 
 local w = require("wezterm")
 
@@ -43,9 +47,7 @@ return {
 	leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 },
 	font_size = 14.0,
 	hide_tab_bar_if_only_one_tab = true,
-
-	-- TODO: Read from THEME and THEME_STYLE env vars?
-	color_scheme = "catppuccin " .. themeStyle, -- or Macchiato, Frappe, Latte
+	color_scheme = "Catppuccin " .. themeStyle, -- or Macchiato, Frappe, Latte
 	keys = {
 		-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
 		{ mods = "OPT",    key = "LeftArrow",  action = w.action({ SendString = "\x1bb" }) },

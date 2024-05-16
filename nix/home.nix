@@ -41,6 +41,7 @@ in
       fd
       eza # exa fork, as original package is not maintained
       jq
+      zoxide
       lua
       rustup
       luarocks
@@ -70,6 +71,7 @@ in
       (metals.override { jre = jdk17; })
       xdg-utils # open apps from console/neovim
       arc-browser
+      wezterm
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash
