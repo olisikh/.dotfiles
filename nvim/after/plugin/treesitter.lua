@@ -111,9 +111,5 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
   command = 'set ft=hocon',
 })
 
--- fix highlighting in *.tfvars
-vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
-  group = ts_augroup,
-  pattern = { '*.tfvars' },
-  command = 'set syntax=tf',
-})
+-- fix highlighting of *.tfvars
+vim.treesitter.language.register('terraform', { 'terraform', 'terraform-vars' })
