@@ -20,8 +20,6 @@
         # init completions
         autoload -U +X bashcompinit && bashcompinit
         autoload -U +X compinit && compinit
-
-        export THEME_STYLE="${themeStyle}";
       '';
 
     initExtra =

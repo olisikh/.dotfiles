@@ -47,11 +47,6 @@ in
         jsregexp
       ]))
       (python3.withPackages (p: with p; [
-        pip
-        pyaes
-        python-jose
-        python-dateutil
-        tabulate
         localstack
       ]))
       docker
@@ -147,6 +142,7 @@ in
 
     sessionVariables = {
       JAVA_HOME = pkgs.jdk17;
+      THEME_STYLE = themeStyle;
       OBSIDIAN_VAULT = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
     };
   };

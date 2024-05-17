@@ -47,10 +47,6 @@ in
       ]))
       (python3.withPackages (p: with p; [
         pip
-        pyaes
-        python-jose
-        python-dateutil
-        tabulate
         localstack
       ]))
       docker
