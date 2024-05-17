@@ -236,9 +236,6 @@ require('lazy').setup({
   -- add indentation function/class/etc context lines
   { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 
-  -- comment lines and blocks with 'gcc', 'gbc'
-  { 'numToStr/Comment.nvim', opts = {} },
-
   -- comments highlighting and navigation
   { 'folke/todo-comments.nvim' },
 

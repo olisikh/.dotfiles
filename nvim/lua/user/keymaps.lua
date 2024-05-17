@@ -36,12 +36,6 @@ map({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'copy to blackhole register' })
 map('n', '<leader>Y', '"+Y', { desc = 'copy line to blackhole register' })
 map({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'cut to blackhole register' })
 
--- Diagnostic keymaps
-map('n', '[d', vim.diagnostic.goto_prev, { desc = 'diagnostic: prev error msg' })
-map('n', ']d', vim.diagnostic.goto_next, { desc = 'diagnostic: next error msg' })
--- map('n', '<leader>E', vim.diagnostic.open_float, { desc = 'open floating diagnostic message' })
--- map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'open diagnostics list' })
-
 -- Increase speed of window resize commande
 nmap('<C-w>>', ':vertical resize +10<cr>', { noremap = true, silent = true })
 nmap('<C-w><', ':vertical resize -10<cr>', { noremap = true, silent = true })
