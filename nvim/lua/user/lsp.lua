@@ -128,13 +128,8 @@ local function setup_lsp_buffer(client, bufnr)
     nmap('<leader>sW', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'lsp: [w]orkspace [s]ymbols' })
   end
 
-  -- See `:help K` for why this keymap
-  if server_capabilities.hoverProvider then
-    map({ 'n', 'v' }, 'Q', vim.lsp.buf.hover, { desc = 'lsp: hover doc' })
-  end
-
   if server_capabilities.signatureHelpProvider then
-    nmap('K', vim.lsp.buf.signature_help, { desc = 'lsp: signature doc' })
+    map({ 'n', 'v' }, 'Q', vim.lsp.buf.signature_help, { desc = 'lsp: signature help' })
   end
 
   if server_capabilities.documentHighlightProvider then
