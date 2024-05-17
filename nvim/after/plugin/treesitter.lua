@@ -102,10 +102,18 @@ require('treesitter-context').setup({
   on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
 })
 
--- enable HOCON
-local hocon_group = vim.api.nvim_create_augroup('UserHocon', { clear = true })
+local ts_augroup = vim.api.nvim_create_augroup('UserTreesitter', { clear = true })
+
+-- enable HOCON highlighting
 vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
-  group = hocon_group,
+  group = ts_augroup,
   pattern = '*/resources/*.conf',
   command = 'set ft=hocon',
+})
+
+-- fix highlighting in *.tfvars
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  group = ts_augroup,
+  pattern = { '*.tfvars' },
+  command = 'set syntax=tf',
 })
