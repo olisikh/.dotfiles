@@ -7,6 +7,10 @@ require('lazy').setup({
 
   -- for wezterm
   {
+    'willothy/wezterm.nvim',
+    config = true,
+  },
+  {
     'mrjones2014/smart-splits.nvim',
     lazy = false,
     config = function()
