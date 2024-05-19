@@ -80,9 +80,8 @@ local process_icons = {
 local function get_dir(tab)
 	local active_pane = tab.active_pane
 	local current_dir = active_pane and active_pane.current_working_dir
-	w.log_info(current_dir)
 
-	local dir = string.gsub(tostring(current_dir), "(.*[/\\])(.*)/", "%2")
+	local dir = string.gsub(tostring(current_dir or "N/A"), "(.*[/\\])(.*)/", "%2")
 	return dir
 end
 
@@ -113,9 +112,17 @@ w.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
 	end
 
 	local idx = tab.tab_index + 1
-	local cwd = get_dir(tab)
 	local process = get_process(tab)
-	local title = process and string.format("%d: %s %s ", idx, process, cwd) or " [?] "
+	local cwd = get_dir(tab)
+
+	local prefix = string.format(" %d:%s ", idx, process or "[?]")
+
+	local space_left = (max_width - #prefix) + 1
+	if #cwd > space_left then
+		cwd = string.sub(cwd, 1, space_left - 2) .. ".."
+	end
+
+	local title = string.format("%s%s ", prefix, cwd)
 
 	if has_unseen_output then
 		return {
@@ -133,6 +140,7 @@ return {
 	leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 },
 	font_size = 14.0,
 	hide_tab_bar_if_only_one_tab = true,
+	use_fancy_tab_bar = false,
 	color_scheme = "Catppuccin " .. themeStyle, -- or Macchiato, Frappe, Latte
 	keys = {
 		-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
