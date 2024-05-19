@@ -7,12 +7,19 @@ function M.capitalize(s)
 	return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
-function M.truncate(s, max_length)
-	if #s > max_length then
-		return string.sub(s, 1, max_length - 2) .. ".."
-	else
-		return s
+function M.table_merge(t1, t2)
+	for k, v in pairs(t2) do
+		if type(v) == "table" then
+			if type(t1[k] or false) == "table" then
+				M.table_merge(t1[k] or {}, t2[k] or {})
+			else
+				t1[k] = v
+			end
+		else
+			t1[k] = v
+		end
 	end
+	return t1
 end
 
 function M.get_dir(tab)

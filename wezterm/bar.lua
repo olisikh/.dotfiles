@@ -5,7 +5,6 @@ local M = {}
 
 -- default configuration
 local config = {
-	position = "bottom",
 	max_width = 32,
 	dividers = "slant_right",
 	indicator = {
@@ -40,21 +39,6 @@ local config = {
 -- parsed config
 local C = {}
 
-local function tableMerge(t1, t2)
-	for k, v in pairs(t2) do
-		if type(v) == "table" then
-			if type(t1[k] or false) == "table" then
-				tableMerge(t1[k] or {}, t2[k] or {})
-			else
-				t1[k] = v
-			end
-		else
-			t1[k] = v
-		end
-	end
-	return t1
-end
-
 local dividers = {
 	slant_right = {
 		left = utf8.char(0xe0be),
@@ -83,7 +67,8 @@ M.apply_to_config = function(c, opts)
 	end
 
 	-- combine user config with defaults
-	config = tableMerge(config, opts)
+	config = utils.table_merge(config, opts)
+
 	C.div = {
 		l = "",
 		r = "",
@@ -124,8 +109,8 @@ M.apply_to_config = function(c, opts)
 
 	-- set wezterm config options according to the parsed config
 	c.use_fancy_tab_bar = false
-	c.tab_bar_at_bottom = config.position == "bottom"
 	c.tab_max_width = config.max_width
+	c.show_new_tab_button_in_tab_bar = false
 end
 
 -- superscript/subscript
@@ -212,24 +197,10 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	local active_fg = colours.background
 	local inactive_bg = colours.inactive_tab.bg_color
 	local inactive_fg = colours.inactive_tab.fg_color
-	local new_tab_bg = colours.new_tab.bg_color
 
 	local s_bg, s_fg, e_bg, e_fg
 
-	-- the last tab
-	if tab.tab_index == #tabs - 1 then
-		if tab.is_active then
-			s_bg = active_bg
-			s_fg = active_fg
-			e_bg = new_tab_bg
-			e_fg = active_bg
-		else
-			s_bg = inactive_bg
-			s_fg = inactive_fg
-			e_bg = new_tab_bg
-			e_fg = inactive_bg
-		end
-	elseif tab.tab_index == active_tab_index - 1 then
+	if tab.tab_index == active_tab_index - 1 then
 		s_bg = inactive_bg
 		s_fg = inactive_fg
 		e_bg = rainbow[(i + 1) % 6 + 1]
@@ -269,25 +240,23 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	end
 
 	-- start and end hardcoded numbers are the Powerline + " " padding
-	local fillerwidth = 2 + string.len(index) + string.len(pane_count) + 2
+	local filler_width = 2 + string.len(index) + string.len(pane_count) + 2
 
 	local process = utils.get_process(tab)
 
-	local tabtitle = nil
+	local tab_title = nil
 	if #tab.tab_title > 0 then
-		tabtitle = tab.tab_title
+		tab_title = tab.tab_title
 	else
-		tabtitle = utils.get_dir(tab) or tab.active_pane.title
+		tab_title = utils.get_dir(tab) or tab.active_pane.title
 	end
 
-	local full_title = string.format("%s%s %s", index, process or "[?]", tabtitle)
+	local full_title = string.format("%s%s %s", index, process or "[?]", tab_title)
 
-	local width = conf.tab_max_width - fillerwidth - 1
-	if (#full_title + fillerwidth) > conf.tab_max_width then
+	local width = conf.tab_max_width - filler_width - 1
+	if (#full_title + filler_width) > conf.tab_max_width then
 		full_title = wezterm.truncate_right(full_title, width) .. "…"
 	end
-
-	wezterm.log_info(full_title)
 
 	local title = string.format(" %s%s%s", full_title, pane_count, C.p)
 
