@@ -251,6 +251,10 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		tab_title = utils.get_dir(tab) or tab.active_pane.title
 	end
 
+	if tab.active_pane.is_zoomed then
+		tab_title = " " .. tab_title
+	end
+
 	local full_title = string.format("%s%s %s", index, process or "[?]", tab_title)
 
 	local width = conf.tab_max_width - filler_width - 1

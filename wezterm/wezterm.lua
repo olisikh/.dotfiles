@@ -2,7 +2,7 @@ local utils = require("utils")
 local bar = require("bar")
 local nav = require("nav")
 
-local themeStyle = utils.capitalize(os.getenv("THEME_STYLE") or "Mocha")
+local theme_style = utils.capitalize(os.getenv("THEME_STYLE") or "Mocha")
 
 local w = require("wezterm")
 local c = w.config_builder()
@@ -10,7 +10,7 @@ local c = w.config_builder()
 c.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 c.font_size = 14.0
 c.hide_tab_bar_if_only_one_tab = false
-c.color_scheme = "Catppuccin " .. themeStyle
+c.color_scheme = "Catppuccin " .. theme_style
 
 c.keys = {
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
@@ -38,7 +38,7 @@ c.keys = {
 
 nav.apply_to_config(c)
 bar.apply_to_config(c, {
-	max_width = 25,
+	max_width = 30,
 	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
 	indicator = {
 		leader = {
