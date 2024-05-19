@@ -19,7 +19,11 @@ function M.get_dir(tab)
 	local active_pane = tab.active_pane
 	local current_dir = active_pane and active_pane.current_working_dir
 
-	return string.gsub(tostring(current_dir or "unknown"), "(.*[/\\])(.*)/", "%2")
+	if current_dir then
+		return string.gsub(tostring(current_dir), "(.*[/\\])(.*)/", "%2")
+	end
+
+	return nil
 end
 
 local process_icons = {

@@ -1,47 +1,9 @@
 local utils = require("utils")
+local bar = require("bar")
 local themeStyle = utils.capitalize(os.getenv("THEME_STYLE") or "Mocha")
 
 local w = require("wezterm")
 local c = w.config_builder()
-
-w.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
-	local idx = tab.tab_index + 1
-	local process = utils.get_process(tab)
-
-	local new_title = nil
-	if #tab.tab_title > 0 then
-		new_title = tab.tab_title
-	else
-		new_title = utils.get_dir(tab)
-	end
-
-	local prefix = string.format(" %d:%s ", idx, process or "[?]")
-
-	new_title = utils.truncate(new_title, (max_width - #prefix) + 1)
-
-	local title = string.format("%s%s ", prefix, new_title)
-
-	-- local has_unseen_output = false
-	-- if not tab.is_active then
-	-- 	for _, pane in ipairs(tab.panes) do
-	-- 		if pane.has_unseen_output then
-	-- 			has_unseen_output = true
-	-- 			break
-	-- 		end
-	-- 	end
-	-- end
-	--
-	-- if has_unseen_output then
-	-- 	return {
-	-- 		{ Foreground = { Color = "#28719c" } },
-	-- 		{ Text = title },
-	-- 	}
-	-- end
-
-	return {
-		{ Text = title },
-	}
-end)
 
 c.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 c.font_size = 14.0
@@ -144,10 +106,10 @@ c.keys = {
 	},
 }
 
-w.plugin.require("https://github.com/nekowinston/wezterm-bar").apply_to_config(c, {
+bar.apply_to_config(c, {
 	position = "top",
 	max_width = 25,
-	dividers = false, -- or "slant_right", "slant_left", "arrows", "rounded", false
+	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
 	indicator = {
 		leader = {
 			enabled = true,
