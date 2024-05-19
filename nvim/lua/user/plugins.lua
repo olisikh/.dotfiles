@@ -107,6 +107,9 @@ require('lazy').setup({
   -- Status updates for LSP showing on the right
   { 'j-hui/fidget.nvim', opts = {} },
 
+  -- Show css colors for strings
+  { 'brenoprata10/nvim-highlight-colors', opts = {} },
+
   -- additional lua configuration, for plugins development
   { 'folke/neoconf.nvim', opts = {} },
   { 'folke/neodev.nvim', opts = {} },

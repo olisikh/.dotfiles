@@ -85,4 +85,19 @@ function M.get_process(tab)
 	return process_icons[process_name] or string.format("[%s]", process_name)
 end
 
+function M.build_tab_title(tab)
+	local tab_title = nil
+	if #tab.tab_title > 0 then
+		tab_title = tab.tab_title
+	else
+		tab_title = M.get_dir(tab) or tab.active_pane.title
+	end
+
+	if tab.active_pane.is_zoomed then
+		tab_title = " " .. tab_title
+	end
+
+	return tab_title
+end
+
 return M

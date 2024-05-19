@@ -5,7 +5,7 @@ local M = {}
 
 -- default configuration
 local config = {
-	max_width = 32,
+	max_width = 30,
 	dividers = "slant_right",
 	indicator = {
 		leader = {
@@ -109,8 +109,8 @@ M.apply_to_config = function(c, opts)
 
 	-- set wezterm config options according to the parsed config
 	c.use_fancy_tab_bar = false
-	c.tab_max_width = config.max_width
 	c.show_new_tab_button_in_tab_bar = false
+	c.tab_max_width = config.max_width
 end
 
 -- superscript/subscript
@@ -171,6 +171,8 @@ local roman_numerals = {
 	"Ⅻ",
 }
 
+local powerline_padding = 2
+
 -- custom tab bar
 wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
 	local colours = conf.resolved_palette.tab_bar
@@ -182,8 +184,7 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		end
 	end
 
-	-- TODO: make colors configurable
-	local rainbow = {
+	local default_colours = {
 		conf.resolved_palette.ansi[2],
 		conf.resolved_palette.indexed[16],
 		conf.resolved_palette.ansi[4],
@@ -192,8 +193,15 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		conf.resolved_palette.ansi[6],
 	}
 
-	local i = tab.tab_index % 6
-	local active_bg = rainbow[i + 1]
+	local tab_colours
+	if config.tabs.colours and #config.tabs.colours > 0 then
+		tab_colours = config.tabs.colours
+	else
+		tab_colours = default_colours
+	end
+
+	local i = tab.tab_index % #tab_colours
+	local active_bg = tab_colours[i + 1]
 	local active_fg = colours.background
 	local inactive_bg = colours.inactive_tab.bg_color
 	local inactive_fg = colours.inactive_tab.fg_color
@@ -203,7 +211,7 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	if tab.tab_index == active_tab_index - 1 then
 		s_bg = inactive_bg
 		s_fg = inactive_fg
-		e_bg = rainbow[(i + 1) % 6 + 1]
+		e_bg = tab_colours[(i + 1) % #tab_colours + 1]
 		e_fg = inactive_bg
 	elseif tab.is_active then
 		s_bg = active_bg
@@ -239,30 +247,16 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		index = string.format("%s%s%s ", C.tabs.brackets.inactive[1], index_i, C.tabs.brackets.inactive[2])
 	end
 
+	local tab_title = string.format("%s%s %s", index, utils.get_process(tab), utils.build_tab_title(tab))
+
 	-- start and end hardcoded numbers are the Powerline + " " padding
-	local filler_width = 2 + string.len(index) + string.len(pane_count) + 2
-
-	local process = utils.get_process(tab)
-
-	local tab_title = nil
-	if #tab.tab_title > 0 then
-		tab_title = tab.tab_title
-	else
-		tab_title = utils.get_dir(tab) or tab.active_pane.title
+	local filler_width = powerline_padding * 2 + string.len(index) + string.len(pane_count)
+	local width = config.max_width - filler_width - 1
+	if (#tab_title + filler_width) > config.max_width then
+		tab_title = wezterm.truncate_right(tab_title, width) .. "…"
 	end
 
-	if tab.active_pane.is_zoomed then
-		tab_title = " " .. tab_title
-	end
-
-	local full_title = string.format("%s%s %s", index, process or "[?]", tab_title)
-
-	local width = conf.tab_max_width - filler_width - 1
-	if (#full_title + filler_width) > conf.tab_max_width then
-		full_title = wezterm.truncate_right(full_title, width) .. "…"
-	end
-
-	local title = string.format(" %s%s%s", full_title, pane_count, C.p)
+	local title = string.format(" %s%s%s", tab_title, pane_count, C.p)
 
 	return {
 		{ Background = { Color = s_bg } },
