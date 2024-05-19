@@ -12,12 +12,13 @@ c.font_size = 14.0
 c.hide_tab_bar_if_only_one_tab = false
 c.color_scheme = "Catppuccin " .. themeStyle
 
-nav.apply_to_config(c, {
+c.keys = {
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
 	{ mods = "OPT", key = "LeftArrow", action = w.action({ SendString = "\x1bb" }) },
 	-- Make Option-Right equivalent to Alt-f; forward-word
 	{ mods = "OPT", key = "RightArrow", action = w.action({ SendString = "\x1bf" }) },
 
+	-- Set a custom title for a tab
 	{
 		key = "E",
 		mods = "LEADER",
@@ -33,8 +34,9 @@ nav.apply_to_config(c, {
 			end),
 		}),
 	},
-})
+}
 
+nav.apply_to_config(c)
 bar.apply_to_config(c, {
 	max_width = 25,
 	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
