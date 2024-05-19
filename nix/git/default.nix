@@ -1,5 +1,6 @@
 { ... }:
 let
+  # TODO: pass name and email as arguments to the module instead
   userName = builtins.getEnv "GIT_NAME";
   userEmail = builtins.getEnv "GIT_EMAIL";
 in

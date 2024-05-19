@@ -12,5 +12,5 @@ mkdir -p ~/.config/nix
 cp -fr ~/.dotfiles/nix.conf ~/.config/nix/nix.conf
 
 # download the internet and install flake
-nix run .#homeConfigurations.olisikh.activationPackage --impure --show-trace
+nix run .#homeConfigurations.home.activationPackage --impure --show-trace
 
