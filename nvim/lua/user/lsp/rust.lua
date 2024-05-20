@@ -17,26 +17,9 @@ M.setup = function(group, capabilities)
       server = {
         capabilitis = capabilities,
         on_attach = function(client, bufnr)
-          -- you can also put keymaps in here
-          nmap('<leader>ra', function()
-            vim.cmd.RustLsp({ 'hover', 'actions' })
-          end, { desc = 'rust: hover actions' })
-
-          nmap('<leader>rr', function()
-            vim.cmd.RustLsp('runnables')
-          end, { desc = 'rust: run runnable' })
-
-          nmap('<leader>rd', function()
-            vim.cmd.RustLsp('debuggables')
-          end, { desc = 'rust: run debug' })
-
-          nmap('<leader>rt', function()
-            vim.cmd.RustLsp('testables')
-          end, { desc = 'rust: run test' })
-
-          nmap('<leader>re', function()
-            vim.cmd.RustLsp('expandError')
-          end, { desc = 'rust: explain error' })
+          nmap('<leader>ce', function()
+            vim.cmd.RustLsp('explainError')
+          end, { desc = 'rust: explain [c]ode [e]rror' })
         end,
       },
       -- DAP configuration

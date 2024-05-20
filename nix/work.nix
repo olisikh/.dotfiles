@@ -40,7 +40,7 @@ in
       eza
       jq
       zoxide
-      rustc
+      rustup
       tree-sitter
       (lua.withPackages (p: with p; [
         jsregexp
