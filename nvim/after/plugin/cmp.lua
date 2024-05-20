@@ -73,17 +73,3 @@ cmp.setup({
     }),
   },
 })
-
-local cached_codeium = nil
-vim.api.nvim_create_user_command('CodeiumToggle', function(_)
-  local codeium = cmp.core:get_sources(function(source)
-    return source.name == 'codeium'
-  end)[1]
-
-  if codeium ~= nil then
-    cmp.core:unregister_source(codeium.id)
-    cached_codeium = codeium
-  else
-    cmp.core:register_source(cached_codeium)
-  end
-end, { nargs = 0 })

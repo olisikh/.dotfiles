@@ -1,11 +1,11 @@
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('UserHighlight', { clear = true })
+local group = vim.api.nvim_create_augroup('UserCommands', { clear = true })
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
     vim.highlight.on_yank()
   end,
-  group = highlight_group,
+  group = group,
   pattern = '*',
 })

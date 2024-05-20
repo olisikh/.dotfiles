@@ -21,6 +21,7 @@ require('user.plugins')
 require('user.theme')
 require('user.keymaps')
 require('user.autocmds')
+require('user.usercmds')
 require('user.lsp')
 
 -- The line beneath this is called `modeline`. See `:help modeline`

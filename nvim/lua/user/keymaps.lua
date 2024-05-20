@@ -41,3 +41,6 @@ nmap('<C-w>>', ':vertical resize +10<cr>', { noremap = true, silent = true })
 nmap('<C-w><', ':vertical resize -10<cr>', { noremap = true, silent = true })
 nmap('<C-w>+', ':horizontal resize +5<cr>', { noremap = true, silent = true })
 nmap('<C-w>-', ':horizontal resize -5<cr>', { noremap = true, silent = true })
+
+nmap('<leader>ig', ':CopilotToggle<cr>', { desc = 'copilot: Toggle Github copilot' })
+nmap('<leader>ic', ':CodeiumToggle<cr>', { desc = 'codeium: Toggle Codeium' })
