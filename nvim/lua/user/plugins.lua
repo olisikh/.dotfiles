@@ -184,7 +184,14 @@ require('lazy').setup({
     event = 'InsertEnter',
     opts = {},
     dependencies = {
-      { 'zbirenbaum/copilot.lua', opts = {} },
+      {
+        'zbirenbaum/copilot.lua',
+        opts = {
+          -- author suggests to disable panel and suggestion if cmp plugin is used
+          suggestion = { enabled = false },
+          panel = { enabled = false },
+        },
+      },
     },
   },
   -- lualine copilot status

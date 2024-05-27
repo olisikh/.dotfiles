@@ -81,7 +81,7 @@ opt('o', 'timeout', true)
 opt('o', 'timeoutlen', 300)
 
 -- Set completeopt to have a better completion experience
--- opt('o', 'completeopt', 'menuone,noinsert,noselect')
+opt('o', 'completeopt', 'menu,menuone,noinsert')
 
 opt('o', 'termguicolors', true)
 

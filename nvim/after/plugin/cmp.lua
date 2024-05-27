@@ -11,7 +11,8 @@ cmp.setup({
     documentation = cmp.config.window.bordered(),
   },
   completion = {
-    completeopt = 'menu,menuone,noinsert',
+    -- don't trigger popup window while typing, trigger only on CMD+Space
+    autocomplete = false,
   },
   snippet = {
     expand = function(args)

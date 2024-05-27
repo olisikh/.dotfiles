@@ -45,6 +45,8 @@ local function setup_lsp_buffer(client, bufnr)
     nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   end
 
+  nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostc: show [c]ode [d]iagnostic' })
+
   if server_capabilities.documentFormattingProvider then
     nmap('<leader>cf', function()
       format_buf(bufnr)
