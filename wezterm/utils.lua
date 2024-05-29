@@ -64,6 +64,7 @@ local process_icons = {
 	["curl"] = nf.mdi_flattr,
 	["gh"] = nf.dev_github_badge,
 	["ruby"] = nf.cod_ruby,
+	["java"] = nf.dev_java,
 	["gear"] = "",
 }
 
