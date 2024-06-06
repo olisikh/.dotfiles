@@ -51,15 +51,6 @@ local function setup_lsp_buffer(client, bufnr)
     nmap('<leader>cf', function()
       format_buf(bufnr)
     end, { desc = 'lsp: [c]ode [f]ormat' })
-
-    -- Format code before save :w
-    vim.api.nvim_create_autocmd('BufWritePre', {
-      callback = function()
-        format_buf(bufnr)
-      end,
-      buffer = bufnr,
-      group = lsp_group,
-    })
   end
 
   if server_capabilities.documentRangeFormattingProvider then
