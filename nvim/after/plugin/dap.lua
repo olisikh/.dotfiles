@@ -18,13 +18,13 @@ mason_dap.setup({
 dap_ui.setup({})
 
 dap.listeners.after.event_initialized['dapui_config'] = function()
-  -- local buf = vim.api.nvim_get_current_buf()
-  -- local bps = breakpoints.get(buf)
-  --
-  -- vim.print(bps)
-  -- vim.print(dap_utils.non_empty(bps))
+  local bps = breakpoints.get(vim.api.nvim_get_current_buf()) -- { {} } the bps is this for some weird reason
 
-  dap_ui.open()
+  if dap_utils.index_of(bps, function(x)
+    return dap_utils.non_empty(x)
+  end) then
+    dap_ui.open()
+  end
 end
 dap.listeners.before.event_terminated['dapui_config'] = function()
   dap_ui.close()
