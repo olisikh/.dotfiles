@@ -50,6 +50,7 @@ cmp.setup({
   sources = {
     { name = 'codeium' },
     { name = 'copilot' },
+    { name = 'lazydev' },
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
     { name = 'crates' },
