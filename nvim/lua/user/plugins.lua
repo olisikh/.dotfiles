@@ -6,10 +6,8 @@ require('lazy').setup({
   'nvim-lualine/lualine.nvim',
 
   -- for wezterm
-  {
-    'willothy/wezterm.nvim',
-    config = true,
-  },
+  { 'willothy/wezterm.nvim', config = true },
+
   {
     'mrjones2014/smart-splits.nvim',
     lazy = false,
@@ -120,6 +118,7 @@ require('lazy').setup({
     ft = 'lua', -- only load on lua files
     opts = {
       library = {
+        'lazy.nvim',
         -- See the configuration section for more details
         -- Load luvit types when the `vim.uv` word is found
         { path = 'luvit-meta/library', words = { 'vim%.uv' } },
