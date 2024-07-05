@@ -258,7 +258,7 @@ require('lazy').setup({
   'folke/which-key.nvim',
 
   -- adds git releated signs to the gutter, as well as utilities for managing changes
-  'lewis6991/gitsigns.nvim',
+  { 'lewis6991/gitsigns.nvim', opts = {} },
 
   -- add indentation function/class/etc context lines
   { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
