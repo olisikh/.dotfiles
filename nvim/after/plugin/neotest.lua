@@ -16,11 +16,7 @@ neotest.setup({
     require('neotest-go')({
       dap_adapter = 'delve',
     }),
-    require('neotest-scala')({
-      args = function(opts)
-        return {}
-      end,
-    }),
+    require('neotest-scala'),
     require('rustaceanvim.neotest'),
   },
   diagnostic = {
