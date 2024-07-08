@@ -176,7 +176,7 @@ require('lazy').setup({
     },
     config = function()
       -- NOTE: update treesitter queries / highlights / etc on startup
-      require('nvim-treesitter.install').update({ with_sync = true })
+      vim.cmd([[TSUpdateSync]])
     end,
   },
 
