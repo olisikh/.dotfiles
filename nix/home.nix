@@ -43,12 +43,7 @@ in
       zoxide
       rustup
       tree-sitter
-      (lua.withPackages (p: with p; [
-        jsregexp
-      ]))
-      (python3.withPackages (p: with p; [
-        localstack
-      ]))
+      luarocks
       docker
       minikube
       kubernetes-helm

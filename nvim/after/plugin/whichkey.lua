@@ -9,9 +9,9 @@ which_key.setup({
   },
 })
 
-which_key.register({
-  ['<leader>c'] = { name = '+Code' },
-  ['<leader>s'] = { name = '+Search' },
-  ['<leader>t'] = { name = '+Test' },
-  ['<leader>x'] = { name = '+Trouble' },
+which_key.add({
+  { '<leader>c', group = 'Code' },
+  { '<leader>s', group = 'Search' },
+  { '<leader>t', group = 'Test' },
+  { '<leader>x', group = 'Trouble' },
 })
