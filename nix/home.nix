@@ -43,7 +43,7 @@ in
       zoxide
       rustup
       tree-sitter
-      luarocks
+      luarocks-nix
       docker
       minikube
       kubernetes-helm
