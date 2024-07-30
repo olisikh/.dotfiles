@@ -105,6 +105,8 @@ require('lazy').setup({
     },
   },
 
+  { 'towolf/vim-helm', ft = 'helm' },
+
   -- Status updates for LSP showing on the right
   { 'j-hui/fidget.nvim', opts = {} },
 
