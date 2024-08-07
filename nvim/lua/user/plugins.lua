@@ -36,7 +36,24 @@ require('lazy').setup({
   'nvim-lua/plenary.nvim',
 
   -- git plugin
-  { 'tpope/vim-fugitive', dependencies = { 'tpope/vim-rhubarb' } },
+  {
+    'kdheepak/lazygit.nvim',
+    cmd = {
+      'LazyGit',
+      'LazyGitConfig',
+      'LazyGitCurrentFile',
+      'LazyGitFilter',
+      'LazyGitFilterCurrentFile',
+    },
+    -- setting the keybinding for LazyGit with 'keys' is recommended in
+    -- order to load the plugin when the command is run for the first time
+    keys = {
+      { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'lazygit: Open [l]azygit' },
+      { '<leader>lc', '<cmd>LazyGitCurrentFile<cr>', desc = 'lazygit: [c]urrent file' },
+      { '<leader>lf', '<cmd>LazyGitFilter<cr>', desc = 'lazygit: [f]ilter' },
+      { '<leader>lF', '<cmd>LazyGitFilterCurrentFile<cr>', desc = 'lazygit: [F]ilter current file' },
+    },
+  },
 
   -- file tree explorer
   { 'nvim-tree/nvim-tree.lua', dependencies = { 'nvim-tree/nvim-web-devicons' } },

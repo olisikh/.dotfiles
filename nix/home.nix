@@ -64,6 +64,7 @@ in
       xdg-utils # open apps from console/neovim
       arc-browser
       wezterm
+      lazygit
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash

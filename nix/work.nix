@@ -62,6 +62,7 @@ in
       (metals.override { jre = jdk17; })
       xdg-utils # open apps from console/neovim
       wezterm
+      lazygit
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash
