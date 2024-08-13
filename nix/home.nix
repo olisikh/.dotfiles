@@ -65,6 +65,7 @@ in
       arc-browser
       wezterm
       lazygit
+      watch
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash

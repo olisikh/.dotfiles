@@ -63,6 +63,7 @@ in
       xdg-utils # open apps from console/neovim
       wezterm
       lazygit
+      watch
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash
