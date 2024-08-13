@@ -48,10 +48,15 @@ cmp.setup({
     end, { 'i', 's' }),
   }),
   sources = {
-    { name = 'codeium' },
-    { name = 'copilot' },
+    -- { name = 'codeium' },
+    -- { name = 'copilot' },
     { name = 'lazydev' },
-    { name = 'nvim_lsp' },
+    {
+      name = 'nvim_lsp',
+      entry_filter = function(entry, _)
+        return require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+      end,
+    },
     { name = 'luasnip' },
     { name = 'crates' },
     { name = 'nvim_lsp_signature_help' },

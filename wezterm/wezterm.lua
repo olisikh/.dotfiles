@@ -34,6 +34,13 @@ c.keys = {
 			end),
 		}),
 	},
+
+	-- Disable M+Enter hotkey to use it in Neovim
+	{
+		key = "Enter",
+		mods = "ALT",
+		action = w.action.DisableDefaultAssignment,
+	},
 }
 
 nav.apply_to_config(c)

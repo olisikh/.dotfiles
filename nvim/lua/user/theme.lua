@@ -55,19 +55,19 @@ local function copilot_status()
   return require('copilot_status').status_string()
 end
 
-local function codeium_status()
-  local codeium = require('cmp').core:get_sources(function(source)
-    return source.name == 'codeium'
-  end)[1]
-
-  if codeium == nil then
-    return ' '
-  elseif codeium.status == 2 then
-    return ' '
-  else
-    return '󰘦 '
-  end
-end
+-- local function codeium_status()
+--   local codeium = require('cmp').core:get_sources(function(source)
+--     return source.name == 'codeium'
+--   end)[1]
+--
+--   if codeium == nil then
+--     return ' '
+--   elseif codeium.status == 2 then
+--     return ' '
+--   else
+--     return '󰘦 '
+--   end
+-- end
 
 require('lualine').setup({
   options = {
@@ -79,7 +79,7 @@ require('lualine').setup({
     },
     lualine_x = {
       'harpoon2',
-      codeium_status,
+      -- codeium_status,
       copilot_status,
       'encoding',
       'filetype',
