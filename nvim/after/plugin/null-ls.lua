@@ -13,6 +13,8 @@ require('mason-null-ls').setup({
     'yamllint',
     -- nix
     'nixpkgs-fmt',
+    -- python
+    'black',
   },
   automatic_installation = false,
   handlers = {},

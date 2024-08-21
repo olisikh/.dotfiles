@@ -64,6 +64,7 @@ in
       wezterm
       lazygit
       watch
+      rover
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash

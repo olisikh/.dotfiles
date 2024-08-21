@@ -178,6 +178,15 @@ local servers = {
       },
     },
   },
+  pyright = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = 'openFilesOnly',
+      },
+    },
+  },
   gopls = {
     gopls = {
       -- setup inlay hints
