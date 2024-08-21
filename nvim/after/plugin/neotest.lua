@@ -18,6 +18,7 @@ neotest.setup({
     }),
     require('neotest-scala'),
     require('rustaceanvim.neotest'),
+    require('neotest-python'),
   },
   diagnostic = {
     enabled = true,

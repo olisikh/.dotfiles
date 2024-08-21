@@ -39,8 +39,13 @@
         export CARGO_HOME=$HOME/.cargo
         export PATH="$CARGO_HOME/bin:$PATH"
 
+        # Add python bin
+        export PYTHON_HOME=$HOME/Library/Python/3.9
+        export PATH="$PYTHON_HOME/bin:$PATH"
+
         alias tf=terraform
         alias k=kubectl
+        alias python=python3
 
         # smart cd
         alias zz="z -"
