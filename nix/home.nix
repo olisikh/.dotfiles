@@ -66,6 +66,11 @@ in
       wezterm
       lazygit
       watch
+      (python3.withPackages (ps: with ps; [
+        pip
+        pytest
+        debugpy
+      ]))
 
       (pkgs.writeShellScriptBin "home" ''
         #!/bin/bash

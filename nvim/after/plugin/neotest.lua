@@ -18,7 +18,24 @@ neotest.setup({
     }),
     require('neotest-scala'),
     require('rustaceanvim.neotest'),
-    require('neotest-python'),
+    require('neotest-python')({
+      args = { '-s' }, -- show stdout in pytest output
+      pytest_discover_instances = true,
+      is_test_file = function(path)
+        local file = io.open(path, 'r')
+        if file == nil then
+          return false
+        end
+        local content = file:read('a')
+
+        if content == nil then
+          return false
+        else
+          file:close()
+          return content:match('def test_')
+        end
+      end,
+    }),
   },
   diagnostic = {
     enabled = true,

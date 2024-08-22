@@ -164,6 +164,7 @@ require('lazy').setup({
       { 'jbyuki/one-small-step-for-vimkind' }, -- debug lua
       { 'leoluz/nvim-dap-go' }, -- debug go
       { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
+      { 'mfussenegger/nvim-dap-python' }, -- debug python
     },
   },
 
@@ -318,7 +319,7 @@ require('lazy').setup({
       'nvim-neotest/neotest-plenary',
       'nvim-neotest/neotest-go',
       'nvim-neotest/neotest-python',
-      { 'stevanmilic/neotest-scala', dev = true, dependencies = { 'nvim-neotest/nvim-nio' } },
+      { 'olisikh/neotest-scala', dev = true },
     },
   },
 }, {

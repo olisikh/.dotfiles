@@ -9,10 +9,12 @@ local mason_dap = require('mason-nvim-dap')
 
 mason_dap.setup({
   ensure_installed = {
-    'codelldb',
+    'codelldb', -- rust
     'js',
-    'delve',
+    'delve', -- go
+    'debugpy', -- python
   },
+  automatic_installation = false,
 })
 
 dap_ui.setup({})
