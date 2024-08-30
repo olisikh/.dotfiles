@@ -151,6 +151,9 @@ require('lazy').setup({
   -- my ZIO helper plugin
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
 
+  -- Java
+  { 'mfussenegger/nvim-jdtls' },
+
   -- rust support
   { 'mrcjkb/rustaceanvim', version = '^4', lazy = false, ft = { 'rust' } },
   { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },

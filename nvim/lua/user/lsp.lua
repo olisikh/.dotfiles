@@ -1,17 +1,13 @@
-local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
 local cmp_lsp = require('cmp_nvim_lsp')
+local utils = require('user.utils')
 
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+local lsp_group = require('user.lsp_utils').lsp_group
+
 local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded' })
 vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = 'rounded' })
-
--- vim.api.nvim_create_user_command('ToggleInlayHints', function()
---   vim.g.inlayhints = not vim.g.inlayhints
---   toggle_inlay_hints(0, vim.g.inlayhints)
--- end, { desc = 'Toggle inlay hints globally' })
 
 local servers = {
   dockerls = {},
@@ -121,18 +117,18 @@ local servers = {
   },
 }
 
--- rust LSP is setup by rust plugin
-local plugin_managed_servers = { 'rust_analyzer' }
+-- LSP servers that are configured by plugins 
+local managed_servers = { 'rust_analyzer', 'jdtls' }
 
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup({
-  ensure_installed = vim.tbl_keys(servers),
+  ensure_installed = utils.list_merge(managed_servers, vim.tbl_keys(servers)),
   automatic_installation = false,
 })
 
 mason_lspconfig.setup_handlers({
   function(server_name)
-    if not vim.list_contains(plugin_managed_servers, server_name) then
+    if not vim.list_contains(managed_servers, server_name) then
       local settings = servers[server_name]
 
       if settings == nil then
@@ -156,7 +152,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local client = vim.lsp.get_client_by_id(opts.data.client_id)
 
     if client then
-      require("user.lsp_utils").setup_lsp_buffer(lsp_group, client, bufnr)
+      require('user.lsp_utils').setup_lsp_buffer(client, bufnr)
     end
   end,
 })

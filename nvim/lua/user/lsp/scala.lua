@@ -8,7 +8,7 @@ local M = {}
 
 M.setup = function(group, capabilities)
   vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'scala', 'sbt', 'java' },
+    pattern = { 'scala', 'sbt' },
     group = group,
     callback = function()
       local metals = require('metals')

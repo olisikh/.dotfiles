@@ -11,6 +11,9 @@ local function format_buf(bufnr, range)
   vim.lsp.buf.format({ bufnr = bufnr, range = range })
 end
 
+---Toggle inlay hints
+---@param bufnr integer buffer num
+---@param enable boolean
 local function toggle_inlay_hints(bufnr, enable)
   vim.lsp.inlay_hint.enable(enable, {
     bufnr = bufnr,
@@ -19,10 +22,12 @@ end
 
 local M = {}
 
+local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
+
 ---Sets up keymaps for LSP buffer
 ---@param client vim.lsp.Client
 ---@param bufnr integer buffer num
-function M.setup_lsp_buffer(lsp_group, client, bufnr)
+function M.setup_lsp_buffer(client, bufnr)
   local server_capabilities = client.server_capabilities or {}
 
   if server_capabilities.renameProvider then

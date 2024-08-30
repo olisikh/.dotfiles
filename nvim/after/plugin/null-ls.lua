@@ -20,8 +20,6 @@ require('mason-null-ls').setup({
   handlers = {},
 })
 
-local null_ls_augroup = vim.api.nvim_create_augroup('UserNullLs', { clear = true })
-
 require('null-ls').setup({
   debug = false,
   sources = {
@@ -29,7 +27,7 @@ require('null-ls').setup({
   },
   on_attach = function(client, bufnr)
     if client.server_capabilities.documentFormattingProvider then
-      require('user.lsp_utils').setup_lsp_buffer(null_ls_augroup, client, bufnr)
+      require('user.lsp_utils').setup_lsp_buffer(client, bufnr)
     end
   end,
 })
