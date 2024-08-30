@@ -57,7 +57,6 @@ in
       stern # kubectl pod log scraping tool
       htop
       pngpaste
-      nodejs
       (sbt.override { jre = jdk17; })
       (metals.override { jre = jdk17; })
       xdg-utils # open apps from console/neovim

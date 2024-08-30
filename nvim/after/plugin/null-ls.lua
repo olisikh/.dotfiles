@@ -29,14 +29,7 @@ require('null-ls').setup({
   },
   on_attach = function(client, bufnr)
     if client.server_capabilities.documentFormattingProvider then
-      vim.api.nvim_clear_autocmds({ group = null_ls_augroup, buffer = bufnr })
-      vim.api.nvim_create_autocmd('BufWritePre', {
-        group = null_ls_augroup,
-        buffer = bufnr,
-        callback = function()
-          vim.lsp.buf.format({ bufnr = bufnr })
-        end,
-      })
+      require('user.lsp_utils').setup_lsp_buffer(null_ls_augroup, client, bufnr)
     end
   end,
 })
