@@ -26,6 +26,9 @@ require('null-ls').setup({
     require('none-ls.formatting.rustfmt'),
   },
   on_attach = function(client, bufnr)
-    require('user.lsp_utils').on_attach(client, bufnr)
+    -- NOTE: if null-ls has a formatter for given filetype, install keymap for formatting the buffer
+    if client.server_capabilities.document_formatting then
+      require('user.lsp_utils').format_buf(bufnr)
+    end
   end,
 })

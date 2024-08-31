@@ -1,3 +1,5 @@
+local nmap = require('user.utils').nmap
+
 local mason_registry = require('mason-registry')
 
 local java_lsp_path = mason_registry.get_package('jdtls'):get_install_path()
@@ -110,5 +112,12 @@ local config = {
     allow_incremental_sync = true,
   },
 }
+
+local bufnr = vim.api.nvim_get_current_buf()
+
+nmap("<leader>co", ":lua require'jdtls'.organize_imports()<cr>", { buffer = bufnr, desc = "lsp: [o]rganize imports" })
+nmap("<leader>cv", ":lua require'jdtls'.extract_variable()<cr>", { buffer = bufnr, desc = "lsp: extract [v]ariable" })
+nmap("<leader>cm", ":lua require'jdtls'.extract_method()<cr>", { buffer = bufnr, desc = "lsp: extract [m]ethod"})
+nmap("<leader>cc", ":lua require'jdtls'.extract_constant()<cr>", { buffer = bufnr, desc = "lsp: extract [c]onstant"})
 
 require('jdtls').start_or_attach(config)

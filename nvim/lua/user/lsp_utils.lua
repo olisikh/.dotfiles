@@ -31,6 +31,8 @@ local M = {}
 M.lsp_group = lsp_group
 M.capabilities = capabilities
 
+M.format_buf = format_buf
+
 ---Sets up keymaps for LSP buffer
 ---@param client vim.lsp.Client
 ---@param bufnr integer buffer num
@@ -45,7 +47,7 @@ function M.on_attach(client, bufnr)
     nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
   end
 
-  nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostc: show [c]ode [d]iagnostic' })
+  nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
 
   if server_capabilities.documentFormattingProvider then
     nmap('<leader>cf', function()
