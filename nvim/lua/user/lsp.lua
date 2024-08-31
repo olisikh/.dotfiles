@@ -1,10 +1,7 @@
-local cmp_lsp = require('cmp_nvim_lsp')
 local utils = require('user.utils')
 
 local lsp_group = require('user.lsp_utils').lsp_group
-
-local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-capabilities.textDocument.completion.completionItem.snippetSupport = true
+local capabilities = require('user.lsp_utils').capabilities
 
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded' })
 vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = 'rounded' })
@@ -22,7 +19,6 @@ local servers = {
     },
   },
   terraformls = {},
-  rnix = {},
   bashls = {},
   yamlls = {
     -- NOTE: Configuration https://github.com/redhat-developer/yaml-language-server
@@ -117,7 +113,7 @@ local servers = {
   },
 }
 
--- LSP servers that are configured by plugins 
+-- LSP servers that are configured by plugins
 local managed_servers = { 'rust_analyzer', 'jdtls' }
 
 local mason_lspconfig = require('mason-lspconfig')
@@ -152,15 +148,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local client = vim.lsp.get_client_by_id(opts.data.client_id)
 
     if client then
-      require('user.lsp_utils').setup_lsp_buffer(client, bufnr)
+      require('user.lsp_utils').on_attach(client, bufnr)
     end
   end,
 })
 
 -- Languages are at ${workspaceDir}/lua/language folder
 require('user.lsp.js').setup(lsp_group)
-require('user.lsp.lua').setup(lsp_group)
-require('user.lsp.go').setup(lsp_group)
 require('user.lsp.scala').setup(lsp_group, capabilities)
-require('user.lsp.rust').setup(lsp_group, capabilities)
-require('user.lsp.python').setup(lsp_group)

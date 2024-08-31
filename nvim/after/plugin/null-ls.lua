@@ -26,8 +26,6 @@ require('null-ls').setup({
     require('none-ls.formatting.rustfmt'),
   },
   on_attach = function(client, bufnr)
-    if client.server_capabilities.documentFormattingProvider then
-      require('user.lsp_utils').setup_lsp_buffer(client, bufnr)
-    end
+    require('user.lsp_utils').on_attach(client, bufnr)
   end,
 })

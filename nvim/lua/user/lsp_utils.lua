@@ -1,4 +1,5 @@
 local telescope_builtin = require('telescope.builtin')
+local cmp_lsp = require('cmp_nvim_lsp')
 
 local uu = require('user.utils')
 local nmap = uu.nmap
@@ -20,14 +21,20 @@ local function toggle_inlay_hints(bufnr, enable)
   })
 end
 
-local M = {}
+local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
+
+local M = {}
+
+M.lsp_group = lsp_group
+M.capabilities = capabilities
 
 ---Sets up keymaps for LSP buffer
 ---@param client vim.lsp.Client
 ---@param bufnr integer buffer num
-function M.setup_lsp_buffer(client, bufnr)
+function M.on_attach(client, bufnr)
   local server_capabilities = client.server_capabilities or {}
 
   if server_capabilities.renameProvider then

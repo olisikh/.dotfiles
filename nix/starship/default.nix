@@ -17,6 +17,7 @@
       lua.symbol = " ";
       terraform.symbol = " ";
       aws.symbol = "  ";
+      gradle.symbol = " ";
     };
   };
 }

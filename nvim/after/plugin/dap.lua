@@ -13,6 +13,8 @@ mason_dap.setup({
     'js',
     'delve', -- go
     'debugpy', -- python
+    'java-debug-adapter',
+    'java-test',
   },
   automatic_installation = false,
 })
