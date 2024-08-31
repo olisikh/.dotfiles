@@ -25,6 +25,7 @@ M.setup = function(group, capabilities)
         useGlobalExecutable = true,
         autoImportBuild = 'on',
         showImplicitArguments = true,
+        enableSemanticHighlighting = false, -- fix highlight issues
         showImplicitConversionsAndClasses = true,
         superMethodLensesEnabled = true,
         showInferredType = true,
