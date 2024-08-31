@@ -50,13 +50,13 @@ function M.on_attach(client, bufnr)
   nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
 
   if server_capabilities.documentFormattingProvider then
-    nmap('<leader>cf', function()
+    nmap('F', function()
       format_buf(bufnr)
     end, { desc = 'lsp: [c]ode [f]ormat' })
   end
 
   if server_capabilities.documentRangeFormattingProvider then
-    map('v', '<leader>cf', function()
+    map('v', 'F', function()
       local vstart = vim.fn.getpos("'<")
       local vend = vim.fn.getpos("'>")
 

@@ -112,10 +112,6 @@ nmap('<leader>cv', ":lua require'jdtls'.extract_variable()<cr>", { buffer = bufn
 nmap('<leader>cm', ":lua require'jdtls'.extract_method()<cr>", { buffer = bufnr, desc = 'lsp: extract [m]ethod' })
 nmap('<leader>cc', ":lua require'jdtls'.extract_constant()<cr>", { buffer = bufnr, desc = 'lsp: extract [c]onstant' })
 
-nmap(
-  '<leader>ds',
-  ":lua require'jdtls.dap'.setup_dap_main_class_configs()<cr>",
-  { buffer = bufnr, desc = 'dap: setup [d]ebug targets' }
-)
+nmap('<leader>jt', ":lua require'jdtls'.pick_test()<cr>", { buffer = bufnr, desc = 'lsp: run [t]est' })
 
 require('jdtls').start_or_attach(config)
