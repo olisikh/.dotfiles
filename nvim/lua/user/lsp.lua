@@ -135,24 +135,11 @@ mason_lspconfig.setup_handlers({
       require('lspconfig')[server_name].setup({
         capabilities = capabilities,
         settings = settings,
+        on_attach = require('user.lsp_utils').on_attach,
       })
     end
   end,
 })
 
--- Setup all keymaps and autocommands for the buffer whenever LSP attaches
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = lsp_group,
-  callback = function(opts)
-    local bufnr = opts.buf
-    local client = vim.lsp.get_client_by_id(opts.data.client_id)
-
-    if client then
-      require('user.lsp_utils').on_attach(client, bufnr)
-    end
-  end,
-})
-
--- Languages are at ${workspaceDir}/lua/language folder
 require('user.lsp.js').setup(lsp_group)
 require('user.lsp.scala').setup(lsp_group, capabilities)

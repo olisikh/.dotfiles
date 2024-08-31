@@ -21,9 +21,6 @@ M.setup = function(group, capabilities)
         },
       }
       metals_config.settings = {
-        jvmOptions = {
-          --  '-Dmetals.enable-best-effort=true', -- Scala 3.5.0 best effort compilation
-        },
         defaultBspToBuildTool = true, -- use BSP, bloop sucks
         useGlobalExecutable = true,
         autoImportBuild = 'on',

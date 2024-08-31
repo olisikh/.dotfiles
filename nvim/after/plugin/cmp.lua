@@ -48,9 +48,7 @@ cmp.setup({
     end, { 'i', 's' }),
   }),
   sources = {
-    -- { name = 'codeium' },
-    -- { name = 'copilot' },
-    { name = 'lazydev' },
+    { name = 'lazydev', group_index = 0 },
     {
       name = 'nvim_lsp',
       entry_filter = function(entry, _)
@@ -66,10 +64,6 @@ cmp.setup({
       mode = 'symbol_text', -- show only symbol annotations
       maxwidth = 70, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
       ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-      symbol_map = {
-        Codeium = '󰘦',
-        Copilot = '',
-      },
       show_labelDetails = true, -- show labelDetails in menu. Disabled by default
 
       -- The function below will be called before any actual modifications from lspkind

@@ -5,7 +5,7 @@ local M = {}
 
 M.setup = function(group)
   -- Setup javascript & typescript (mostly dap)
-    local js_debugger = mason_registry.get_package('js-debug-adapter'):get_install_path()
+  local js_debugger = mason_registry.get_package('js-debug-adapter'):get_install_path()
 
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
