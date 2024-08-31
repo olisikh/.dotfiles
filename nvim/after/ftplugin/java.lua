@@ -11,7 +11,7 @@ local java_test_path = mason_registry.get_package('java-test'):get_install_path(
 local bundles = {
   vim.fn.glob(java_dap_path .. '/extension/server/com.microsoft.java.debug.plugin-*.jar', true),
 }
-vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. "/extension/server/*.jar", true), "\n"))
+vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. '/extension/server/*.jar', true), '\n'))
 
 -- NOTE: Decrease the amount of files to improve speed(Experimental).
 -- INFO: It's annoying to edit the version again and again.
@@ -107,10 +107,15 @@ local config = {
 
 local bufnr = vim.api.nvim_get_current_buf()
 
-nmap("<leader>co", ":lua require'jdtls'.organize_imports()<cr>", { buffer = bufnr, desc = "lsp: [o]rganize imports" })
-nmap("<leader>cv", ":lua require'jdtls'.extract_variable()<cr>", { buffer = bufnr, desc = "lsp: extract [v]ariable" })
-nmap("<leader>cm", ":lua require'jdtls'.extract_method()<cr>", { buffer = bufnr, desc = "lsp: extract [m]ethod"})
-nmap("<leader>cc", ":lua require'jdtls'.extract_constant()<cr>", { buffer = bufnr, desc = "lsp: extract [c]onstant"})
-nmap("<leader>cD", ":lua require'jdtls.dap'.setup_dap_main_class_configs()<cr>", { buffer = bufnr, desc = "lsp: setup [d]ebugging"})
+nmap('<leader>co', ":lua require'jdtls'.organize_imports()<cr>", { buffer = bufnr, desc = 'lsp: [o]rganize imports' })
+nmap('<leader>cv', ":lua require'jdtls'.extract_variable()<cr>", { buffer = bufnr, desc = 'lsp: extract [v]ariable' })
+nmap('<leader>cm', ":lua require'jdtls'.extract_method()<cr>", { buffer = bufnr, desc = 'lsp: extract [m]ethod' })
+nmap('<leader>cc', ":lua require'jdtls'.extract_constant()<cr>", { buffer = bufnr, desc = 'lsp: extract [c]onstant' })
+
+nmap(
+  '<leader>ds',
+  ":lua require'jdtls.dap'.setup_dap_main_class_configs()<cr>",
+  { buffer = bufnr, desc = 'dap: setup [d]ebug targets' }
+)
 
 require('jdtls').start_or_attach(config)

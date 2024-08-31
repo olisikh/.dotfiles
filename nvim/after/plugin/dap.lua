@@ -22,13 +22,13 @@ mason_dap.setup({
 dap_ui.setup({})
 
 dap.listeners.after.event_initialized['dapui_config'] = function()
-  local bps = breakpoints.get(vim.api.nvim_get_current_buf()) -- { {} } the bps is this for some weird reason
+  -- local bps = breakpoints.get(vim.api.nvim_get_current_buf()) -- { {} } the bps is this for some weird reason
 
-  if dap_utils.index_of(bps, function(x)
-    return dap_utils.non_empty(x)
-  end) then
+  -- if dap_utils.index_of(bps, function(x)
+  --   return dap_utils.non_empty(x)
+  -- end) then
     dap_ui.open()
-  end
+  -- end
 end
 dap.listeners.before.event_terminated['dapui_config'] = function()
   dap_ui.close()
@@ -37,27 +37,28 @@ dap.listeners.before.event_exited['dapui_config'] = function()
   dap_ui.close()
 end
 
-nmap('<F1>', dap_ui.toggle, { desc = 'dap-ui: toggle' })
-nmap('<F2>', dap.set_breakpoint, { desc = 'dap: set breakpoint' })
-nmap('<F3>', function()
+nmap('<leader>db', dap.toggle_breakpoint, { desc = 'dap: set breakpoint' })
+nmap('<leader>dB', function()
   dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
 end, { desc = 'dap: cond breakpoint' })
-nmap('<F4>', dap.toggle_breakpoint, { desc = 'dap: breakpoint' })
-nmap('<F5>', dap.continue, { desc = 'dap: continue' })
-nmap('<F6>', dap.step_over, { desc = 'dap: step over' })
-nmap('<F7>', dap.step_into, { desc = 'dap: step into' })
-nmap('<F8>', dap.step_out, { desc = 'dap: step out' })
 
-nmap('<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
-nmap('<leader>dh', dap_widgets.hover, { desc = 'dap: hover' })
-nmap('<leader>do', dap_ui.toggle, { desc = 'dap-ui: toggle ui' })
+nmap('<leader>dc', dap.continue, { desc = 'dap: [c]ontinue' })
+nmap('<leader>di', dap.step_into, { desc = 'dap: step [i]nto' })
+nmap('<leader>do', dap.step_out, { desc = 'dap: step [o]ut' })
+nmap('<leader>dv', dap.step_over, { desc = 'dap: step o[v]er' })
+
+-- nmap('<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
+-- nmap('<leader>dh', dap_widgets.hover, { desc = 'dap: hover' })
+
+nmap('<leader>dd', dap_ui.toggle, { desc = 'dap-ui: toggle ui' })
 nmap('<leader>dq', dap.terminate, { desc = 'dap: terminate' })
-nmap('<leader>dr', function()
-  dap.restart({ terminateDebugee = false })
-end, { desc = 'dap: restart dap' })
-nmap('<leader>dR', function()
-  dap.restart({ terminateDebugee = true })
-end, { desc = 'dap: terminate & restart dap' })
+
+-- nmap('<leader>dr', function()
+--   dap.restart({ terminateDebugee = false })
+-- end, { desc = 'dap: restart dap' })
+-- nmap('<leader>dr', function()
+--   dap.restart({ terminateDebugee = true })
+-- end, { desc = 'dap: terminate & restart dap' })
 
 local sign = vim.fn.sign_define
 
