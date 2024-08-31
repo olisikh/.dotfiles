@@ -152,7 +152,7 @@ require('lazy').setup({
   { 'alisiikh/nvim-scala-zio-quickfix', dev = true, opts = {} },
 
   -- Java
-  { 'mfussenegger/nvim-jdtls' },
+  { 'mfussenegger/nvim-jdtls', dependencies = { 'mfussenegger/nvim-dap' } },
 
   -- rust support
   { 'mrcjkb/rustaceanvim', version = '^4', lazy = false, ft = { 'rust' } },
