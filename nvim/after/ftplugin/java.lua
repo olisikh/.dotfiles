@@ -6,10 +6,12 @@ local mason_registry = require('mason-registry')
 
 local java_lsp_path = mason_registry.get_package('jdtls'):get_install_path()
 local java_dap_path = mason_registry.get_package('java-debug-adapter'):get_install_path()
+local java_test_path = mason_registry.get_package('java-test'):get_install_path()
 
 local bundles = {
   vim.fn.glob(java_dap_path .. '/extension/server/com.microsoft.java.debug.plugin-*.jar', true),
 }
+vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. "/extension/server/*.jar", true), "\n"))
 
 -- NOTE: Decrease the amount of files to improve speed(Experimental).
 -- INFO: It's annoying to edit the version again and again.
