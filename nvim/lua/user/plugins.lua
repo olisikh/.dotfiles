@@ -333,6 +333,10 @@ require('lazy').setup({
   dev = {
     path = '~/Develop/nvim-plugins',
   },
+  install = {
+    -- try to load one of these colorschemes when starting an installation during startup
+    colorscheme = { "catppuccin-mocha" },
+  },
   ui = {
     border = 'rounded',
   },
