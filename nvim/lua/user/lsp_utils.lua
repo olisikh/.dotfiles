@@ -9,7 +9,13 @@ local map = uu.map
 ---@param bufnr integer buffer num
 ---@param range table? {start:integer[], end:integer[]}
 local function format_buf(bufnr, range)
-  vim.lsp.buf.format({ bufnr = bufnr, range = range })
+  vim.lsp.buf.format({
+    bufnr = bufnr,
+    range = range,
+    filter = function(client)
+      return client.name == 'null-ls'
+    end,
+  })
 end
 
 ---Toggle inlay hints
@@ -30,8 +36,6 @@ local M = {}
 
 M.lsp_group = lsp_group
 M.capabilities = capabilities
-
-M.format_buf = format_buf
 
 ---Sets up keymaps for LSP buffer
 ---@param client vim.lsp.Client
@@ -82,13 +86,13 @@ function M.on_attach(client, bufnr)
   if server_capabilities.referencesProvider then
     nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
 
-    vim.api.nvim_create_autocmd('CursorMoved', {
-      callback = function()
-        vim.lsp.buf.clear_references()
-      end,
-      buffer = bufnr,
-      group = lsp_group,
-    })
+    -- vim.api.nvim_create_autocmd('CursorMoved', {
+    --   callback = function()
+    --     vim.lsp.buf.clear_references()
+    --   end,
+    --   buffer = bufnr,
+    --   group = lsp_group,
+    -- })
   end
 
   if server_capabilities.implementationProvider then
@@ -102,13 +106,13 @@ function M.on_attach(client, bufnr)
   if server_capabilities.codeLensProvider then
     nmap('gl', vim.lsp.codelens.run, { desc = 'lsp: [g]o through [l]ens' })
 
-    vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-      callback = function()
-        vim.lsp.codelens.refresh({ bufnr = bufnr })
-      end,
-      buffer = bufnr,
-      group = lsp_group,
-    })
+    -- vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+    --   callback = function()
+    --     vim.lsp.codelens.refresh({ bufnr = bufnr })
+    --   end,
+    --   buffer = bufnr,
+    --   group = lsp_group,
+    -- })
   end
 
   if server_capabilities.typeDefinitionProvider then
