@@ -45,8 +45,8 @@ function M.on_attach(client, bufnr, init_opts)
 
   if init_opts then
     if init_opts.format_null_ls then
-      server_capabilities.documentFormattingProvider = true
-      server_capabilities.documentRangeFormattingProvider = true
+      server_capabilities.documentFormattingProvider = false
+      server_capabilities.documentRangeFormattingProvider = false
     end
   end
 
