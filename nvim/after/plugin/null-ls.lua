@@ -31,7 +31,7 @@ require('null-ls').setup({
   },
   on_attach = function(client, bufnr)
     -- NOTE: if null-ls has a formatter for given filetype, install keymap for formatting the buffer
-    if client.server_capabilities.documentFormattingProvider then
+    if client.supports_method('textDocument/formatting') then
       nmap('F', function()
         vim.lsp.buf.format({ bufnr = bufnr })
       end, { desc = 'lsp: [c]ode [f]ormat' })

@@ -1,12 +1,15 @@
-local group = require('user.lsp_utils').group
 
-local dap = require('dap')
+local M = {}
+
+function M.setup(group)
 
 -- setup lua dap
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'lua' },
   group = group,
   callback = function()
+    local dap = require('dap')
+
     dap.configurations.lua = {
       {
         type = 'nlua',
@@ -24,3 +27,6 @@ vim.api.nvim_create_autocmd('FileType', {
     end
   end,
 })
+end
+
+return M

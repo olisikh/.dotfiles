@@ -141,5 +141,8 @@ mason_lspconfig.setup_handlers({
   end,
 })
 
+require('user.lsp.lua').setup(lsp_group)
 require('user.lsp.js').setup(lsp_group)
+require('user.lsp.go').setup(lsp_group)
 require('user.lsp.scala').setup(lsp_group, capabilities)
+require('user.lsp.rust').setup(lsp_group, capabilities)
