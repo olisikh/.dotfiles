@@ -5,26 +5,11 @@ local uu = require('user.utils')
 local nmap = uu.nmap
 local map = uu.map
 
----Format buffer
----@param bufnr integer buffer num
----@param range table? {start:integer[], end:integer[]}
-local function format_buf(bufnr, range)
-  vim.lsp.buf.format({
-    bufnr = bufnr,
-    range = range,
-    filter = function(client)
-      return client.name == 'null-ls'
-    end,
-  })
-end
-
 ---Toggle inlay hints
 ---@param bufnr integer buffer num
 ---@param enable boolean
 local function toggle_inlay_hints(bufnr, enable)
-  vim.lsp.inlay_hint.enable(enable, {
-    bufnr = bufnr,
-  })
+  vim.lsp.inlay_hint.enable(enable, { bufnr = bufnr })
 end
 
 local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
@@ -45,6 +30,8 @@ function M.on_attach(client, bufnr, init_opts)
 
   if init_opts then
     if init_opts.format_null_ls then
+      -- force formatting via none-ls if LSP formatting is not supported,
+      -- but LSP client might still say otherwise
       server_capabilities.documentFormattingProvider = false
       server_capabilities.documentRangeFormattingProvider = false
     end
@@ -62,7 +49,7 @@ function M.on_attach(client, bufnr, init_opts)
 
   if server_capabilities.documentFormattingProvider then
     nmap('F', function()
-      format_buf(bufnr)
+      vim.lsp.buf.format()
     end, { desc = 'lsp: [c]ode [f]ormat' })
   end
 
@@ -71,7 +58,7 @@ function M.on_attach(client, bufnr, init_opts)
       local vstart = vim.fn.getpos("'<")
       local vend = vim.fn.getpos("'>")
 
-      format_buf(bufnr, { vstart, vend })
+      vim.lsp.buf.format({ range = { vstart, vend } })
     end, { desc = 'lsp: [c]ode [f]ormat' })
   end
 
@@ -83,7 +70,7 @@ function M.on_attach(client, bufnr, init_opts)
     nmap('<leader>cI', ':ToggleInlayHints<cr>', { desc = 'lsp: toggle inlay hints (global)' })
 
     -- disable inlay hints by default
-    toggle_inlay_hints(0, vim.g.inlayhints)
+    toggle_inlay_hints(0, vim.g.inlay_hints)
   end
 
   if server_capabilities.definitionProvider then

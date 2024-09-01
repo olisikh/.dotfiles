@@ -4,7 +4,7 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- Globally enable/disable inlay hints
-vim.g.inlayhints = false
+vim.g.inlay_hints = false
 
 vim.diagnostic.config({
   virtual_text = true,
