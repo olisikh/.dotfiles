@@ -27,7 +27,7 @@ dap.listeners.after.event_initialized['dapui_config'] = function()
   -- if dap_utils.index_of(bps, function(x)
   --   return dap_utils.non_empty(x)
   -- end) then
-    dap_ui.open()
+  dap_ui.open()
   -- end
 end
 dap.listeners.before.event_terminated['dapui_config'] = function()

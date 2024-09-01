@@ -40,8 +40,15 @@ M.capabilities = capabilities
 ---Sets up keymaps for LSP buffer
 ---@param client vim.lsp.Client
 ---@param bufnr integer buffer num
-function M.on_attach(client, bufnr)
+function M.on_attach(client, bufnr, init_opts)
   local server_capabilities = client.server_capabilities or {}
+
+  if init_opts then
+    if init_opts.format_null_ls then
+      server_capabilities.documentFormattingProvider = true
+      server_capabilities.documentRangeFormattingProvider = true
+    end
+  end
 
   if server_capabilities.renameProvider then
     nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })

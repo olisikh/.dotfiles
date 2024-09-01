@@ -158,7 +158,12 @@ require('lazy').setup({
   { 'mfussenegger/nvim-jdtls', dependencies = { 'mfussenegger/nvim-dap' } },
 
   -- rust support
-  { 'mrcjkb/rustaceanvim', version = '^4', lazy = false, ft = { 'rust' } },
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^4',
+    lazy = false,
+    ft = { 'rust' },
+  },
   { 'saecki/crates.nvim', opts = {}, ft = { 'rust', 'toml' } },
 
   -- debugging
@@ -335,7 +340,7 @@ require('lazy').setup({
   },
   install = {
     -- try to load one of these colorschemes when starting an installation during startup
-    colorscheme = { "catppuccin-mocha" },
+    colorscheme = { 'catppuccin-mocha' },
   },
   ui = {
     border = 'rounded',
