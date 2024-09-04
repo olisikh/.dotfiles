@@ -216,6 +216,9 @@ require('lazy').setup({
     'zbirenbaum/copilot.lua',
     event = 'InsertEnter',
     cmd = 'Copilot',
+    keys = {
+      { '<leader>ig', ':CopilotToggle<cr>', desc = 'copilot: Toggle Github copilot' },
+    },
     config = function()
       require('copilot').setup({
         suggestion = {
