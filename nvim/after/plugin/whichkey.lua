@@ -4,7 +4,7 @@ which_key.setup({
   spelling = {
     enabled = false,
   },
-  window = {
+  win = {
     border = 'single',
   },
 })
