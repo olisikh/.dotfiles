@@ -57,24 +57,31 @@ function M.apply_to_config(c)
 
 		-- swap splits
 		{ mods = "LEADER", key = "Space", action = w.action.PaneSelect({ mode = "SwapWithActive" }) },
+		-- rotate splits
+		{ mods = "LEADER", key = "b", action = w.action.RotatePanes("CounterClockwise") },
+		{ mods = "LEADER", key = "n", action = w.action.RotatePanes("Clockwise") },
 
 		-- activate copy mode or vim mode
-		{ key = "[", mods = "LEADER", action = w.action.ActivateCopyMode },
+		{ mods = "LEADER", key = "[", action = w.action.ActivateCopyMode },
 
-		{ key = "1", mods = "LEADER", action = w.action({ ActivateTab = 0 }) },
-		{ key = "2", mods = "LEADER", action = w.action({ ActivateTab = 1 }) },
-		{ key = "3", mods = "LEADER", action = w.action({ ActivateTab = 2 }) },
-		{ key = "4", mods = "LEADER", action = w.action({ ActivateTab = 3 }) },
-		{ key = "5", mods = "LEADER", action = w.action({ ActivateTab = 4 }) },
-		{ key = "6", mods = "LEADER", action = w.action({ ActivateTab = 5 }) },
-		{ key = "7", mods = "LEADER", action = w.action({ ActivateTab = 6 }) },
-		{ key = "8", mods = "LEADER", action = w.action({ ActivateTab = 7 }) },
-		{ key = "9", mods = "LEADER", action = w.action({ ActivateTab = 8 }) },
+		{ mods = "LEADER", key = "1", action = w.action({ MoveTab = 0 }) },
+		{ mods = "LEADER", key = "2", action = w.action({ MoveTab = 1 }) },
+		{ mods = "LEADER", key = "3", action = w.action({ MoveTab = 2 }) },
+		{ mods = "LEADER", key = "4", action = w.action({ MoveTab = 3 }) },
+		{ mods = "LEADER", key = "5", action = w.action({ MoveTab = 4 }) },
+		{ mods = "LEADER", key = "6", action = w.action({ MoveTab = 5 }) },
+		{ mods = "LEADER", key = "7", action = w.action({ MoveTab = 6 }) },
+		{ mods = "LEADER", key = "8", action = w.action({ MoveTab = 7 }) },
+		{ mods = "LEADER", key = "9", action = w.action({ MoveTab = 8 }) },
 
-		{ key = "c", mods = "LEADER", action = w.action({ SpawnTab = "CurrentPaneDomain" }) },
-		{ key = "&", mods = "LEADER|SHIFT", action = w.action({ CloseCurrentTab = { confirm = true } }) },
-		{ key = "d", mods = "LEADER", action = w.action({ CloseCurrentPane = { confirm = true } }) },
-		{ key = "x", mods = "LEADER", action = w.action({ CloseCurrentPane = { confirm = true } }) },
+		-- map a tab
+		{ mods = "LEADER", key = "c", action = w.action({ SpawnTab = "CurrentPaneDomain" }) },
+		-- close a tab
+		{ mods = "LEADER|SHIFT", key = "&", action = w.action({ CloseCurrentTab = { confirm = true } }) },
+
+		-- close current pane
+		{ mods = "LEADER", key = "d", action = w.action({ CloseCurrentPane = { confirm = true } }) },
+		{ mods = "LEADER", key = "x", action = w.action({ CloseCurrentPane = { confirm = true } }) },
 
 		-- move between split panes
 		split_nav("move", "h"),
