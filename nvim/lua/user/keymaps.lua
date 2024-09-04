@@ -1,6 +1,5 @@
-local uu = require('user.utils')
-local map = uu.map
-local nmap = uu.nmap
+local map = require('user.utils').map
+local nmap = require('user.utils').nmap
 
 -- Make sure Space is not mapped to anything, used as leader key
 map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
