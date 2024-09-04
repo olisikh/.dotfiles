@@ -1,16 +1,8 @@
 local telescope_builtin = require('telescope.builtin')
 local cmp_lsp = require('cmp_nvim_lsp')
 
-local uu = require('user.utils')
-local nmap = uu.nmap
-local map = uu.map
-
----Toggle inlay hints
----@param bufnr integer buffer num
----@param enable boolean
-local function toggle_inlay_hints(bufnr, enable)
-  vim.lsp.inlay_hint.enable(enable, { bufnr = bufnr })
-end
+local nmap = require('user.utils').nmap
+local map = require('user.utils').map
 
 local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -64,13 +56,13 @@ function M.on_attach(client, bufnr, init_opts)
 
   if server_capabilities.inlayHintProvider then
     nmap('<leader>ci', function()
-      toggle_inlay_hints(bufnr, not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }))
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
     end, { desc = 'lsp: toggle inlay hints (buffer)' })
 
     nmap('<leader>cI', ':ToggleInlayHints<cr>', { desc = 'lsp: toggle inlay hints (global)' })
 
     -- disable inlay hints by default
-    toggle_inlay_hints(0, vim.g.inlay_hints)
+    vim.lsp.inlay_hint.enable(vim.g.inlay_hints)
   end
 
   if server_capabilities.definitionProvider then
@@ -102,7 +94,7 @@ function M.on_attach(client, bufnr, init_opts)
 
     vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
       callback = function()
-        vim.lsp.codelens.refresh({ bufnr = bufnr })
+        vim.lsp.codelens.refresh()
       end,
       buffer = bufnr,
       group = lsp_group,

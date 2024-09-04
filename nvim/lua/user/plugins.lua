@@ -216,9 +216,6 @@ require('lazy').setup({
     'zbirenbaum/copilot.lua',
     event = 'InsertEnter',
     cmd = 'Copilot',
-    keys = {
-      { '<leader>ig', ':CopilotToggle<cr>', desc = 'copilot: Toggle Github copilot' },
-    },
     config = function()
       require('copilot').setup({
         suggestion = {
@@ -227,31 +224,6 @@ require('lazy').setup({
       })
     end,
   },
-
-  -- unofficial Codeium plugin
-  -- {
-  --   'Exafunction/codeium.nvim',
-  --   event = 'InsertEnter',
-  --   opts = {
-  --     enable_chat = true,
-  --   },
-  -- },
-
-  -- {
-  --   'zbirenbaum/copilot-cmp',
-  --   event = 'InsertEnter',
-  --   opts = {},
-  --   dependencies = {
-  --     {
-  --       'zbirenbaum/copilot.lua',
-  --       opts = {
-  --         -- author suggests to disable panel and suggestion if cmp plugin is used
-  --         suggestion = { enabled = false },
-  --         panel = { enabled = false },
-  --       },
-  --     },
-  --   },
-  -- },
 
   -- lualine copilot status
   { 'jonahgoldwastaken/copilot-status.nvim', lazy = true, event = 'BufReadPost' },
