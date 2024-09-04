@@ -48,5 +48,9 @@ nmap('<S-Tab>', '<<', { noremap = true, silent = true })
 map('v', '<Tab>', '>gv', { noremap = true, silent = true })
 map('v', '<S-Tab>', '<gv', { noremap = true, silent = true })
 
+-- keep jump keymaps
+nmap("<C-i>", "<C-i>", { noremap = true })
+nmap("<C-o>", "<C-o>", { noremap = true })
+
 nmap('<leader>ig', ':CopilotToggle<cr>', { desc = 'copilot: Toggle Github copilot' })
 

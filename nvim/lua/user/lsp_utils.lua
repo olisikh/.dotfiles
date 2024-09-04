@@ -125,6 +125,10 @@ function M.on_attach(client, bufnr, init_opts)
     map({ 'n', 'v' }, 'Q', vim.lsp.buf.signature_help, { desc = 'lsp: signature help' })
   end
 
+  if server_capabilities.hoverProvider then
+    map({ 'n', 'v' }, 'K', vim.lsp.buf.hover, { desc = 'lsp: hover' })
+  end
+
   if server_capabilities.documentHighlightProvider then
     vim.api.nvim_create_autocmd('CursorHold', {
       callback = function()
