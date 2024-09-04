@@ -68,6 +68,9 @@ opt('o', 'tabstop', 2)
 opt('o', 'shiftwidth', 2)
 opt('o', 'expandtab', true)
 
+-- Forever remove tabs
+opt('o', 'showtabline', 0)
+
 -- Case insensitive searching UNLESS /C or capital in search
 opt('o', 'ignorecase', true)
 opt('o', 'smartcase', true)
