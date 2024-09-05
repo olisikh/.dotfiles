@@ -118,7 +118,7 @@ function M.on_attach(client, bufnr, init_opts)
   end
 
   if server_capabilities.hoverProvider then
-    map({ 'n', 'v' }, 'K', vim.lsp.buf.hover, { desc = 'lsp: hover' })
+    nmap('K', vim.lsp.buf.hover, { desc = 'lsp: hover' })
   end
 
   if server_capabilities.documentHighlightProvider then
