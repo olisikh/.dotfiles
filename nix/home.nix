@@ -21,6 +21,8 @@ in
     ./direnv
   ];
 
+  # nixpkgs.overlays = [ (import ./overlays) ];
+
   home = {
     username = user;
     homeDirectory = "/Users/${user}";
@@ -50,7 +52,7 @@ in
       terraform
       yarn
       go
-      jdk17
+      jdk
       kafkactl
       awscli2
       kcat
@@ -59,8 +61,10 @@ in
       htop
       pngpaste
       nodejs
-      (sbt.override { jre = jdk17; })
-      (metals.override { jre = jdk17; })
+      (scala-cli.override { jre = jdk; })
+      (scala.override { jre = jdk; })
+      (sbt.override { jre = jdk; })
+      (metals.override { jre = jdk; })
       xdg-utils # open apps from console/neovim
       arc-browser
       wezterm
@@ -143,7 +147,8 @@ in
     ];
 
     sessionVariables = {
-      JAVA_HOME = pkgs.jdk17;
+      SCALA_HOME = pkgs.scala;
+      JAVA_HOME = pkgs.jdk;
       THEME_STYLE = themeStyle;
       OBSIDIAN_VAULT = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
     };
