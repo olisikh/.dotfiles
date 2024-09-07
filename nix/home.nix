@@ -2,6 +2,8 @@
 let
   user = "olisikh";
   themeStyle = "mocha";
+
+  bloop = (import <nixpkgs> { system = "x86_64-darwin"; }).bloop;
 in
 {
   imports = [
@@ -21,7 +23,7 @@ in
     ./direnv
   ];
 
-  # nixpkgs.overlays = [ (import ./overlays) ];
+  nixpkgs.overlays = [ (import ./overlays) ];
 
   home = {
     username = user;
@@ -61,8 +63,9 @@ in
       htop
       pngpaste
       nodejs
-      (scala-cli.override { jre = jdk; })
+      (bloop.override { jre = jdk; })
       (scala.override { jre = jdk; })
+      (scala-cli.override { jre = jdk; })
       (sbt.override { jre = jdk; })
       (metals.override { jre = jdk; })
       xdg-utils # open apps from console/neovim
@@ -76,7 +79,7 @@ in
         debugpy
       ]))
 
-      (pkgs.writeShellScriptBin "home" ''
+      (writeShellScriptBin "home" ''
         #!/bin/bash
 
         # Function to display help message
@@ -93,7 +96,7 @@ in
 
         # Function to perform 'home make'
         home_make() {
-            home-manager switch --flake ~/.dotfiles#home --impure
+            home-manager switch --flake ~/.dotfiles#home --impure "$@"
         }
 
         # Function to perform 'home update'
@@ -118,9 +121,13 @@ in
 
         # Main function to handle input and execute corresponding action
         main() {
-            case "$1" in
+            # shift
+            item="$1"
+            shift
+
+            case "$item" in
                 make)
-                    home_make
+                    home_make "$@"
                     ;;
                 update)
                     home_update
