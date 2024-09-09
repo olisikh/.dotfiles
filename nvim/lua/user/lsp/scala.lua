@@ -46,24 +46,34 @@ M.setup = function(group, capabilities)
         map('v', '<leader>mt', function()
           metals.type_of_range()
         end, { desc = 'metals: see type of range' })
+
         nmap('<leader>mw', function()
           metals.hover_worksheet({ border = 'single' })
         end, { desc = 'metals: hover worksheet' })
+
         nmap('<leader>mv', function()
           metals_tvp.toggle_tree_view()
         end, { desc = 'metals: toggle tree view' })
+
         nmap('<leader>mr', function()
           metals_tvp.reveal_in_tree()
         end, { desc = 'metals: reveal in tree' })
+
         nmap('<leader>mi', function()
           metals.toggle_setting('showImplicitArguments')
         end, { desc = 'metals: show implicit args' })
+
         nmap('<leader>mc', function()
           require('telescope').extensions.metals.commands()
         end, { desc = 'metals: open commands' })
+
+        nmap('<leader>mf', function()
+          metals.run_scalafix()
+        end, { desc = 'metals: scalafix' })
+
         nmap('<leader>co', function()
           metals.organize_imports()
-        end, { desc = 'lsp: [o]rganise imports' })
+        end, { desc = 'metals: [o]rganise imports' })
 
         -- nvim-dap
         dap.configurations.scala = {

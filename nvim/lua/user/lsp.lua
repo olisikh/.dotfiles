@@ -10,7 +10,7 @@ local servers = {
   dockerls = {},
   helm_ls = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     -- NOTE: Configuration: https://github.com/mrjosh/helm-ls?tab=readme-ov-file#nvim-lspconfig-setup
     settings = {
@@ -27,7 +27,7 @@ local servers = {
   bashls = {},
   yamlls = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     -- NOTE: Configuration https://github.com/redhat-developer/yaml-language-server
     settings = {
@@ -51,7 +51,7 @@ local servers = {
   },
   pyright = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     settings = {
       python = {
@@ -65,7 +65,7 @@ local servers = {
   },
   gopls = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     settings = {
       gopls = {
@@ -84,7 +84,7 @@ local servers = {
   },
   tsserver = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     settings = {
       javascript = {
@@ -116,7 +116,7 @@ local servers = {
   jsonls = {},
   lua_ls = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     settings = {
       Lua = {
@@ -137,7 +137,7 @@ local servers = {
   },
   nil_ls = {
     init_opts = {
-      format_null_ls = true,
+      no_fmt = true,
     },
     settings = {
       ['nil'] = {

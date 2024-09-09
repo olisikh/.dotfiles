@@ -21,7 +21,7 @@ function M.on_attach(client, bufnr, init_opts)
   local server_capabilities = client.server_capabilities or {}
 
   if init_opts then
-    if init_opts.format_null_ls then
+    if init_opts.no_fmt then
       -- force formatting via none-ls if LSP formatting is not supported,
       -- but LSP client might still say otherwise
       server_capabilities.documentFormattingProvider = false
@@ -42,7 +42,7 @@ function M.on_attach(client, bufnr, init_opts)
   if server_capabilities.documentFormattingProvider then
     nmap('F', function()
       vim.lsp.buf.format()
-    end, { desc = 'lsp: [c]ode [f]ormat' })
+    end, { desc = 'lsp: [f]ormat' })
   end
 
   if server_capabilities.documentRangeFormattingProvider then

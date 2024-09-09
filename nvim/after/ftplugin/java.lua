@@ -1,5 +1,5 @@
 -- NOTE: Inspired by: https://github.com/Alexis12119/nvim-config/blob/main/ftplugin/java.lua
-
+local jdtls = require('jdtls')
 local nmap = require('user.utils').nmap
 
 local mason_registry = require('mason-registry')
@@ -92,7 +92,7 @@ local config = {
     },
 
     signatureHelp = { enabled = true },
-    extendedClientCapabilities = require('jdtls').extendedClientCapabilities,
+    extendedClientCapabilities = jdtls.extendedClientCapabilities,
     sources = {
       organizeImports = {
         starThreshold = 9999,
@@ -105,13 +105,24 @@ local config = {
   },
 }
 
-local bufnr = vim.api.nvim_get_current_buf()
+nmap('<leader>jv', function()
+  jdtls.extract_variable()
+end, { desc = 'jdtls: extract [v]ariable' })
 
-nmap('<leader>co', ":lua require'jdtls'.organize_imports()<cr>", { buffer = bufnr, desc = 'lsp: [o]rganize imports' })
-nmap('<leader>cv', ":lua require'jdtls'.extract_variable()<cr>", { buffer = bufnr, desc = 'lsp: extract [v]ariable' })
-nmap('<leader>cm', ":lua require'jdtls'.extract_method()<cr>", { buffer = bufnr, desc = 'lsp: extract [m]ethod' })
-nmap('<leader>cc', ":lua require'jdtls'.extract_constant()<cr>", { buffer = bufnr, desc = 'lsp: extract [c]onstant' })
+nmap('<leader>jm', function()
+  jdtls.extract_method()
+end, { desc = 'jdtls: extract [m]ethod' })
 
-nmap('<leader>jt', ":lua require'jdtls'.pick_test()<cr>", { buffer = bufnr, desc = 'lsp: run [t]est' })
+nmap('<leader>jc', function()
+  jdtls.extract_constant()
+end, { desc = 'jdtls: extract [c]onstant' })
 
-require('jdtls').start_or_attach(config)
+nmap('<leader>jt', function()
+  jdtls.pick_test()
+end, { desc = 'jdtls: run [t]est' })
+
+nmap('<leader>co', function()
+  jdtls.organize_imports()
+end, { desc = 'jdtls: [o]rganize imports' })
+
+jdtls.start_or_attach(config)
