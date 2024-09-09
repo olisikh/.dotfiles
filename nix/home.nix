@@ -7,12 +7,8 @@ let
 in
 {
   imports = [
-    (import ./zsh {
-      inherit themeStyle;
-    })
-    (import ./fzf {
-      inherit themeStyle;
-    })
+    (import ./zsh { inherit themeStyle; })
+    (import ./fzf { inherit themeStyle; })
     ./zoxide
     ./wezterm
     ./ripgrep

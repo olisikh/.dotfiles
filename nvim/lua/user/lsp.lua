@@ -82,7 +82,7 @@ local servers = {
       },
     },
   },
-  tsserver = {
+  ts_ls = {
     init_opts = {
       no_fmt = true,
     },

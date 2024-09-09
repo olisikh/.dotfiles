@@ -231,10 +231,16 @@ require('lazy').setup({
   -- discipline
   {
     'm4xshen/hardtime.nvim',
-    dependencies = { 'MunifTanjim/nui.nvim', 'nvim-lua/plenary.nvim' },
+    dependencies = { 'MunifTanjim/nui.nvim' },
     opts = {},
   },
 
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    ft = 'markdown',
+    lazy = true,
+    opts = {},
+  },
   {
     'epwalsh/obsidian.nvim',
     version = '*', -- recommended, use latest release instead of latest commit
@@ -247,12 +253,6 @@ require('lazy').setup({
     --   "BufReadPre path/to/my-vault/**.md",
     --   "BufNewFile path/to/my-vault/**.md",
     -- },
-    dependencies = {
-      -- Required.
-      'nvim-lua/plenary.nvim',
-
-      -- see below for full list of optional dependencies 👇
-    },
   },
 
   -- detect tabstop and shiftwidth automatically
@@ -291,7 +291,7 @@ require('lazy').setup({
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
-    ft = { 'markdown' },
+    ft = 'markdown',
     build = function()
       vim.fn['mkdp#util#install']()
     end,
