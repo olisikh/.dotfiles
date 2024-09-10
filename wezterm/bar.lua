@@ -177,7 +177,6 @@ local powerline_padding = 2
 wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
 	local colors = conf.resolved_palette.tab_bar
 
-
 	local active_tab_index = 0
 	for _, t in ipairs(tabs) do
 		if t.is_active == true then
