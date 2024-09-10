@@ -207,6 +207,8 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	local inactive_fg = colors.inactive_tab.fg_color
 	local bar_bg = colors.background
 
+	local is_last_tab = (tab.tab_index == #tabs - 1)
+
 	local s_bg, s_fg, e_bg, e_fg
 
 	if tab.tab_index == active_tab_index - 1 then
@@ -217,12 +219,12 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	elseif tab.is_active then
 		s_bg = active_bg
 		s_fg = active_fg
-		e_bg = (tab.tab_index == #tabs - 1) and bar_bg or inactive_bg
+		e_bg = is_last_tab and bar_bg or inactive_bg
 		e_fg = active_bg
 	else
 		s_bg = inactive_bg
 		s_fg = inactive_fg
-		e_bg = bar_bg
+		e_bg = is_last_tab and bar_bg or inactive_bg
 		e_fg = inactive_bg
 	end
 
