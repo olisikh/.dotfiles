@@ -7,10 +7,22 @@ local theme_style = utils.capitalize(os.getenv("THEME_STYLE") or "Mocha")
 local w = require("wezterm")
 local c = w.config_builder()
 
+local bg_opacity = 0.8
+
 c.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 c.font_size = 14.0
 c.hide_tab_bar_if_only_one_tab = false
+c.window_background_opacity = bg_opacity
+c.macos_window_background_blur = 10
+
 c.color_scheme = "Catppuccin " .. theme_style
+c.colors = {
+	tab_bar = {
+		-- TODO: how to access catppuccin palette, take the color and apply opacity?
+		-- catppuccin mocha background
+		background = "rgba(30, 30, 46," .. bg_opacity .. ")",
+	},
+}
 
 c.keys = {
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word

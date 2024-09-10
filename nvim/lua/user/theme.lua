@@ -5,8 +5,10 @@ local themeStyle = vim.fn.getenv('THEME_STYLE')
 require('catppuccin').setup({
   compile_path = vim.fn.stdpath('cache') .. '/catppuccin',
   dim_inactive = {
-    enabled = true,
+    enabled = false,
   },
+  transparent_background = true,
+  default_integrations = true,
   integrations = {
     fidget = true,
     cmp = true,
@@ -54,20 +56,6 @@ require('catppuccin').setup({
 local function copilot_status()
   return require('copilot_status').status_string()
 end
-
--- local function codeium_status()
---   local codeium = require('cmp').core:get_sources(function(source)
---     return source.name == 'codeium'
---   end)[1]
---
---   if codeium == nil then
---     return ' '
---   elseif codeium.status == 2 then
---     return ' '
---   else
---     return '󰘦 '
---   end
--- end
 
 require('lualine').setup({
   options = {

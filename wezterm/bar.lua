@@ -175,7 +175,8 @@ local powerline_padding = 2
 
 -- custom tab bar
 wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
-	local colours = conf.resolved_palette.tab_bar
+	local colors = conf.resolved_palette.tab_bar
+
 
 	local active_tab_index = 0
 	for _, t in ipairs(tabs) do
@@ -184,7 +185,7 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		end
 	end
 
-	local default_colours = {
+	local default_colors = {
 		conf.resolved_palette.ansi[2],
 		conf.resolved_palette.indexed[16],
 		conf.resolved_palette.ansi[4],
@@ -193,35 +194,36 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		conf.resolved_palette.ansi[6],
 	}
 
-	local tab_colours
-	if config.tabs.colours and #config.tabs.colours > 0 then
-		tab_colours = config.tabs.colours
+	local tab_colors
+	if config.tabs.colors and #config.tabs.colors > 0 then
+		tab_colors = config.tabs.colors
 	else
-		tab_colours = default_colours
+		tab_colors = default_colors
 	end
 
-	local i = tab.tab_index % #tab_colours
-	local active_bg = tab_colours[i + 1]
-	local active_fg = colours.background
-	local inactive_bg = colours.inactive_tab.bg_color
-	local inactive_fg = colours.inactive_tab.fg_color
+	local i = tab.tab_index % #tab_colors
+	local active_bg = tab_colors[i + 1]
+	local active_fg = colors.background
+	local inactive_bg = colors.inactive_tab.bg_color
+	local inactive_fg = colors.inactive_tab.fg_color
+	local bar_bg = colors.background
 
 	local s_bg, s_fg, e_bg, e_fg
 
 	if tab.tab_index == active_tab_index - 1 then
 		s_bg = inactive_bg
 		s_fg = inactive_fg
-		e_bg = tab_colours[(i + 1) % #tab_colours + 1]
+		e_bg = tab_colors[(i + 1) % #tab_colors + 1]
 		e_fg = inactive_bg
 	elseif tab.is_active then
 		s_bg = active_bg
 		s_fg = active_fg
-		e_bg = inactive_bg
+		e_bg = (tab.tab_index == #tabs - 1) and bar_bg or inactive_bg
 		e_fg = active_bg
 	else
 		s_bg = inactive_bg
 		s_fg = inactive_fg
-		e_bg = inactive_bg
+		e_bg = bar_bg
 		e_fg = inactive_bg
 	end
 
