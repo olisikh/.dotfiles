@@ -20,7 +20,7 @@ end
 
 -- See `:help vim.o`
 -- Highlight cursor line
-opt('o', 'cursorline', true)
+opt('o', 'cursorline', false)
 -- Set line width marker at 120 characters per line
 opt('opt', 'colorcolumn', '121')
 -- Keep cursor always in the middle when possible

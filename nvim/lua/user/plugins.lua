@@ -125,7 +125,17 @@ require('lazy').setup({
   { 'towolf/vim-helm', ft = 'helm' },
 
   -- Status updates for LSP showing on the right
-  { 'j-hui/fidget.nvim', opts = {} },
+  {
+    'j-hui/fidget.nvim',
+    opts = {
+      -- disable black background, good for transparent background
+      notification = {
+        window = {
+          winblend = 0,
+        },
+      },
+    },
+  },
 
   -- Highlight color strings
   { 'norcalli/nvim-colorizer.lua', opts = {} },

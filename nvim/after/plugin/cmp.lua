@@ -55,9 +55,9 @@ cmp.setup({
         return require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
       end,
     },
+    { name = 'nvim_lsp_signature_help' },
     { name = 'luasnip' },
     { name = 'crates' },
-    { name = 'nvim_lsp_signature_help' },
   },
   formatting = {
     format = lspkind.cmp_format({
