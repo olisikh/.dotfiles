@@ -34,6 +34,13 @@ M.setup = function(group, capabilities)
           'akka.stream.javadsl',
           'akka.http.javadsl',
         },
+        inlayHints = {
+          hintsInPatternMatch = { enable = true },
+          implicitArguments = { enable = true },
+          implicitConversions = { enable = true },
+          inferredTypes = { enable = true },
+          typeParameters = { enable = true },
+        },
       }
       metals_config.init_options = {
         statusBarProvider = 'off',
