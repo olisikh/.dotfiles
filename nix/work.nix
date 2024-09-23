@@ -47,7 +47,8 @@ in
       minikube
       kubernetes-helm
       terraform
-      yarn
+      nodejs
+      (yarn.override { nodejs = nodejs; })
       go
       jdk17
       kafkactl
