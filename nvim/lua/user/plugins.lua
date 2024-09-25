@@ -315,6 +315,7 @@ require('lazy').setup({
       'nvim-neotest/neotest-plenary',
       'nvim-neotest/neotest-go',
       'nvim-neotest/neotest-python',
+      'marilari88/neotest-vitest',
       { 'olisikh/neotest-scala', dev = true },
     },
   },

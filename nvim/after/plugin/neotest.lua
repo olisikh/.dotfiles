@@ -36,6 +36,7 @@ neotest.setup({
         end
       end,
     }),
+    require('neotest-vitest'),
   },
   diagnostic = {
     enabled = true,
