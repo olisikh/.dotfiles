@@ -31,7 +31,7 @@ require('null-ls').setup({
   },
   on_attach = function(client)
     if client.server_capabilities.documentFormattingProvider then
-      nmap('F', function()
+      nmap('<leader>cf', function()
         vim.lsp.buf.format()
       end, { desc = 'lsp: [c]ode [f]ormat' })
     end
