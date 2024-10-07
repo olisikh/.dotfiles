@@ -67,8 +67,21 @@ require('lualine').setup({
     },
     lualine_x = {
       'harpoon2',
-      -- codeium_status,
       copilot_status,
+      {
+        function()
+          local status = require('ollama').status()
+
+          if status == 'WORKING' then
+            return '󱚤 ' -- nf-md-robot
+          elseif status == 'IDLE' then
+            return '󱙻 ' -- nf-md-robot_off_outline
+          end
+        end,
+        cond = function()
+          return package.loaded['ollama'] and require('ollama').status() ~= nil
+        end,
+      },
       'encoding',
       'filetype',
     },

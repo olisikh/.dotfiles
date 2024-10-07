@@ -75,6 +75,7 @@ in
         pytest
         debugpy
       ]))
+      ollama
 
       (writeShellScriptBin "home" ''
         #!/bin/bash

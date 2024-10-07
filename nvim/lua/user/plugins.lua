@@ -235,6 +235,35 @@ require('lazy').setup({
     end,
   },
 
+  -- ollama https://github.com/nomnivore/ollama.nvim
+  {
+    'nomnivore/ollama.nvim',
+    cmd = { 'Ollama', 'OllamaModel', 'OllamaServe', 'OllamaServeStop' },
+    keys = {
+      {
+        '<leader>ip',
+        ":<c-u>lua require('ollama').prompt()<cr>",
+        desc = 'ollama: select prompt',
+        mode = { 'n', 'v' },
+      },
+      {
+        '<leader>il',
+        function()
+          local status = require('ollama').status()
+          if status == 'IDLE' then
+            require('ollama').run_serve()
+          else
+            require('ollama').serve_stop()
+          end
+        end,
+        desc = 'ollama: toggle serve',
+        mode = 'n',
+      },
+    },
+    ---@type Ollama.Config
+    opts = {},
+  },
+
   -- lualine copilot status
   { 'jonahgoldwastaken/copilot-status.nvim', lazy = true, event = 'BufReadPost' },
 
