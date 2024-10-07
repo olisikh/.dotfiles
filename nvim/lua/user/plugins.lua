@@ -253,7 +253,7 @@ require('lazy').setup({
           if status == 'IDLE' then
             require('ollama').run_serve()
           else
-            require('ollama').serve_stop()
+            require('ollama').stop_serve()
           end
         end,
         desc = 'ollama: toggle serve',
@@ -261,7 +261,9 @@ require('lazy').setup({
       },
     },
     ---@type Ollama.Config
-    opts = {},
+    opts = {
+      model = 'codestral',
+    },
   },
 
   -- lualine copilot status
