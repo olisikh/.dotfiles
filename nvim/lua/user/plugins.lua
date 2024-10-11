@@ -48,10 +48,20 @@ require('lazy').setup({
     -- setting the keybinding for LazyGit with 'keys' is recommended in
     -- order to load the plugin when the command is run for the first time
     keys = {
-      { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'lazygit: Open [l]azygit' },
-      { '<leader>lc', '<cmd>LazyGitCurrentFile<cr>', desc = 'lazygit: [c]urrent file' },
-      { '<leader>lf', '<cmd>LazyGitFilter<cr>', desc = 'lazygit: [f]ilter' },
-      { '<leader>lF', '<cmd>LazyGitFilterCurrentFile<cr>', desc = 'lazygit: [F]ilter current file' },
+      { '<leader>gg', '<cmd>LazyGit<cr>', desc = 'git: Open [l]azygit' },
+      { '<leader>gc', '<cmd>LazyGitCurrentFile<cr>', desc = 'git: [c]urrent file' },
+      { '<leader>gf', '<cmd>LazyGitFilter<cr>', desc = 'git: [f]ilter' },
+      { '<leader>gF', '<cmd>LazyGitFilterCurrentFile<cr>', desc = 'git: [F]ilter current file' },
+    },
+  },
+
+  -- git blame plugin
+  {
+    'FabijanZulj/blame.nvim',
+    cmd = { 'BlameToggle' },
+    opts = {},
+    keys = {
+      { '<leader>gb', '<cmd>BlameToggle<cr>', desc = 'git: [b]lame window' },
     },
   },
 
