@@ -49,9 +49,9 @@ require('lazy').setup({
     -- order to load the plugin when the command is run for the first time
     keys = {
       { '<leader>gg', '<cmd>LazyGit<cr>', desc = 'git: Open [l]azygit' },
-      { '<leader>gc', '<cmd>LazyGitCurrentFile<cr>', desc = 'git: [c]urrent file' },
-      { '<leader>gf', '<cmd>LazyGitFilter<cr>', desc = 'git: [f]ilter' },
-      { '<leader>gF', '<cmd>LazyGitFilterCurrentFile<cr>', desc = 'git: [F]ilter current file' },
+      { '<leader>gf', '<cmd>LazyGitCurrentFile<cr>', desc = 'git: [c]urrent file' },
+      -- { '<leader>gf', '<cmd>LazyGitFilter<cr>', desc = 'git: [f]ilter' },
+      -- { '<leader>gF', '<cmd>LazyGitFilterCurrentFile<cr>', desc = 'git: [F]ilter current file' },
     },
   },
 
@@ -252,27 +252,22 @@ require('lazy').setup({
     keys = {
       {
         '<leader>ip',
-        ":<c-u>lua require('ollama').prompt()<cr>",
-        desc = 'ollama: select prompt',
+        ':<c-u>lua require("ollama").prompt()<cr>',
         mode = { 'n', 'v' },
+        desc = 'ollama: select prompt',
       },
       {
-        '<leader>il',
-        function()
-          local status = require('ollama').status()
-          if status == 'IDLE' then
-            require('ollama').run_serve()
-          else
-            require('ollama').stop_serve()
-          end
-        end,
-        desc = 'ollama: toggle serve',
+        '<leader>im',
+        ':OllamaModel<cr>',
         mode = 'n',
+        desc = 'ollama: choose model',
       },
     },
-    ---@type Ollama.Config
     opts = {
       model = 'codestral',
+      serve = {
+        on_start = true, -- start ollama server on plugin load
+      },
     },
   },
 

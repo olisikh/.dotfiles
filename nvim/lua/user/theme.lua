@@ -70,12 +70,16 @@ require('lualine').setup({
       copilot_status,
       {
         function()
+          -- nf-md-robot hacker font icon
           local status = require('ollama').status()
+          if not status then
+            return '󱙻 '
+          end
 
           if status == 'WORKING' then
-            return '󱚤 ' -- nf-md-robot
-          elseif status == 'IDLE' then
-            return '󱙻 ' -- nf-md-robot_off_outline
+            return '󱚣 '
+          else
+            return '󱙺 '
           end
         end,
         cond = function()
