@@ -58,8 +58,7 @@ in
       stern # kubectl pod log scraping tool
       htop
       pngpaste
-      (scala.override { jre = jdk17; })
-      (scala-cli.override { jre = jdk17; })
+      (scala-next.override { jre = jdk17; })
       (sbt.override { jre = jdk17; })
       (metals.override { jre = jdk17; })
       xdg-utils # open apps from console/neovim

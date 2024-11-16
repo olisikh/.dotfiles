@@ -60,9 +60,8 @@ in
       htop
       pngpaste
       nodejs
+      scala-next # latest Scala (currently Scala 3 with bundled in Scala CLI)
       (bloop.override { jre = jdk; })
-      (scala.override { jre = jdk; })
-      (scala-cli.override { jre = jdk; })
       (sbt.override { jre = jdk; })
       (metals.override { jre = jdk; })
       xdg-utils # open apps from console/neovim
@@ -153,6 +152,7 @@ in
 
     sessionVariables = {
       SCALA_HOME = pkgs.scala;
+      SCALA_CLI_POWER = "true";
       JAVA_HOME = pkgs.jdk;
       THEME_STYLE = themeStyle;
       OBSIDIAN_VAULT = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
