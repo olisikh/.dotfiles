@@ -1,8 +1,9 @@
-{ ... }:
+{ lib, ... }:
 let
-  # TODO: pass name and email as arguments to the module instead
+  # TODO: pass all these as arguments to the module instead of env vars
   userName = builtins.getEnv "GIT_NAME";
   userEmail = builtins.getEnv "GIT_EMAIL";
+  signingKey = builtins.getEnv "GIT_SIGNING_KEY";
 in
 {
   programs.git = {
@@ -23,6 +24,11 @@ in
       init = {
         defaultBranch = "main";
       };
+    };
+  } // lib.optionalAttrs (!(builtins.isNull signingKey)) {
+    signing = {
+      key = signingKey;
+      signByDefault = true;
     };
   };
 }

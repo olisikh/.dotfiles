@@ -44,6 +44,8 @@ in
       tree-sitter
       luarocks-nix
       docker
+      colima
+      qemu
       minikube
       kubernetes-helm
       terraform
@@ -58,12 +60,13 @@ in
       stern # kubectl pod log scraping tool
       htop
       pngpaste
-      (scala-next.override { jre = jdk17; })
+      scala-next
       (sbt.override { jre = jdk17; })
       (metals.override { jre = jdk17; })
       xdg-utils # open apps from console/neovim
       wezterm
       lazygit
+      gnupg # tool for generating GPG keys
       watch
       rover
       (python3.withPackages (ps: with ps; [
