@@ -1,14 +1,16 @@
 { pkgs, ... }:
 let
   user = "olisikh";
-  themeStyle = "mocha";
 
-  bloop = (import <nixpkgs> { system = "x86_64-darwin"; }).bloop;
+  ipkgs = import <nixpkgs> { system = "x86_64-darwin"; };
+  bloop = ipkgs.bloop;
+  jdk = pkgs.jdk17;
+  scala = pkgs.scala-next;
 in
 {
   imports = [
-    (import ./zsh { inherit themeStyle; })
-    (import ./fzf { inherit themeStyle; })
+    ./zsh
+    ./fzf
     ./zoxide
     ./wezterm
     ./ripgrep
@@ -75,6 +77,7 @@ in
         debugpy
       ]))
       ollama
+      obsidian
 
       (writeShellScriptBin "home" ''
         #!/bin/bash
@@ -151,10 +154,9 @@ in
     ];
 
     sessionVariables = {
-      SCALA_HOME = pkgs.scala;
+      SCALA_HOME = scala;
       SCALA_CLI_POWER = "true";
-      JAVA_HOME = pkgs.jdk;
-      THEME_STYLE = themeStyle;
+      JAVA_HOME = jdk;
       OBSIDIAN_VAULT = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
     };
   };

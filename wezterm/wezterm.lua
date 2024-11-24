@@ -1,8 +1,7 @@
-local utils = require("utils")
 local bar = require("bar")
 local nav = require("nav")
 
-local theme_style = utils.capitalize(os.getenv("THEME_STYLE") or "Mocha")
+local theme_style = "Mocha"
 
 local w = require("wezterm")
 local c = w.config_builder()

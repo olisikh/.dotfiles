@@ -1,16 +1,13 @@
 { pkgs, ... }:
 let
   user = "O.Lisikh";
-  themeStyle = "mocha";
+  jdk = pkgs.jdk17;
+  scala = pkgs.scala-next;
 in
 {
   imports = [
-    (import ./zsh {
-      inherit themeStyle;
-    })
-    (import ./fzf {
-      inherit themeStyle;
-    })
+    ./zsh 
+    ./fzf 
     ./zoxide
     ./wezterm
     ./ripgrep
@@ -52,7 +49,7 @@ in
       nodejs
       (yarn.override { nodejs = nodejs; })
       go
-      jdk17
+      jdk
       kafkactl
       awscli2
       kcat
@@ -60,9 +57,9 @@ in
       stern # kubectl pod log scraping tool
       htop
       pngpaste
-      scala-next
-      (sbt.override { jre = jdk17; })
-      (metals.override { jre = jdk17; })
+      scala
+      (sbt.override { jre = jdk; })
+      (metals.override { jre = jdk; })
       xdg-utils # open apps from console/neovim
       wezterm
       lazygit
@@ -146,8 +143,8 @@ in
     ];
 
     sessionVariables = {
-      SCALA_HOME = pkgs.scala;
-      JAVA_HOME = pkgs.jdk17;
+      SCALA_HOME = scala;
+      JAVA_HOME = jdk;
     };
   };
 

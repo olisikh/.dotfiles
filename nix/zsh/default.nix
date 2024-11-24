@@ -1,4 +1,4 @@
-{ themeStyle, ... }: { lib, config, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 {
   home.file = {
     ".config/zsh/catppuccin".source = pkgs.fetchFromGitHub {
@@ -25,7 +25,7 @@
     initExtra =
       #bash
       ''
-        source $HOME/.config/zsh/catppuccin/themes/catppuccin_${themeStyle}-zsh-syntax-highlighting.zsh
+        source $HOME/.config/zsh/catppuccin/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
         eval "$(kafkactl completion zsh)"
 
         # Preferred editor for local and remote sessions

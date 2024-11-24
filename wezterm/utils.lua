@@ -3,10 +3,6 @@ local nf = w.nerdfonts
 
 local M = {}
 
-function M.capitalize(s)
-	return s:sub(1, 1):upper() .. s:sub(2):lower()
-end
-
 function M.table_merge(t1, t2)
 	for k, v in pairs(t2) do
 		if type(v) == "table" then
