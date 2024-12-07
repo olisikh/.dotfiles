@@ -3,11 +3,12 @@ let
   user = "O.Lisikh";
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
+  homeDir = "/Users/${user}";
 in
 {
   imports = [
-    ./zsh 
-    ./fzf 
+    ./zsh
+    ./fzf
     ./zoxide
     ./wezterm
     ./ripgrep
@@ -20,7 +21,7 @@ in
 
   home = {
     username = user;
-    homeDirectory = "/Users/${user}";
+    homeDirectory = homeDir;
 
     stateVersion = "22.11";
 
@@ -41,6 +42,7 @@ in
       tree-sitter
       luarocks-nix
       docker
+      docker-compose
       colima
       qemu
       minikube
@@ -145,6 +147,8 @@ in
     sessionVariables = {
       SCALA_HOME = scala;
       JAVA_HOME = jdk;
+      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = /var/run/docker.sock;
+      DOCKER_HOST = "unix://${homeDir}/.colima/default/docker.sock";
     };
   };
 
