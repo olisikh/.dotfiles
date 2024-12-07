@@ -11,6 +11,11 @@ in
     userName = userName;
     userEmail = userEmail;
 
+    signing = lib.mkIf (signingKey != "") {
+      key = signingKey;
+      signByDefault = true;
+    };
+
     extraConfig = {
       core = {
         autocrlf = "input";
@@ -24,11 +29,6 @@ in
       init = {
         defaultBranch = "main";
       };
-    };
-  } // lib.optionalAttrs (!(builtins.isNull signingKey)) {
-    signing = {
-      key = signingKey;
-      signByDefault = true;
     };
   };
 }
