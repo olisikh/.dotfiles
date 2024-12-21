@@ -6,7 +6,7 @@ local theme_style = "Mocha"
 local w = require("wezterm")
 local c = w.config_builder()
 
-local bg_opacity = 0.85
+local bg_opacity = 1 -- 0.85
 
 c.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 c.font_size = 14.0

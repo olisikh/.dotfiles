@@ -1,6 +1,11 @@
 require('lazy').setup({
   -- catppuccin theme
-  { 'catppuccin/nvim', name = 'catppuccin', lazy = false, priority = 1000 },
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    lazy = false,
+    priority = 1000,
+  },
 
   -- statusline plugin
   'nvim-lualine/lualine.nvim',
@@ -96,18 +101,13 @@ require('lazy').setup({
     end,
   },
 
-  -- autocompletion (cmp), integration with lsp, ai, snippets, etc.
   {
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/vim-vsnip',
-      'hrsh7th/vim-vsnip-integ',
-      'hrsh7th/cmp-nvim-lsp-signature-help',
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-      'onsails/lspkind-nvim',
-    },
+    'saghen/blink.cmp',
+    -- optional: provides snippets for the snippet source
+    dependencies = { 'rafamadriz/friendly-snippets' },
+
+    -- use a release tag to download pre-built binaries
+    version = '*',
   },
 
   {

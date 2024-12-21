@@ -31,9 +31,10 @@ in
       nix-prefetch
       bash
       wget
-      (nerdfonts.override {
-        fonts = [ "Meslo" "JetBrainsMono" "FiraCode" "Hack" ];
-      })
+      nerd-fonts.meslo-lg
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.fira-code
+      nerd-fonts.hack
       fd
       eza
       jq

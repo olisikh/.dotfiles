@@ -1,10 +1,8 @@
 local utils = require('user.utils')
 
 local lsp_group = require('user.lsp_utils').lsp_group
-local capabilities = require('user.lsp_utils').capabilities
-
-vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded' })
-vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = 'rounded' })
+local capabilities = require('user.lsp_utils').lsp_capabilities
+local default_attach = require('user.lsp_utils').default_attach
 
 local servers = {
   dockerls = {},
@@ -184,7 +182,7 @@ mason_lspconfig.setup_handlers({
         capabilities = capabilities,
         settings = settings,
         on_attach = function(client, bufnr)
-          require('user.lsp_utils').on_attach(client, bufnr, init_opts)
+          default_attach(client, bufnr, init_opts)
         end,
       })
     end

@@ -1,23 +1,21 @@
 local telescope_builtin = require('telescope.builtin')
-local cmp_lsp = require('cmp_nvim_lsp')
+local blink_cmp = require('blink.cmp')
 
 local nmap = require('user.utils').nmap
 local map = require('user.utils').map
 
-local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-
 local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
+local lsp_capabilities = blink_cmp.get_lsp_capabilities()
 
 local M = {}
 
 M.lsp_group = lsp_group
-M.capabilities = capabilities
+M.lsp_capabilities = lsp_capabilities
 
 ---Sets up keymaps for LSP buffer
 ---@param client vim.lsp.Client
 ---@param bufnr integer buffer num
-function M.on_attach(client, bufnr, init_opts)
+function M.default_attach(client, bufnr, init_opts)
   local server_capabilities = client.server_capabilities or {}
 
   if init_opts then

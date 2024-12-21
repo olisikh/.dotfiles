@@ -7,11 +7,12 @@ require('catppuccin').setup({
   dim_inactive = {
     enabled = false,
   },
-  transparent_background = true,
+  transparent_background = false, -- NOTE: enable if terminal is transparent
   default_integrations = true,
   integrations = {
     fidget = true,
-    cmp = true,
+    cmp = false,
+    blink_cmp = true,
     gitsigns = true,
     nvimtree = true,
     neotest = true,
