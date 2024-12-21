@@ -47,7 +47,7 @@ M.setup = function(group, capabilities)
       }
       metals_config.capabilities = capabilities
       metals_config.on_attach = function(client, bufnr)
-        require('user.lsp_utils').on_attach(client, bufnr)
+        require('user.lsp_utils').default_attach(client, bufnr)
 
         -- Metals specific mappings
         map('v', '<leader>mt', function()

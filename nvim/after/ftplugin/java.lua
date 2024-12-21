@@ -64,7 +64,7 @@ local config = {
   },
 
   on_attach = function(client, bufnr)
-    require('user.lsp_utils').on_attach(client, bufnr)
+    require('user.lsp_utils').default_attach(client, bufnr)
   end,
   capabilities = require('user.lsp_utils').capabilities,
   -- 💀
