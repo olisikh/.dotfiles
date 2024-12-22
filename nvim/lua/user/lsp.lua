@@ -144,6 +144,11 @@ local servers = {
       },
     },
   },
+  kotlin_language_server = {
+    init_opts = {
+      no_fmt = false,
+    },
+  },
 }
 
 -- LSP servers that are configured by plugins
@@ -194,3 +199,4 @@ require('user.lsp.js').setup(lsp_group)
 require('user.lsp.go').setup(lsp_group)
 require('user.lsp.scala').setup(lsp_group, capabilities)
 require('user.lsp.rust').setup(lsp_group, capabilities)
+require('user.lsp.kotlin').setup(lsp_group, capabilities)

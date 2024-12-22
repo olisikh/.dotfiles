@@ -196,6 +196,7 @@ require('lazy').setup({
       { 'leoluz/nvim-dap-go' }, -- debug go
       { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
       { 'mfussenegger/nvim-dap-python' }, -- debug python
+      { 'Mgenuit/nvim-dap-kotlin' } -- debug kotlin
     },
   },
 

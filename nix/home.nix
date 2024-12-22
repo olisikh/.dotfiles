@@ -67,6 +67,8 @@ in
       (bloop.override { jre = jdk; })
       (sbt.override { jre = jdk; })
       (metals.override { jre = jdk; })
+      kotlin
+      gradle
       xdg-utils # open apps from console/neovim
       arc-browser
       wezterm

@@ -5,7 +5,7 @@ local nmap = require('user.utils').nmap
 local map = require('user.utils').map
 
 local lsp_group = vim.api.nvim_create_augroup('UserLsp', { clear = true })
-local lsp_capabilities = blink_cmp.get_lsp_capabilities()
+local lsp_capabilities = blink_cmp.get_lsp_capabilities({}, true)
 
 local M = {}
 

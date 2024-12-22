@@ -15,6 +15,7 @@ mason_dap.setup({
     'debugpy', -- python
     'java-debug-adapter',
     'java-test',
+    'kotlin-debug-adapter',
   },
   automatic_installation = false,
 })
