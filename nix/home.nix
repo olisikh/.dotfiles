@@ -16,9 +16,10 @@ in
     ./ripgrep
     ./starship
     ./git
-    ./nvim
+    # ./nvim
     ./mc
     ./direnv
+    ./nixvim
   ];
 
   nixpkgs.overlays = [ (import ./overlays) ];
@@ -81,6 +82,7 @@ in
       ]))
       ollama
       obsidian
+      vscode
 
       (writeShellScriptBin "home" ''
         #!/bin/bash
