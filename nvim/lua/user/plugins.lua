@@ -151,23 +151,18 @@ require('lazy').setup({
   { 'norcalli/nvim-colorizer.lua', opts = {} },
 
   -- additional lua configuration, for plugins development
-  { 'folke/neoconf.nvim', opts = {} },
   {
     'folke/lazydev.nvim',
-    dependencies = {
-      { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` typings
-    },
     ft = 'lua', -- only load on lua files
     opts = {
       library = {
         'lazy.nvim',
         -- See the configuration section for more details
         -- Load luvit types when the `vim.uv` word is found
-        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
       },
     },
   },
-  { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` typings
 
   -- Scala metals
   'scalameta/nvim-metals',
@@ -196,7 +191,7 @@ require('lazy').setup({
       { 'leoluz/nvim-dap-go' }, -- debug go
       { 'mxsdev/nvim-dap-vscode-js' }, -- debug js
       { 'mfussenegger/nvim-dap-python' }, -- debug python
-      { 'Mgenuit/nvim-dap-kotlin' } -- debug kotlin
+      { 'Mgenuit/nvim-dap-kotlin' }, -- debug kotlin
     },
   },
 

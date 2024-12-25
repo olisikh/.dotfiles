@@ -5,14 +5,7 @@ function M.setup(group, capabilities)
     pattern = { 'kotlin' },
     group = group,
     callback = function()
-      vim.print('Setting up Kotlin DAP')
-      require('dap-kotlin').setup({
-        dap_command = 'kotlin-debug-adapter',
-        project_root = '${workspaceFolder}',
-        enable_logging = false,
-        log_file_path = '',
-      })
-      vim.print('Finished Kotlin DAP setup')
+      require('dap-kotlin').setup({})
     end,
   })
 end
