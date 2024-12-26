@@ -1,304 +1,304 @@
-{ self, ... }: {
+{ ... }: {
 
   keymaps = [
-# -- Make sure Space is not mapped to anything, used as leader key
-# map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
-# map('n', '<esc>', '<nop>', { silent = true })
-  {
-    key = "<Space>";
-    action = "<nop>";
-    mode = "n";
-    options = {
-      silent = true;
-    };
-  }
-  {
-    key = "<Space>";
-    action = "<nop>";
-    mode = "v";
-    options = {
-      silent = true;
-    };
-  }
-  {
-    key = "<Esc>";
-    action = "<nop>";
-    mode = "n";
-    options = {
-      silent = true;
-    };
-  }
+    # -- Make sure Space is not mapped to anything, used as leader key
+    # map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
+    # map('n', '<esc>', '<nop>', { silent = true })
+    {
+      key = "<Space>";
+      action = "<nop>";
+      mode = "n";
+      options = {
+        silent = true;
+      };
+    }
+    {
+      key = "<Space>";
+      action = "<nop>";
+      mode = "v";
+      options = {
+        silent = true;
+      };
+    }
+    {
+      key = "<Esc>";
+      action = "<nop>";
+      mode = "n";
+      options = {
+        silent = true;
+      };
+    }
 
-# -- Shift Q to do nothing, avoid weirdness
-# map('n', 'Q', '<nop>')
-  {
-    key = "Q";
-    action = "<nop>";
-    mode = "n";
-    options = {
-      silent = true;
-    };
-  }
+    # -- Shift Q to do nothing, avoid weirdness
+    # map('n', 'Q', '<nop>')
+    {
+      key = "Q";
+      action = "<nop>";
+      mode = "n";
+      options = {
+        silent = true;
+      };
+    }
 
-#
-# -- Remap for dealing with word wrap
-# map('n', 'k', "v:count == 0 ? 'gk' : 'kzz'", { expr = true, silent = true })
-# map('n', 'j', "v:count == 0 ? 'gj' : 'jzz'", { expr = true, silent = true })
-  {
-    key = "k";
-    action = "v:count == 0 ? 'gk' : 'kzz'";
-    mode = "n";
-    options = {
-      expr = true;
-      silent = true;
-    };
-  }
-  {
-    key = "j";
-    action = "v:count == 0 ? 'gj' : 'jzz'";
-    mode = "n";
-    options = {
-      expr = true;
-      silent = true;
-    };
-  }
+    #
+    # -- Remap for dealing with word wrap
+    # map('n', 'k', "v:count == 0 ? 'gk' : 'kzz'", { expr = true, silent = true })
+    # map('n', 'j', "v:count == 0 ? 'gj' : 'jzz'", { expr = true, silent = true })
+    {
+      key = "k";
+      action = "v:count == 0 ? 'gk' : 'kzz'";
+      mode = "n";
+      options = {
+        expr = true;
+        silent = true;
+      };
+    }
+    {
+      key = "j";
+      action = "v:count == 0 ? 'gj' : 'jzz'";
+      mode = "n";
+      options = {
+        expr = true;
+        silent = true;
+      };
+    }
 
-# -- Join lines together
-# map('n', 'J', 'mzJ`z', { desc = 'join lines' })
-  {
-    key = "J";
-    action = "mzJ`z";
-    mode = "n";
-    options = {
-      desc = "join lines";
-    };
-  }
+    # -- Join lines together
+    # map('n', 'J', 'mzJ`z', { desc = 'join lines' })
+    {
+      key = "J";
+      action = "mzJ`z";
+      mode = "n";
+      options = {
+        desc = "join lines";
+      };
+    }
 
-# -- Move things between statements
-# map('v', 'J', ":m '>+1<cr>gv=gv", { desc = 'move selection down between statements' })
-# map('v', 'K', ":m '<-2<cr>gv=gv", { desc = 'move selection up between statements' })
-  {
-    key = "J";
-    action = ":m '>+1<cr>gv=gv";
-    mode = "v";
-    options = {
-      desc = "move selection down";
-    };
-  }
-  {
-    key = "K";
-    action = ":m '<-2<cr>gv=gv";
-    mode = "v";
-    options = {
-      desc = "move selection up";
-    };
-  }
+    # -- Move things between statements
+    # map('v', 'J', ":m '>+1<cr>gv=gv", { desc = 'move selection down between statements' })
+    # map('v', 'K', ":m '<-2<cr>gv=gv", { desc = 'move selection up between statements' })
+    {
+      key = "J";
+      action = ":m '>+1<cr>gv=gv";
+      mode = "v";
+      options = {
+        desc = "move selection down";
+      };
+    }
+    {
+      key = "K";
+      action = ":m '<-2<cr>gv=gv";
+      mode = "v";
+      options = {
+        desc = "move selection up";
+      };
+    }
 
-# -- Keep cursor in the middle when moving half page up/down
-# -- map('n', '<C-d>', '<C-d>zz', { desc = 'jump half page down' })
-# -- map('n', '<C-u>', '<C-u>zz', { desc = 'jump half page up' })
-  {
-    key = "<C-d>";
-    action = "<C-d>zz";
-    mode = "n";
-    options = {
-      desc = "jump half page down";
-    };
-  }
-  {
-    key = "<C-u>";
-    action = "<C-u>zz";
-    mode = "n";
-    options = {
-      desc = "jump half page up";
-    };
-  }
+    # -- Keep cursor in the middle when moving half page up/down
+    # -- map('n', '<C-d>', '<C-d>zz', { desc = 'jump half page down' })
+    # -- map('n', '<C-u>', '<C-u>zz', { desc = 'jump half page up' })
+    {
+      key = "<C-d>";
+      action = "<C-d>zz";
+      mode = "n";
+      options = {
+        desc = "jump half page down";
+      };
+    }
+    {
+      key = "<C-u>";
+      action = "<C-u>zz";
+      mode = "n";
+      options = {
+        desc = "jump half page up";
+      };
+    }
 
-# -- Cursor in the middle during searches
-# map('n', 'n', 'nzzzv', { desc = 'jump to next match item' })
-# map('n', 'N', 'Nzzzv', { desc = 'jump to prev match item' })
-  {
-    key = "n";
-    action = "nzzzv";
-    mode = "n";
-    options = {
-      desc = "jump to next match";
-    };
-  }
-  {
-    key = "N";
-    action = "Nzzzv";
-    mode = "n";
-    options = {
-      desc = "jump to prev match";
-    };
-  }
+    # -- Cursor in the middle during searches
+    # map('n', 'n', 'nzzzv', { desc = 'jump to next match item' })
+    # map('n', 'N', 'Nzzzv', { desc = 'jump to prev match item' })
+    {
+      key = "n";
+      action = "nzzzv";
+      mode = "n";
+      options = {
+        desc = "jump to next match";
+      };
+    }
+    {
+      key = "N";
+      action = "Nzzzv";
+      mode = "n";
+      options = {
+        desc = "jump to prev match";
+      };
+    }
 
-# -- Paste the text and keep it in clipboard while pasting
-# map('x', '<leader>p', '"_dP', { desc = 'paste keeping the clipboard' })
-  {
-    key = "<leader>p";
-    action = "\"_dP";
-    mode = "x";
-    options = {
-      desc = "paste & keep";
-    };
-  }
+    # -- Paste the text and keep it in clipboard while pasting
+    # map('x', '<leader>p', '"_dP', { desc = 'paste keeping the clipboard' })
+    {
+      key = "<leader>p";
+      action = "\"_dP";
+      mode = "x";
+      options = {
+        desc = "paste & keep";
+      };
+    }
 
-# -- copy into system clipboard, (useful for copying outside of vim context)
-# map({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'copy to blackhole register' })
-# map('n', '<leader>Y', '"+Y', { desc = 'copy line to blackhole register' })
-# map({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'cut to blackhole register' })
-  {
-    key = "<leader>y";
-    action = "\"+y";
-    mode = "n";
-    options = {
-      desc = "copy to blackhole";
-    };
-  }
-  {
-    key = "<leader>y";
-    action = "\"+y";
-    mode = "v";
-    options = {
-      desc = "copy to blackhole";
-    };
-  }
-  {
-    key = "<leader>Y";
-    action = "\"+Y";
-    mode = "n";
-    options = {
-      desc = "copy line to blackhole";
-    };
-  }
-  {
-    key = "<leader>d";
-    action = "\"_d";
-    mode = "n";
-    options = {
-      desc = "cut to blackhole";
-    };
-  }
-  {
-    key = "<leader>d";
-    action = "\"_d";
-    mode = "v";
-    options = {
-      desc = "cut to blackhole";
-    };
-  }
+    # -- copy into system clipboard, (useful for copying outside of vim context)
+    # map({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'copy to blackhole register' })
+    # map('n', '<leader>Y', '"+Y', { desc = 'copy line to blackhole register' })
+    # map({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'cut to blackhole register' })
+    {
+      key = "<leader>y";
+      action = "\"+y";
+      mode = "n";
+      options = {
+        desc = "copy to blackhole";
+      };
+    }
+    {
+      key = "<leader>y";
+      action = "\"+y";
+      mode = "v";
+      options = {
+        desc = "copy to blackhole";
+      };
+    }
+    {
+      key = "<leader>Y";
+      action = "\"+Y";
+      mode = "n";
+      options = {
+        desc = "copy line to blackhole";
+      };
+    }
+    {
+      key = "<leader>d";
+      action = "\"_d";
+      mode = "n";
+      options = {
+        desc = "cut to blackhole";
+      };
+    }
+    {
+      key = "<leader>d";
+      action = "\"_d";
+      mode = "v";
+      options = {
+        desc = "cut to blackhole";
+      };
+    }
 
-#
-# -- Increase speed of window resize commande
-# nmap('<C-w>>', ':vertical resize +10<cr>', { noremap = true, silent = true })
-# nmap('<C-w><', ':vertical resize -10<cr>', { noremap = true, silent = true })
-# nmap('<C-w>+', ':horizontal resize +5<cr>', { noremap = true, silent = true })
-# nmap('<C-w>-', ':horizontal resize -5<cr>', { noremap = true, silent = true })
-  {
-    key = "<C-w>>";
-    action = ":vertical resize +10<cr>";
-    mode = "n";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-  {
-    key = "<C-w><";
-    action = ":vertical resize -10<cr>";
-    mode = "n";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-  {
-    key = "<C-w>+";
-    action = ":horizontal resize +5<cr>";
-    mode = "n";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-  {
-    key = "<C-w>-";
-    action = ":horizontal resize -5<cr>";
-    mode = "n";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-#
-# -- Shift line or block right and left
-# nmap('<Tab>', '>>', { noremap = true, silent = true })
-# nmap('<S-Tab>', '<<', { noremap = true, silent = true })
-# map('v', '<Tab>', '>gv', { noremap = true, silent = true })
-# map('v', '<S-Tab>', '<gv', { noremap = true, silent = true })
-  {
-    key = "<Tab>";
-    action = ">>";
-    mode = "n";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-  {
-    key = "<S-Tab>";
-    action = "<<";
-    mode = "n";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-  {
-    key = "<Tab>";
-    action = ">gv";
-    mode = "v";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
-  {
-    key = "<S-Tab>";
-    action = "<gv";
-    mode = "v";
-    options = {
-      noremap = true;
-      silent = true;
-    };
-  }
+    #
+    # -- Increase speed of window resize commande
+    # nmap('<C-w>>', ':vertical resize +10<cr>', { noremap = true, silent = true })
+    # nmap('<C-w><', ':vertical resize -10<cr>', { noremap = true, silent = true })
+    # nmap('<C-w>+', ':horizontal resize +5<cr>', { noremap = true, silent = true })
+    # nmap('<C-w>-', ':horizontal resize -5<cr>', { noremap = true, silent = true })
+    {
+      key = "<C-w>>";
+      action = ":vertical resize +10<cr>";
+      mode = "n";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<C-w><";
+      action = ":vertical resize -10<cr>";
+      mode = "n";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<C-w>+";
+      action = ":horizontal resize +5<cr>";
+      mode = "n";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<C-w>-";
+      action = ":horizontal resize -5<cr>";
+      mode = "n";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    #
+    # -- Shift line or block right and left
+    # nmap('<Tab>', '>>', { noremap = true, silent = true })
+    # nmap('<S-Tab>', '<<', { noremap = true, silent = true })
+    # map('v', '<Tab>', '>gv', { noremap = true, silent = true })
+    # map('v', '<S-Tab>', '<gv', { noremap = true, silent = true })
+    {
+      key = "<Tab>";
+      action = ">>";
+      mode = "n";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<S-Tab>";
+      action = "<<";
+      mode = "n";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<Tab>";
+      action = ">gv";
+      mode = "v";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<S-Tab>";
+      action = "<gv";
+      mode = "v";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
 
-#
-# -- keep jump keymaps
-# nmap('<C-i>', '<C-i>', { noremap = true })
-# nmap('<C-o>', '<C-o>', { noremap = true })
-  {
-    key = "<C-i>";
-    action = "<C-i>";
-    mode = "n";
-    options = {
-      noremap = true;
-    };
-  }
-  {
-    key = "<C-o>";
-    action = "<C-o>";
-    mode = "n";
-    options = {
-      noremap = true;
-    };
-  }
+    #
+    # -- keep jump keymaps
+    # nmap('<C-i>', '<C-i>', { noremap = true })
+    # nmap('<C-o>', '<C-o>', { noremap = true })
+    {
+      key = "<C-i>";
+      action = "<C-i>";
+      mode = "n";
+      options = {
+        noremap = true;
+      };
+    }
+    {
+      key = "<C-o>";
+      action = "<C-o>";
+      mode = "n";
+      options = {
+        noremap = true;
+      };
+    }
 
-# Oil plugin
-# nmap('-', oil.open, { desc = 'oil: open parent directory' })
-# nmap('_', function() oil.open(vim.uv.cwd()) end, { desc = 'oil: open cwd directory' })
+    # Oil plugin
+    # nmap('-', oil.open, { desc = 'oil: open parent directory' })
+    # nmap('_', function() oil.open(vim.uv.cwd()) end, { desc = 'oil: open cwd directory' })
     {
       key = "-";
       action = ":lua require('oil').open()<cr>";
@@ -323,79 +323,79 @@
       action = ":lua require('smart-splits').resize_left()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<A-j>', s.resize_down)
+    # vim.keymap.set('n', '<A-j>', s.resize_down)
     {
       key = "<A-j>";
       action = ":lua require('smart-splits').resize_down()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<A-k>', s.resize_up)
+    # vim.keymap.set('n', '<A-k>', s.resize_up)
     {
       key = "<A-k>";
       action = ":lua require('smart-splits').resize_up()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<A-l>', s.resize_right)
+    # vim.keymap.set('n', '<A-l>', s.resize_right)
     {
       key = "<A-l>";
       action = ":lua require('smart-splits').resize_right()<cr>";
       mode = "n";
     }
-# -- moving between splits
-# vim.keymap.set('n', '<C-h>', s.move_cursor_left)
+    # -- moving between splits
+    # vim.keymap.set('n', '<C-h>', s.move_cursor_left)
     {
       key = "<C-h>";
       action = ":lua require('smart-splits').move_cursor_left()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<C-j>', s.move_cursor_down)
+    # vim.keymap.set('n', '<C-j>', s.move_cursor_down)
     {
       key = "<C-j>";
       action = ":lua require('smart-splits').move_cursor_down()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<C-k>', s.move_cursor_up)
+    # vim.keymap.set('n', '<C-k>', s.move_cursor_up)
     {
       key = "<C-k>";
       action = ":lua require('smart-splits').move_cursor_up()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<C-l>', s.move_cursor_right)
+    # vim.keymap.set('n', '<C-l>', s.move_cursor_right)
     {
       key = "<C-l>";
       action = ":lua require('smart-splits').move_cursor_right()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<C-\\>', s.move_cursor_previous)
-# -- swapping buffers between windows
-# vim.keymap.set('n', '<leader><leader>h', s.swap_buf_left)
+    # vim.keymap.set('n', '<C-\\>', s.move_cursor_previous)
+    # -- swapping buffers between windows
+    # vim.keymap.set('n', '<leader><leader>h', s.swap_buf_left)
     {
       key = "<leader><leader>h";
       action = ":lua require('smart-splits').swap_buf_left()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<leader><leader>j', s.swap_buf_down)
+    # vim.keymap.set('n', '<leader><leader>j', s.swap_buf_down)
     {
       key = "<leader><leader>j";
       action = ":lua require('smart-splits').swap_buf_down()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<leader><leader>k', s.swap_buf_up)
+    # vim.keymap.set('n', '<leader><leader>k', s.swap_buf_up)
     {
       key = "<leader><leader>k";
       action = ":lua require('smart-splits').swap_buf_up()<cr>";
       mode = "n";
     }
-# vim.keymap.set('n', '<leader><leader>l', s.swap_buf_right)
+    # vim.keymap.set('n', '<leader><leader>l', s.swap_buf_right)
     {
       key = "<leader><leader>l";
       action = ":lua require('smart-splits').swap_buf_right()<cr>";
       mode = "n";
     }
 
-# Telescope
-#     -- Telescope key mappings
-# nmap('<leader>?', telescope_builtin.oldfiles, { desc = 'telescope: find recently opened files' })
+    # Telescope
+    #     -- Telescope key mappings
+    # nmap('<leader>?', telescope_builtin.oldfiles, { desc = 'telescope: find recently opened files' })
     {
       key = "<leader>?";
       action = ":lua require('telescope.builtin').oldfiles()<cr>";
@@ -404,7 +404,7 @@
         desc = "telescope: recent files";
       };
     }
-# nmap('<leader><space>', telescope_builtin.buffers, { desc = 'telescope: find existing buffers' })
+    # nmap('<leader><space>', telescope_builtin.buffers, { desc = 'telescope: find existing buffers' })
     {
       key = "<leader><Space>";
       action = ":lua require('telescope.builtin').buffers()<cr>";
@@ -413,9 +413,9 @@
         desc = "telescope: buffers";
       };
     }
-# nmap('<leader>/', function()
-#   telescope_builtin.current_buffer_fuzzy_find(telescope_themes.get_dropdown({ winblend = 10, previewer = false }))
-# end, { desc = 'telescope: fuzzy find in current buffer' })
+    # nmap('<leader>/', function()
+    #   telescope_builtin.current_buffer_fuzzy_find(telescope_themes.get_dropdown({ winblend = 10, previewer = false }))
+    # end, { desc = 'telescope: fuzzy find in current buffer' })
     {
       key = "<leader><Space>";
       action = ":lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({ winblend = 10, previewer = false }))<cr>";
@@ -424,8 +424,8 @@
         desc = "telescope: find in buffer";
       };
     }
-#
-# nmap('<leader>sf', telescope_builtin.git_files, { desc = 'telescope: [s]earch [f]iles' })
+    #
+    # nmap('<leader>sf', telescope_builtin.git_files, { desc = 'telescope: [s]earch [f]iles' })
     {
       key = "<leader>sf";
       action = ":lua require('telescope.builtin').git_files()<cr>";
@@ -434,7 +434,7 @@
         desc = "telescope: [s]earch [f]iles";
       };
     }
-# nmap('<leader>sp', telescope_builtin.find_files, { desc = 'telescope: [s]earch [p]roject files' })
+    # nmap('<leader>sp', telescope_builtin.find_files, { desc = 'telescope: [s]earch [p]roject files' })
     {
       key = "<leader>sp";
       action = ":lua require('telescope.builtin').find_files()<cr>";
@@ -443,7 +443,7 @@
         desc = "telescope: search [p]roject [f]iles";
       };
     }
-# nmap('<leader>sh', telescope_builtin.help_tags, { desc = 'telescope: [s]earch [h]elp' })
+    # nmap('<leader>sh', telescope_builtin.help_tags, { desc = 'telescope: [s]earch [h]elp' })
     {
       key = "<leader>sh";
       action = ":lua require('telescope.builtin').help_tags()<cr>";
@@ -452,7 +452,7 @@
         desc = "telescope: search [h]elp";
       };
     }
-# nmap('<leader>sw', telescope_builtin.grep_string, { desc = 'telescope: [s]earch current [w]ord' })
+    # nmap('<leader>sw', telescope_builtin.grep_string, { desc = 'telescope: [s]earch current [w]ord' })
     {
       key = "<leader>sw";
       action = ":lua require('telescope.builtin').grep_string()<cr>";
@@ -461,7 +461,7 @@
         desc = "telescope: [s]earch [w]ord";
       };
     }
-# nmap('<leader>sg', telescope_builtin.live_grep, { desc = 'telescope: [s]earch by [g]rep' })
+    # nmap('<leader>sg', telescope_builtin.live_grep, { desc = 'telescope: [s]earch by [g]rep' })
     {
       key = "<leader>sg";
       action = ":lua require('telescope.builtin').live_grep()<cr>";
@@ -470,7 +470,7 @@
         desc = "telescope: [s]earch [g]rep";
       };
     }
-# nmap('<leader>sd', telescope_builtin.diagnostics, { desc = 'telescope: [s]earch [d]iagnostics' })
+    # nmap('<leader>sd', telescope_builtin.diagnostics, { desc = 'telescope: [s]earch [d]iagnostics' })
     {
       key = "<leader>sd";
       action = ":lua require('telescope.builtin').diagnostics()<cr>";
@@ -479,7 +479,7 @@
         desc = "telescope: [s]earch [d]iagnostics";
       };
     }
-# nmap('<leader>sk', telescope_builtin.keymaps, { desc = 'telescope: [s]earch [k]eymaps' })
+    # nmap('<leader>sk', telescope_builtin.keymaps, { desc = 'telescope: [s]earch [k]eymaps' })
     {
       key = "<leader>sk";
       action = ":lua require('telescope.builtin').keymaps()<cr>";
@@ -490,7 +490,7 @@
     }
 
 
-# LazyGit
+    # LazyGit
     {
       key = "<leader>gg";
       action = "<cmd>LazyGit<cr>";
@@ -507,5 +507,31 @@
         desc = "lazygit: open current file";
       };
     }
+
+    # LSP
+    # nmap('<leader>cr', vim.lsp.buf.rename, { desc = 'lsp: [r]ename' })
+    # nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
+    # nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
+    # nmap('<leader>cf', function() vim.lsp.buf.format() end, { desc = 'lsp: [c]ode [f]ormat' })
+    {
+      key = "<leader>cf";
+      action = ":lua vim.lsp.buf.format()<cr>";
+      mode = "n";
+      options = {
+        desc = "lsp: [c]ode [f]ormat";
+      };
+    }
+
+    # map('v', '<leader>cf', function()
+    #   local vstart = vim.fn.getpos("'<")
+    #   local vend = vim.fn.getpos("'>")
+    #
+    #   vim.lsp.buf.format({ range = { vstart, vend } })
+    # end, { desc = 'lsp: [c]ode [f]ormat' })
+    # nmap('<leader>ci', function()
+    #   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    # end, { desc = 'lsp: toggle inlay hints (buffer)' })
+    # nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
+    # nmap('gr', telescope_builtin.lsp_references, { desc = 'lsp: [g]oto [r]eferences' })
   ];
 } 
