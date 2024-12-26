@@ -2,6 +2,9 @@
   programs.nixvim = {
     enable = true;
 
+    # TODO: use nightly?
+    # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+
     colorschemes.catppuccin.enable = true;
 
     imports = [
@@ -9,6 +12,5 @@
       ./options.nix
       ./keymaps.nix
     ];
-
   };
 }

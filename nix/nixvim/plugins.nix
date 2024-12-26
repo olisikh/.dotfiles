@@ -4,24 +4,21 @@
       web-devicons.enable = true;
 
       lualine.enable = true;
-      # wezterm.enable = true;
+      oil.enable = true;
+      nvim-tree.enable = true;
+      smart-splits.enable = true;
+      treesitter.enable = true;
+      treesitter-refactor.enable = true;
+      treesitter-textobjects.enable = true;
 
-      oil = {
-        enable = true;
-      };
+      nvim-autopairs.enable = true;
+      lazygit.enable = true;
 
-      treesitter = {
-        enable = true;
-      };
-
-
-      nvim-autopairs = {
-        enable = true;
-      };
-
-      lazygit = {
-        enable = true;
-      };
+      harpoon.enable = true;
+      # TODO: add the following plugin for nice icons in lualine
+      # harpoon-lualine = {
+      #   enable = true;
+      # };
 
       dap = {
         enable = true;
@@ -38,12 +35,22 @@
       };
 
       which-key = {
-        enable = false;
-      # registrations = {
-        # "<leader>fg" = "Find Git files with telescope";
-        # "<leader>fw" = "Find text with telescope";
-        # "<leader>ff" = "Find files with telescope";
-      # };
+        enable = true;
+        settings = {
+          spelling = {
+            enabled = false;
+          };
+          win = {
+            border = "single";
+          };
+        };
+        # TODO: refactor which-key registrations
+        registrations = {
+          "<leader>c" = "Code";
+          "<leader>s" = "Search";
+          "<leader>t" = "Test"; 
+          "<leader>x" = "Trouble"; 
+        };
       };
 
       markdown-preview = {
@@ -57,18 +64,25 @@
           fzf-native = {
             enable = true;
           };
+          # dap = {
+          #   enable = true;
+          # };
+          ui-select = {
+            enable = true;
+          };
         };
       };
+      
 
       todo-comments = {
         enable = true;
           # settings.colors = {
-            # error = ["DiagnosticError" "ErrorMsg" "#DC2626"];
-            # warning = ["DiagnosticWarn" "WarningMsg" "#FBBF24"];
-            # info = ["DiagnosticInfo" "#2563EB"];
-            # hint = ["DiagnosticHint" "#10B981"];
-            # default = ["Identifier" "#7C3AED"];
-            # test = ["Identifier" "#FF00FF"];
+          #   error = ["DiagnosticError" "ErrorMsg" "#DC2626"];
+          #   warning = ["DiagnosticWarn" "WarningMsg" "#FBBF24"];
+          #   info = ["DiagnosticInfo" "#2563EB"];
+          #   hint = ["DiagnosticHint" "#10B981"];
+          #   default = ["Identifier" "#7C3AED"];
+          #   test = ["Identifier" "#FF00FF"];
           # };
       };
 
@@ -127,6 +141,89 @@
         #   "<C-M>" = [ "n" "x" ];
         #   "<C-N>" = [ "n" "x" ];
         #   "<C-P>" = [ "n" "x" ];
+        };
+      };
+
+
+      # NOTE: seems like plugin is old
+      blink-cmp = {
+        enable = true;
+
+        settings = {
+          keymap = { 
+            # -- 'default' for mappings similar to built-in completion
+            # -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
+            # -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
+            # -- See the full "keymap" documentation for information on defining your own keymap.
+            preset = "default";
+          };
+
+          appearance = {
+            # -- Sets the fallback highlight groups to nvim-cmp's highlight groups
+            # -- Useful for when your theme doesn't support blink.cmp
+            # -- Will be removed in a future release
+            use_nvim_cmp_as_default = false;
+
+            # -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+            # -- Adjusts spacing to ensure icons are aligned
+            nerd_font_variant = "mono";
+          };
+
+          sources = {
+            default = [
+              "lsp"
+              "path"
+              "snippets"
+              "buffer"
+            ];
+          };
+
+          completion = {
+            # -- 'prefix' will fuzzy match on the text before the cursor
+            # -- 'full' will fuzzy match on the text before *and* after the cursor
+            # -- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
+            keyword = { 
+              range = "full"; 
+            };
+
+            # -- Disable auto brackets
+            # -- NOTE: some LSPs may add auto brackets themselves anyway
+            accept = { 
+              auto_brackets = { 
+                enabled = false; 
+              }; 
+            };
+
+            # -- Insert completion item on selection, don't select by default
+            list = { selection = "auto_insert"; };
+
+            menu = {
+              # -- Don't automatically show the completion menu
+              auto_show = false;
+
+              # -- nvim-cmp style menu
+              # TODO: figure how to fix this
+              # draw = {
+              #   columns = [
+              #     [ "label" "label_description" { gap = 1; } ]
+              #     [ "kind_icon" "kind" ]
+              #   ];
+              # };
+            };
+
+            # -- Show documentation when selecting a completion item
+            documentation = { 
+              auto_show = true; 
+              auto_show_delay_ms = 200; 
+            };
+
+            # -- Display a preview of the selected item on the current line
+            ghost_text = { enabled = true; };
+          };
+
+          signature = {
+            enabled = true;
+          };
         };
       };
 
