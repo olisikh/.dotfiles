@@ -6,16 +6,116 @@
     oil.enable = true;
     nvim-tree.enable = true;
     smart-splits.enable = true;
-    treesitter.enable = true;
+    treesitter = {
+      enable = true;
+      settings = {
+        auto_install = true;
+        highlight = { enable = true; };
+        indent = { enable = true; disable = [ "python" ]; };
+        incremental_selection = {
+          enable = true;
+          keymaps = {
+            init_selection = "<C-space>";
+            node_incremental = "<C-space>";
+            node_decremental = "<C-b>";
+            # -- scope_incremental = "<C-b>";
+          };
+        };
+        # ensure_installed = [
+        #   "c"
+        #   "sql"
+        #   "lua"
+        #   "dockerfile"
+        #   "terraform"
+        #   "go"
+        #   "gomod"
+        #   "gosum"
+        #   "rust"
+        #   "toml"
+        #   "scala"
+        #   "tsx"
+        #   "typescript"
+        #   "nix"
+        #   "json"
+        #   "yaml"
+        #   "python"
+        #   "vim"
+        #   "vimdoc"
+        #   "markdown"
+        #   "markdown_inline"
+        #   "hocon"
+        # ];
+      };
+    };
     treesitter-refactor.enable = true;
-    treesitter-textobjects.enable = true;
-    treesitter-context.enable = true;
+    treesitter-textobjects = {
+      enable = true;
+      select = {
+        enable = true;
+        lookahead = true; # -- Automatically jump forward to textobj, similar to targets.vim
+        keymaps = {
+          # -- You can use the capture groups defined in textobjects.scm
+          aa = "@parameter.outer";
+          ia = "@parameter.inner";
+          af = "@function.outer";
+          "if" = "@function.inner";
+          ac = "@class.outer";
+          ic = "@class.inner";
+        };
+      };
+      move = {
+        enable = true;
+        setJumps = true;
+        gotoNextStart = {
+          "]m" = "@function.outer";
+          "]]" = "@class.outer";
+        };
+        gotoNextEnd = {
+          "]M" = "@function.outer";
+          "][" = "@class.outer";
+        };
+        gotoPreviousStart = {
+          "[m" = "@function.outer";
+          "[[" = "@class.outer";
+        };
+        gotoPreviousEnd = {
+          "[M" = "@function.outer";
+          "[]" = "@class.outer";
+        };
+      };
+      swap = {
+        enable = true;
+        swapPrevious = {
+          "[p" = "@parameter.inner";
+        };
+        swapNext = {
+          "]p" = "@parameter.inner";
+        };
+      };
+    };
+    treesitter-context = {
+      enable = true;
+
+      settings = {
+        max_lines = 5; # -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 0; # -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true;
+        multiline_threshold = 20; # -- Maximum number of lines to show for a single context
+        trim_scope = "inner"; # -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = "cursor"; # -- Line used to calculate context. Choices: 'cursor', 'topline'
+        # -- Separator between context and content. Should be a single character string, like '-'.
+        # -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        # separator = nil,
+        zindex = 20; # -- The Z-index of the context window
+        # on_attach = nil, # -- (fun(buf: integer): boolean) return false to disable attaching
+      };
+    };
 
     nvim-autopairs.enable = true;
     lazygit.enable = true;
 
 
-    harpoon.enable = true;
+    # harpoon.enable = true;
     # TODO: add the following plugin for nice icons in lualine
     # harpoon-lualine = {
     #   enable = true;
@@ -109,7 +209,6 @@
         focusOnToggle = true;
       };
     };
-    # fundo.enable = true;
 
     hardtime = {
       enable = true;
@@ -137,8 +236,6 @@
       };
     };
 
-
-    # NOTE: seems like plugin is old
     blink-cmp = {
       enable = true;
 
@@ -164,6 +261,7 @@
 
         sources = {
           default = [
+            "lazydev"
             "lsp"
             "path"
             "snippets"
@@ -233,6 +331,7 @@
         ts_ls.enable = true;
         gopls.enable = true;
         jdtls.enable = true;
+        kotlin_language_server.enable = true;
         pylsp.enable = true;
         pylyzer.enable = true;
         terraformls.enable = true;
@@ -251,7 +350,6 @@
           filetypes = [ "helm" ];
         };
 
-
         yamlls = {
           enable = true;
           filetypes = [ "yaml" ];
@@ -263,6 +361,10 @@
       enable = true;
     };
 
+    rustaceanvim = {
+      enable = true;
+    };
+
     fidget = {
       enable = true;
     };
@@ -270,11 +372,17 @@
     nvim-surround.enable = true;
 
     # NOTE: Not sure if I need this plugin
-    guess-indent.enable = true;
+    # guess-indent.enable = true;
 
     # TODO: missing plugins
     # nvim-helm
     # nvim-metals
     # nvim-fundo
+    # vim-sleuth? is it alternative for guess-indent?
+    # nvim-jdtls
+    # rustaceanvim
+    # crates.nvim
+    # alisiikh/nvim-scala-zio-quickfix
+    # lazydev.nvim
   };
 }
