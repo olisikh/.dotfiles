@@ -1,5 +1,6 @@
 { self, ... }: {
 
+
     plugins = {
       web-devicons.enable = true;
 
@@ -10,9 +11,11 @@
       treesitter.enable = true;
       treesitter-refactor.enable = true;
       treesitter-textobjects.enable = true;
+      treesitter-context.enable = true;
 
       nvim-autopairs.enable = true;
       lazygit.enable = true;
+
 
       harpoon.enable = true;
       # TODO: add the following plugin for nice icons in lualine
@@ -45,18 +48,19 @@
           };
         };
         # TODO: refactor which-key registrations
-        registrations = {
-          "<leader>c" = "Code";
-          "<leader>s" = "Search";
-          "<leader>t" = "Test"; 
-          "<leader>x" = "Trouble"; 
-        };
+        # registrations = {
+        #   "<leader>c" = "Code";
+        #   "<leader>s" = "Search";
+        #   "<leader>t" = "Test"; 
+        #   "<leader>x" = "Trouble"; 
+        # };
       };
 
       markdown-preview = {
         enable = true;
         settings.theme = "dark";
       };
+      render-markdown.enable = true;
 
       telescope = {
         enable = true;
@@ -74,17 +78,7 @@
       };
       
 
-      todo-comments = {
-        enable = true;
-          # settings.colors = {
-          #   error = ["DiagnosticError" "ErrorMsg" "#DC2626"];
-          #   warning = ["DiagnosticWarn" "WarningMsg" "#FBBF24"];
-          #   info = ["DiagnosticInfo" "#2563EB"];
-          #   hint = ["DiagnosticHint" "#10B981"];
-          #   default = ["Identifier" "#7C3AED"];
-          #   test = ["Identifier" "#FF00FF"];
-          # };
-      };
+      todo-comments.enable = true;
 
       neo-tree = {
         enable = true;
@@ -117,9 +111,10 @@
           focusOnToggle = true;
         };
       };
+      # fundo.enable = true;
 
       hardtime = {
-        enable = false;
+        enable = true;
         settings = {
         # disableMouse = true;
         # enabled = false;
@@ -233,9 +228,22 @@
         };
       };
 
+      none-ls = {
+        enable = true;
+      };
+      
       fidget = {
         enable = true;
       };
-    };
 
+      nvim-surround.enable = true;
+
+      # NOTE: Not sure if I need this plugin
+      guess-indent.enable = true;
+
+      # TODO: missing plugins
+      # nvim-helm
+      # nvim-metals
+      # nvim-fundo
+    };
 }
