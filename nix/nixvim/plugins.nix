@@ -294,12 +294,12 @@
 
             # -- nvim-cmp style menu
             # TODO: figure how to fix this
-            # draw = {
-            #   columns = [
-            #     [ "label" "label_description" { gap = 1; } ]
-            #     [ "kind_icon" "kind" ]
-            #   ];
-            # };
+            draw = {
+              # columns = [
+              #   [ "label" "label_description" { gap = 1; } ]
+              #   [ "kind_icon" "kind" ]
+              # ];
+            };
           };
 
           # -- Show documentation when selecting a completion item
