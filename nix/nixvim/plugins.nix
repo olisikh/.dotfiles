@@ -114,12 +114,12 @@
     nvim-autopairs.enable = true;
     lazygit.enable = true;
 
-
     # harpoon.enable = true;
     # TODO: add the following plugin for nice icons in lualine
     # harpoon-lualine = {
     #   enable = true;
     # };
+    # or use harpoon2?
 
     dap = {
       enable = true;
@@ -129,6 +129,8 @@
     trouble = {
       enable = true;
     };
+
+    sleuth.enable = true;
 
     gitsigns = {
       enable = true;
@@ -174,7 +176,6 @@
         };
       };
     };
-
 
     todo-comments.enable = true;
 
@@ -361,9 +362,12 @@
       enable = true;
     };
 
+    helm.enable = true;
+
     rustaceanvim = {
       enable = true;
     };
+    crates.enable = true;
 
     nvim-jdtls = {
       enable = true;
@@ -381,14 +385,7 @@
     # guess-indent.enable = true;
 
     # TODO: missing plugins
-    # nvim-helm
-    # nvim-metals
     # nvim-fundo
-    # vim-sleuth? is it alternative for guess-indent?
-    # nvim-jdtls
-    # rustaceanvim
-    # crates.nvim
     # alisiikh/nvim-scala-zio-quickfix
-    # lazydev.nvim
   };
 }

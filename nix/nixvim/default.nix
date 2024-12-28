@@ -18,6 +18,11 @@
         pattern = [ "*.tf" " *.tfvars" " *.hcl" ];
         command = "set filetype=terraform";
       }
+      {
+        event = "FileType";
+        pattern = "helm";
+        command = "LspRestart";
+      }
     ];
 
     imports = [
@@ -35,7 +40,6 @@
       nvim-metals
       crates-nvim
       vim-helm
-      vim-sleuth
       colorizer
       lazydev-nvim
       harpoon2
