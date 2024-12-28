@@ -1,4 +1,4 @@
-{ ... }: {
+{ pkgs, ... }: {
   plugins = {
     web-devicons.enable = true;
 
@@ -330,7 +330,7 @@
         tailwindcss.enable = true;
         ts_ls.enable = true;
         gopls.enable = true;
-        jdtls.enable = true;
+        jdtls.enable = false;
         kotlin_language_server.enable = true;
         pylsp.enable = true;
         pylyzer.enable = true;
@@ -363,6 +363,12 @@
 
     rustaceanvim = {
       enable = true;
+    };
+
+    nvim-jdtls = {
+      enable = true;
+      configuration = "${pkgs.jdt-language-server}/config_mac";
+      data = "~/.cache/jdtls/workspace";
     };
 
     fidget = {

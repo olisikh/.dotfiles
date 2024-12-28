@@ -26,10 +26,13 @@
       ./keymaps.nix
     ];
 
+    extraPackages = with pkgs; [
+      jdt-language-server
+    ];
+
     # TODO: all these plugins need to be installed
     extraPlugins = with pkgs.vimPlugins; [
       nvim-metals
-      nvim-jdtls
       crates-nvim
       vim-helm
       vim-sleuth
@@ -55,8 +58,8 @@
     '';
 
     extraFiles = {
-      "ftplugin/java.lua".text = import ./ftplugin/java.lua.nix { inherit pkgs; };
       "ftplugin/lua.lua".source = ./ftplugin/lua.lua;
+      "ftplugin/scala.lua".source = ./ftplugin/scala.lua;
     };
   };
 }
