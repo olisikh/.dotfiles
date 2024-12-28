@@ -25,6 +25,23 @@
       }
     ];
 
+    userCommands = {
+      # TODO: this is not working, fix
+      #
+      # CopilotToggle = {
+      #   command = ''
+      #     local status = require('copilot_status').status()
+      #
+      #     if status.status == 'offline' then
+      #       vim.cmd([[Copilot enable]])
+      #     else
+      #       vim.cmd([[Copilot disable]])
+      #     end
+      #   '';
+      #   nargs = 0;
+      # };
+    };
+
     imports = [
       ./plugins.nix
       ./options.nix
@@ -40,9 +57,9 @@
       nvim-metals
       crates-nvim
       vim-helm
-      colorizer
       lazydev-nvim
       harpoon2
+      copilot-lualine
     ];
 
     extraConfigLua = ''

@@ -4,7 +4,7 @@
 
     lualine.enable = true;
     oil.enable = true;
-    nvim-tree.enable = true;
+    nvim-tree.enable = true; # NOTE: newer alternative: neo-tree
     smart-splits.enable = true;
     treesitter = {
       enable = true;
@@ -21,30 +21,6 @@
             # -- scope_incremental = "<C-b>";
           };
         };
-        # ensure_installed = [
-        #   "c"
-        #   "sql"
-        #   "lua"
-        #   "dockerfile"
-        #   "terraform"
-        #   "go"
-        #   "gomod"
-        #   "gosum"
-        #   "rust"
-        #   "toml"
-        #   "scala"
-        #   "tsx"
-        #   "typescript"
-        #   "nix"
-        #   "json"
-        #   "yaml"
-        #   "python"
-        #   "vim"
-        #   "vimdoc"
-        #   "markdown"
-        #   "markdown_inline"
-        #   "hocon"
-        # ];
       };
     };
     treesitter-refactor.enable = true;
@@ -126,11 +102,27 @@
       # TODO: add config
     };
 
+    neotest = {
+      enable = true;
+      settings = {
+        diagnostic = {
+          enabled = true;
+          severity = 1; # ERROR
+        };
+        status = {
+          enabled = true;
+          signs = false;
+          virtual_text = true;
+        };
+      };
+    };
+
     trouble = {
       enable = true;
     };
 
     sleuth.enable = true;
+    colorizer.enable = true;
 
     gitsigns = {
       enable = true;
@@ -179,29 +171,7 @@
 
     todo-comments.enable = true;
 
-    neo-tree = {
-      enable = true;
-      enableDiagnostics = true;
-      enableGitStatus = true;
-      enableModifiedMarkers = true;
-      enableRefreshOnWrite = true;
-      closeIfLastWindow = true;
-      popupBorderStyle = "rounded"; # Type: null or one of “NC”, “double”, “none”, “rounded”, “shadow”, “single”, “solid” or raw lua code
-      buffers = {
-        bindToCwd = false;
-        followCurrentFile = {
-          enabled = true;
-        };
-      };
-      window = {
-        width = 40;
-        height = 15;
-        autoExpandWidth = false;
-        mappings = {
-          "<space>" = "none";
-        };
-      };
-    };
+    copilot-lua.enable = true;
 
     undotree = {
       enable = true;

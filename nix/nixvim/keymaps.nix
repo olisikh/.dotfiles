@@ -347,24 +347,40 @@
       key = "<C-h>";
       action = ":lua require('smart-splits').move_cursor_left()<cr>";
       mode = "n";
+      options = {
+        silent = true;
+        noremap = true;
+      };
     }
     # vim.keymap.set('n', '<C-j>', s.move_cursor_down)
     {
       key = "<C-j>";
       action = ":lua require('smart-splits').move_cursor_down()<cr>";
       mode = "n";
+      options = {
+        silent = true;
+        noremap = true;
+      };
     }
     # vim.keymap.set('n', '<C-k>', s.move_cursor_up)
     {
       key = "<C-k>";
       action = ":lua require('smart-splits').move_cursor_up()<cr>";
       mode = "n";
+      options = {
+        silent = true;
+        noremap = true;
+      };
     }
     # vim.keymap.set('n', '<C-l>', s.move_cursor_right)
     {
       key = "<C-l>";
       action = ":lua require('smart-splits').move_cursor_right()<cr>";
       mode = "n";
+      options = {
+        silent = true;
+        noremap = true;
+      };
     }
     # vim.keymap.set('n', '<C-\\>', s.move_cursor_previous)
     # -- swapping buffers between windows
