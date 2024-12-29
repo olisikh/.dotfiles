@@ -13,7 +13,7 @@
             "filename"
           ];
           lualine_x = [
-            # "harpoon2" # NOTE: plugin is not available as vimPlugin
+            "harpoon2" # NOTE: plugin is not available as vimPlugin
             "copilot"
             "encoding"
             "filetype"
@@ -109,21 +109,6 @@
     nvim-autopairs.enable = true;
     lazygit.enable = true;
 
-    harpoon = {
-      enable = true;
-      enableTelescope = true;
-      keymaps = {
-        addFile = "<leader>a";
-        toggleQuickMenu = "<leader>h";
-        navFile = {
-          "1" = "<leader>1";
-          "2" = "<leader>2";
-          "3" = "<leader>3";
-          "4" = "<leader>4";
-        };
-      };
-    };
-
     dap = {
       enable = true;
       # TODO: add config
@@ -200,6 +185,11 @@
 
     copilot-lua.enable = true;
 
+    # TODO: install ollama
+    # ollama = {
+    #   enable = true;
+    # };
+
     undotree = {
       enable = true;
       settings = {
@@ -208,31 +198,7 @@
       };
     };
 
-    hardtime = {
-      enable = true;
-      settings = {
-        # disableMouse = true;
-        # enabled = false;
-        # disabledFiletypes = [ "Oil" ];
-        # restrictionMode = "hint";
-        # hint = true;
-        # maxCount = 40;
-        # maxTime = 1000;
-        # restrictedKeys = {
-        #   "h" = [ "n" "x" ];
-        #   "j" = [ "n" "x" ];
-        #   "k" = [ "n" "x" ];
-        #   "l" = [ "n" "x" ];
-        #   "-" = [ "n" "x" ];
-        #   "+" = [ "n" "x" ];
-        #   "gj" = [ "n" "x" ];
-        #   "gk" = [ "n" "x" ];
-        #   "<CR>" = [ "n" "x" ];
-        #   "<C-M>" = [ "n" "x" ];
-        #   "<C-N>" = [ "n" "x" ];
-        #   "<C-P>" = [ "n" "x" ];
-      };
-    };
+    hardtime.enable = true;
 
     blink-cmp = {
       enable = true;
@@ -336,7 +302,6 @@
 
         nixd = {
           enable = true;
-
           settings = {
             formatting.command = [ "nixpkgs-fmt" ];
             nixpkgs.expr = "import <nixpkgs> {}";
@@ -363,18 +328,11 @@
 
     rustaceanvim = {
       enable = true;
+      # TODO: configure
     };
     crates.enable = true;
 
-    # nvim-jdtls = {
-    # enable = true;
-    # configuration = "${pkgs.jdt-language-server}/config_mac";
-    # data = "~/.cache/jdtls/workspace";
-    # };
-
-    fidget = {
-      enable = true;
-    };
+    fidget.enable = true;
 
     nvim-surround.enable = true;
 

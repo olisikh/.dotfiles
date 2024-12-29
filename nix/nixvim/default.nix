@@ -1,4 +1,16 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+let
+  harpoon-lualine = (pkgs.vimUtils.buildVimPlugin {
+    name = "harpoon-lualine";
+    src = pkgs.fetchFromGitHub {
+      owner = "letieu";
+      repo = "harpoon-lualine";
+      rev = "main";
+      hash = "sha256-pH7U1BYD7B1y611TJ+t8ggPM3KOaSIB3Jtuj3fPKqpc=";
+    };
+  });
+in
+{
   programs.nixvim = {
     enable = true;
 
@@ -112,7 +124,8 @@
       nvim-jdtls
       lazydev-nvim
       copilot-lualine
-      # harpoon-lualine # NOTE: missing, add to vimPlugins?
+      harpoon2 # NOTE: contribute and wrap harpoon2 into nixvim?
+      harpoon-lualine # NOTE: same?
     ];
 
     extraConfigLua = ''
@@ -129,6 +142,37 @@
 
       -- set undodir to ensure that the undofiles are not saved to git repos.
       vim.o.undodir = vim.fn.stdpath("data") .. "/undo" 
+
+
+      local harpoon = require('harpoon')
+      harpoon:setup({})
+
+
+      -- TODO: move harpoon config to a separate file
+      local conf = require('telescope.config').values
+      local function toggle_telescope(harpoon_files)
+        local file_paths = {}
+        for _, item in ipairs(harpoon_files.items) do
+          table.insert(file_paths, item.value)
+        end
+
+        require('telescope.pickers')
+          .new({}, {
+            prompt_title = 'Harpoon',
+            finder = require('telescope.finders').new_table({ results = file_paths }),
+            previewer = conf.file_previewer({}),
+            sorter = conf.generic_sorter({}),
+          })
+          :find()
+      end
+
+      vim.keymap.set('n', '<leader>H', function() toggle_telescope(harpoon:list()) end, { desc = 'harpoon: Open harpoon window' })
+      vim.keymap.set('n', '<leader>h', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'harpoon: Toggle quick menu' })
+      vim.keymap.set('n', '<leader>a', function() harpoon:list():add() end, { desc = 'harpoon: Add file to list' })
+      vim.keymap.set('n', '<leader>1', function() harpoon:list():select(1) end, { desc = 'harpoon: Open file 1' })
+      vim.keymap.set('n', '<leader>2', function() harpoon:list():select(2) end, { desc = 'harpoon: Open file 2' })
+      vim.keymap.set('n', '<leader>3', function() harpoon:list():select(3) end, { desc = 'harpoon: Open file 3' })
+      vim.keymap.set('n', '<leader>4', function() harpoon:list():select(4) end, { desc = 'harpoon: Open file 4' })
     '';
 
     extraFiles = {
