@@ -109,9 +109,15 @@
     nvim-autopairs.enable = true;
     lazygit.enable = true;
 
+    # TODO: add config
     dap = {
       enable = true;
-      # TODO: add config
+      extensions = {
+        dap-go.enable = true;
+        dap-python.enable = true;
+        dap-ui.enable = true;
+        dap-virtual-text.enable = true;
+      };
     };
 
     neotest = {

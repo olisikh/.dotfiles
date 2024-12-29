@@ -5,7 +5,7 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "letieu";
       repo = "harpoon-lualine";
-      rev = "main";
+      rev = "master";
       hash = "sha256-pH7U1BYD7B1y611TJ+t8ggPM3KOaSIB3Jtuj3fPKqpc=";
     };
   });
@@ -90,20 +90,6 @@ in
     ];
 
     userCommands = {
-      # TODO: this is not working, fix
-      #
-      # CopilotToggle = {
-      #   command = ''
-      #     local status = require('copilot_status').status()
-      #
-      #     if status.status == 'offline' then
-      #       vim.cmd([[Copilot enable]])
-      #     else
-      #       vim.cmd([[Copilot disable]])
-      #     end
-      #   '';
-      #   nargs = 0;
-      # };
     };
 
     imports = [

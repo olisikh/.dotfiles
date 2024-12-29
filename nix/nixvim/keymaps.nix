@@ -537,7 +537,7 @@
     # nmap('<leader>ca', vim.lsp.buf.code_action, { desc = 'lsp: [c]ode [a]ction' })
     {
       key = "<leader>ca";
-      action = ":lua vim.lsp.buf.code_action<cr>";
+      action = ":lua vim.lsp.buf.code_action()<cr>";
       mode = "n";
       options = {
         desc = "lsp: [c]ode [a]ction";
@@ -546,7 +546,7 @@
     # nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
     {
       key = "<leader>cd";
-      action = ":lua vim.diagnostic.open_float<cr>";
+      action = ":lua vim.diagnostic.open_float()<cr>";
       mode = "n";
       options = {
         desc = "lsp: [c]ode [d]iagnostic";
