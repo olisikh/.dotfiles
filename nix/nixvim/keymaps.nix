@@ -296,7 +296,7 @@
       };
     }
 
-    # Oil plugin
+    # NOTE: Oil plugin
     # nmap('-', oil.open, { desc = 'oil: open parent directory' })
     # nmap('_', function() oil.open(vim.uv.cwd()) end, { desc = 'oil: open cwd directory' })
     {
@@ -316,7 +316,7 @@
       };
     }
 
-    # Smart Splits for Wezterm
+    # NOTE: Smart Splits for Wezterm
     # vim.keymap.set('n', '<A-h>', s.resize_left)
     {
       key = "<A-h>";
@@ -409,7 +409,7 @@
       mode = "n";
     }
 
-    # Telescope
+    # NOTE: Telescope
     #     -- Telescope key mappings
     # nmap('<leader>?', telescope_builtin.oldfiles, { desc = 'telescope: find recently opened files' })
     {
@@ -506,7 +506,7 @@
     }
 
 
-    # LazyGit
+    # NOTE: LazyGit
     {
       key = "<leader>gg";
       action = "<cmd>LazyGit<cr>";
@@ -607,7 +607,7 @@
     }
 
 
-    # JDTLS
+    # NOTE: JDTLS
     # nmap('<leader>jv', function() jdtls.extract_variable() end, { desc = 'jdtls: extract [v]ariable' })
     {
       key = "<leader>jv";
@@ -654,7 +654,7 @@
       };
     }
 
-    # NeoTree
+    # NOTE: NeoTree
     # nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
     {
       key = "<leader>o";
@@ -677,5 +677,14 @@
     }
 
 
+    # NOTE: harpoon2
+    #
+      # { "<leader>A", function() require("harpoon"):list():append() end, desc = "harpoon file", },
+      # { "<leader>a", function() local harpoon = require("harpoon") harpoon.ui:toggle_quick_menu(harpoon:list()) end, desc = "harpoon quick menu", },
+      # { "<leader>1", function() require("harpoon"):list():select(1) end, desc = "harpoon to file 1", },
+      # { "<leader>2", function() require("harpoon"):list():select(2) end, desc = "harpoon to file 2", },
+      # { "<leader>3", function() require("harpoon"):list():select(3) end, desc = "harpoon to file 3", },
+      # { "<leader>4", function() require("harpoon"):list():select(4) end, desc = "harpoon to file 4", },
+      # { "<leader>5", function() require("harpoon"):list():select(5) end, desc = "harpoon to file 5", },
   ];
 } 

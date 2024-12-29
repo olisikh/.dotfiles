@@ -104,27 +104,5 @@
     },
   }
 
-
-  -- NOTE: move to keymaps?
-  -- nmap('<leader>jv', function()
-  -- jdtls.extract_variable()
-  -- end, { desc = 'jdtls: extract [v]ariable' })
-  --
-  -- nmap('<leader>jm', function()
-  --   jdtls.extract_method()
-  -- end, { desc = 'jdtls: extract [m]ethod' })
-  --
-  -- nmap('<leader>jc', function()
-  --   jdtls.extract_constant()
-  -- end, { desc = 'jdtls: extract [c]onstant' })
-  --
-  -- nmap('<leader>jt', function()
-  --   jdtls.pick_test()
-  -- end, { desc = 'jdtls: run [t]est' })
-  --
-  -- nmap('<leader>co', function()
-  --   jdtls.organize_imports()
-  -- end, { desc = 'jdtls: [o]rganize imports' })
-
   jdtls.start_or_attach(config)
 ''

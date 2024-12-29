@@ -2,7 +2,26 @@
   plugins = {
     web-devicons.enable = true;
 
-    lualine.enable = true;
+    lualine = {
+      enable = true;
+      settings = {
+        options = {
+          theme = "catppuccin";
+        };
+        sections = {
+          lualine_c = [
+            "filename"
+          ];
+          lualine_x = [
+            # "harpoon2" # NOTE: plugin is not available as vimPlugin
+            "copilot"
+            "encoding"
+            "filetype"
+          ];
+        };
+      };
+    };
+
     oil.enable = true;
     nvim-tree.enable = true; # NOTE: newer alternative: neo-tree
     smart-splits.enable = true;
@@ -90,12 +109,20 @@
     nvim-autopairs.enable = true;
     lazygit.enable = true;
 
-    # harpoon.enable = true;
-    # TODO: add the following plugin for nice icons in lualine
-    # harpoon-lualine = {
-    #   enable = true;
-    # };
-    # or use harpoon2?
+    harpoon = {
+      enable = true;
+      enableTelescope = true;
+      keymaps = {
+        addFile = "<leader>a";
+        toggleQuickMenu = "<leader>h";
+        navFile = {
+          "1" = "<leader>1";
+          "2" = "<leader>2";
+          "3" = "<leader>3";
+          "4" = "<leader>4";
+        };
+      };
+    };
 
     dap = {
       enable = true;
@@ -340,9 +367,9 @@
     crates.enable = true;
 
     # nvim-jdtls = {
-      # enable = true;
-      # configuration = "${pkgs.jdt-language-server}/config_mac";
-      # data = "~/.cache/jdtls/workspace";
+    # enable = true;
+    # configuration = "${pkgs.jdt-language-server}/config_mac";
+    # data = "~/.cache/jdtls/workspace";
     # };
 
     fidget = {
