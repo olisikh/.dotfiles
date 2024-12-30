@@ -102,16 +102,21 @@ in
       jdt-language-server
       vscode-extensions.vscjava.vscode-java-debug
       vscode-extensions.vscjava.vscode-java-test
+      vscode-extensions.ms-python.debugpy
+      vscode-extensions.vadimcn.vscode-lldb
+      vscode-js-debug
+      delve
     ];
 
     # TODO: all these plugins need to be installed
+    # maybe some of them I could contribute to nixvim
     extraPlugins = with pkgs.vimPlugins; [
       nvim-metals
       nvim-jdtls
       lazydev-nvim
       copilot-lualine
-      harpoon2 # NOTE: contribute and wrap harpoon2 into nixvim?
-      harpoon-lualine # NOTE: same?
+      harpoon2
+      harpoon-lualine
     ];
 
     extraConfigLua = ''

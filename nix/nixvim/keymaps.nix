@@ -422,7 +422,7 @@
     }
     # nmap('<leader><space>', telescope_builtin.buffers, { desc = 'telescope: find existing buffers' })
     {
-      key = "<leader><Space>";
+      key = "<leader>.";
       action = ":lua require('telescope.builtin').buffers()<cr>";
       mode = "n";
       options = {
@@ -433,11 +433,11 @@
     #   telescope_builtin.current_buffer_fuzzy_find(telescope_themes.get_dropdown({ winblend = 10, previewer = false }))
     # end, { desc = 'telescope: fuzzy find in current buffer' })
     {
-      key = "<leader><Space>";
+      key = "<leader>sb";
       action = ":lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({ winblend = 10, previewer = false }))<cr>";
       mode = "n";
       options = {
-        desc = "telescope: find in buffer";
+        desc = "telescope: [s]earch [b]uffer";
       };
     }
     #
@@ -676,15 +676,100 @@
       };
     }
 
-
-    # NOTE: harpoon2
+    # NOTE: DAP
     #
-      # { "<leader>A", function() require("harpoon"):list():append() end, desc = "harpoon file", },
-      # { "<leader>a", function() local harpoon = require("harpoon") harpoon.ui:toggle_quick_menu(harpoon:list()) end, desc = "harpoon quick menu", },
-      # { "<leader>1", function() require("harpoon"):list():select(1) end, desc = "harpoon to file 1", },
-      # { "<leader>2", function() require("harpoon"):list():select(2) end, desc = "harpoon to file 2", },
-      # { "<leader>3", function() require("harpoon"):list():select(3) end, desc = "harpoon to file 3", },
-      # { "<leader>4", function() require("harpoon"):list():select(4) end, desc = "harpoon to file 4", },
-      # { "<leader>5", function() require("harpoon"):list():select(5) end, desc = "harpoon to file 5", },
+    # nmap('<leader>db', dap.toggle_breakpoint, { desc = 'dap: set breakpoint' })
+    {
+      key = "<leader>db";
+      action = ":lua require('dap').toggle_breakpoint()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: set breakpoint";
+      };
+    }
+    # nmap('<leader>dB', function()
+    #   dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+    # end, { desc = 'dap: cond breakpoint' })
+    {
+      key = "<leader>dB";
+      action = ":lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition:'))<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: set breakpoint";
+      };
+    }
+    # nmap('<leader>dc', dap.continue, { desc = 'dap: [c]ontinue' })
+    {
+      key = "<leader>dc";
+      action = ":lua require('dap').continue()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: [c]ontinue";
+      };
+    }
+    # nmap('<leader>di', dap.step_into, { desc = 'dap: step [i]nto' })
+    {
+      key = "<leader>di";
+      action = ":lua require('dap').step_into()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: step [i]nto";
+      };
+    }
+    # nmap('<leader>do', dap.step_out, { desc = 'dap: step [o]ut' })
+    {
+      key = "<leader>do";
+      action = ":lua require('dap').step_out()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: step [o]ut";
+      };
+    }
+    # nmap('<leader>dv', dap.step_over, { desc = 'dap: step o[v]er' })
+    {
+      key = "<leader>dv";
+      action = ":lua require('dap').step_over()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: step o[v]er";
+      };
+    }
+    # -- nmap('<leader>dr', dap.repl.toggle, { desc = 'dap: repl toggle' })
+    {
+      key = "<leader>dr";
+      action = "lua: require('dap').repl.toggle()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: [r]epl toggle";
+      };
+    }
+    # -- nmap('<leader>dh', dap_widgets.hover, { desc = 'dap: hover' })
+    {
+      key = "<leader>dh";
+      action = ":lua require('dap.ui.widgets').hover()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: [h]over";
+      };
+    }
+    #
+    # nmap('<leader>dd', dap_ui.toggle, { desc = 'dap-ui: toggle ui' })
+    {
+      key = "<leader>dd";
+      action = ":lua require('dapui').toggle()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: toggle ui";
+      };
+    }
+    # nmap('<leader>dq', dap.terminate, { desc = 'dap: terminate' })
+    {
+      key = "<leader>dq";
+      action = ":lua require('dapui').terminate()<cr>";
+      mode = "n";
+      options = {
+        desc = "dap: terminate";
+      };
+    }
   ];
 } 
