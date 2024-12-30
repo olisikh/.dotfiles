@@ -26,11 +26,13 @@ in
     };
     adapters = {
       go = {
+        enable = true;
         settings = {
           dap_adapter = "delve";
         };
       };
       python = {
+        enable = true;
         settings = {
           args = [ "-s" ];
           pytest_discover_instances = true;
@@ -55,8 +57,11 @@ in
         };
       };
       scala = {
-        package = neotest-scala;
+        enable = true;
+        package = neotest-scala; # NOTE: replace with my neotest-scala plugin
       };
+      rust.enable = true;
+      vitest.enable = true;
     };
   };
 }
