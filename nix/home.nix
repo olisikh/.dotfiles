@@ -16,7 +16,6 @@ in
     ./ripgrep
     ./starship
     ./git
-    # ./nvim
     ./mc
     ./direnv
     ./nixvim
