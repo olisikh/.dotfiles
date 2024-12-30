@@ -9,6 +9,15 @@ let
       hash = "sha256-pH7U1BYD7B1y611TJ+t8ggPM3KOaSIB3Jtuj3fPKqpc=";
     };
   });
+  zio-quickfix = (pkgs.vimUtils.buildVimPlugin {
+    name = "nvim-scala-zio-quickfix";
+    src = pkgs.fetchFromGitHub {
+      owner = "olisikh";
+      repo = "nvim-scala-zio-quickfix";
+      rev = "main";
+      hash = "sha256-dVRVDBZWncEkBw6cLBJE2HZ8KhNSpffEn3Exvnllx78=";
+    };
+  });
 in
 {
   programs.nixvim = {
@@ -89,14 +98,25 @@ in
       }
     ];
 
-    userCommands = {
-    };
+    userCommands = { };
 
     imports = [
-      ./plugins.nix
       ./options.nix
-      ./keymaps.nix
+      ./plugins.nix
     ];
+
+    keymaps = import ./keymaps
+      ++ import keymaps/dap.nix
+      ++ import keymaps/lsp.nix
+      ++ import keymaps/telescope.nix
+      ++ import keymaps/smart-splits.nix
+      ++ import keymaps/oil.nix
+      ++ import keymaps/nvim-tree.nix
+      ++ import keymaps/neotest.nix
+      ++ import keymaps/trouble.nix
+      ++ import keymaps/nvim-jdtls.nix
+      ++ import keymaps/lazy-git.nix
+      ++ import keymaps/todo-comments.nix;
 
     extraPackages = with pkgs; [
       jdt-language-server
@@ -117,6 +137,7 @@ in
       copilot-lualine
       harpoon2
       harpoon-lualine
+      zio-quickfix
     ];
 
     extraConfigLua = ''
@@ -134,10 +155,9 @@ in
       -- set undodir to ensure that the undofiles are not saved to git repos.
       vim.o.undodir = vim.fn.stdpath("data") .. "/undo" 
 
-
+      -- NOTE: configure harpoon2
       local harpoon = require('harpoon')
       harpoon:setup({})
-
 
       -- TODO: move harpoon config to a separate file
       local conf = require('telescope.config').values
@@ -164,6 +184,14 @@ in
       vim.keymap.set('n', '<leader>2', function() harpoon:list():select(2) end, { desc = 'harpoon: Open file 2' })
       vim.keymap.set('n', '<leader>3', function() harpoon:list():select(3) end, { desc = 'harpoon: Open file 3' })
       vim.keymap.set('n', '<leader>4', function() harpoon:list():select(4) end, { desc = 'harpoon: Open file 4' })
+
+
+      -- NOTE: replace generic letter signs with nice icons for diagnostics
+      local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
+      for type, icon in pairs(signs) do
+        local hl = 'DiagnosticSign' .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+      end
     '';
 
     extraFiles = {
@@ -176,5 +204,3 @@ in
     };
   };
 }
-
-
