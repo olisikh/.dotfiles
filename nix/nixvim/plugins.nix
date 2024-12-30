@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ ... }: {
   plugins = {
     web-devicons.enable = true;
 
@@ -196,6 +196,7 @@
       };
     };
 
+
     # TODO: configure, install adapters
     neotest = {
       enable = true;
@@ -212,10 +213,7 @@
       };
     };
 
-    trouble = {
-      enable = true;
-    };
-
+    trouble.enable = true;
     sleuth.enable = true;
     colorizer.enable = true;
 
