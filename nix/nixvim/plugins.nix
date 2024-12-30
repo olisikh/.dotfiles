@@ -113,11 +113,26 @@
     dap = {
       enable = true;
       signs = {
-        dapBreakpoint = { text = "●"; };
-        dapBreakpointCondition = { text = "●"; };
-        dapBreakpointRejected = { text = "●"; };
-        dapStopped = { text = "→"; };
-        dapLogPoint = { text = "◆"; };
+        dapBreakpoint = {
+          text = "●";
+          texthl = "DapBreakpoint";
+        };
+        dapBreakpointCondition = {
+          text = "●";
+          texthl = "DapBreakpointCondition";
+        };
+        dapBreakpointRejected = {
+          text = "●";
+          texthl = "DapBreakpointRejected";
+        };
+        dapStopped = {
+          text = "→";
+          texthl = "DapStopped";
+        };
+        dapLogPoint = {
+          text = "◆";
+          texthl = "DapLogPoint";
+        };
       };
       extensions = {
         dap-go.enable = true;
@@ -151,6 +166,7 @@
       };
     };
 
+    # TODO: configure, install adapters
     neotest = {
       enable = true;
       settings = {
@@ -209,9 +225,6 @@
         fzf-native = {
           enable = true;
         };
-        # dap = {
-        #   enable = true;
-        # };
         ui-select = {
           enable = true;
         };
