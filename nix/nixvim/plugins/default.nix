@@ -13,6 +13,7 @@
     nvim-autopairs.enable = true;
     lazygit.enable = true;
     dap.enable = true;
+    dap-lldb.enable = true;
     neotest.enable = true;
     trouble.enable = true;
     sleuth.enable = true;
@@ -36,7 +37,7 @@
     nvim-surround.enable = true;
   }
   // import ./blink-cmp.nix
-  // import ./dap.nix
+  // import ./dap.nix { inherit pkgs; }
   // import ./gitsigns.nix
   // import ./lsp.nix
   // import ./lualine.nix
@@ -47,5 +48,6 @@
   // import ./telescope.nix
   // import ./treesitter.nix
   // import ./undotree.nix
+  // import ./rustaceanvim.nix { inherit pkgs; }
   // import ./which-key.nix;
 }

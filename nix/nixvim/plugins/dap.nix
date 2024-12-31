@@ -1,4 +1,4 @@
-{
+{ pkgs, ... }: {
   dap = {
     enable = true;
     signs = {
@@ -24,7 +24,10 @@
       };
     };
     extensions = {
-      dap-go.enable = true;
+      dap-go = {
+        enable = true;
+        delve.path = "${pkgs.delve}/bin/dlv";
+      };
       dap-python.enable = true;
       dap-ui.enable = true;
       dap-virtual-text = {
@@ -51,5 +54,12 @@
       };
     };
     configurations = { };
+  };
+
+  dap-lldb = {
+    enable = true;
+    settings = {
+      codelldb_path = "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb";
+    };
   };
 }

@@ -56,6 +56,7 @@ in
       };
       golang.enable = true;
       rust.enable = true;
+      java.enable = true;
       vitest.enable = true;
     };
   };
