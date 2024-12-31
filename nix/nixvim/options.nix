@@ -24,7 +24,6 @@
     swapfile = false;
     backup = false;
     undofile = true;
-    # TODO: undo files parameters
 
     autoindent = true;
     smartindent = true;

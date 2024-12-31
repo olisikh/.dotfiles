@@ -1,6 +1,5 @@
 # lua
 ''
-  -- NOTE: configure harpoon2
   local harpoon = require('harpoon')
   harpoon:setup({})
 

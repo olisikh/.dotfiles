@@ -50,8 +50,6 @@
         virtTextWinCol = null; # -- position the virtual text at a fixed window column (starting from the first text column) ,
       };
     };
-    configurations = {
-      # TODO: should I define configurations here or elsewhere?
-    };
+    configurations = { };
   };
 }

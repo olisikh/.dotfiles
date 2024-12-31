@@ -1,5 +1,4 @@
 [
-  # TODO: configure NeoTest
   # NOTE: NeoTest
   # nmap('<leader>tr', neotest.run.run, { desc = 'neotest: run nearest test' })
   {

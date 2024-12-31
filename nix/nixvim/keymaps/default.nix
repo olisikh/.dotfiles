@@ -295,17 +295,15 @@
       };
     }
   ]
-  ++ (
-  (import ./dap.nix)
-  ++ (import ./lsp.nix)
-  ++ (import ./telescope.nix)
-  ++ (import ./smart-splits.nix)
-  ++ (import ./oil.nix)
-  ++ (import ./nvim-tree.nix)
-  ++ (import ./neotest.nix)
-  ++ (import ./trouble.nix)
-  ++ (import ./nvim-jdtls.nix)
-  ++ (import ./lazy-git.nix)
-  ++ (import ./todo-comments.nix)
-  );
+  ++ import ./dap.nix
+  ++ import ./lsp.nix
+  ++ import ./telescope.nix
+  ++ import ./smart-splits.nix
+  ++ import ./oil.nix
+  ++ import ./nvim-tree.nix
+  ++ import ./neotest.nix
+  ++ import ./trouble.nix
+  ++ import ./nvim-jdtls.nix
+  ++ import ./lazy-git.nix
+  ++ import ./todo-comments.nix;
 }
