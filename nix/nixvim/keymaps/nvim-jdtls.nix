@@ -1,7 +1,7 @@
 [
   # nmap('<leader>jv', function() jdtls.extract_variable() end, { desc = 'jdtls: extract [v]ariable' })
   {
-    key = "<leader>jv";
+    key = "<leader>cev";
     action = ":lua require('jdtls').extract_variable()<cr>";
     mode = "n";
     options = {
@@ -10,7 +10,7 @@
   }
   # nmap('<leader>jm', function() jdtls.extract_method() end, { desc = 'jdtls: extract [m]ethod' })
   {
-    key = "<leader>jm";
+    key = "<leader>cem";
     action = ":lua require('jdtls').extract_method()<cr>";
     mode = "n";
     options = {
@@ -19,7 +19,7 @@
   }
   # nmap('<leader>jc', function() jdtls.extract_constant() end, { desc = 'jdtls: extract [c]onstant' })
   {
-    key = "<leader>jc";
+    key = "<leader>cec";
     action = ":lua require('jdtls').extract_constant()<cr>";
     mode = "n";
     options = {
@@ -28,7 +28,7 @@
   }
   # nmap('<leader>jt', function() jdtls.pick_test() end, { desc = 'jdtls: run [t]est' })
   {
-    key = "<leader>jt";
+    key = "<leader>cjt";
     action = ":lua require('jdtls').pick_test()<cr>";
     mode = "n";
     options = {

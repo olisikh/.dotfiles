@@ -5,7 +5,7 @@
     action = ":TodoTelescope<cr>";
     mode = "n";
     options = {
-      desc = "todo: [s]each [t]odos";
+      desc = "telescope: [s]each [t]odos";
     };
   }
   # nmap('<leader>xt', ':TodoTrouble<cr>', { desc = 'trouble: [t]odos' })

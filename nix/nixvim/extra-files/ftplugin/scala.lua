@@ -39,19 +39,19 @@ metals_config.init_options = {
 metals_config.capabilities = require('blink.cmp').get_lsp_capabilities()
 metals_config.on_attach = function(client, bufnr)
   -- Metals specific mappings
-  map('v', '<leader>mt', function() metals.type_of_range() end,
+  map('v', '<leader>ctr', function() metals.type_of_range() end,
     { desc = 'metals: see type of range' })
-  map('n', '<leader>mw', function() metals.hover_worksheet({ border = 'single' }) end,
+  map('n', '<leader>chw', function() metals.hover_worksheet({ border = 'single' }) end,
     { desc = 'metals: hover worksheet' })
-  map('n', '<leader>mv', function() metals_tvp.toggle_tree_view() end,
+  map('n', '<leader>ctv', function() metals_tvp.toggle_tree_view() end,
     { desc = 'metals: toggle tree view' })
-  map('n', '<leader>mr', function() metals_tvp.reveal_in_tree() end,
+  map('n', '<leader>crt', function() metals_tvp.reveal_in_tree() end,
     { desc = 'metals: reveal in tree' })
-  map('n', '<leader>mi', function() metals.toggle_setting('showImplicitArguments') end,
+  map('n', '<leader>cts', function() metals.toggle_setting('showImplicitArguments') end,
     { desc = 'metals: show implicit args' })
-  map('n', '<leader>mc', function() require('telescope').extensions.metals.commands() end,
+  map('n', '<leader>cmc', function() require('telescope').extensions.metals.commands() end,
     { desc = 'metals: open commands' })
-  map('n', '<leader>mf', function() metals.run_scalafix() end,
+  map('n', '<leader>csf', function() metals.run_scalafix() end,
     { desc = 'metals: scalafix' })
   map('n', '<leader>co', function() metals.organize_imports() end,
     { desc = 'metals: [o]rganise imports' })

@@ -137,7 +137,7 @@
     # map('x', '<leader>p', '"_dP', { desc = 'paste keeping the clipboard' })
     {
       key = "<leader>p";
-      action = "\"_dP";
+      action = ''"_dP'';
       mode = "x";
       options = {
         desc = "paste & keep";
@@ -150,23 +150,23 @@
     # map({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'cut to blackhole register' })
     {
       key = "<leader>y";
-      action = "\"+y";
+      action = ''"+y'';
       mode = "n";
       options = {
-        desc = "copy to blackhole";
+        desc = "yank to system clipboard";
       };
     }
     {
       key = "<leader>y";
-      action = "\"+y";
+      action = ''"+y'';
       mode = "v";
       options = {
-        desc = "copy to blackhole";
+        desc = "yank to system clipboard";
       };
     }
     {
       key = "<leader>Y";
-      action = "\"+Y";
+      action = ''"+Y'';
       mode = "n";
       options = {
         desc = "copy line to blackhole";
@@ -174,7 +174,7 @@
     }
     {
       key = "<leader>d";
-      action = "\"_d";
+      action = ''"_d'';
       mode = "n";
       options = {
         desc = "cut to blackhole";
@@ -182,7 +182,7 @@
     }
     {
       key = "<leader>d";
-      action = "\"_d";
+      action = ''"_d'';
       mode = "v";
       options = {
         desc = "cut to blackhole";
@@ -305,5 +305,6 @@
   ++ import ./trouble.nix
   ++ import ./nvim-jdtls.nix
   ++ import ./lazy-git.nix
-  ++ import ./todo-comments.nix;
+  ++ import ./todo-comments.nix
+  ++ import ./treesj.nix;
 }

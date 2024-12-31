@@ -126,6 +126,7 @@ in
       harpoon2
       harpoon-lualine
       zio-quickfix
+      treesj
     ];
 
     extraConfigLua = import ./extra-config;
