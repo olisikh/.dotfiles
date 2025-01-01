@@ -13,9 +13,14 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, flake-utils, home-manager, ... } @ inputs:
+  outputs = { nixpkgs, flake-utils, home-manager, nixvim, ... } @ inputs:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -60,7 +65,10 @@
         # personal
         packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./nix/home.nix ];
+          modules = [ 
+            nixvim.homeManagerModules.nixvim
+            ./nix/home.nix 
+          ];
         };
 
         # work
