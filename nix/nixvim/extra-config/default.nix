@@ -21,6 +21,9 @@
       local hl = 'DiagnosticSign' .. type
       vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
     end
+
+    -- NOTE: install plugins that don't have interfacing via nixvim
+    require('scala-zio-quickfix').setup({});
   ''
 )
-+ import ./harpoon.lua.nix
+  + import ./harpoon.lua.nix

@@ -65,9 +65,10 @@
         # personal
         packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ 
+
+          modules = [
             nixvim.homeManagerModules.nixvim
-            ./nix/home.nix 
+            ./nix/home.nix
           ];
         };
 

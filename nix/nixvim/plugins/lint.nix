@@ -2,6 +2,8 @@
   lint = {
     enable = true;
     lintersByFt = {
+      javascript = [ "eslint_d" ];
+      typescript = [ "eslint_d" ];
       json = [ "jsonlint" ];
       yaml = [ "yamllint" ];
       markdown = [ "vale" ];

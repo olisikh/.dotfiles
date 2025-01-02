@@ -113,6 +113,7 @@ in
       vscode-extensions.davidanson.vscode-markdownlint
       vscode-js-debug
       gofumpt
+      gotools
       black
       isort
       lldb
@@ -129,6 +130,9 @@ in
       rustfmt
       stylua
       jq
+      ktlint
+      eslint_d
+      google-java-format
     ];
 
     # TODO: all these plugins need to be installed
@@ -144,7 +148,12 @@ in
       treesj
     ];
 
-    extraConfigLua = import ./extra-config;
     extraFiles = import ./extra-files { inherit pkgs; };
+
+    extraConfigLua = import ./extra-config;
+    extraConfigLuaPost = ''
+      -- This line is called a `modeline`. See `:help modeline`
+      -- vim: ts=2 sts=2 sw=2 et
+    '';
   };
 }

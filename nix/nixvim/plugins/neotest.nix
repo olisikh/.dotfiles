@@ -34,7 +34,6 @@ in
             # lua
             ''
               function(file_path)
-                vim.print("I AM EXECUTED!")
                 if not vim.endswith(file_path, ".py") then
                   return false
                 end
@@ -44,20 +43,22 @@ in
                   return false
                 end
                 local content = file:read('a')
+                file:close()
 
                 if content == nil then
                   return false
                 end
 
-                file:close()
                 local has_tests = content:match('def test')
 
-                if content:match('def test') then
+                -- NOTE: check if there are functions that start with test_
+                if content:match('def test_') then
                   return true
                 end
 
-                local elems = vim.split(file_path, "/")
-                local file_name = elems[#elems]
+                -- NOTE: check if there are files starting or ending with test
+                local path_segments = vim.split(file_path, "/")
+                local file_name = elems[#path_segments]
                 return vim.startswith(file_name, "test_") or vim.endswith(file_name, "_test.py")
               end
             '';

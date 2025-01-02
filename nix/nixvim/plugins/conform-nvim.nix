@@ -9,14 +9,16 @@
       formatters_by_ft = {
         "_" = [ "trim_whitespace" ];
         go = [ "goimports" "gofumpt" ];
-        javascript = [ [ "prettierd" ] ];
+        javascript = [ "prettierd" ];
+        typescript = [ "prettierd" ];
+        java = [ "google-java-format" ];
         json = [ "jq" ];
         lua = [ "stylua" ];
         python = [ "isort" "black" ];
         rust = [ "rustfmt" ];
         sh = [ "shfmt" ];
         terraform = [ "terraform_fmt" ];
-        kotlin = [ "ktlin" ];
+        kotlin = [ "ktlint" ];
       };
     };
   };

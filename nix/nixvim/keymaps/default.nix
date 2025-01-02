@@ -172,22 +172,22 @@
         desc = "copy line to blackhole";
       };
     }
-    {
-      key = "<leader>d";
-      action = ''"_d'';
-      mode = "n";
-      options = {
-        desc = "cut to blackhole";
-      };
-    }
-    {
-      key = "<leader>d";
-      action = ''"_d'';
-      mode = "v";
-      options = {
-        desc = "cut to blackhole";
-      };
-    }
+    # {
+    #   key = "<leader>d";
+    #   action = ''"_d'';
+    #   mode = "n";
+    #   options = {
+    #     desc = "cut to blackhole";
+    #   };
+    # }
+    # {
+    #   key = "<leader>d";
+    #   action = ''"_d'';
+    #   mode = "v";
+    #   options = {
+    #     desc = "cut to blackhole";
+    #   };
+    # }
 
     #
     # -- Increase speed of window resize commande
