@@ -47,16 +47,10 @@
   local java_test_path = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test"
   local lombok_path = "${pkgs.lombok}/share/java"
 
-  vim.print(java_lsp_path)
-  vim.print(java_test_path)
-  vim.print(java_dap_path)
-
   local bundles = {
     vim.fn.glob(java_dap_path .. '/server/com.microsoft.java.debug.plugin-*.jar', true),
   }
   vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. '/server/*.jar', true), '\n'))
-
-  vim.print(vim.inspect(bundles))
 
   -- NOTE: Decrease the amount of files to improve speed(Experimental).
   -- INFO: It's annoying to edit the version again and again.
