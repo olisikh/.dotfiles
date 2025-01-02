@@ -29,17 +29,22 @@
     hardtime.enable = true;
     blink-cmp.enable = true;
     lsp.enable = true;
+    lint.enable = true;
+    conform-nvim.enable = true;
     none-ls.enable = true;
     helm.enable = true;
     rustaceanvim.enable = true;
     crates.enable = true;
     fidget.enable = true;
     nvim-surround.enable = true;
+    nix.enable = true;
   }
   // import ./blink-cmp.nix
   // import ./dap.nix { inherit pkgs; }
   // import ./gitsigns.nix
   // import ./lsp.nix
+  // import ./lint.nix
+  // import ./conform-nvim.nix
   // import ./lualine.nix
   // import ./markdown-preview.nix
   // import ./neotest.nix { inherit pkgs; }

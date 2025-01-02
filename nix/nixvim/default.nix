@@ -9,7 +9,7 @@ let
       hash = "sha256-pH7U1BYD7B1y611TJ+t8ggPM3KOaSIB3Jtuj3fPKqpc=";
     };
   });
-  zio-quickfix = (pkgs.vimUtils.buildVimPlugin {
+  nvim-scala-zio-quickfix = (pkgs.vimUtils.buildVimPlugin {
     name = "nvim-scala-zio-quickfix";
     src = pkgs.fetchFromGitHub {
       owner = "olisikh";
@@ -22,6 +22,7 @@ in
 {
   programs.nixvim = {
     enable = true;
+    defaultEditor = true;
 
     # TODO: use nightly?
     # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
@@ -98,8 +99,6 @@ in
       }
     ];
 
-    userCommands = { };
-
     imports = [
       ./options.nix
       ./keymaps
@@ -111,9 +110,25 @@ in
       vscode-extensions.vscjava.vscode-java-debug
       vscode-extensions.vscjava.vscode-java-test
       vscode-extensions.ms-python.debugpy
-      vscode-extensions.vadimcn.vscode-lldb
+      vscode-extensions.davidanson.vscode-markdownlint
       vscode-js-debug
+      gofumpt
+      black
+      isort
+      lldb
       delve
+      prettierd
+      yamllint
+      hadolint
+      vale
+      tflint
+      pylint
+      checkstyle
+      nodePackages.jsonlint
+      shfmt
+      rustfmt
+      stylua
+      jq
     ];
 
     # TODO: all these plugins need to be installed
@@ -125,7 +140,7 @@ in
       copilot-lualine
       harpoon2
       harpoon-lualine
-      zio-quickfix
+      nvim-scala-zio-quickfix
       treesj
     ];
 

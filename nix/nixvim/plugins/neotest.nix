@@ -30,10 +30,16 @@ in
         settings = {
           args = [ "-s" ];
           pytest_discover_instances = true;
-          is_test_file = {
-            __raw = ''
-              function(path)
-                local file = io.open(path, 'r')
+          is_test_file.__raw =
+            # lua
+            ''
+              function(file_path)
+                vim.print("I AM EXECUTED!")
+                if not vim.endswith(file_path, ".py") then
+                  return false
+                end
+
+                local file = io.open(file_path, 'r')
                 if file == nil then
                   return false
                 end
@@ -41,13 +47,20 @@ in
 
                 if content == nil then
                   return false
-                else
-                  file:close()
-                  return content:match('def test_')
                 end
+
+                file:close()
+                local has_tests = content:match('def test')
+
+                if content:match('def test') then
+                  return true
+                end
+
+                local elems = vim.split(file_path, "/")
+                local file_name = elems[#elems]
+                return vim.startswith(file_name, "test_") or vim.endswith(file_name, "_test.py")
               end
             '';
-          };
         };
       };
       scala = {
@@ -58,6 +71,7 @@ in
       rust.enable = true;
       java.enable = true;
       vitest.enable = true;
+      jest.enable = true;
     };
   };
 }

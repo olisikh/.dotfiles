@@ -1,4 +1,52 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+let
+  jsDapConfig = [
+    {
+      type = "pwa-node";
+      request = "launch";
+      name = "Launch file";
+      program = ''''${file}'';
+      cwd = ''''${workspaceFolder}'';
+    }
+    {
+      type = "pwa-node";
+      request = "attach";
+      name = "Attach";
+      processId = { __raw = "require'dap.utils'.pick_process"; };
+      cwd = ''''${workspaceFolder}'';
+    }
+    {
+      type = "pwa-node";
+      request = "launch";
+      name = "Debug Jest Tests";
+      # -- trace = true, -- include debugger info
+      runtimeExecutable = "node";
+      runtimeArgs = [
+        "./node_modules/jest/bin/jest.js"
+        "--runInBand"
+      ];
+      rootPath = ''''${workspaceFolder}'';
+      cwd = ''''${workspaceFolder}'';
+      console = "integratedTerminal";
+      internalConsoleOptions = "neverOpen";
+    }
+    {
+      type = "pwa-node";
+      request = "launch";
+      name = "Debug Mocha Tests";
+      # -- trace = true, -- include debugger info
+      runtimeExecutable = "node";
+      runtimeArgs = [
+        "./node_modules/mocha/bin/mocha.js"
+      ];
+      rootPath = ''''${workspaceFolder}'';
+      cwd = ''''${workspaceFolder}'';
+      console = "integratedTerminal";
+      internalConsoleOptions = "neverOpen";
+    }
+  ];
+in
+{
   dap = {
     enable = true;
     signs = {
@@ -53,7 +101,20 @@
         virtTextWinCol = null; # -- position the virtual text at a fixed window column (starting from the first text column) ,
       };
     };
-    configurations = { };
+    configurations = {
+      java = [
+        {
+          type = "java";
+          request = "launch";
+          name = "Debug (Attach) - Remote";
+          hostName = "127.0.0.1";
+          port = 5005;
+        }
+      ];
+
+      javascript = jsDapConfig;
+      typescript = jsDapConfig;
+    };
   };
 
   dap-lldb = {

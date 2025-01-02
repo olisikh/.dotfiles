@@ -29,7 +29,7 @@
   # nmap('<leader>cf', function() vim.lsp.buf.format() end, { desc = 'lsp: [c]ode [f]ormat' })
   {
     key = "<leader>cf";
-    action = ":lua vim.lsp.buf.format()<cr>";
+    action = ":lua require('conform').format()<cr>";
     mode = "n";
     options = {
       desc = "lsp: [c]ode [f]ormat";
@@ -44,7 +44,7 @@
   # end, { desc = 'lsp: [c]ode [f]ormat' })
   {
     key = "<leader>cf";
-    action = ":lua vim.lsp.buf.format({ range = { vim.fn.getpos(\"'<\"), vim.fn.getpos(\"'>\") } })<cr>";
+    action = ":lua require('conform').format()<cr>";
     mode = "v";
     options = {
       desc = "lsp: [c]ode [f]ormat";
@@ -59,6 +59,15 @@
     mode = "n";
     options = {
       desc = "lsp: [c]ode [i]nlay hints";
+    };
+  }
+  # map("n", "<leader>cl", vim.lsp.codelens.run)
+  {
+    key = "<leader>cl";
+    action = ":lua vim.lsp.codelens.run()<cr>";
+    mode = "n";
+    options = {
+      desc = "lsp: [c]ode [l]ens";
     };
   }
   # nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })

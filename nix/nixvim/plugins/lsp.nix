@@ -78,16 +78,16 @@
       pylsp.enable = true;
       pylyzer.enable = true;
       terraformls.enable = true;
+      marksman.enable = true;
 
       nixd = {
         enable = true;
         settings = {
-          # formatting = {
-          #   enable = false; # NOTE: delegate to none-ls
-          #
-          #   # command = [ "nixpkgs-fmt" ];
-          # };
-          # nixpkgs.expr = "import <nixpkgs> {}";
+          formatting = {
+            enable = true;
+            command = [ "nixpkgs-fmt" ];
+          };
+          nixpkgs.expr = "import <nixpkgs> {}";
         };
       };
 

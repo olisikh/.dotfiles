@@ -5,5 +5,4 @@
 3. LSP formatting and none-ls seem to conflict, (e.g. double formatting which leads to unpredictability)
 4. Add kotlin support
 5. JS/TS is missing everything except lsp and neotest
-
-
+6. Neotest python is not working
