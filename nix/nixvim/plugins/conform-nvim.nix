@@ -10,7 +10,9 @@
         "_" = [ "trim_whitespace" ];
         go = [ "goimports" "gofumpt" ];
         javascript = [ "prettierd" ];
+        javascriptreact = [ "prettierd" ];
         typescript = [ "prettierd" ];
+        typescriptreact = [ "prettierd" ];
         java = [ "google-java-format" ];
         json = [ "jq" ];
         lua = [ "stylua" ];

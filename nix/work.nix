@@ -66,6 +66,7 @@ in
       xdg-utils # open apps from console/neovim
       wezterm
       lazygit
+      gh
       gnupg # tool for generating GPG keys
       watch
       rover

@@ -73,6 +73,7 @@ in
       arc-browser
       wezterm
       lazygit
+      gh
       watch
       (python3.withPackages (ps: with ps; [
         pip

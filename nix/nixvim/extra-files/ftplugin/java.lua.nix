@@ -82,7 +82,6 @@
   local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
   local workspace_dir = workspace_path .. '/' .. project_name
   local config_dir = vim.fn.stdpath('data') .. '/jdtls-config'
-  -- local config_dir = java_lsp_path .. '/config_' .. os_name 
 
   -- WARN: IMPORTANT! The folder of a config for equinox must be writeable!
   if not folder_exists(config_dir) then
@@ -146,11 +145,6 @@
         contentProvider = {
             preferred = "fernflower"
         },
-        -- Setup automatical package import oranization on file save
-        saveActions = {
-            organizeImports = true
-        },
-        -- Customize completion options
         completion = {
             -- When using an unimported static method, how should the LSP rank possible places to import the static method from
             favoriteStaticMembers = {
@@ -186,7 +180,6 @@
                 staticThreshold = 9999
             }
         },
-        -- How should different pieces of code be generated?
         codeGeneration = {
             -- When generating toString use a json format
             toString = {
@@ -203,11 +196,11 @@
         configuration = {
             updateBuildConfiguration = "interactive"
         },
-        -- enable code lens in the lsp
+        -- Enable code lens in the lsp
         referencesCodeLens = {
             enabled = true
         },
-        -- enable inlay hints for parameter names,
+        -- Enable inlay hints for parameter names,
         inlayHints = {
             parameterNames = {
                 enabled = "all"

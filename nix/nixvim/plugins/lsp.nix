@@ -76,7 +76,7 @@
       # jdtls.enable = true;
       kotlin_language_server.enable = true;
       pylsp.enable = true;
-      pylyzer.enable = true;
+      # pylyzer.enable = true;
       terraformls.enable = true;
       marksman.enable = true;
 
