@@ -3,18 +3,20 @@
 ''
   local jdtls = require('jdtls')
 
-  local java_lsp_path = "${pkgs.jdt-language-server}"
-  local java_dap_path = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}"
-  local java_test_path = "${pkgs.vscode-extensions.vscjava.vscode-java-test}"
+  local java_lsp_path = "${pkgs.jdt-language-server}/share/java/jdtls"
+  local java_dap_path = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug"
+  local java_test_path = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test"
+  local lombok_path = "${pkgs.lombok}/share/java"
 
   local bundles = {
-    vim.fn.glob(java_dap_path .. '/extension/server/com.microsoft.java.debug.plugin-*.jar', true),
+    vim.fn.glob(java_dap_path .. '/server/com.microsoft.java.debug.plugin-*.jar', true),
   }
-  vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. '/extension/server/*.jar', true), '\n'))
+  vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. '/server/*.jar', true), '\n'))
 
   -- NOTE: Decrease the amount of files to improve speed(Experimental).
   -- INFO: It's annoying to edit the version again and again.
   local equinox_path = vim.split(vim.fn.glob(java_lsp_path .. '/plugins/*jar'), '\n')
+
   local equinox_launcher = ""
 
   for _, file in pairs(equinox_path) do
@@ -24,7 +26,10 @@
     end
   end
 
+  vim.print(equinox_launcher)
+
   WORKSPACE_PATH = vim.fn.stdpath('data') .. '/workspace/'
+
   if vim.fn.has('mac') == 1 then
     OS_NAME = 'mac'
   elseif vim.fn.has('unix') == 1 then
@@ -47,7 +52,7 @@
       '-Declipse.product=org.eclipse.jdt.ls.core.product',
       '-Dlog.protocol=true',
       '-Dlog.level=ALL',
-      '-javaagent:' .. java_lsp_path .. '/lombok.jar',
+      '-javaagent:' .. lombok_path .. '/lombok.jar',
       '-Xms1g',
       '--add-modules=ALL-SYSTEM',
       '--add-opens',
@@ -56,16 +61,14 @@
       'java.base/java.lang=ALL-UNNAMED',
       '-jar',
       equinox_launcher,
+      -- TODO: this folder must be writeable, can we copy it out of java_lsp_path and make it writeable? :thinking:
       '-configuration',
-      java_lsp_path .. '/config_' .. OS_NAME,
+      java_lsp_path .. '/config_' .. OS_NAME,  -- WARN: this folder has to be writeable, but how to do it with nix
       '-data',
       workspace_dir,
     },
 
-    -- on_attach = function(client, bufnr)
-    --   require('user.lsp_utils').default_attach(client, bufnr)
-    -- end,
-    -- capabilities = require('user.lsp_utils').capabilities,
+    capabilities = require('blink.cmp').get_lsp_capabilities(),
     -- 💀
     -- This is the default if not provided, you can remove it. Or adjust as needed.
     -- One dedicated LSP server & client will be started per unique root_dir

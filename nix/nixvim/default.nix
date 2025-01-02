@@ -81,6 +81,7 @@ in
       ktlint
       eslint_d
       google-java-format
+      lombok
     ];
 
     # TODO: all these plugins need to be installed
