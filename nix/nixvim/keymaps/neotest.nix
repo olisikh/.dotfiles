@@ -99,4 +99,12 @@
       desc = "neotest: jump to next failed test";
     };
   }
+  {
+    key = "<leader>tS";
+    action = ":lua require('neotest').summary.toggle()<cr>";
+    mode = "n";
+    options = {
+      desc = "neotest: [t]est [S]ummary";
+    };
+  }
 ]

@@ -9,11 +9,21 @@ let
       hash = "sha256-RFEPtWPVHKehfc6PMF6ya0UaDpFIJDD8bFG8xwXPpsk=";
     };
   });
+  neotest-gradle = (pkgs.vimUtils.buildVimPlugin {
+    name = "neotest-gradle";
+    src = pkgs.fetchFromGitHub {
+      owner = "olisikh";
+      repo = "neotest-gradle";
+      rev = "fix/no_tests_found";
+      hash = "sha256-5vwd7VjJjiaWiNWde9iHJMPvNxrOoX28iCJFkDb93is=";
+    };
+  });
 in
 {
   neotest = {
     enable = true;
     settings = {
+      log_level = "debug"; # NOTE: show debug logs
       diagnostic = {
         enabled = true;
         severity = "error";
@@ -38,28 +48,32 @@ in
                   return false
                 end
 
-                local file = io.open(file_path, 'r')
+                -- NOTE: check if there the file is starting or ending with test keyword
+                local path_segments = vim.split(file_path, "/")
+                local file_name = path_segments[#path_segments]
+                if vim.startswith(file_name, "test_") then
+                  return true
+                elseif vim.endswith(file_name, "_test.py" ) then
+                  return true
+                end
+
+                local file = io.open(file_path, "r")
                 if file == nil then
                   return false
                 end
-                local content = file:read('a')
+                local content = file:read("a")
                 file:close()
 
                 if content == nil then
                   return false
                 end
 
-                local has_tests = content:match('def test')
-
                 -- NOTE: check if there are functions that start with test_
-                if content:match('def test_') then
+                if content:match("def test_") then
                   return true
                 end
 
-                -- NOTE: check if there are files starting or ending with test
-                local path_segments = vim.split(file_path, "/")
-                local file_name = elems[#path_segments]
-                return vim.startswith(file_name, "test_") or vim.endswith(file_name, "_test.py")
+                return false
               end
             '';
         };
@@ -70,9 +84,12 @@ in
       };
       golang.enable = true;
       rust.enable = true;
-      java.enable = true;
       vitest.enable = true;
       jest.enable = true;
+      gradle = {
+        enable = true;
+        package = neotest-gradle;
+      };
     };
   };
 }

@@ -26,4 +26,4 @@
     require('scala-zio-quickfix').setup({});
   ''
 )
-  + import ./harpoon.lua.nix
++ import ./harpoon.lua.nix
