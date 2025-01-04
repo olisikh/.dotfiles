@@ -18,6 +18,7 @@
   };
 
   treesitter-textobjects = {
+    enable = true;
     select = {
       enable = true;
       lookahead = true; # -- Automatically jump forward to textobj, similar to targets.vim
@@ -63,6 +64,7 @@
   };
 
   treesitter-context = {
+    enable = true;
     settings = {
       max_lines = 5; # -- How many lines the window should span. Values <= 0 mean no limit.
       min_window_height = 0; # -- Minimum editor window height to enable context. Values <= 0 mean no limit.

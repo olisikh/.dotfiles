@@ -24,6 +24,32 @@
 
     -- NOTE: install plugins that don't have interfacing via nixvim
     require('scala-zio-quickfix').setup({});
+
+    -- NOTE: setup border for ui elements
+    local _border = "rounded"
+
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+      vim.lsp.handlers.hover, {
+        border = _border
+      }
+    )
+
+    vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+      vim.lsp.handlers.signature_help, {
+        border = _border
+      }
+    )
+
+    vim.diagnostic.config {
+      float = { border = _border }
+    };
+
+    require('lspconfig.ui.windows').default_options = { border = _border }
+
+    -- #NOTE: open and close DAP UI when debugging on/off
+    require('dap').listeners.after.event_initialized['dapui_config'] = require('dapui').open
+    require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
+    require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
   ''
 )
-+ import ./harpoon.lua.nix
+  + import ./harpoon.lua.nix

@@ -83,7 +83,7 @@ in
         package = neotest-scala; # NOTE: replace with my neotest-scala plugin
       };
       golang.enable = true;
-      rust.enable = true;
+      rust.enable = true; # NOTE: rustacean's neotest integration is used instead
       vitest.enable = true;
       jest.enable = true;
       gradle = {

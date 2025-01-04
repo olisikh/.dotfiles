@@ -13,7 +13,6 @@
     nvim-autopairs.enable = true;
     lazygit.enable = true;
     dap.enable = true;
-    dap-lldb.enable = true;
     neotest.enable = true;
     trouble.enable = true;
     sleuth.enable = true;

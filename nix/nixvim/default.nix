@@ -59,12 +59,12 @@ in
       vscode-extensions.vscjava.vscode-java-test
       vscode-extensions.ms-python.debugpy
       vscode-extensions.davidanson.vscode-markdownlint
+      vscode-extensions.vadimcn.vscode-lldb
       vscode-js-debug
       gofumpt
       gotools
       black
       isort
-      lldb
       delve
       prettierd
       yamllint
@@ -76,6 +76,7 @@ in
       nodePackages.jsonlint
       shfmt
       rustfmt
+      rust-analyzer
       stylua
       jq
       ktlint

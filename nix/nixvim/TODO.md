@@ -1,8 +1,5 @@
 ## TODOs:
 
-1. Rust doesn't work well with neotest
-2. Rust has issues detecting lldb
-3. LSP formatting and none-ls seem to conflict, (e.g. double formatting which leads to unpredictability)
-4. Add kotlin support
-5. JS/TS is missing everything except lsp and neotest
-6. Neotest python is not working
+1. Rust has no dap config
+1. Add kotlin support
+1. JS/TS is missing everything except lsp and neotest
