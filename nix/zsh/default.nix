@@ -35,9 +35,7 @@
           export EDITOR='nvim'
         fi
 
-        # Add rust (cargo) executables
-        export CARGO_HOME=$HOME/.cargo
-        export PATH="$CARGO_HOME/bin:$PATH"
+        export LIBRARY_PATH="${pkgs.libiconv}/lib:$LIBRARY_PATH";
 
         alias tf=terraform
         alias k=kubectl

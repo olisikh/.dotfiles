@@ -18,6 +18,15 @@ let
       hash = "sha256-dVRVDBZWncEkBw6cLBJE2HZ8KhNSpffEn3Exvnllx78=";
     };
   });
+  nvim-dap-kotlin = (pkgs.vimUtils.buildVimPlugin {
+    name = "nvim-dap-kotlin";
+    src = pkgs.fetchFromGitHub {
+      owner = "olisikh";
+      repo = "nvim-dap-kotlin";
+      rev = "fix/bugs_and_deprecations";
+      hash = "sha256-cz0oCg5XSXKuPswMVYioawnDroPhgQd7PWt9v1ugPBE=";
+    };
+  });
 in
 {
   programs.nixvim = {
@@ -29,21 +38,41 @@ in
 
     colorschemes = import ./colorscheme;
 
+    autoGroups = {
+      user_generic.clear = true;
+      user_lsp.clear = true;
+    };
+
     autoCmd = [
       {
-        event = [ "TextYankPost" ];
-        pattern = [ "*" ];
+        event = "TextYankPost";
+        pattern = "*";
+        group = "user_generic";
         command = "silent! lua vim.highlight.on_yank()";
       }
       {
         event = [ "BufRead" "BufNewFile" ];
         pattern = [ "*.tf" " *.tfvars" " *.hcl" ];
+        group = "user_lsp";
         command = "set filetype=terraform";
       }
       {
         event = "FileType";
         pattern = "helm";
+        group = "user_lsp";
         command = "LspRestart";
+      }
+      {
+        event = [ "BufEnter" "CursorHold" "InsertLeave" ];
+        pattern = "*";
+        group = "user_lsp";
+        callback.__raw =
+          # lua
+          ''
+            function()
+              pcall(vim.lsp.codelens.refresh)
+            end
+          '';
       }
     ];
 
@@ -77,6 +106,7 @@ in
       shfmt
       rustfmt
       rust-analyzer
+      libiconv
       stylua
       jq
       ktlint
@@ -96,11 +126,11 @@ in
       harpoon-lualine
       nvim-scala-zio-quickfix
       treesj
+      nvim-dap-kotlin
     ];
 
     extraFiles = import ./extra-files { inherit pkgs; };
-
-    extraConfigLua = import ./extra-config;
+    extraConfigLua = import ./extra-config { inherit pkgs; };
     extraConfigLuaPost = ''
       -- This line is called a `modeline`. See `:help modeline`
       -- vim: ts=2 sts=2 sw=2 et

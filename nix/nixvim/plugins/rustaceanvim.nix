@@ -7,7 +7,6 @@ in
 {
   rustaceanvim = {
     enable = true;
-
     settings = {
       dap = {
         autoload_configurations = true;
@@ -22,9 +21,16 @@ in
       server = {
         default_settings = {
           rust-analyzer = {
+            cargo.allFeatures = true;
+            installCargo = false;
+            installRustc = false;
             files = { excludeDirs = [ ".direnv" ]; };
           };
         };
+      };
+      tools = {
+        enable_nextest = true;
+        # test_executor = "neotest";
       };
     };
   };

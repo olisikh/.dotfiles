@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   plugins = {
+    lz-n.enable = true;
     web-devicons.enable = true;
     lualine.enable = true;
     oil.enable = true;
@@ -53,5 +54,6 @@
   // import ./treesitter.nix
   // import ./undotree.nix
   // import ./rustaceanvim.nix { inherit pkgs; }
-  // import ./which-key.nix;
+  // import ./which-key.nix
+  // import ./copilot-lua.nix;
 }

@@ -1,3 +1,11 @@
+{ pkgs, ... }:
+let
+  kotlin-dap-adapter = pkgs.fetchzip {
+    name = "kotlin-dap-adapter-0.4.4";
+    url = "https://github.com/fwcd/kotlin-debug-adapter/releases/download/0.4.4/adapter.zip";
+    hash = "sha256-gNbGomFcWqOLTa83/RWS4xpRGr+jmkovns9Sy7HX9bg=";
+  };
+in
 (
   # lua
   ''
@@ -22,34 +30,35 @@
       vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
     end
 
-    -- NOTE: install plugins that don't have interfacing via nixvim
-    require('scala-zio-quickfix').setup({});
-
     -- NOTE: setup border for ui elements
-    local _border = "rounded"
+    local border = "rounded"
 
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-      vim.lsp.handlers.hover, {
-        border = _border
-      }
+      vim.lsp.handlers.hover, { border = border }
     )
 
     vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-      vim.lsp.handlers.signature_help, {
-        border = _border
-      }
+      vim.lsp.handlers.signature_help, { border = border }
     )
 
-    vim.diagnostic.config {
-      float = { border = _border }
-    };
+    vim.diagnostic.config { float = { border = border } }
 
-    require('lspconfig.ui.windows').default_options = { border = _border }
+    require('lspconfig.ui.windows').default_options = { border = border }
 
-    -- #NOTE: open and close DAP UI when debugging on/off
+    -- NOTE: open and close DAP UI when debugging on/off
     require('dap').listeners.after.event_initialized['dapui_config'] = require('dapui').open
     require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
     require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
+
+
+    -- NOTE: install plugins that don't have interfacing via nixvim
+    require('scala-zio-quickfix').setup({});
+
+    -- NOTE: configure nvim-dap-kotlin
+    -- polyfil a function that is used by plugin
+    require('dap-kotlin').setup({
+      dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
+    })
   ''
 )
   + import ./harpoon.lua.nix

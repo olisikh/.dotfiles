@@ -63,11 +63,11 @@
   }
   # map("n", "<leader>cl", vim.lsp.codelens.run)
   {
-    key = "<leader>cl";
+    key = "gl";
     action = ":lua vim.lsp.codelens.run()<cr>";
     mode = "n";
     options = {
-      desc = "lsp: [c]ode [l]ens";
+      desc = "lsp: [g]oto [l]ens";
     };
   }
   # nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })

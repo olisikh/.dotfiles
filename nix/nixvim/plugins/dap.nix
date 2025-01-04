@@ -43,18 +43,25 @@ let
       internalConsoleOptions = "neverOpen";
     }
     # TODO: not working, can't debug vitest tests
-    {
-      type = "pwa-node";
-      request = "launch";
-      name = "Debug Vitest Tests";
-      # -- trace = true, -- include debugger info
-      runtimeExecutable = "node";
-      runtimeArgs = [ "./node_modules/node_modules/vitest/vitest.mjs" ];
-      rootPath = ''''${workspaceFolder}'';
-      cwd = ''''${workspaceFolder}'';
-      console = "integratedTerminal";
-      internalConsoleOptions = "neverOpen";
-    }
+    # {
+    #   type = "pwa-node";
+    #   request = "launch";
+    #   name = "Debug Vitest Tests";
+    #   # -- trace = true, -- include debugger info
+    #   runtimeExecutable = "node";
+    #   runtimeArgs = [ 
+    #     "./node_modules/node_modules/vitest/vitest.mjs" 
+    #     "--threads"
+    #     "false"
+    #   ];
+    #   rootPath = ''''${workspaceFolder}'';
+    #   cwd = ''''${workspaceFolder}'';
+    #   console = "integratedTerminal";
+    #   internalConsoleOptions = "neverOpen";
+    #   autoAttachChildProcesses = false;
+    #   sourceMaps = true;
+    #   smartStep = true;
+    # }
   ];
 in
 {
