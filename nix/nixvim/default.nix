@@ -85,6 +85,7 @@
       eslint_d
       google-java-format
       lombok
+      nixpkgs-fmt
     ];
 
     # TODO: all these plugins need to be installed

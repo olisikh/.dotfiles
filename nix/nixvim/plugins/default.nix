@@ -55,5 +55,6 @@
   // import ./undotree.nix
   // import ./rustaceanvim.nix { inherit pkgs; }
   // import ./which-key.nix
-  // import ./copilot-lua.nix;
+  // import ./copilot-lua.nix
+  // import ./todo-comments.nix;
 }

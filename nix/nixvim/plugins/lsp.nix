@@ -79,17 +79,7 @@
       # pylyzer.enable = true;
       terraformls.enable = true;
       marksman.enable = true;
-
-      nixd = {
-        enable = true;
-        settings = {
-          formatting = {
-            enable = true;
-            command = [ "nixpkgs-fmt" ];
-          };
-          nixpkgs.expr = "import <nixpkgs> {}";
-        };
-      };
+      nil_ls.enable = true;
 
       helm_ls = {
         enable = true;

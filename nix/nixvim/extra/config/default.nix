@@ -50,10 +50,10 @@ in
     require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
     require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
 
-    -- NOTE: install plugins that don't have interfacing via nixvim
+    -- TODO: requires a plugin to be installed
     -- require('scala-zio-quickfix').setup({});
 
-    -- NOTE: configure nvim-dap-kotlin
+    -- TODO: configure nvim-dap-kotlin
     -- polyfil a function that is used by plugin
     -- require('dap-kotlin').setup({
     --   dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
