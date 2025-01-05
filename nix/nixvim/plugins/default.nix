@@ -51,7 +51,7 @@
   // import ./none-ls.nix
   // import ./nvim-tree.nix
   // import ./telescope.nix
-  // import ./treesitter.nix
+  // import ./treesitter.nix { inherit pkgs; }
   // import ./undotree.nix
   // import ./rustaceanvim.nix { inherit pkgs; }
   // import ./which-key.nix

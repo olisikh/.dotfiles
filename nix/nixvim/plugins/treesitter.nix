@@ -1,6 +1,7 @@
-{
+{ pkgs, ... }: {
   treesitter = {
     enable = true;
+    gccPackage = pkgs.gcc;
     settings = {
       auto_install = true;
       highlight = { enable = true; };

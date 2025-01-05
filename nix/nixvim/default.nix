@@ -1,33 +1,4 @@
-{ pkgs, ... }:
-let
-  harpoon-lualine = (pkgs.vimUtils.buildVimPlugin {
-    name = "harpoon-lualine";
-    src = pkgs.fetchFromGitHub {
-      owner = "letieu";
-      repo = "harpoon-lualine";
-      rev = "master";
-      hash = "sha256-pH7U1BYD7B1y611TJ+t8ggPM3KOaSIB3Jtuj3fPKqpc=";
-    };
-  });
-  nvim-scala-zio-quickfix = (pkgs.vimUtils.buildVimPlugin {
-    name = "nvim-scala-zio-quickfix";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "nvim-scala-zio-quickfix";
-      rev = "main";
-      hash = "sha256-dVRVDBZWncEkBw6cLBJE2HZ8KhNSpffEn3Exvnllx78=";
-    };
-  });
-  nvim-dap-kotlin = (pkgs.vimUtils.buildVimPlugin {
-    name = "nvim-dap-kotlin";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "nvim-dap-kotlin";
-      rev = "fix/bugs_and_deprecations";
-      hash = "sha256-cz0oCg5XSXKuPswMVYioawnDroPhgQd7PWt9v1ugPBE=";
-    };
-  });
-in
+{ pkgs, lib, ... }:
 {
   programs.nixvim = {
     enable = true;
@@ -83,12 +54,13 @@ in
     ];
 
     extraPackages = with pkgs; [
+      gcc
       jdt-language-server
       vscode-extensions.vscjava.vscode-java-debug
       vscode-extensions.vscjava.vscode-java-test
       vscode-extensions.ms-python.debugpy
       vscode-extensions.davidanson.vscode-markdownlint
-      vscode-extensions.vadimcn.vscode-lldb
+      # vscode-extensions.vadimcn.vscode-lldb
       vscode-js-debug
       gofumpt
       gotools
@@ -117,20 +89,9 @@ in
 
     # TODO: all these plugins need to be installed
     # maybe some of them I could contribute to nixvim
-    extraPlugins = with pkgs.vimPlugins; [
-      nvim-metals
-      nvim-jdtls
-      lazydev-nvim
-      copilot-lualine
-      harpoon2
-      harpoon-lualine
-      nvim-scala-zio-quickfix
-      treesj
-      nvim-dap-kotlin
-    ];
-
-    extraFiles = import ./extra-files { inherit pkgs; };
-    extraConfigLua = import ./extra-config { inherit pkgs; };
+    extraPlugins = import ./extra/plugins { inherit pkgs lib; };
+    extraFiles = import ./extra/files { inherit pkgs; };
+    extraConfigLua = import ./extra/config { inherit pkgs; };
     extraConfigLuaPost = ''
       -- This line is called a `modeline`. See `:help modeline`
       -- vim: ts=2 sts=2 sw=2 et

@@ -62,20 +62,24 @@
           useUserPackages = true;
         };
 
-        # personal
-        packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
+        packages.homeConfigurations = {
+          # personal
+          home = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              nixvim.homeManagerModules.nixvim
+              ./nix/home.nix
+            ];
+          };
 
-          modules = [
-            nixvim.homeManagerModules.nixvim
-            ./nix/home.nix
-          ];
-        };
-
-        # work
-        packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./nix/work.nix ];
+          # work
+          work = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              nixvim.homeManagerModules.nixvim
+              ./nix/work.nix
+            ];
+          };
         };
       }
     );

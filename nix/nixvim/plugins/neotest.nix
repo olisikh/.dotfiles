@@ -1,24 +1,4 @@
 { pkgs, ... }:
-let
-  neotest-scala = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-scala";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-scala";
-      rev = "main";
-      hash = "sha256-RFEPtWPVHKehfc6PMF6ya0UaDpFIJDD8bFG8xwXPpsk=";
-    };
-  });
-  neotest-gradle = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-gradle";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-gradle";
-      rev = "fix/no_tests_found";
-      hash = "sha256-5vwd7VjJjiaWiNWde9iHJMPvNxrOoX28iCJFkDb93is=";
-    };
-  });
-in
 {
   neotest = {
     enable = true;
@@ -80,7 +60,7 @@ in
       };
       scala = {
         enable = true;
-        package = neotest-scala; # NOTE: replace with my neotest-scala plugin
+        package = pkgs.vimPlugins.neotest-scala; # NOTE: replace with my neotest-scala plugin
       };
       golang.enable = true;
       rust.enable = true; # NOTE: rustacean's neotest integration is used instead
@@ -88,7 +68,7 @@ in
       jest.enable = true;
       gradle = {
         enable = true;
-        package = neotest-gradle;
+        package = pkgs.vimPlugins.neotest-gradle;
       };
     };
   };

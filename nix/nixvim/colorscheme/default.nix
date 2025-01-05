@@ -16,9 +16,7 @@
         neotest = true;
         treesitter = true;
         treesitter_context = true;
-        telescope = {
-          enabled = true;
-        };
+        telescope.enabled = true;
         lsp_trouble = true;
         harpoon = true;
         mason = true;
