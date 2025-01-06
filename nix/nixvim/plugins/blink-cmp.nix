@@ -1,3 +1,4 @@
+{ nixvimLib, ... }:
 {
   blink-cmp = {
     enable = true;
@@ -50,14 +51,10 @@
 
           # -- nvim-cmp style menu
           draw = {
-            columns.__raw =
-              # lua
-              ''
-                {
-                  { 'label', 'label_description', gap = 1 },
-                  { 'kind_icon', 'kind', gap = 1 },
-                };
-              '';
+            columns = [
+              (nixvimLib.listToUnkeyedAttrs [ "label" "label_description" ] // { gap = 1; })
+              (nixvimLib.listToUnkeyedAttrs [ "kind_icon" "kind" ] // { gap = 1; })
+            ];
           };
         };
 

@@ -1,4 +1,7 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
+let
+  nixvimLib = config.lib.nixvim;
+in
 {
   programs.nixvim = {
     enable = true;
@@ -37,7 +40,7 @@
         event = [ "BufEnter" "CursorHold" "InsertLeave" ];
         pattern = "*";
         group = "user_lsp";
-        callback.__raw =
+        callback = nixvimLib.mkRaw
           # lua
           ''
             function()
@@ -50,8 +53,9 @@
     imports = [
       ./options
       ./keymaps
-      ./plugins
     ];
+
+    plugins = import ./plugins { inherit pkgs nixvimLib; };
 
     extraPackages = with pkgs; [
       gcc

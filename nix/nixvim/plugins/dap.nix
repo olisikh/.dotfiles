@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, nixvimLib, ... }:
 let
   jsConfigs = [
     {
@@ -12,7 +12,7 @@ let
       type = "pwa-node";
       request = "attach";
       name = "Attach";
-      processId.__raw = "require('dap.utils').pick_process";
+      processId = nixvimLib.mkRaw "require('dap.utils').pick_process";
       cwd = ''''${workspaceFolder}'';
     }
     {

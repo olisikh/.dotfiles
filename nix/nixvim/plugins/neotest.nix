@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, nixvimLib, ... }:
 {
   neotest = {
     enable = true;
@@ -20,7 +20,7 @@
         settings = {
           args = [ "-s" ];
           pytest_discover_instances = true;
-          is_test_file.__raw =
+          is_test_file = nixvimLib.mkRaw
             # lua
             ''
               function(file_path)
