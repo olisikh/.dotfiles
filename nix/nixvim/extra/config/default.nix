@@ -51,13 +51,13 @@ in
     require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
 
     -- TODO: requires a plugin to be installed
-    -- require('scala-zio-quickfix').setup({});
+    require('scala-zio-quickfix').setup({});
 
     -- TODO: configure nvim-dap-kotlin
     -- polyfil a function that is used by plugin
-    -- require('dap-kotlin').setup({
-    --   dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
-    -- })
+    require('dap-kotlin').setup({
+      dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
+    })
   ''
 )
   + import ./harpoon.lua.nix
