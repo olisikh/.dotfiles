@@ -2,23 +2,17 @@
   lsp = {
     enable = true;
     inlayHints = false; # NOTE: disable inlay-hints by default
+    capabilities = # lua
+      ''require('blink.cmp').get_lsp_capabilities(capabilities)'';
     servers = {
       lua_ls = {
         enable = true;
         settings = {
           Lua = {
-            workspace = {
-              checkThirdParty = false;
-            };
-            telemetry = {
-              enable = false;
-            };
-            format = {
-              enable = false;
-            };
-            hint = {
-              enable = true;
-            };
+            workspace.checkThirdParty = false;
+            telemetry.enable = false;
+            format.enable = false;
+            hint.enable = true;
           };
         };
       };

@@ -24,9 +24,11 @@
   telescope.enable = true;
   todo-comments.enable = true;
   copilot-lua.enable = true;
+  codecompanion.enable = true;
   undotree.enable = true;
   hardtime.enable = true;
   blink-cmp.enable = true;
+  luasnip.enable = true;
   lsp.enable = true;
   lint.enable = true;
   conform-nvim.enable = true;

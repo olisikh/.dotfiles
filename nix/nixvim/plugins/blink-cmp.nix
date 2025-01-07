@@ -12,14 +12,52 @@
       # -- Default list of enabled providers defined so that you can extend it
       # -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = [ "lazydev" "lsp" "path" "snippets" ];
+        default = [ "lazydev" "lsp" "snippets" "luasnip" "path" ];
+        cmdline = [ ]; # disable neovim cmdline completions, use classic Tab instead
         providers = {
           lazydev = {
             name = "LazyDev";
+            enabled = true;
             module = "lazydev.integrations.blink";
-            score_offset = 100; # -- show at a higher priority than lsp
+            score_offset = 10000; # -- show at a higher priority than lsp
+          };
+          lsp = {
+            name = "LSP";
+            enabled = true;
+            module = "blink.cmp.sources.lsp";
+            score_offset = 1000;
+          };
+          luasnip = {
+            name = "luasnip";
+            enabled = true;
+            module = "blink.cmp.sources.luasnip";
+            score_offset = 950;
+          };
+          snippets = {
+            name = "snippets";
+            enabled = true;
+            module = "blink.cmp.sources.snippets";
+            score_offset = 900;
           };
         };
+      };
+      snippets = {
+        expand = nixvimLib.mkRaw ''
+          function(snip) require('luasnip').lsp_expand(snip) end
+        '';
+        active = nixvimLib.mkRaw ''
+          function(filter)
+            if filter and filter.direction then
+              return require('luasnip').jumpable(filter.direction)
+            end
+            return require('luasnip').in_snippet()
+          end
+        '';
+        jump = nixvimLib.mkRaw ''
+          function(direction)
+            require('luasnip').jump(direction)
+          end
+        '';
       };
 
       appearance = {
