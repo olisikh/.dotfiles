@@ -59,3 +59,4 @@
 // import ./copilot-lua.nix
 // import ./todo-comments.nix
 // import ./colorizer.nix
+// import ./codecompanion.nix

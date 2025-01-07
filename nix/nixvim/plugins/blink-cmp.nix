@@ -13,7 +13,7 @@
       # -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
         default = [ "lazydev" "lsp" "snippets" "luasnip" "path" ];
-        cmdline = [ ]; # disable neovim cmdline completions, use classic Tab instead
+        cmdline = nixvimLib.emptyTable; # disable neovim cmdline completions, use classic Tab instead
         providers = {
           lazydev = {
             name = "LazyDev";
