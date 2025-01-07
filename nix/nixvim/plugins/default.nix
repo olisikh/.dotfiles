@@ -56,3 +56,4 @@
 // import ./which-key.nix
 // import ./copilot-lua.nix
 // import ./todo-comments.nix
+// import ./colorizer.nix
