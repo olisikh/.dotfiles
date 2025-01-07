@@ -350,6 +350,22 @@
         "type": "github"
       }
     },
+    "lldb-nix-fix": {
+      "locked": {
+        "lastModified": 1712740125,
+        "narHash": "sha256-YXvbuxzaLmHgzWyQK4Cxduz8oMMaq6FgiVnqJhWCAjE=",
+        "owner": "mstone",
+        "repo": "nixpkgs",
+        "rev": "d0415e5734f5ed2c58d7ba96b5153e3028f6ca20",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mstone",
+        "ref": "darwin-fix-vscode-lldb",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "neovim-nightly-overlay": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -514,6 +530,7 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "home-manager": "home-manager",
+        "lldb-nix-fix": "lldb-nix-fix",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-stable": "nixpkgs-stable",

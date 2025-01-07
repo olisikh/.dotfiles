@@ -306,5 +306,6 @@
   ++ import ./nvim-jdtls.nix
   ++ import ./lazy-git.nix
   ++ import ./todo-comments.nix
-  ++ import ./treesj.nix;
+  ++ import ./treesj.nix
+  ++ import ./undotree.nix;
 }

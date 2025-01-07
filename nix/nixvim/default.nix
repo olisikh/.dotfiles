@@ -64,7 +64,7 @@ in
       vscode-extensions.vscjava.vscode-java-test
       vscode-extensions.ms-python.debugpy
       vscode-extensions.davidanson.vscode-markdownlint
-      # vscode-extensions.vadimcn.vscode-lldb # TODO: code-lldb fails to build
+      vscode-extensions.vadimcn.vscode-lldb
       vscode-js-debug
       gofumpt
       gotools

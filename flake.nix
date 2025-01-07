@@ -18,9 +18,12 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # NOTE: since lldb is broken in nixpkgs on main, this fix is very handy
+    lldb-nix-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
   };
 
-  outputs = { nixpkgs, flake-utils, home-manager, nixvim, ... } @ inputs:
+  outputs = { nixpkgs, flake-utils, home-manager, nixvim, lldb-nix-fix, ... } @ inputs:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -50,6 +53,13 @@
                     --add-flags "${oldAttrs.extraJavaOpts} \$METALS_OPTS -cp $CLASSPATH scala.meta.metals.Main"
                 '';
               });
+
+              # NOTE: override lldb package
+              vscode-extensions = prev.vscode-extensions // {
+                vadimcn = prev.vscode-extensions.vadimcn // {
+                  vscode-lldb = lldb-nix-fix.legacyPackages.${system}.vscode-extensions.vadimcn.vscode-lldb;
+                };
+              };
             })
 
             inputs.neovim-nightly-overlay.overlays.default
