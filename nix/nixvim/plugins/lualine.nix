@@ -10,7 +10,7 @@
           "filename"
         ];
         lualine_x = [
-          # "harpoon2" # NOTE: plugin is not available as vimPlugin
+          "harpoon2"
           "copilot"
           "encoding"
           "filetype"
