@@ -89,7 +89,6 @@ in
       SCALA_HOME = scala;
       SCALA_CLI_POWER = "true";
       JAVA_HOME = jdk;
-      OBSIDIAN_VAULT = "~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes";
     };
   };
 

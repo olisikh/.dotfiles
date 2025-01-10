@@ -80,4 +80,6 @@
       # on_attach = nil, # -- (fun(buf: integer): boolean) return false to disable attaching
     };
   };
+
+  treesitter-refactor.enable = true;
 }

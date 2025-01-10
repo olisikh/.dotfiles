@@ -34,13 +34,47 @@ c.keys = {
 		key = "E",
 		mods = "LEADER",
 		action = w.action.PromptInputLine({
-			description = "Enter new name for tab",
+			description = "Rename tab",
 			action = w.action_callback(function(window, pane, line)
 				-- line will be `nil` if they hit escape without entering anything
 				-- An empty string if they just hit enter
 				-- Or the actual line of text they wrote
 				if line then
 					window:active_tab():set_title(line)
+				end
+			end),
+		}),
+	},
+
+	-- Show workspaces menu
+	{
+		key = "w",
+		mods = "LEADER",
+		action = w.action.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES", title = "Workspaces" }),
+	},
+	{
+		key = "t",
+		mods = "LEADER",
+		action = w.action.ShowLauncherArgs({ flags = "FUZZY|TABS", title = "Tabs" }),
+	},
+	{
+		key = "l",
+		mods = "LEADER",
+		action = w.action.ShowLauncherArgs({ flags = "FUZZY|COMMANDS", title = "Commands launcher" }),
+	},
+
+	-- Rename current workspace
+	{
+		key = "R",
+		mods = "LEADER",
+		action = w.action.PromptInputLine({
+			description = "Rename workspace",
+			action = w.action_callback(function(window, pane, line)
+				-- line will be `nil` if they hit escape without entering anything
+				-- An empty string if they just hit enter
+				-- Or the actual line of text they wrote
+				if line then
+					w.mux.rename_workspace(w.mux.get_active_workspace(), line)
 				end
 			end),
 		}),

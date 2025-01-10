@@ -307,5 +307,6 @@
   ++ import ./lazy-git.nix
   ++ import ./todo-comments.nix
   ++ import ./treesj.nix
-  ++ import ./undotree.nix;
+  ++ import ./undotree.nix
+  ++ import ./obsidian.nix;
 }
