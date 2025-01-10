@@ -294,6 +294,42 @@
         noremap = true;
       };
     }
+    {
+      key = "<Up>";
+      action = "<Nop>";
+      mode = "i";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<Down>";
+      action = "<Nop>";
+      mode = "i";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<Left>";
+      action = "<Nop>";
+      mode = "i";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
+    {
+      key = "<Right>";
+      action = "<Nop>";
+      mode = "i";
+      options = {
+        noremap = true;
+        silent = true;
+      };
+    }
   ]
   ++ import ./dap.nix
   ++ import ./lsp.nix
