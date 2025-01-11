@@ -20,7 +20,7 @@ import ./copilot-lua.nix //
 import ./todo-comments.nix //
 import ./colorizer.nix //
 import ./codecompanion.nix //
-import ./obsidian.nix //
+import ./obsidian.nix { inherit nixvimLib; } //
 {
   lz-n.enable = true;
   web-devicons.enable = true;

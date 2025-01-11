@@ -1,9 +1,6 @@
 { pkgs, ... }:
 let
   user = "olisikh";
-
-  ipkgs = import <nixpkgs> { system = "x86_64-darwin"; };
-  bloop = ipkgs.bloop;
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
 in
@@ -62,7 +59,6 @@ in
       pngpaste
       nodejs
       scala-next # latest Scala (currently Scala 3 with bundled in Scala CLI)
-      (bloop.override { jre = jdk; })
       (sbt.override { jre = jdk; })
       (metals.override { jre = jdk; })
       kotlin

@@ -3,7 +3,6 @@ let
   user = "O.Lisikh";
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
-  homeDir = "/Users/${user}";
 in
 {
   imports = [
@@ -21,7 +20,7 @@ in
 
   home = {
     username = user;
-    homeDirectory = homeDir;
+    homeDirectory = "/Users/${user}";
 
     stateVersion = "22.11";
 
@@ -83,7 +82,7 @@ in
       SCALA_HOME = scala;
       JAVA_HOME = jdk;
       TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = /var/run/docker.sock;
-      DOCKER_HOST = "unix://${homeDir}/.colima/default/docker.sock";
+      DOCKER_HOST = "unix:///Users/${user}/.colima/default/docker.sock";
     };
   };
 

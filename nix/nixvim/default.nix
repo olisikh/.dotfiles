@@ -74,7 +74,7 @@ in
       prettierd
       yamllint
       hadolint
-      vale
+      mdformat
       tflint
       pylint
       checkstyle
