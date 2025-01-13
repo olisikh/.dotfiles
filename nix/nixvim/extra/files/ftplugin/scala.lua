@@ -45,8 +45,8 @@ metals_config.on_attach = function(client, bufnr)
     { desc = 'metals: hover worksheet' })
   map('n', '<leader>ctv', function() metals_tvp.toggle_tree_view() end,
     { desc = 'metals: toggle tree view' })
-  map('n', '<leader>crt', function() metals_tvp.reveal_in_tree() end,
-    { desc = 'metals: reveal in tree' })
+  map('n', '<leader>ctR', function() metals_tvp.reveal_in_tree() end,
+    { desc = 'metals: tree reveal' })
   map('n', '<leader>cts', function() metals.toggle_setting('showImplicitArguments') end,
     { desc = 'metals: show implicit args' })
   map('n', '<leader>cmc', function() require('telescope').extensions.metals.commands() end,
