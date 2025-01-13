@@ -1,5 +1,5 @@
 {
-  description = "Darwin configuration";
+  description = "Oleksii's Home Manager configuration";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

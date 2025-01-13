@@ -18,6 +18,7 @@ in
     ./nixvim
   ];
 
+
   home = {
     username = user;
     homeDirectory = "/Users/${user}";

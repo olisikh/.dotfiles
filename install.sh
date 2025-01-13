@@ -3,7 +3,7 @@
 # verify nix installation
 if ! command -v nix-env &> /dev/null
 then
-    echo "nix-env is not installed, exiting..."
+    echo "[ERROR]: nix is not installed, please install nix before proceeding"
     exit
 fi
 

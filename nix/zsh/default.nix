@@ -1,12 +1,16 @@
-{ lib, config, pkgs, ... }:
+{ pkgs, ... }:
+let
+  catppuccinZshTheme = pkgs.fetchFromGitHub {
+    "owner" = "catppuccin";
+    "repo" = "zsh-syntax-highlighting";
+    "rev" = "main";
+    "sha256" = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
+  };
+in
 {
+
   home.file = {
-    ".config/zsh/catppuccin".source = pkgs.fetchFromGitHub {
-      "owner" = "catppuccin";
-      "repo" = "zsh-syntax-highlighting";
-      "rev" = "main";
-      "sha256" = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
-    };
+    ".config/zsh/catppuccin".source = catppuccinZshTheme;
   };
 
   programs.zsh = {
@@ -25,8 +29,9 @@
     initExtra =
       #bash
       ''
-        source $HOME/.config/zsh/catppuccin/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
+        source ${catppuccinZshTheme}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
         eval "$(kafkactl completion zsh)"
+        eval "$(fzf --zsh)"
 
         # Preferred editor for local and remote sessions
         if [[ -n $SSH_CONNECTION ]]; then
@@ -34,6 +39,29 @@
         else
           export EDITOR='nvim'
         fi
+
+        bindkey -e # enable emacs mode
+        bindkey '^p' history-search-backward
+        bindkey '^n' history-search-forward
+
+        # history settings
+        HISTSIZE=1000
+        HISTFILE=~/.zsh_history
+        SAVEHIST=$HISTSIZE
+        HISTDUP=erase
+        setopt appendhistory
+        setopt sharehistory
+        setopt hist_ignore_space
+        setopt hist_ignore_all_dups
+        setopt hist_save_no_dups
+        setopt hist_ignore_dups
+        setopt hist_find_no_dups
+
+        # extra plugin settings
+        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+        # zstyle ':completion:*' list-colors $${(s.:.)LS_COLORS}
+        zstyle ':completion:*' menu no
+        zstyle ':fzf-tab:complete:*' fzf-preview 'ls $realpath'
 
         export LIBRARY_PATH="${pkgs.libiconv}/lib:$LIBRARY_PATH";
 
@@ -64,6 +92,7 @@
         "chisui/zsh-nix-shell"
         "nix-community/nix-zsh-completions"
         "ohmyzsh/ohmyzsh path:plugins/git"
+        "Aloxaf/fzf-tab"
       ];
     };
   };

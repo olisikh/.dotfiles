@@ -7,8 +7,8 @@ in
     enable = true;
     defaultEditor = true;
 
-    # TODO: use nightly?
-    # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+    # NOTE: due to overlay, nixvim would install and use nightly
+    package = pkgs.neovim;
 
     colorschemes = import ./colorscheme;
 
@@ -74,7 +74,6 @@ in
       prettierd
       yamllint
       hadolint
-      mdformat
       tflint
       pylint
       checkstyle
