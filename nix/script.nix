@@ -1,4 +1,18 @@
 { homeManagerConfig, ... }:
+let
+  nixShell =
+    # nix
+    ''{ pkgs ? import <nixpkgs> {} }:
+pkgs.mkShell {
+  nativBuildInputs = [
+    # build dependencies
+  ];
+  buildInputs = [
+    # runtime dependencies
+  ];
+}'';
+in
+
 # bash
 ''
   #!/bin/bash
@@ -67,6 +81,9 @@
               ;;
           gc)
               home_gc
+              ;;
+          mkshell)
+              echo "${nixShell}" > shell.nix
               ;;
           *)
               display_help

@@ -59,7 +59,7 @@ in
       htop
       pngpaste
       nodejs
-      scala-next # latest Scala (currently Scala 3 with bundled in Scala CLI)
+      scala
       (sbt.override { jre = jdk; })
       (metals.override { jre = jdk; })
       kotlin
@@ -78,6 +78,7 @@ in
       ollama
       obsidian
       vscode
+      cmatrix
 
       (writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "home"; }))
     ];
