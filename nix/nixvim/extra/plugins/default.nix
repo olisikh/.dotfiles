@@ -37,31 +37,6 @@ let
     };
     dependencies = with pkgs.vimPlugins; [ nvim-dap ];
   });
-  neotest-scala = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-scala";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-scala";
-      rev = "main";
-      hash = "sha256-RFEPtWPVHKehfc6PMF6ya0UaDpFIJDD8bFG8xwXPpsk=";
-    };
-    dependencies = with pkgs.vimPlugins; [
-      plenary-nvim
-      nvim-nio
-      nvim-treesitter-parsers.xml
-      neotest
-    ];
-  });
-  neotest-gradle = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-gradle";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-gradle";
-      rev = "fix/no_tests_found";
-      hash = "sha256-ZRI5fMGqKK5BaMPU38Dtl8A+XmWBzBI9af6wld/V0Q0=";
-    };
-    dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
-  });
 in
 with pkgs.vimPlugins; [
   nvim-metals
@@ -73,6 +48,4 @@ with pkgs.vimPlugins; [
   harpoon-lualine
   nvim-dap-kotlin
   nvim-scala-zio-quickfix
-  neotest-gradle
-  neotest-scala
 ]

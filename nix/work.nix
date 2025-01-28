@@ -74,6 +74,7 @@ in
         pytest
         debugpy
       ]))
+      ollama
 
       (pkgs.writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "work"; }))
     ];

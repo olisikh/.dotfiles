@@ -8,7 +8,8 @@ in
     defaultEditor = true;
 
     # NOTE: due to overlay, nixvim would install and use nightly
-    package = pkgs.neovim;
+    # TODO: commented out because neotest-scala and ziofix plugins don't work properly on nightly
+    # package = pkgs.neovim;
 
     colorschemes = import ./colorscheme;
 

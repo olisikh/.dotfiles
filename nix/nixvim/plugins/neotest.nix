@@ -1,4 +1,32 @@
 { pkgs, nixvimLib, ... }:
+let
+  # TODO: override these plugins in vimPlugins?
+  neotest-scala = (pkgs.vimUtils.buildVimPlugin {
+    name = "neotest-scala";
+    src = pkgs.fetchFromGitHub {
+      owner = "olisikh";
+      repo = "neotest-scala";
+      rev = "main";
+      hash = "sha256-RFEPtWPVHKehfc6PMF6ya0UaDpFIJDD8bFG8xwXPpsk=";
+    };
+    dependencies = with pkgs.vimPlugins; [
+      plenary-nvim
+      nvim-nio
+      nvim-treesitter-parsers.xml
+      neotest
+    ];
+  });
+  neotest-gradle = (pkgs.vimUtils.buildVimPlugin {
+    name = "neotest-gradle";
+    src = pkgs.fetchFromGitHub {
+      owner = "olisikh";
+      repo = "neotest-gradle";
+      rev = "fix/no_tests_found";
+      hash = "sha256-ZRI5fMGqKK5BaMPU38Dtl8A+XmWBzBI9af6wld/V0Q0=";
+    };
+    dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
+  });
+in
 {
   neotest = {
     enable = true;
@@ -60,7 +88,7 @@
       };
       scala = {
         enable = true;
-        package = pkgs.vimPlugins.neotest-scala; # NOTE: replace with my neotest-scala plugin
+        package = neotest-scala; # NOTE: replace with my neotest-scala plugin
       };
       golang.enable = true;
       rust.enable = true; # NOTE: rustacean's neotest integration is used instead
@@ -68,7 +96,7 @@
       jest.enable = true;
       gradle = {
         enable = true;
-        package = pkgs.vimPlugins.neotest-gradle;
+        package = neotest-gradle;
       };
     };
   };

@@ -19,7 +19,7 @@ import ./which-key.nix //
 import ./copilot-lua.nix //
 import ./todo-comments.nix //
 import ./colorizer.nix //
-import ./codecompanion.nix //
+import ./codecompanion.nix { inherit nixvimLib; } //
 import ./obsidian.nix { inherit nixvimLib; } //
 {
   lz-n.enable = true;
@@ -36,4 +36,5 @@ import ./obsidian.nix { inherit nixvimLib; } //
   crates.enable = true;
   fidget.enable = true;
   nvim-surround.enable = true;
+  lazygit.enable = true;
 }
