@@ -1,5 +1,5 @@
 {
-  description = "Darwin configuration";
+  description = "Oleksii's Home Manager configuration";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -13,9 +13,17 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # NOTE: since lldb is broken in nixpkgs on main, this fix is very handy
+    lldb-nix-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
   };
 
-  outputs = { nixpkgs, flake-utils, home-manager, ... } @ inputs:
+  outputs = { nixpkgs, flake-utils, home-manager, nixvim, lldb-nix-fix, ... } @ inputs:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -45,6 +53,13 @@
                     --add-flags "${oldAttrs.extraJavaOpts} \$METALS_OPTS -cp $CLASSPATH scala.meta.metals.Main"
                 '';
               });
+
+              # NOTE: override lldb package
+              vscode-extensions = prev.vscode-extensions // {
+                vadimcn = prev.vscode-extensions.vadimcn // {
+                  vscode-lldb = lldb-nix-fix.legacyPackages.${system}.vscode-extensions.vadimcn.vscode-lldb;
+                };
+              };
             })
 
             inputs.neovim-nightly-overlay.overlays.default
@@ -57,16 +72,24 @@
           useUserPackages = true;
         };
 
-        # personal
-        packages.homeConfigurations.home = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./nix/home.nix ];
-        };
+        packages.homeConfigurations = {
+          # personal
+          home = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              nixvim.homeManagerModules.nixvim
+              ./nix/home.nix
+            ];
+          };
 
-        # work
-        packages.homeConfigurations.work = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./nix/work.nix ];
+          # work
+          work = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              nixvim.homeManagerModules.nixvim
+              ./nix/work.nix
+            ];
+          };
         };
       }
     );
