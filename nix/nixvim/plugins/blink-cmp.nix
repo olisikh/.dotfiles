@@ -7,12 +7,12 @@
       # -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
       # -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
       # -- See the full "keymap" documentation for information on defining your own keymap.
-      keymap = { preset = "default"; };
+      keymap.preset = "default";
 
       # -- Default list of enabled providers defined so that you can extend it
       # -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = [ "lazydev" "lsp" "snippets" "luasnip" "path" ];
+        default = [ "lazydev" "lsp" "snippets" "path" ];
         cmdline = nixvimLib.emptyTable; # disable neovim cmdline completions, use classic Tab instead
         providers = {
           lazydev = {
@@ -27,12 +27,6 @@
             module = "blink.cmp.sources.lsp";
             score_offset = 1000;
           };
-          luasnip = {
-            name = "luasnip";
-            enabled = true;
-            module = "blink.cmp.sources.luasnip";
-            score_offset = 950;
-          };
           snippets = {
             name = "snippets";
             enabled = true;
@@ -41,24 +35,8 @@
           };
         };
       };
-      snippets = {
-        expand = nixvimLib.mkRaw ''
-          function(snip) require('luasnip').lsp_expand(snip) end
-        '';
-        active = nixvimLib.mkRaw ''
-          function(filter)
-            if filter and filter.direction then
-              return require('luasnip').jumpable(filter.direction)
-            end
-            return require('luasnip').in_snippet()
-          end
-        '';
-        jump = nixvimLib.mkRaw ''
-          function(direction)
-            require('luasnip').jump(direction)
-          end
-        '';
-      };
+
+      snippets.preset = "luasnip";
 
       appearance = {
         # -- Sets the fallback highlight groups to nvim-cmp's highlight groups
@@ -81,7 +59,7 @@
         accept = { auto_brackets = { enabled = false; }; };
 
         # -- Insert completion item on selection, don't select by default
-        list = { selection = "auto_insert"; };
+        list = { selection = { preselect = true; auto_insert = true; }; };
 
         menu = {
           # -- Don't automatically show the completion menu
