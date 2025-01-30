@@ -89,15 +89,6 @@ in
         texthl = "DapLogPoint";
       };
     };
-    extensions = {
-      dap-go = {
-        enable = true;
-        delve.path = "${pkgs.delve}/bin/dlv";
-      };
-      dap-python.enable = true;
-      dap-ui.enable = true;
-      dap-virtual-text.enable = true;
-    };
     adapters = {
       servers = {
         "pwa-node" = {
@@ -124,4 +115,15 @@ in
       typescript = jsConfigs;
     };
   };
+
+
+  dap-go = {
+    enable = true;
+    settings = {
+      delve.path = "${pkgs.delve}/bin/dlv";
+    };
+  };
+  dap-python.enable = true;
+  dap-ui.enable = true;
+  dap-virtual-text.enable = true;
 }

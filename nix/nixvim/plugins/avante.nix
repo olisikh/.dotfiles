@@ -1,0 +1,5 @@
+{ nixvimLib }: {
+  avante = {
+    enable = true;
+  };
+}

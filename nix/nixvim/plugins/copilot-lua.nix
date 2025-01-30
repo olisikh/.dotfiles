@@ -1,6 +1,8 @@
 {
   copilot-lua = {
     enable = true;
-    suggestion.autoTrigger = true;
+    settings = {
+      suggestion.auto_trigger = true;
+    };
   };
 }

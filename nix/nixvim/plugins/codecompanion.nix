@@ -13,7 +13,8 @@
                   },
                   schema = {
                       model = {
-                          default = 'deepseek-r1:8b',
+                          -- default = 'deepseek-r1:8b',
+                        default = 'codellama:7b'
                       },
                       num_ctx = {
                           default = 32768,
