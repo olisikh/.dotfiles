@@ -16,8 +16,8 @@ in
     ./mc
     ./direnv
     ./nixvim
+    ./amethyst
   ];
-
 
   home = {
     username = user;
@@ -79,6 +79,11 @@ in
       obsidian
       vscode
       cmatrix
+
+      sketchybar # nice status bar
+      skhd # app navigation hotkeys (alt+t - terminal, alt+b - browser, etc)
+      jankyborders # window focus
+      raycast
 
       (writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "home"; }))
     ];
