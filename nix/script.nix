@@ -1,5 +1,6 @@
 { homeManagerConfig, ... }:
 let
+  dotfiles = "~/.dotfiles";
   nixShell =
     # nix
     ''{ pkgs ? import <nixpkgs> {} }:
@@ -32,12 +33,13 @@ in
 
   # Function to perform 'home make'
   home_make() {
-      home-manager switch --flake ~/.dotfiles#${homeManagerConfig} --impure "$@"
+      echo "home make is disabled..."
+      # nix build ${dotfiles}#darwinConfigurations.${homeManagerConfig}.config.system && ${dotfiles}/result/sw/bin/darwin-rebuild switch --flake ~/.dotfiles
   }
 
   # Function to perform 'home update'
   home_update() {
-      nix flake update ~/.dotfiles
+      nix flake update ${dotfiles}
   }
 
   # Function to perform 'home upgrade'

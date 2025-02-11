@@ -2,7 +2,7 @@
 {
   services.nix-daemon.enable = true;
 
-  users.users.noghartt = {
+  users.users.${user} = {
     home = "/Users/${user}";
   };
 

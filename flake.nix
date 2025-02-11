@@ -63,9 +63,9 @@
             specialArgs = { inherit inputs; };
 
             modules = [
-              (./nix/config.nix { user = "olisikh"; })
-              inputs.nixvim.homeManagerModules.nixvim
+              (import ./nix/config.nix { user = "olisikh"; })
               inputs.home-manager.darwinModules.home-manager
+              inputs.nixvim.homeManagerModules.nixvim
               {
                 nixpkgs = nixpkgsConfig;
 
@@ -82,9 +82,9 @@
             specialArgs = { inherit inputs; };
 
             modules = [
-              (./nix/config.nix { user = "O.Lisikh"; })
-              inputs.nixvim.homeManagerModules.nixvim
+              (import ./nix/config.nix { user = "O.Lisikh"; })
               inputs.home-manager.darwinModules.home-manager
+              inputs.nixvim.homeManagerModules.nixvim
               {
                 nixpkgs = nixpkgsConfig;
 
