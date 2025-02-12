@@ -41,13 +41,19 @@ in
         event = [ "BufEnter" "CursorHold" "InsertLeave" ];
         pattern = "*";
         group = "user_lsp";
-        callback = nixvimLib.mkRaw
-          # lua
-          ''
-            function()
-              pcall(vim.lsp.codelens.refresh)
-            end
-          '';
+        command = "silent! lua vim.lsp.codelens.refresh()";
+      }
+      {
+        event = [ "CursorHold" "CursorHoldI" ];
+        pattern = "*";
+        group = "user_lsp";
+        command = "silent! lua vim.lsp.buf.document_highlight()";
+      }
+      {
+        event = "CursorMoved";
+        pattern = "*";
+        group = "user_lsp";
+        command = "silent! lua vim.lsp.buf.clear_references()";
       }
     ];
 
