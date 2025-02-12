@@ -16,7 +16,6 @@ in
     ./mc
     ./direnv
     ./nixvim
-    ./amethyst
   ];
 
   home = {
@@ -24,7 +23,7 @@ in
     homeDirectory = "/Users/${user}";
 
     # don't ever change the stateVersion value, it will break the state
-    stateVersion = "22.11";
+    stateVersion = "25.05";
 
     # The home.packages option allows you to install Nix packages into your
     # environment.
@@ -79,6 +78,7 @@ in
       obsidian
       vscode
       cmatrix
+      mkalias
 
       sketchybar # nice status bar
       skhd # app navigation hotkeys (alt+t - terminal, alt+b - browser, etc)

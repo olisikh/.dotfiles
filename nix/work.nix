@@ -22,7 +22,7 @@ in
     username = user;
     homeDirectory = "/Users/${user}";
 
-    stateVersion = "22.11";
+    stateVersion = "25.05";
 
     # The home.packages option allows you to install Nix packages into your
     # environment.

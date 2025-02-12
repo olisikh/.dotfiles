@@ -5,8 +5,11 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
 
-    nix-darwin.url = "github:lnl7/nix-darwin/master";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    darwin-util.url = "github:hraban/mac-app-util";
+    darwin-util.inputs.nixpkgs.follows = "nixpkgs";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
@@ -26,9 +29,13 @@
     let
       system = "aarch64-darwin";
 
-      nixpkgsConfig = {
-        config.allowUnfree = true;
-        config.allowUnfreePredicate = _: true;
+      pkgs = import nixpkgs {
+        inherit system;
+
+        config = {
+          allowUnfree = true;
+          allowUnfreePredicate = _: true;
+        };
 
         overlays = [
           # adds $METALS_OPTS to pass extra JVM args to metals 
@@ -37,7 +44,7 @@
               installPhase = ''
                 mkdir -p $out/bin
                 makeWrapper ${prev.jre}/bin/java $out/bin/metals \
-                  --add-flags "${oldAttrs.extraJavaOpts} \$METALS_OPTS -cp $CLASSPATH scala.meta.metals.Main"
+                --add-flags "${oldAttrs.extraJavaOpts} \$METALS_OPTS -cp $CLASSPATH scala.meta.metals.Main"
               '';
             });
 
@@ -55,42 +62,51 @@
     in
     {
       darwinConfigurations =
-        let inherit (inputs.nix-darwin.lib) darwinSystem; in
+        let inherit (inputs.darwin.lib) darwinSystem; in
         {
-          home = darwinSystem {
-            inherit system;
+          olisikh = darwinSystem {
+            inherit system pkgs;
 
             specialArgs = { inherit inputs; };
 
             modules = [
-              (import ./nix/config.nix { user = "olisikh"; })
+              (import ./nix/darwin.nix { user = "olisikh"; })
               inputs.home-manager.darwinModules.home-manager
-              inputs.nixvim.homeManagerModules.nixvim
+              inputs.darwin-util.darwinModules.default
               {
-                nixpkgs = nixpkgsConfig;
-
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users.olisikh = import ./nix/home.nix;
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  users.olisikh.imports = [
+                    inputs.nixvim.homeManagerModules.nixvim
+                    inputs.darwin-util.homeManagerModules.default
+                    ./nix/home.nix
+                  ];
+                };
               }
             ];
           };
 
           work = darwinSystem {
-            inherit system;
+            inherit system pkgs;
 
             specialArgs = { inherit inputs; };
 
             modules = [
-              (import ./nix/config.nix { user = "O.Lisikh"; })
+              (import ./nix/darwin.nix { user = "O.Lisikh"; })
               inputs.home-manager.darwinModules.home-manager
-              inputs.nixvim.homeManagerModules.nixvim
+              inputs.darwin-util.darwinModules.default
               {
-                nixpkgs = nixpkgsConfig;
 
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users."O.Lisikh" = import ./nix/work.nix;
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  users."O.Lisikh".imports = [
+                    inputs.nixvim.homeManagerModules.nixvim
+                    inputs.darwin-util.homeManagerModules.default
+                    ./nix/work.nix
+                  ];
+                };
               }
             ];
           };
