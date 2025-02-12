@@ -16,6 +16,7 @@ in
     ./mc
     ./direnv
     ./nixvim
+    ./amethyst
   ];
 
 
