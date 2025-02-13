@@ -17,6 +17,8 @@ in
     ./direnv
     ./nixvim
     ./amethyst
+    ./borders
+    # ./sketchybar
   ];
 
   home = {
@@ -81,9 +83,11 @@ in
       cmatrix
       mkalias
 
+      discord
+
       sketchybar # nice status bar
+      sketchybar-app-font # font for sketchybar
       skhd # app navigation hotkeys (alt+t - terminal, alt+b - browser, etc)
-      jankyborders # window focus
       raycast
 
       (writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "home"; }))

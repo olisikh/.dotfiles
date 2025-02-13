@@ -21,6 +21,11 @@
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
+    sketchybar = {
+      url = "github:FelixKratz/dotfiles";
+      flake = false;
+    };
+
     # NOTE: since lldb is broken in nixpkgs on main, this fix is very handy
     lldb-nix-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
   };
