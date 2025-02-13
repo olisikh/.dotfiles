@@ -1,24 +1,24 @@
-{ user }: { pkgs, config, ... }:
+{ pkgs, config, username, inputs, ... }:
 {
   system.stateVersion = 6;
 
   nix = {
     enable = false;
     # extraOptions = ''
-      # auto-optimise-store = true
-      # experimental-features = nix-command flakes
-      # extra-platforms = x86_64-darwin aarch64-darwin
+    # auto-optimise-store = true
+    # experimental-features = nix-command flakes
+    # extra-platforms = x86_64-darwin aarch64-darwin
     # '';
   };
 
   system = {
     keyboard = {
       enableKeyMapping = true;
-      remapCapsLockToControl = true;
+      remapCapsLockToEscape = true;
     };
 
     defaults = {
-      ".GlobalPreferences"."com.apple.mouse.scaling" = 4.0;
+      ".GlobalPreferences"."com.apple.mouse.scaling" = 2.0;
       spaces.spans-displays = false;
       universalaccess = {
         # FIXME: cannot write universal access
@@ -70,20 +70,24 @@
   };
 
   services = {
-    # FIXME: driver issues
-    # karabiner-elements.enable = false;
+    # https://mynixos.com/nix-darwin/options/services.jankyborders
+    jankyborders = {
+      enable = true;
+      active_color = "0xffe1e3e4";
+      inactive_color = "0xff494d64";
+      width = 10.0;
+    };
 
-    # nix-daemon.enable = true;
-    # sketchybar = {
-    #   enable = false;
-    #   extraPackages = with pkgs; [ jq gh ];
-    # };
+    sketchybar = {
+      enable = true;
+      extraPackages = with pkgs; [ jq gh ];
+    };
   };
 
   security.pam.enableSudoTouchIdAuth = true;
 
-  users.users.${user} = {
-    home = "/Users/${user}";
+  users.users.${username} = {
+    home = "/Users/${username}";
   };
 
   homebrew = {
@@ -94,16 +98,11 @@
       upgrade = false;
       cleanup = "zap";
     };
-    brews = [
-      "borders"
-    ];
-    casks = [
-      # "discord"
-    ];
+    brews = [ ];
+    casks = [ ];
     taps = [
       # default
       "homebrew/bundle"
-      # "homebrew/cask-fonts"
       "homebrew/services"
       # custom
       "FelixKratz/formulae" # borders

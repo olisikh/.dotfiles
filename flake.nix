@@ -21,16 +21,11 @@
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
-    sketchybar = {
-      url = "github:FelixKratz/dotfiles";
-      flake = false;
-    };
-
     # NOTE: since lldb is broken in nixpkgs on main, this fix is very handy
-    lldb-nix-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
+    lldb-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
   };
 
-  outputs = { nixpkgs, lldb-nix-fix, ... } @ inputs:
+  outputs = { nixpkgs, ... } @ inputs:
     let
       system = "aarch64-darwin";
 
@@ -56,7 +51,7 @@
             # NOTE: override lldb package
             vscode-extensions = prev.vscode-extensions // {
               vadimcn = prev.vscode-extensions.vadimcn // {
-                vscode-lldb = lldb-nix-fix.legacyPackages.aarch64-darwin.vscode-extensions.vadimcn.vscode-lldb;
+                vscode-lldb = inputs.lldb-fix.legacyPackages.aarch64-darwin.vscode-extensions.vadimcn.vscode-lldb;
               };
             };
           })
@@ -69,52 +64,63 @@
       darwinConfigurations =
         let inherit (inputs.darwin.lib) darwinSystem; in
         {
-          olisikh = darwinSystem {
-            inherit system pkgs;
+          olisikh =
+            let
+              username = "olisikh";
+              specialArgs = { inherit inputs username; };
+            in
+            darwinSystem {
+              inherit system pkgs specialArgs;
 
-            specialArgs = { inherit inputs; };
+              modules = [
+                ./nix/darwin.nix
+                inputs.home-manager.darwinModules.home-manager
+                inputs.darwin-util.darwinModules.default
+                {
+                  home-manager = {
+                    extraSpecialArgs = specialArgs;
 
-            modules = [
-              (import ./nix/darwin.nix { user = "olisikh"; })
-              inputs.home-manager.darwinModules.home-manager
-              inputs.darwin-util.darwinModules.default
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  users.olisikh.imports = [
-                    inputs.nixvim.homeManagerModules.nixvim
-                    inputs.darwin-util.homeManagerModules.default
-                    ./nix/home.nix
-                  ];
-                };
-              }
-            ];
-          };
+                    useGlobalPkgs = true;
+                    useUserPackages = true;
 
-          work = darwinSystem {
-            inherit system pkgs;
+                    users."${username}".imports = [
+                      inputs.nixvim.homeManagerModules.nixvim
+                      inputs.darwin-util.homeManagerModules.default
+                      ./nix/home.nix
+                    ];
+                  };
+                }
+              ];
+            };
 
-            specialArgs = { inherit inputs; };
+          work =
+            let
+              username = "O.Lisikh";
+              specialArgs = { inherit inputs username; };
+            in
+            darwinSystem {
+              inherit system pkgs specialArgs;
 
-            modules = [
-              (import ./nix/darwin.nix { user = "O.Lisikh"; })
-              inputs.home-manager.darwinModules.home-manager
-              inputs.darwin-util.darwinModules.default
-              {
+              modules = [
+                ./nix/darwin.nix
+                inputs.home-manager.darwinModules.home-manager
+                inputs.darwin-util.darwinModules.default
+                {
+                  home-manager = {
+                    extraSpecialArgs = specialArgs;
 
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  users."O.Lisikh".imports = [
-                    inputs.nixvim.homeManagerModules.nixvim
-                    inputs.darwin-util.homeManagerModules.default
-                    ./nix/work.nix
-                  ];
-                };
-              }
-            ];
-          };
+                    useGlobalPkgs = true;
+                    useUserPackages = true;
+
+                    users."${username}".imports = [
+                      inputs.nixvim.homeManagerModules.nixvim
+                      inputs.darwin-util.homeManagerModules.default
+                      ./nix/work.nix
+                    ];
+                  };
+                }
+              ];
+            };
         };
     };
 }

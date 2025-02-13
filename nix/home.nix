@@ -1,6 +1,5 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 let
-  user = "olisikh";
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
 in
@@ -17,13 +16,13 @@ in
     ./direnv
     ./nixvim
     ./amethyst
-    ./borders
-    # ./sketchybar
+    ./sketchybar
   ];
 
   home = {
-    username = user;
-    homeDirectory = "/Users/${user}";
+    inherit username;
+
+    homeDirectory = "/Users/${username}";
 
     # don't ever change the stateVersion value, it will break the state
     stateVersion = "25.05";
@@ -45,6 +44,7 @@ in
       rustup
       tree-sitter
       luarocks-nix
+      lua
       docker
       minikube
       kubernetes-helm
@@ -85,6 +85,7 @@ in
 
       discord
 
+      jankyborders # visible borders
       sketchybar # nice status bar
       sketchybar-app-font # font for sketchybar
       skhd # app navigation hotkeys (alt+t - terminal, alt+b - browser, etc)

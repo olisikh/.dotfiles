@@ -1,6 +1,5 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 let
-  user = "O.Lisikh";
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
 in
@@ -20,9 +19,11 @@ in
   ];
 
   home = {
-    username = user;
-    homeDirectory = "/Users/${user}";
+    inherit username;
 
+    homeDirectory = "/Users/${username}";
+
+    # don't ever change the stateVersion value, it will break the state
     stateVersion = "25.05";
 
     # The home.packages option allows you to install Nix packages into your

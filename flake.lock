@@ -447,7 +447,7 @@
         "type": "github"
       }
     },
-    "lldb-nix-fix": {
+    "lldb-fix": {
       "locked": {
         "lastModified": 1712740125,
         "narHash": "sha256-YXvbuxzaLmHgzWyQK4Cxduz8oMMaq6FgiVnqJhWCAjE=",
@@ -629,28 +629,11 @@
         "darwin-util": "darwin-util",
         "flake-utils": "flake-utils_2",
         "home-manager": "home-manager",
-        "lldb-nix-fix": "lldb-nix-fix",
+        "lldb-fix": "lldb-fix",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-stable": "nixpkgs-stable",
-        "nixvim": "nixvim",
-        "sketchybar": "sketchybar"
-      }
-    },
-    "sketchybar": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1734104004,
-        "narHash": "sha256-e7HE7sS6cwwA3S92OmUmovA/CXy1fIWvmsJVwH8RQVw=",
-        "owner": "FelixKratz",
-        "repo": "dotfiles",
-        "rev": "e27673f07ff41eb6a4816daabb79b0a5e837a105",
-        "type": "github"
-      },
-      "original": {
-        "owner": "FelixKratz",
-        "repo": "dotfiles",
-        "type": "github"
+        "nixvim": "nixvim"
       }
     },
     "systems": {
