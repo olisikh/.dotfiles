@@ -22,7 +22,7 @@
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
     # NOTE: since lldb is broken in nixpkgs on main, this fix is very handy
-    lldb-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
+    vscodelldb-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
   };
 
   outputs = { nixpkgs, ... } @ inputs:
@@ -51,7 +51,7 @@
             # NOTE: override lldb package
             vscode-extensions = prev.vscode-extensions // {
               vadimcn = prev.vscode-extensions.vadimcn // {
-                vscode-lldb = inputs.lldb-fix.legacyPackages.aarch64-darwin.vscode-extensions.vadimcn.vscode-lldb;
+                vscode-lldb = inputs.vscodelldb-fix.legacyPackages."${system}".vscode-extensions.vadimcn.vscode-lldb;
               };
             };
           })

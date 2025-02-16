@@ -7,14 +7,14 @@ let
 in
 {
   programs.git = {
-    enable = true;
-    userName = userName;
-    userEmail = userEmail;
+    inherit userName userEmail;
 
-    signing = lib.mkIf (signingKey != "") {
-      key = signingKey;
-      signByDefault = true;
-    };
+    enable = true;
+
+    # signing = lib.mkIf (signingKey != "") {
+    #   key = signingKey;
+    #   signByDefault = true;
+    # };
 
     extraConfig = {
       core = {

@@ -15,7 +15,7 @@ in
     ./mc
     ./direnv
     ./nixvim
-    ./amethyst
+    # ./amethyst
     ./sketchybar
   ];
 
@@ -71,6 +71,7 @@ in
       wezterm
       lazygit
       gh
+      gnupg # tool for generating GPG keys
       watch
       (python3.withPackages (ps: with ps; [
         pip
@@ -84,12 +85,6 @@ in
       mkalias
 
       discord
-
-      jankyborders # visible borders
-      sketchybar # nice status bar
-      sketchybar-app-font # font for sketchybar
-      skhd # app navigation hotkeys (alt+t - terminal, alt+b - browser, etc)
-      raycast
 
       (writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "home"; }))
     ];
