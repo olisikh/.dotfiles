@@ -40,6 +40,7 @@ in
       rustup
       tree-sitter
       luarocks-nix
+      lua
       docker
       docker-compose
       colima
@@ -74,6 +75,7 @@ in
         debugpy
       ]))
       ollama
+      cmatrix
 
       (pkgs.writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "work"; }))
     ];
@@ -81,8 +83,6 @@ in
     sessionVariables = {
       SCALA_HOME = scala;
       JAVA_HOME = jdk;
-      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = /var/run/docker.sock;
-      DOCKER_HOST = "unix:///Users/${username}/.colima/default/docker.sock";
     };
   };
 
