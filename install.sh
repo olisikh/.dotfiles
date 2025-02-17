@@ -13,9 +13,9 @@ fi
 mkdir -p ~/.config/nix
 cp -fr ~/.dotfiles/nix.conf ~/.config/nix/nix.conf
 
-# download the internet and install flake
-HOSTNAME=$(scutil --get ComputerName)
+HOSTNAME=$(scutil --get LocalHostName)
 
-nix build .#darwinConfigurations.olisikh.system --impure --show-trace && \
+# download the internet and install flake
+nix build .#darwinConfigurations.${HOSTNAME}.system --impure --show-trace && \
   ./result/sw/bin/darwin-rebuild switch --flake . --impure
 

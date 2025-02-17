@@ -93,7 +93,7 @@
               ];
             };
 
-          work =
+          Q9NPPWVXMF =
             let
               username = "O.Lisikh";
               specialArgs = { inherit inputs username; };

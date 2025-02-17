@@ -15,7 +15,7 @@ in
     ./mc
     ./direnv
     ./nixvim
-    ./amethyst
+    ./sketchybar
   ];
 
   home = {
@@ -32,10 +32,7 @@ in
       nix-prefetch
       bash
       wget
-      nerd-fonts.meslo-lg
       nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-      nerd-fonts.hack
       fd
       eza
       jq
@@ -85,7 +82,7 @@ in
       SCALA_HOME = scala;
       JAVA_HOME = jdk;
       TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = /var/run/docker.sock;
-      DOCKER_HOST = "unix:///Users/${user}/.colima/default/docker.sock";
+      DOCKER_HOST = "unix:///Users/${username}/.colima/default/docker.sock";
     };
   };
 

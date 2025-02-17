@@ -131,10 +131,10 @@
       enable = true;
       skhdConfig = ''
         # focus window
-        ctrl - h : yabai -m window --focus west
-        ctrl - j : yabai -m window --focus south
-        ctrl - k : yabai -m window --focus north
-        ctrl - l : yabai -m window --focus east
+        shift + ctrl - h : yabai -m window --focus west
+        shift + ctrl - j : yabai -m window --focus south
+        shift + ctrl - k : yabai -m window --focus north
+        shift + ctrl - l : yabai -m window --focus east
 
         # swap managed window
         shift + alt - h : yabai -m window --swap west

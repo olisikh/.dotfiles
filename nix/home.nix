@@ -15,7 +15,6 @@ in
     ./mc
     ./direnv
     ./nixvim
-    # ./amethyst
     ./sketchybar
   ];
 
@@ -33,10 +32,7 @@ in
       nix-prefetch
       bash
       wget
-      nerd-fonts.meslo-lg
       nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-      nerd-fonts.hack
       fd
       eza
       jq
