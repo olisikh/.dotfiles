@@ -52,7 +52,7 @@
       };
 
       NSGlobalDomain = {
-        _HIHideMenuBar = false;
+        _HIHideMenuBar = true;
         AppleFontSmoothing = 0;
         AppleInterfaceStyle = "Dark";
         AppleKeyboardUIMode = 3;
@@ -110,7 +110,7 @@
         window_gap = 12;
         layout = "bsp"; # default "float" (windows are not managed)
       };
-      enableScriptingAddition = false;
+      enableScriptingAddition = true;
       extraConfig = ''
         # apps to not manage (ignore)
         yabai -m rule --add app="^System Preferences$" manage=off
@@ -253,10 +253,12 @@
       cleanup = "zap";
     };
     brews = [
+      "lua" # required by sketchybars...
       "sketchybar"
     ];
     casks = [
       "raycast"
+      "font-sketchybar-app-font"
     ];
     taps = [
       "homebrew/bundle"

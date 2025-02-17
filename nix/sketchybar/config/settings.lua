@@ -1,4 +1,4 @@
 return {
-  font = "SF Pro",
+  font = "JetBrains Mono",
   paddings = 3,
 }

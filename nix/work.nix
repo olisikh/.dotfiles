@@ -40,7 +40,6 @@ in
       rustup
       tree-sitter
       luarocks-nix
-      lua
       docker
       docker-compose
       colima
