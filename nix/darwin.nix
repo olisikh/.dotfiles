@@ -149,20 +149,20 @@
         shift + alt + ctrl - l : yabai -m window --warp east
 
         # rotate tree
-        alt - r : yabai -m space --rotate 90
+        shift + alt - r : yabai -m space --rotate 90
 
         # toggle window fullscreen zoom
-        alt - f : yabai -m window --toggle zoom-fullscreen
+        shift + alt - f : yabai -m window --toggle zoom-fullscreen
 
         # toggle padding and gap
-        alt - g : yabai -m space --toggle padding; yabai -m space --toggle gap
+        shift + alt - g : yabai -m space --toggle padding; yabai -m space --toggle gap
 
         # float / unfloat window and center on screen
-        alt - t : yabai -m window --toggle float;\
+        shift + alt - t : yabai -m window --toggle float;\
                   yabai -m window --grid 4:4:1:1:2:2
 
         # toggle window split type
-        alt - e : yabai -m window --toggle split
+        shift + alt - e : yabai -m window --toggle split
 
         # balance size of windows
         shift + alt - 0 : yabai -m space --balance
@@ -185,7 +185,7 @@
                            yabai -m space --focus "''${index}"
 
         # fast focus desktop
-        alt - 0 : yabai -m space --focus recent
+        shift + alt - 0 : yabai -m space --focus recent
 
         # send window to monitor and follow focus
         shift + alt - n : yabai -m window --display next; yabai -m display --focus next
@@ -208,11 +208,11 @@
         gh 
         sketchybar-app-font
       ];
-      config = ''
-        sketchybar --bar height=24
-        sketchybar --update
-        echo "sketchybar configuration loaded.."
-      '';
+      # config = ''
+      #   sketchybar --bar height=24
+      #   sketchybar --update
+      #   echo "sketchybar configuration loaded.."
+      # '';
     };
   };
 
