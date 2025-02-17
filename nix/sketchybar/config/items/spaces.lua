@@ -50,20 +50,20 @@ sbar.add("bracket", spaces, {
   background = { color = colors.bg1, border_color = colors.bg2 }
 })
 
-local space_creator = sbar.add("item", {
-  padding_left=10,
-  padding_right=8,
-  icon = {
-    string = "󱂬 ",
-    font = {
-      style = "Heavy",
-      size = 16.0,
-    },
-  },
-  label = { drawing = false },
-  associated_display = "active",
-})
-
-space_creator:subscribe("mouse.clicked", function(_)
-  sbar.exec("yabai -m space --create")
-end)
+-- local space_creator = sbar.add("item", {
+--   padding_left=10,
+--   padding_right=8,
+--   icon = {
+--     string = "󱂬 ",
+--     font = {
+--       style = "Heavy",
+--       size = 16.0,
+--     },
+--   },
+--   label = { drawing = false },
+--   associated_display = "active",
+-- })
+--
+-- space_creator:subscribe("mouse.clicked", function(_)
+--   sbar.exec("yabai -m space --create")
+-- end)
