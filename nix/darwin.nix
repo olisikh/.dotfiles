@@ -110,6 +110,12 @@
         window_gap = 12;
         layout = "bsp"; # default "float" (windows are not managed)
       };
+      # WARN: Yabai scription addition requires Security Integration Protection to be partially disabled.
+      # 1. In OSX Recovery mode terminal (long press power button during boot) run the following command:
+      # > csrutil enable --without fs --without debug --without nvram
+      # 2. In normal mode enable non-Apple signed binaries:
+      # > sudo nvram boot-args=-arm64e_preview_abi
+      # 3. Reboot again
       enableScriptingAddition = true;
       extraConfig = ''
         # apps to not manage (ignore)
