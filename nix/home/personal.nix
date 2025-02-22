@@ -5,17 +5,17 @@ let
 in
 {
   imports = [
-    ./zsh
-    ./fzf
-    ./zoxide
-    ./wezterm
-    ./ripgrep
-    ./starship
-    ./git
-    ./mc
-    ./direnv
-    ./nixvim
-    ./sketchybar
+    ./programs/zsh
+    ./programs/fzf
+    ./programs/zoxide
+    ./programs/wezterm
+    ./programs/ripgrep
+    ./programs/starship
+    ./programs/git
+    ./programs/mc
+    ./programs/direnv
+    ./programs/nixvim
+    ./programs/sketchybar
   ];
 
   home = {
@@ -40,10 +40,6 @@ in
       rustup
       tree-sitter
       luarocks-nix
-      docker
-      docker-compose
-      colima
-      qemu
       minikube
       kubernetes-helm
       terraform
@@ -58,29 +54,38 @@ in
       stern # kubectl pod log scraping tool
       htop
       pngpaste
+      nodejs
       scala
       (sbt.override { jre = jdk; })
       (metals.override { jre = jdk; })
+      kotlin
+      gradle
       xdg-utils # open apps from console/neovim
+      arc-browser
       wezterm
       lazygit
       gh
       gnupg # tool for generating GPG keys
       watch
-      rover
       (python3.withPackages (ps: with ps; [
         pip
         pytest
         debugpy
       ]))
       ollama
+      obsidian
+      vscode
       cmatrix
+      mkalias
 
-      (pkgs.writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "work"; }))
+      discord
+
+      (writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "home"; }))
     ];
 
     sessionVariables = {
       SCALA_HOME = scala;
+      SCALA_CLI_POWER = "true";
       JAVA_HOME = jdk;
     };
   };

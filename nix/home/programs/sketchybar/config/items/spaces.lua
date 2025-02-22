@@ -1,4 +1,5 @@
 local colors = require("colors")
+local settings = require("settings")
 
 local function mouse_click(env)
   if env.BUTTON == "right" then
@@ -35,7 +36,7 @@ for i = 1, 10, 1 do
       padding_right = 20,
       color = colors.grey,
       highlight_color = colors.white,
-      font = "sketchybar-app-font:Regular:16.0",
+      font = settings.font .. ":Regular:16.0",
       y_offset = -1,
       drawing = false,
     },

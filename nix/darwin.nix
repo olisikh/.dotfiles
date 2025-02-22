@@ -207,19 +207,19 @@
       '';
     };
 
-    # sketchybar = {
-    #   # enable = true;
-    #   extraPackages = with pkgs; [
-    #     jq
-    #     gh
-    #     sketchybar-app-font
-    #   ];
-    #   config = ''
-    #     sketchybar --bar height=24
-    #     sketchybar --update
-    #     echo "sketchybar configuration loaded.."
-    #   '';
-    # };
+    sketchybar = {
+      enable = true;
+      extraPackages = with pkgs; [
+        lua5_4
+        jq
+        sketchybar-app-font
+      ];
+      # config = ''
+      #   sketchybar --bar height=24
+      #   sketchybar --update
+      #   echo "sketchybar configuration loaded.."
+      # '';
+    };
   };
 
   launchd.agents = {
@@ -231,8 +231,8 @@
         KeepAlive = true;
 
         # not sure where to put these paths and not reference a hard-coded `$HOME`; `/var/log`?
-        StandardOutPath = "/Users/${username}/.colima/default/daemon/launchd.stdout.log";
-        StandardErrorPath = "/Users/${username}/.colima/default/daemon/launchd.stderr.log";
+        StandardOutPath = "/var/log/colima/default/daemon/launchd.stdout.log";
+        StandardErrorPath = "/var/log/colima/default/daemon/launchd.stderr.log";
 
         # not using launchd.agents.<name>.path because colima needs the system ones as well
         EnvironmentVariables = {
@@ -244,6 +244,23 @@
     };
   };
 
+  environment = {
+    systemPackages = with pkgs; [
+      lua5_4
+      lima
+      colima
+      docker
+      docker-compose
+      sbarlua
+    ];
+
+    variables = {
+      PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
+      DOCKER_HOST = "unix:///Users/${username}/.colima/default/docker.sock";
+    };
+  };
+
   security.pam.enableSudoTouchIdAuth = true;
 
   users.users.${username} = {
@@ -252,24 +269,18 @@
 
   homebrew = {
     enable = true;
-
     onActivation = {
       autoUpdate = false;
       upgrade = false;
       cleanup = "zap";
     };
-    brews = [
-      "lua" # required by sketchybars...
-      "sketchybar"
-    ];
+    brews = [ ];
     casks = [
       "raycast"
-      "font-sketchybar-app-font"
     ];
     taps = [
       "homebrew/bundle"
       "homebrew/services"
-      "FelixKratz/formulae"
     ];
   };
 }

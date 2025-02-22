@@ -57,6 +57,11 @@
           })
 
           inputs.neovim-nightly-overlay.overlays.default
+
+
+          (final: prev: {
+            sbarlua = prev.callPackage ./nix/packages/sbarlua { };
+          })
         ];
       };
     in
@@ -86,7 +91,7 @@
                     users."${username}".imports = [
                       inputs.nixvim.homeManagerModules.nixvim
                       inputs.darwin-util.homeManagerModules.default
-                      ./nix/home.nix
+                      ./nix/home/personal.nix
                     ];
                   };
                 }
@@ -115,7 +120,7 @@
                     users."${username}".imports = [
                       inputs.nixvim.homeManagerModules.nixvim
                       inputs.darwin-util.homeManagerModules.default
-                      ./nix/work.nix
+                      ./nix/home/work.nix
                     ];
                   };
                 }
