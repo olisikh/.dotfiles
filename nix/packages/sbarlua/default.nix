@@ -1,11 +1,4 @@
-{ stdenv
-, clang
-, fetchFromGitHub
-, gcc
-, readline
-, lua5_4
-,
-}:
+{ stdenv, clang, fetchFromGitHub, gcc, readline, lua5_4, pkgs, lib }:
 let
   lua = lua5_4;
 in

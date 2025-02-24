@@ -118,6 +118,9 @@
       # 3. Reboot again
       enableScriptingAddition = true;
       extraConfig = ''
+        # enable scripting addition
+        sudo yabai --load-sa
+
         # apps to not manage (ignore)
         yabai -m rule --add app="^System Preferences$" manage=off
         yabai -m rule --add app="^Archive Utility$" manage=off
@@ -207,18 +210,14 @@
       '';
     };
 
+    # NOTE: good example of sketchybar configuration
+    # https://github.com/khaneliman/khanelinix/blob/60bc9ff5b65ca7e107de3b288e16998fd2b01c88/modules/home/programs/graphical/bars/sketchybar/default.nix
     sketchybar = {
       enable = true;
       extraPackages = with pkgs; [
-        lua5_4
         jq
         sketchybar-app-font
       ];
-      # config = ''
-      #   sketchybar --bar height=24
-      #   sketchybar --update
-      #   echo "sketchybar configuration loaded.."
-      # '';
     };
   };
 
@@ -255,7 +254,16 @@
     ];
 
     variables = {
-      PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+      PATH = builtins.concatStringsSep ":" [
+        "${pkgs.yabai}/bin"
+        "${pkgs.colima}/bin"
+        "${pkgs.docker}/bin"
+        "/usr/bin"
+        "/bin"
+        "/usr/sbin"
+        "/sbin"
+        ''''${PATH}''
+      ];
       TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
       DOCKER_HOST = "unix:///Users/${username}/.colima/default/docker.sock";
     };

@@ -22,11 +22,13 @@ in
       echo "Usage: home <command>"
       echo
       echo "Commands:"
-      echo "  make        : Rebuild dotfiles"
-      echo "  update      : Update dotfiles"
-      echo "  generations : List dotfiles generations"
-      echo "  rollback    : Rollback to previous generation"
-      echo "  gc          : Nix gc"
+      echo
+      echo "make        : Rebuild dotfiles"
+      echo "update      : Update dotfiles"
+      echo "generations : List dotfiles generations"
+      echo "rollback    : Rollback to previous generation"
+      echo "gc          : Nix gc"
+      echo "help        : Help"
   }
 
   # Function to perform 'home make'
