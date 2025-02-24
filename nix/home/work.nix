@@ -61,6 +61,7 @@ in
       xdg-utils # open apps from console/neovim
       wezterm
       lazygit
+      lazydocker
       gh
       gnupg # tool for generating GPG keys
       watch

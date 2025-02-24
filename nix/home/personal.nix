@@ -64,6 +64,7 @@ in
       arc-browser
       wezterm
       lazygit
+      lazydocker
       gh
       gnupg # tool for generating GPG keys
       watch

@@ -116,10 +116,10 @@
       # 2. In normal mode enable non-Apple signed binaries:
       # > sudo nvram boot-args=-arm64e_preview_abi
       # 3. Reboot again
-      enableScriptingAddition = false;
+      enableScriptingAddition = true;
       extraConfig = ''
         # enable scripting addition
-        # sudo yabai --load-sa
+        sudo yabai --load-sa
 
         # apps to not manage (ignore)
         yabai -m rule --add app="^System Preferences$" manage=off
@@ -147,16 +147,16 @@
         shift + ctrl - l : yabai -m window --focus east
 
         # swap managed window
-        shift + alt - h : yabai -m window --swap west
-        shift + alt - j : yabai -m window --swap south
-        shift + alt - k : yabai -m window --swap north
-        shift + alt - l : yabai -m window --swap east
+        shift + ctrl + alt - h : yabai -m window --swap west
+        shift + ctrl + alt - j : yabai -m window --swap south
+        shift + ctrl + alt - k : yabai -m window --swap north
+        shift + ctrl + alt - l : yabai -m window --swap east
 
         # move managed window
-        shift + alt + ctrl - h : yabai -m window --warp west
-        shift + alt + ctrl - j : yabai -m window --warp south
-        shift + alt + ctrl - k : yabai -m window --warp north
-        shift + alt + ctrl - l : yabai -m window --warp east
+        shift + alt - h : yabai -m window --warp west
+        shift + alt - j : yabai -m window --warp south
+        shift + alt - k : yabai -m window --warp north
+        shift + alt - l : yabai -m window --warp east
 
         # rotate tree
         shift + alt - r : yabai -m space --rotate 90
