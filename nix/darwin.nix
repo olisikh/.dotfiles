@@ -116,10 +116,10 @@
       # 2. In normal mode enable non-Apple signed binaries:
       # > sudo nvram boot-args=-arm64e_preview_abi
       # 3. Reboot again
-      enableScriptingAddition = true;
+      enableScriptingAddition = false;
       extraConfig = ''
         # enable scripting addition
-        sudo yabai --load-sa
+        # sudo yabai --load-sa
 
         # apps to not manage (ignore)
         yabai -m rule --add app="^System Preferences$" manage=off
