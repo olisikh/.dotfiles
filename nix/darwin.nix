@@ -125,7 +125,8 @@
         yabai -m rule --add app="^System Preferences$" manage=off
         yabai -m rule --add app="^Archive Utility$" manage=off
         yabai -m rule --add app="^Creative Cloud$" manage=off
-        yabai -m rule --add app="^Logi Options$" manage=off
+        yabai -m rule --add app="^Login Options$" manage=off
+        yabai -m rule --add app="^ClearVPN$" manage=off
 
         # yabai -m rule --add app="^Wally$" manage=off
         # yabai -m rule --add app="^Pika$" manage=off

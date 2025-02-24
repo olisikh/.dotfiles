@@ -1,3 +1,4 @@
+# WARN: this is not used, so can be deleted, but nice for reference
 { stdenv, clang, fetchFromGitHub, gcc, readline, lua5_4, pkgs, lib }:
 let
   lua = lua5_4;
