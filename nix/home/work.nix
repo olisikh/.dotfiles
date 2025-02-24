@@ -1,29 +1,30 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 let
-  user = "O.Lisikh";
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
 in
 {
   imports = [
-    ./zsh
-    ./fzf
-    ./zoxide
-    ./wezterm
-    ./ripgrep
-    ./starship
-    ./git
-    ./mc
-    ./direnv
-    ./nixvim
-    ./amethyst
+    ./programs/zsh
+    ./programs/fzf
+    ./programs/zoxide
+    ./programs/wezterm
+    ./programs/ripgrep
+    ./programs/starship
+    ./programs/git
+    ./programs/mc
+    ./programs/direnv
+    ./programs/nixvim
+    ./programs/sketchybar
   ];
 
   home = {
-    username = user;
-    homeDirectory = "/Users/${user}";
+    inherit username;
 
-    stateVersion = "22.11";
+    homeDirectory = "/Users/${username}";
+
+    # don't ever change the stateVersion value, it will break the state
+    stateVersion = "25.05";
 
     # The home.packages option allows you to install Nix packages into your
     # environment.
@@ -31,10 +32,7 @@ in
       nix-prefetch
       bash
       wget
-      nerd-fonts.meslo-lg
       nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-      nerd-fonts.hack
       fd
       eza
       jq
@@ -42,9 +40,6 @@ in
       rustup
       tree-sitter
       luarocks-nix
-      docker
-      docker-compose
-      colima
       qemu
       minikube
       kubernetes-helm
@@ -66,6 +61,7 @@ in
       xdg-utils # open apps from console/neovim
       wezterm
       lazygit
+      lazydocker
       gh
       gnupg # tool for generating GPG keys
       watch
@@ -76,6 +72,7 @@ in
         debugpy
       ]))
       ollama
+      cmatrix
 
       (pkgs.writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "work"; }))
     ];
@@ -83,8 +80,6 @@ in
     sessionVariables = {
       SCALA_HOME = scala;
       JAVA_HOME = jdk;
-      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = /var/run/docker.sock;
-      DOCKER_HOST = "unix:///Users/${user}/.colima/default/docker.sock";
     };
   };
 

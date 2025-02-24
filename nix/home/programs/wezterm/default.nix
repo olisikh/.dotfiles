@@ -1,7 +1,7 @@
 { ... }:
 {
   home.file = {
-    ".config/wezterm".source = ~/.dotfiles/wezterm;
+    ".config/wezterm".source = ./config;
   };
 
   programs.wezterm = {

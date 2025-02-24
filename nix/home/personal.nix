@@ -1,31 +1,30 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 let
-  user = "olisikh";
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
 in
 {
   imports = [
-    ./zsh
-    ./fzf
-    ./zoxide
-    ./wezterm
-    ./ripgrep
-    ./starship
-    ./git
-    ./mc
-    ./direnv
-    ./nixvim
-    ./amethyst
+    ./programs/zsh
+    ./programs/fzf
+    ./programs/zoxide
+    ./programs/wezterm
+    ./programs/ripgrep
+    ./programs/starship
+    ./programs/git
+    ./programs/mc
+    ./programs/direnv
+    ./programs/nixvim
+    ./programs/sketchybar
   ];
 
-
   home = {
-    username = user;
-    homeDirectory = "/Users/${user}";
+    inherit username;
+
+    homeDirectory = "/Users/${username}";
 
     # don't ever change the stateVersion value, it will break the state
-    stateVersion = "22.11";
+    stateVersion = "25.05";
 
     # The home.packages option allows you to install Nix packages into your
     # environment.
@@ -33,10 +32,7 @@ in
       nix-prefetch
       bash
       wget
-      nerd-fonts.meslo-lg
       nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-      nerd-fonts.hack
       fd
       eza
       jq
@@ -44,7 +40,6 @@ in
       rustup
       tree-sitter
       luarocks-nix
-      docker
       minikube
       kubernetes-helm
       terraform
@@ -69,7 +64,9 @@ in
       arc-browser
       wezterm
       lazygit
+      lazydocker
       gh
+      gnupg # tool for generating GPG keys
       watch
       (python3.withPackages (ps: with ps; [
         pip
@@ -80,6 +77,9 @@ in
       obsidian
       vscode
       cmatrix
+      mkalias
+
+      discord
 
       (writeShellScriptBin "home" (import ./script.nix { homeManagerConfig = "home"; }))
     ];
