@@ -3,7 +3,7 @@
     mapleader = " ";
     maplocalleader = " ";
     loaded_netrw = 1;
-	  loaded_netrwPlugin = 1;
+    loaded_netrwPlugin = 1;
   };
 
   diagnostics = {
@@ -12,6 +12,8 @@
 
   opts = {
     cursorline = false;
+    linebreak = true;
+    wrap = true;
     colorcolumn = "121";
     scrolloff = 8;
     splitbelow = true; # when splitting horizontally
