@@ -6,6 +6,12 @@ in
 {
   olisikh = {
     user = enabled;
+    services = {
+      jankyborders = enabled;
+      yabai = enabled;
+      sketchybar = enabled;
+      skhd = enabled;
+    };
   };
 
   networking = {
