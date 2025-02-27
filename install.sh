@@ -16,6 +16,6 @@ cp -fr ~/.dotfiles/nix.conf ~/.config/nix/nix.conf
 HOSTNAME=$(scutil --get LocalHostName)
 
 # download the internet and install flake
-nix build .#darwinConfigurations.${HOSTNAME}.system --impure --show-trace && \
-  ./result/sw/bin/darwin-rebuild switch --flake . --impure
+nix build .#darwinConfigurations.${HOSTNAME}.system --show-trace && \
+  ./result/sw/bin/darwin-rebuild switch --flake .
 

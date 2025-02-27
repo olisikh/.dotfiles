@@ -2,10 +2,8 @@
 let
   inherit (lib.${namespace}) enabled;
 
-
-  userName = builtins.getEnv "GIT_NAME";
-  userEmail = builtins.getEnv "GIT_EMAIL";
-  signingKey = builtins.getEnv "GIT_SIGNING_KEY";
+  userName = "Oleksii Lisikh";
+  userEmail = "alisiikh@gmail.com";
 in
 {
   olisikh = {
@@ -17,7 +15,7 @@ in
     ripgrep = enabled;
     starship = enabled;
     git = {
-      inherit userName userEmail signingKey;
+      inherit userName userEmail;
       enable = true;
     };
     mc = enabled;

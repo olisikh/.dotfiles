@@ -1,4 +1,3 @@
-{ ... }:
 let
   nixShell =
     # nix
@@ -33,7 +32,7 @@ in
 
   # Function to perform 'home make'
   home_make() {
-      darwin-rebuild switch --flake ~/.dotfiles --impure "$@"
+      darwin-rebuild switch --flake ~/.dotfiles "$@"
   }
 
   # Function to perform 'home update'

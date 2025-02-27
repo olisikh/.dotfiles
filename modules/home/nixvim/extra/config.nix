@@ -51,4 +51,4 @@
   require('dap-kotlin').setup({
     dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
   })
-'') + import ./harpoon.lua.nix
+'') + import ./config/harpoon.lua.nix

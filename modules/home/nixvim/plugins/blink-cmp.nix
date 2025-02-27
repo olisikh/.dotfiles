@@ -11,9 +11,11 @@
 
       # -- Default list of enabled providers defined so that you can extend it
       # -- elsewhere in your config, without redefining it, due to `opts_extend`
+
+      cmdline.enabled = false; # disable neovim cmdline completions, use classic Tab instead
+
       sources = {
         default = [ "lazydev" "lsp" "snippets" "path" ];
-        cmdline = nixvimLib.emptyTable; # disable neovim cmdline completions, use classic Tab instead
         providers = {
           lazydev = {
             name = "LazyDev";
@@ -82,7 +84,7 @@
 
         # -- Display a preview of the selected item on the current line
         ghost_text = {
-          enabled = true;
+          enabled = false; # conflicts with copilot
         };
       };
 

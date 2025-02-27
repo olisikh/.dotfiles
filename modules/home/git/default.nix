@@ -16,6 +16,7 @@ in
   config = mkIf cfg.enable {
     programs.git = {
       enable = true;
+
       inherit (cfg) userName userEmail;
 
       signing = lib.mkIf (cfg.signingKey != "") {

@@ -77,7 +77,7 @@ in
 
         discord
 
-        (writeShellScriptBin "home" import ./script.nix)
+        (writeShellScriptBin "home" (import ./script.nix))
       ];
 
       sessionVariables = {

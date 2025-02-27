@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 let
   harpoon-lualine = (pkgs.vimUtils.buildVimPlugin {
     name = "harpoon-lualine";

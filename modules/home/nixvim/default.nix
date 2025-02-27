@@ -5,7 +5,7 @@ let
 
   cfg = config.${namespace}.nixvim;
 
-  nixvimLib = inputs.nixvim.lib;
+  nixvimLib = inputs.nixvim.lib.nixvim;
 
   kotlin-dap-adapter = pkgs.fetchzip {
     name = "kotlin-dap-adapter-0.4.4";
