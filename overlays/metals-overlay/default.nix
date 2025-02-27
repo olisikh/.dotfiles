@@ -1,4 +1,4 @@
-{ channels, namespace, inputs, ... }:
+{ channels, inputs, ... }:
 
 final: prev: {
   metals = prev.metals.overrideAttrs (oldAttrs: {

@@ -1,4 +1,4 @@
-{ homeManagerConfig, ... }:
+{ ... }:
 let
   nixShell =
     # nix

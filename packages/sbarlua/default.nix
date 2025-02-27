@@ -22,9 +22,4 @@ stdenv.mkDerivation {
     mkdir -p $out/lib/lua/${lua.luaversion}/
     cp -r bin/* "$out/lib/lua/${lua.luaversion}/"
   '';
-
-  meta = {
-    description = "Sketchybar Lua module which enabled configuration of Sketchybar using Lua language";
-    platforms = [ "x86_64-darwin" "aarch64-darwin" ];
-  };
 }

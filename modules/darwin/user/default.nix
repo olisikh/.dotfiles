@@ -1,13 +1,14 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib) mkIf types;
+  inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
-  cfg = config.${namespace}.mc;
+  cfg = config.${namespace}.user;
 in
 {
-  options.${namespace}.darwin = {
-    enable = mkBoolOpt false "Enable darwin shared module";
+  options.${namespace}.user = with types; {
+    enable = mkBoolOpt false "Enable shared darwin module";
+    name = mkOpt str "olisikh" "Name of the user";
   };
 
   config = mkIf cfg.enable {
@@ -18,6 +19,18 @@ in
     #   experimental-features = nix-command flakes
     #   extra-platforms = x86_64-darwin aarch64-darwin
     # '';
+
+    snowfallorg.users.${cfg.name}.home.config = {
+      home = {
+        file = {
+          ".profile".text = ''
+            # The default file limit is far too low and throws an error when rebuilding the system.
+            # See the original with: ulimit -Sa
+            ulimit -n 4096
+          '';
+        };
+      };
+    };
 
     system = {
       keyboard = {
@@ -254,16 +267,21 @@ in
     };
 
     environment = {
-      systemPackages = with pkgs; [
-        lua5_4
-        lima
-        colima
-        docker
-        docker-compose
-        sbarlua
-      ];
+      systemPath = [ "/opt/homebrew/bin" ];
+
+      systemPackages =
+        with pkgs;
+        with (pkgs."${namespace}"); [
+          lua5_4
+          lima
+          colima
+          docker
+          docker-compose
+          sbarlua
+        ];
 
       variables = {
+        # TODO: Is there a better way to extend path in nix-darwin?
         PATH = builtins.concatStringsSep ":" [
           "${pkgs.yabai}/bin"
           "${pkgs.colima}/bin"
@@ -279,10 +297,11 @@ in
       };
     };
 
-    security.pam.enableSudoTouchIdAuth = true;
+    security.pam.services.sudo_local.touchIdAuth = true;
 
     users.users.${cfg.name} = {
       home = "/Users/${cfg.name}";
+      shell = pkgs.zsh;
     };
 
     homebrew = {

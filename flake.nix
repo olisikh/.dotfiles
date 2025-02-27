@@ -50,12 +50,11 @@
         src = ./.;
 
         snowfall = {
+          namespace = "olisikh";
           meta = {
             name = "olisikh";
             title = "Oleksii's snowfall flake";
           };
-
-          namespace = "olisikh";
         };
       };
     in
@@ -63,6 +62,10 @@
       inherit inputs;
 
       src = ./.;
+
+      overlays = [
+        inputs.neovim-nightly-overlay.overlays.default
+      ];
 
       channels-config = {
         allowUnfree = true;

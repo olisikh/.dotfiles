@@ -1,6 +1,6 @@
-{ lib, config, namespace, types, ... }:
+{ lib, config, namespace, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.git;
@@ -13,28 +13,29 @@ in
     signingKey = mkOpt str "" "The GPG key to use for signing commits";
   };
 
-  programs.git = mkIf cfg.enable {
-    inherit (cfg) userName userEmail;
+  config = mkIf cfg.enable {
+    programs.git = {
+      enable = true;
+      inherit (cfg) userName userEmail;
 
-    enable = true;
-
-    signing = lib.mkIf (cfg.signingKey != "") {
-      key = cfg.signingKey;
-      signByDefault = true;
-    };
-
-    extraConfig = {
-      core = {
-        autocrlf = "input";
-        excludesfile = "~/.gitignore_global";
+      signing = lib.mkIf (cfg.signingKey != "") {
+        key = cfg.signingKey;
+        signByDefault = true;
       };
 
-      submodule = {
-        recurse = true;
-      };
+      extraConfig = {
+        core = {
+          autocrlf = "input";
+          excludesfile = "~/.gitignore_global";
+        };
 
-      init = {
-        defaultBranch = "main";
+        submodule = {
+          recurse = true;
+        };
+
+        init = {
+          defaultBranch = "main";
+        };
       };
     };
   };

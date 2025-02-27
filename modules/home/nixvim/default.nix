@@ -1,11 +1,17 @@
-{ lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, pkgs, inputs, ... }:
 let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.nixvim;
 
-  nixvimLib = config.lib.nixvim;
+  nixvimLib = inputs.nixvim.lib;
+
+  kotlin-dap-adapter = pkgs.fetchzip {
+    name = "kotlin-dap-adapter-0.4.4";
+    url = "https://github.com/fwcd/kotlin-debug-adapter/releases/download/0.4.4/adapter.zip";
+    hash = "sha256-gNbGomFcWqOLTa83/RWS4xpRGr+jmkovns9Sy7HX9bg=";
+  };
 in
 {
   options.${namespace}.nixvim = {
@@ -21,7 +27,7 @@ in
       # TODO: commented out because neotest-scala and ziofix plugins don't work properly on nightly
       # package = pkgs.neovim;
 
-      colorschemes = import ./colorscheme;
+      colorschemes = import ./colorscheme.nix;
 
       autoGroups = {
         user_generic.clear = true;
@@ -68,11 +74,11 @@ in
       ];
 
       imports = [
-        ./options
-        ./keymaps
+        ./options.nix
+        ./keymaps.nix
       ];
 
-      plugins = import ./plugins { inherit pkgs nixvimLib; };
+      plugins = import ./plugins.nix { inherit pkgs nixvimLib; };
 
       extraPackages = with pkgs; [
         gcc
@@ -110,9 +116,9 @@ in
 
       # TODO: all these plugins need to be installed
       # maybe some of them I could contribute to nixvim
-      extraPlugins = import ./extra/plugins { inherit pkgs lib; };
-      extraFiles = import ./extra/files { inherit pkgs; };
-      extraConfigLua = import ./extra/config { inherit pkgs; };
+      extraPlugins = import ./extra/plugins.nix { inherit pkgs nixvimLib; };
+      extraFiles = import ./extra/files.nix { inherit pkgs; };
+      extraConfigLua = import ./extra/config.nix { inherit kotlin-dap-adapter; };
       extraConfigLuaPost = ''
         -- This line is called a `modeline`. See `:help modeline`
         -- vim: ts=2 sts=2 sw=2 et

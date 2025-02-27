@@ -1,27 +1,28 @@
-{ pkgs, ... }:
+{ lib, namespace, ... }:
 let
-  jdk = pkgs.jdk17;
-  scala = pkgs.scala-next;
+  inherit (lib.${namespace}) enabled;
+
+
+  userName = builtins.getEnv "GIT_NAME";
+  userEmail = builtins.getEnv "GIT_EMAIL";
+  signingKey = builtins.getEnv "GIT_SIGNING_KEY";
 in
 {
   olisikh = {
-    direnv.enable = true;
-    zsh.enable = true;
-    fzf.enable = true;
-    zoxide.enable = true;
-    wezterm.enable = true;
-    ripgrep.enable = true;
-    starship.enable = true;
+    direnv = enabled;
+    zsh = enabled;
+    fzf = enabled;
+    zoxide = enabled;
+    wezterm = enabled;
+    ripgrep = enabled;
+    starship = enabled;
     git = {
+      inherit userName userEmail signingKey;
       enable = true;
-      userName = builtins.getEnv "GIT_NAME";
-      userEmail = builtins.getEnv "GIT_EMAIL";
-      signingKey = builtins.getEnv "GIT_SIGNING_KEY";
     };
-    mc.enable = true;
-    nixvim.enable = true;
-    sketchybar.enable = true;
-
-    shared.enable = true;
+    mc = enabled;
+    nixvim = enabled;
+    sketchybar = enabled;
+    shared = enabled;
   };
 }

@@ -1,7 +1,7 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib) mkIf types;
+  inherit (lib.${namespace}) mkOpt mkBoolOpt;
 
   cfg = config.${namespace}.shared;
 
@@ -9,17 +9,18 @@ let
   scala = pkgs.scala-next;
 in
 {
-  options.${namespace}.shared = {
+  options.${namespace}.shared = with types; {
     enable = mkBoolOpt false "Enable shared programs";
+    name = mkOpt str "olisikh" "Name of the user";
   };
 
   config = mkIf cfg.enable {
     home = {
-      # username = "olisikh";
-      # homedirectory = "/users/${username}";
+      username = cfg.name;
+      homeDirectory = "/Users/${cfg.name}";
 
       # don't ever change the stateversion value, it will break the state
-      stateversion = "25.05";
+      stateVersion = "25.05";
 
       # the home.packages option allows you to install nix packages into your
       # environment.
@@ -63,7 +64,7 @@ in
         gh
         gnupg # tool for generating gpg keys
         watch
-        (python3.withpackages (ps: with ps; [
+        (python3.withPackages (ps: with ps; [
           pip
           pytest
           debugpy
@@ -76,13 +77,13 @@ in
 
         discord
 
-        (writeshellscriptbin "home" (import ./script.nix { homemanagerconfig = "home"; }))
+        (writeShellScriptBin "home" import ./script.nix)
       ];
 
-      sessionvariables = {
-        scala_home = scala;
-        scala_cli_power = "true";
-        java_home = jdk;
+      sessionVariables = {
+        SCALA_HOME = scala;
+        SCALA_CLI_POWER = "true";
+        JAVA_HOME = jdk;
       };
     };
 
