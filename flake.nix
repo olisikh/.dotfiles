@@ -10,6 +10,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -67,16 +72,14 @@
         inputs.neovim-nightly-overlay.overlays.default
       ];
 
-      channels-config = {
-        allowUnfree = true;
-        # allowUnfreePredicate = _: true;
-      };
+      channels-config.allowUnfree = true;
 
       systems.modules.darwin = with inputs; [
-        # darwin-util.darwinModules.default
+        sops-nix.darwinModules.sops
       ];
 
       homes.modules = with inputs; [
+        sops-nix.homeManagerModules.sops
         nixvim.homeManagerModules.nixvim
       ];
     };

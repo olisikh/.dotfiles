@@ -26,6 +26,7 @@ in
     };
 
     environment.systemPackages = with pkgs; with pkgs.${namespace}; [
+      lua5_4
       sbarlua
     ];
   };

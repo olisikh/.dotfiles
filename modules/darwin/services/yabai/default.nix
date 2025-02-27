@@ -35,9 +35,7 @@ in
           mouse_action1 = "move";
           mouse_action2 = "resize";
           mouse_drop_action = "swap";
-
-          # NOTE: top padding should be bigger to not overlap the sketchybar
-          top_padding = 42;
+          top_padding = 12;
           bottom_padding = 12;
           left_padding = 12;
           right_padding = 12;

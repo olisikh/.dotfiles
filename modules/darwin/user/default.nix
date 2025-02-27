@@ -12,14 +12,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    nix.enable = false;
-
-    # nix.extraOptions = ''
-    #   auto-optimise-store = true
-    #   experimental-features = nix-command flakes
-    #   extra-platforms = x86_64-darwin aarch64-darwin
-    # '';
-
     snowfallorg.users.${cfg.name}.home.config = {
       home = {
         file = {
@@ -92,53 +84,22 @@ in
       };
     };
 
-    launchd.agents = {
-      "colima.default" = {
-        command = "${pkgs.colima}/bin/colima start --foreground";
-        serviceConfig = {
-          Label = "com.colima.default";
-          RunAtLoad = true;
-          KeepAlive = true;
-
-          # not sure where to put these paths and not reference a hard-coded `$HOME`; `/var/log`?
-          StandardOutPath = "/var/log/colima/default/daemon/launchd.stdout.log";
-          StandardErrorPath = "/var/log/colima/default/daemon/launchd.stderr.log";
-
-          # not using launchd.agents.<name>.path because colima needs the system ones as well
-          EnvironmentVariables = {
-            PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-            TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-            DOCKER_HOST = "unix:///Users/${cfg.name}/.colima/default/docker.sock";
-          };
-        };
-      };
-    };
 
     environment = {
       systemPath = [ "/opt/homebrew/bin" ];
 
-      systemPackages = with pkgs; [
-        lua5_4
-        lima
-        colima
-        docker
-        docker-compose
-      ];
-
-      variables = {
-        # TODO: Is there a better way to extend path in nix-darwin?
-        PATH = builtins.concatStringsSep ":" [
-          "${pkgs.colima}/bin"
-          "${pkgs.docker}/bin"
-          "/usr/bin"
-          "/bin"
-          "/usr/sbin"
-          "/sbin"
-          ''''${PATH}''
-        ];
-        TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-        DOCKER_HOST = "unix:///Users/${cfg.name}/.colima/default/docker.sock";
-      };
+      # variables = {
+      # TODO: Is there a better way to extend path in nix-darwin?
+      # PATH = builtins.concatStringsSep ":" [
+      #   "/usr/bin"
+      #   "/bin"
+      #   "/usr/sbin"
+      #   "/sbin"
+      #   ''''${PATH}''
+      # ];
+      # TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
+      # DOCKER_HOST = "unix:///Users/${cfg.name}/.colima/default/docker.sock";
+      # };
     };
 
     security.pam.services.sudo_local.touchIdAuth = true;
@@ -164,7 +125,5 @@ in
         "homebrew/services"
       ];
     };
-
-    system.stateVersion = 6;
   };
 }
