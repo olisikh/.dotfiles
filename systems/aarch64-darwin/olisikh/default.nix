@@ -4,9 +4,11 @@ let
 in
 {
   olisikh = {
-    # NOTE: determinate nix distro can't be managed by nix-darwin, hence disabled
+    # NOTE: Determinate nix distro can't be managed by nix-darwin, hence disabled
     nix = disabled;
+
     user = enabled;
+    homebrew = enabled;
     services = {
       jankyborders = enabled;
       yabai = enabled;

@@ -84,46 +84,11 @@ in
       };
     };
 
-
-    environment = {
-      systemPath = [ "/opt/homebrew/bin" ];
-
-      # variables = {
-      # TODO: Is there a better way to extend path in nix-darwin?
-      # PATH = builtins.concatStringsSep ":" [
-      #   "/usr/bin"
-      #   "/bin"
-      #   "/usr/sbin"
-      #   "/sbin"
-      #   ''''${PATH}''
-      # ];
-      # TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-      # DOCKER_HOST = "unix:///Users/${cfg.name}/.colima/default/docker.sock";
-      # };
-    };
-
     security.pam.services.sudo_local.touchIdAuth = true;
 
     users.users.${cfg.name} = {
       home = "/Users/${cfg.name}";
       shell = pkgs.zsh;
-    };
-
-    homebrew = {
-      enable = true;
-      onActivation = {
-        autoUpdate = false;
-        upgrade = false;
-        cleanup = "zap";
-      };
-      brews = [ ];
-      casks = [
-        "raycast"
-      ];
-      taps = [
-        "homebrew/bundle"
-        "homebrew/services"
-      ];
     };
   };
 }
