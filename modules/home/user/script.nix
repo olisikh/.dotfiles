@@ -82,6 +82,9 @@ in
           mkshell)
               echo "${nixShell}" > shell.nix
               ;;
+          secrets)
+              sops ~/.config/sops/secrets.yaml
+              ;;
           *)
               display_help
               exit 1

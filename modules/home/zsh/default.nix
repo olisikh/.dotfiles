@@ -85,6 +85,7 @@ in
           alias ll="exa -alh"
           alias tree="exa --tree"
 
+
           # overrides for work
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
         '';

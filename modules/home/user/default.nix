@@ -3,15 +3,24 @@ let
   inherit (lib) mkIf types;
   inherit (lib.${namespace}) mkOpt mkBoolOpt;
 
-  cfg = config.${namespace}.shared;
+  cfg = config.${namespace}.user;
+
+  userName = config.snowfallorg.user.name or "olisikh";
+  homeDirectory =
+    if pkgs.stdenv.isDarwin then
+      "/Users/${cfg.name}"
+    else
+      "/home/${cfg.name}";
 
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
 in
 {
-  options.${namespace}.shared = with types; {
-    enable = mkBoolOpt false "Enable shared programs";
-    name = mkOpt str "olisikh" "Name of the user";
+  options.${namespace}.user = with types; {
+    enable = mkBoolOpt false "Enable user programs";
+    name = mkOpt str userName "Name of the user";
+    fullName = mkOpt types.str "Oleksii Lisikh" "Full name of the user";
+    home = mkOpt types.str homeDirectory "The user's home directory";
   };
 
   config = mkIf cfg.enable {
@@ -74,6 +83,9 @@ in
         vscode
         cmatrix
         mkalias
+
+        age
+        sops
 
         discord
 

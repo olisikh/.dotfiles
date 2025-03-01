@@ -7,7 +7,7 @@ let
 in
 {
   options.${namespace}.user = with types; {
-    enable = mkBoolOpt false "Enable shared darwin module";
+    enable = mkBoolOpt false "Enable user darwin module";
     name = mkOpt str "olisikh" "Name of the user";
   };
 

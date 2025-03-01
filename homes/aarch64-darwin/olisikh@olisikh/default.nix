@@ -1,9 +1,7 @@
-{ lib, namespace, ... }:
+{ lib, namespace, config, ... }:
 let
   inherit (lib.${namespace}) enabled;
-
-  userName = "Oleksii Lisikh";
-  userEmail = "alisiikh@gmail.com";
+  secrets = config.sops.secrets;
 in
 {
   olisikh = {
@@ -14,13 +12,11 @@ in
     wezterm = enabled;
     ripgrep = enabled;
     starship = enabled;
-    git = {
-      inherit userName userEmail;
-      enable = true;
-    };
+    git = enabled;
     mc = enabled;
     nixvim = enabled;
     sketchybar = enabled;
-    shared = enabled;
+    user = enabled;
+    sops = enabled;
   };
 }

@@ -6,7 +6,7 @@ let
 in
 {
   options.${namespace}.nix = {
-    enable = mkBoolOpt false "Enable shared darwin module";
+    enable = mkBoolOpt false "Enable nix darwin module";
   };
 
   config = {

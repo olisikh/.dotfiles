@@ -1,43 +1,40 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf types;
-  inherit (lib.${namespace}) mkBoolOpt mkOpt;
+  inherit (lib.${namespace}) mkBoolOpt mkOpt enabled;
 
   cfg = config.${namespace}.git;
+  user = config.${namespace}.user;
+  secrets = config.sops.secrets;
 in
 {
   options.${namespace}.git = with types; {
     enable = mkBoolOpt false "Enable git program";
-    userName = mkOpt str "" "The name to use for git commits";
-    userEmail = mkOpt str "" "The email to use for git commits";
-    signingKey = mkOpt str "" "The GPG key to use for signing commits";
+    signByDefault = mkOpt bool false "Whether to sign commits by default.";
   };
 
   config = mkIf cfg.enable {
-    programs.git = {
-      enable = true;
+    programs.git = enabled;
 
-      inherit (cfg) userName userEmail;
-
-      signing = lib.mkIf (cfg.signingKey != "") {
-        key = cfg.signingKey;
-        signByDefault = true;
-      };
-
-      extraConfig = {
-        core = {
+    home.activation.writeGitConfig = lib.mkAfter ''
+      cat > ~/.gitconfig <<EOF
+      [user]
+          name = ${user.fullName}ssss
+          email = $(cat ${secrets.userEmail.path})
+          ${if (secrets.signingKey.path != "") then "signingkey = $(cat ${secrets.signingKey.path})" else ""}
+      [commit]
+          gpgSign = true
+      [core]
+          editor = nvim
           autocrlf = "input";
           excludesfile = "~/.gitignore_global";
-        };
-
-        submodule = {
-          recurse = true;
-        };
-
-        init = {
-          defaultBranch = "main";
-        };
-      };
-    };
+      [pull]
+          rebase = true
+      [submodule]
+          recurse = true
+      [init]
+          defaultBranch = main
+      EOF
+    '';
   };
 }
