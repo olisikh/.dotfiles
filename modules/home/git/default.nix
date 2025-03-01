@@ -19,11 +19,11 @@ in
     home.activation.writeGitConfig = lib.mkAfter ''
       cat > ~/.gitconfig <<EOF
       [user]
-          name = ${user.fullName}ssss
+          name = ${user.fullName}
           email = $(cat ${secrets.userEmail.path})
           ${if (secrets.signingKey.path != "") then "signingkey = $(cat ${secrets.signingKey.path})" else ""}
       [commit]
-          gpgSign = true
+          gpgSign = ${toString cfg.signByDefault}
       [core]
           editor = nvim
           autocrlf = "input";

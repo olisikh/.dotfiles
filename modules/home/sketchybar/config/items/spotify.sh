@@ -16,7 +16,7 @@ sketchybar --add item spotify q \
 	background.padding_right=-5 \
 	background.drawing=on \
 	label.padding_right=10 \
-	label.max_chars=23 \
+	label.max_chars=43 \
 	associated_display=active \
 	updates=on \
 	script="$PLUGIN_DIR/spotify.sh" \

@@ -26,6 +26,7 @@ in
       echo "update      : Update dotfiles"
       echo "generations : List dotfiles generations"
       echo "rollback    : Rollback to previous generation"
+      echo "secrets     : Edit secrets"
       echo "gc          : Nix gc"
       echo "help        : Help"
   }
