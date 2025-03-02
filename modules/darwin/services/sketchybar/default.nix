@@ -31,8 +31,8 @@ in
     ];
 
     snowfallorg.users.${user.name}.home.config = {
-      home.file = {
-        ".config/sketchybar".source = ./config;
+      xdg.configFile = {
+        "sketchybar".source = ./config;
       };
     };
   };

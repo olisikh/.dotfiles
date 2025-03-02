@@ -18,18 +18,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    snowfallorg.users.${cfg.name}.home.config = {
-      home = {
-        file = {
-          ".profile".text = ''
-            # The default file limit is far too low and throws an error when rebuilding the system.
-            # See the original with: ulimit -Sa
-            ulimit -n 4096
-          '';
-        };
-      };
-    };
-
     system = {
       keyboard = {
         enableKeyMapping = true;
