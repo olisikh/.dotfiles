@@ -31,6 +31,7 @@ import ./plugins/obsidian.nix { inherit nixvimLib; } //
   sleuth.enable = true;
   render-markdown.enable = true;
   hardtime.enable = true;
+  luasnip.enable = false; # WARN: disabled for now, using vim.snippets
   helm.enable = true;
   crates.enable = true;
   fidget.enable = true;
