@@ -1,6 +1,6 @@
 { lib, namespace, config, ... }:
 let
-  inherit (lib.${namespace}) enabled;
+  inherit (lib.${namespace}) enabled disabled;
 in
 {
   olisikh = {
