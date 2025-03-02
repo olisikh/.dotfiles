@@ -31,7 +31,6 @@ import ./plugins/obsidian.nix { inherit nixvimLib; } //
   sleuth.enable = true;
   render-markdown.enable = true;
   hardtime.enable = true;
-  luasnip.enable = true;
   helm.enable = true;
   crates.enable = true;
   fidget.enable = true;

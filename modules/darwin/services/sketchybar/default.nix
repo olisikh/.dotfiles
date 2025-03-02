@@ -32,7 +32,7 @@ in
 
     snowfallorg.users.${user.name}.home.config = {
       home.file = {
-        ".confg/sketchybar".source = ./config;
+        ".config/sketchybar".source = ./config;
       };
     };
   };

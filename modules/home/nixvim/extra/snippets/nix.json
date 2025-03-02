@@ -1,0 +1,24 @@
+{
+  "snowfall-module": {
+    "prefix": "snowfall-module",
+    "body": [
+      "{ lib, config, namespcae, pkgs, ... }:",
+      "with lib;",
+      "let",
+      "  inherit (lib.\\${namespace}) mkOpt mkBoolOpt;",
+      "",
+      "  cfg = config.\\${namespace}.$1;",
+      "in",
+      "{",
+      "  options.\\${namespace}.$1 = with types; {",
+      "    enable = mkBoolOpt false \"Enable $1 module\";",
+      "  };",
+      "",
+      "  config = mkIf cfg.enable {",
+      "    ",
+      "  };",
+      "}"
+    ],
+    "description": "Create a Nix Snowfall-lib module"
+  }
+}
