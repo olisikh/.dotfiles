@@ -9,10 +9,10 @@ in
 {
   options.${namespace}.sops = with lib.types; {
     enable = mkBoolOpt false "Enable sops program";
-    keysFile = mkOpt str "${home}/.config/sops/age/keys.txt" "Path to the sops age keys file";
+    keyFile = mkOpt str "${home}/.config/sops/age/keys.txt" "Path to the sops age keys file";
     secretsFile = mkOpt str "${home}/.config/sops/secrets.yaml" "Path to the sops secrets file";
     generateKey = mkOpt bool true "Generate a new sops age key";
-    sshKeyPaths = mkOpt (list str) [ "${home}/.ssh/id_ed25519" ] "List of ssh key paths to convert to age keys";
+    sshKeyPaths = mkOpt (listOf str) [ "${home}/.ssh/id_ed25519" ] "List of ssh key paths to convert to age keys";
   };
 
   config = mkIf cfg.enable {
