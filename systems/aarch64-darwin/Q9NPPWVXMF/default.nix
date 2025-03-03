@@ -13,7 +13,7 @@ in
     services = {
       jankyborders = enabled;
       yabai = enabled;
-      sketchybar = disabled;
+      sketchybar = enabled;
       skhd = enabled;
       colima = enabled;
     };

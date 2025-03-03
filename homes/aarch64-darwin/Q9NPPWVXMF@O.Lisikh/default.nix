@@ -15,6 +15,11 @@ in
     mc = enabled;
     nixvim = enabled;
     user = enabled;
-    sops = enabled;
+    sops = {
+      enable = true;
+      sshKeyPaths = [
+        "${config.${namespace}.user.home}/.ssh/id_rsa"
+      ];
+    };
   };
 }

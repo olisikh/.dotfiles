@@ -9,8 +9,10 @@ in
 {
   options.${namespace}.sops = with lib.types; {
     enable = mkBoolOpt false "Enable sops program";
-    ageKeysFile = mkOpt str "${home}/.config/sops/age/keys.txt" "Path to the sops age keys file";
+    keysFile = mkOpt str "${home}/.config/sops/age/keys.txt" "Path to the sops age keys file";
     secretsFile = mkOpt str "${home}/.config/sops/secrets.yaml" "Path to the sops secrets file";
+    generateKey = mkOpt bool true "Generate a new sops age key";
+    sshKeyPaths = mkOpt (list str) [ "${home}/.ssh/id_ed25519" ] "List of ssh key paths to convert to age keys";
   };
 
   config = mkIf cfg.enable {
@@ -19,13 +21,11 @@ in
       defaultSopsFile = cfg.secretsFile;
 
       age = {
-        keyFile = cfg.ageKeysFile;
-
         # NOTE: These 2 properties would generate a keys.txt file if it is not present:
         # essentially doing sometihng like this:
         # $ nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
-        sshKeyPaths = [ "${home}/.ssh/id_ed25519" ];
-        generateKey = true;
+        # $ nix-shell -p sops --run "sops ~/.config/sops/secrets.yaml"
+        inherit (cfg) sshKeyPaths generateKey keyFile;
       };
 
       secrets = {
