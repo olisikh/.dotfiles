@@ -38,8 +38,8 @@
         };
       };
 
-      # WARN: this disables vim.snippets, which is a default source
-      # snippets.preset = "luasnip";
+      # NOTE: disabling luasnip enables default vim.snippets
+      snippets.preset = "luasnip";
 
       appearance = {
         # -- Sets the fallback highlight groups to nvim-cmp's highlight groups

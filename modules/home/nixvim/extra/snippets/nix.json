@@ -1,6 +1,6 @@
 {
   "snowfall-module": {
-    "prefix": "snowfall-module",
+    "prefix": "module",
     "body": [
       "{ lib, config, namespcae, pkgs, ... }:",
       "with lib;",

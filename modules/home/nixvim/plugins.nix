@@ -21,6 +21,7 @@ import ./plugins/colorizer.nix //
 import ./plugins/codecompanion.nix { inherit nixvimLib; } //
 import ./plugins/avante.nix { inherit nixvimLib; } //
 import ./plugins/obsidian.nix { inherit nixvimLib; } //
+import ./plugins/luasnip.nix { inherit nixvimLib; } //
 {
   lz-n.enable = true;
   web-devicons.enable = true;
@@ -31,7 +32,7 @@ import ./plugins/obsidian.nix { inherit nixvimLib; } //
   sleuth.enable = true;
   render-markdown.enable = true;
   hardtime.enable = true;
-  luasnip.enable = false; # WARN: disabled for now, using vim.snippets
+  friendly-snippets.enable = true;
   helm.enable = true;
   crates.enable = true;
   fidget.enable = true;
