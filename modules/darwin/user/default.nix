@@ -4,7 +4,10 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.user;
-  homeDirectory =
+
+  # WARN: if config.snowfallorg is accessed here, an infinite recursion occurs
+  defaultUsername = "O.Lisikh";
+  defaultHomeDir =
     if pkgs.stdenv.isDarwin then
       "/Users/${cfg.name}"
     else
@@ -13,8 +16,8 @@ in
 {
   options.${namespace}.user = with types; {
     enable = mkBoolOpt false "Enable user darwin module";
-    name = mkOpt str "olisikh" "Name of the user";
-    home = mkOpt str homeDirectory "Home directory of the user";
+    name = mkOpt str defaultUsername "Name of the user";
+    home = mkOpt str defaultHomeDir "Home directory of the user";
   };
 
   config = mkIf cfg.enable {
@@ -78,28 +81,10 @@ in
       };
     };
 
-
-    environment = {
-      systemPath = [ "/opt/homebrew/bin" ];
-
-      # variables = {
-      # TODO: Is there a better way to extend path in nix-darwin?
-      # PATH = builtins.concatStringsSep ":" [
-      #   "/usr/bin"
-      #   "/bin"
-      #   "/usr/sbin"
-      #   "/sbin"
-      #   ''''${PATH}''
-      # ];
-      # TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-      # DOCKER_HOST = "unix:///Users/${cfg.name}/.colima/default/docker.sock";
-      # };
-    };
-
     security.pam.services.sudo_local.touchIdAuth = true;
 
-    users.users.${cfg.name} = {
-      home = "/Users/${cfg.name}";
+    users.users."${cfg.name}" = {
+      home = cfg.home;
       shell = pkgs.zsh;
     };
   };

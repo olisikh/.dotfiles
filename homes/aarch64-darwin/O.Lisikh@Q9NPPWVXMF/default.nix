@@ -1,6 +1,8 @@
 { lib, namespace, config, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
+
+  user = config.${namespace}.user;
 in
 {
   olisikh = {
@@ -18,7 +20,7 @@ in
     sops = {
       enable = true;
       sshKeyPaths = [
-        "${config.${namespace}.user.home}/.ssh/id_rsa"
+        "${user.home}/.ssh/id_rsa"
       ];
     };
   };

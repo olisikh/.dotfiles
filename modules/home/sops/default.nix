@@ -35,7 +35,7 @@ in
     };
 
     home.sessionVariables = {
-      SOPS_AGE_KEY_FILE = /Users/olisikh/.config/sops/age/keys.txt;
+      SOPS_AGE_KEY_FILE = cfg.keyFile;
     };
   };
 }

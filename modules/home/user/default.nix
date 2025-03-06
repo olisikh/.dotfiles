@@ -5,8 +5,8 @@ let
 
   cfg = config.${namespace}.user;
 
-  userName = config.snowfallorg.user.name or "olisikh";
-  homeDirectory =
+  defaultUsername = config.snowfallorg.user.name or "O.Lisikh";
+  defaultHomeDir =
     if pkgs.stdenv.isDarwin then
       "/Users/${cfg.name}"
     else
@@ -18,15 +18,15 @@ in
 {
   options.${namespace}.user = with types; {
     enable = mkBoolOpt false "Enable user programs";
-    name = mkOpt str userName "Name of the user";
+    name = mkOpt str defaultUsername "Name of the user";
     fullName = mkOpt types.str "Oleksii Lisikh" "Full name of the user";
-    home = mkOpt types.str homeDirectory "The user's home directory";
+    home = mkOpt types.str defaultHomeDir "The user's home directory";
   };
 
   config = mkIf cfg.enable {
     home = {
       username = cfg.name;
-      homeDirectory = "/Users/${cfg.name}";
+      homeDirectory = cfg.home;
 
       # don't ever change the stateversion value, it will break the state
       stateVersion = "25.05";
