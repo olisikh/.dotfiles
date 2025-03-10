@@ -7,7 +7,10 @@ in
     # NOTE: Determinate nix distro can't be managed by nix-darwin, hence disabled
     nix = disabled;
 
-    user = enabled;
+    user = {
+      enable = true;
+      name = "olisikh";
+    };
     homebrew = enabled;
     services = {
       jankyborders = enabled;
