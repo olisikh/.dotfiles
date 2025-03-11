@@ -6,7 +6,7 @@ let
   cfg = config.${namespace}.services.colima;
   user = config.${namespace}.user;
 
-  colimaDir = "${user.home}/.config/colima/default";
+  # colimaDir = "${user.home}/.config/colima/default";
 in
 {
   options.${namespace}.services.colima = {

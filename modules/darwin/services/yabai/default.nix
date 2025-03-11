@@ -16,7 +16,6 @@ in
         enable = true;
         config = {
           mouse_follows_focus = "off";
-          focus_follows_mouse = "autoraise";
           window_origin_display = "default";
           window_placement = "second_child";
           window_opacity = "off";
