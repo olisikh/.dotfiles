@@ -1,1 +1,3 @@
 result
+.sops.yaml
+secrets.yaml
