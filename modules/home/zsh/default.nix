@@ -5,6 +5,8 @@ let
 
   cfg = config.${namespace}.zsh;
 
+  secrets = config.sops.secrets;
+
   catppuccinZshTheme = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
     "repo" = "zsh-syntax-highlighting";
@@ -85,6 +87,7 @@ in
           alias ll="exa -alh"
           alias tree="exa --tree"
 
+          export ANTHROPIC_API_KEY=$(cat ${secrets.claudeApiKey.path});
 
           # overrides for work
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

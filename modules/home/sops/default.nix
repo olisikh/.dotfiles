@@ -31,6 +31,7 @@ in
       secrets = {
         userEmail = { };
         signingKey = { };
+        claudeApiKey = { };
       };
     };
 
