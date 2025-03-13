@@ -4,7 +4,6 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt enabled;
 
   cfg = config.${namespace}.git;
-  user = config.${namespace}.user;
   secrets = config.sops.secrets;
 in
 {
@@ -19,7 +18,7 @@ in
     home.activation.writeGitConfig = lib.mkAfter ''
       cat > ~/.gitconfig <<EOF
       [user]
-          name = ${user.fullName}
+          name = Oleksii Lisikh 
           email = $(cat ${secrets.userEmail.path})
           ${if (secrets.signingKey.path != "") then "signingkey = $(cat ${secrets.signingKey.path})" else ""}
       [commit]

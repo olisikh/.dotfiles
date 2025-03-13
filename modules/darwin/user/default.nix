@@ -9,14 +9,14 @@ let
   defaultUsername = "O.Lisikh";
   defaultHomeDir =
     if pkgs.stdenv.isDarwin then
-      "/Users/${cfg.name}"
+      "/Users/${cfg.username}"
     else
-      "/home/${cfg.name}";
+      "/home/${cfg.username}";
 in
 {
   options.${namespace}.user = with types; {
     enable = mkBoolOpt false "Enable user darwin module";
-    name = mkOpt str defaultUsername "Name of the user";
+    username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt str defaultHomeDir "Home directory of the user";
   };
 
@@ -83,7 +83,7 @@ in
 
     security.pam.services.sudo_local.touchIdAuth = true;
 
-    users.users."${cfg.name}" = {
+    users.users."${cfg.username}" = {
       home = cfg.home;
       shell = pkgs.zsh;
     };

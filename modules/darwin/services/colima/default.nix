@@ -4,7 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.colima;
-  user = config.${namespace}.user;
+  userCfg = config.${namespace}.user;
 
   # colimaDir = "${user.home}/.config/colima/default";
 in
@@ -24,7 +24,7 @@ in
 
       variables = {
         TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-        DOCKER_HOST = "unix://${user.home}/.config/colima/default/docker.sock";
+        DOCKER_HOST = "unix://${userCfg.home}/.config/colima/default/docker.sock";
       };
 
       systemPath = [

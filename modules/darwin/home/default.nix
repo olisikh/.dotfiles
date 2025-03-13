@@ -3,7 +3,7 @@ with lib;
 let
   inherit (lib.${namespace}) mkOpt;
 
-  user = config.${namespace}.user;
+  userCfg = config.${namespace}.user;
 in
 {
   options.${namespace}.home = with types; {
@@ -20,7 +20,7 @@ in
       xdg.configFile = mkAliasDefinitions options.${namespace}.home.configFile;
     };
 
-    snowfallorg.users.${user.name}.home.config = mkAliasDefinitions options.${namespace}.home.extraOptions;
+    snowfallorg.users.${userCfg.username}.home.config = mkAliasDefinitions options.${namespace}.home.extraOptions;
 
     home-manager = {
       useUserPackages = true;

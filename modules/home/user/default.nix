@@ -8,9 +8,9 @@ let
   defaultUsername = config.snowfallorg.user.name or "O.Lisikh";
   defaultHomeDir =
     if pkgs.stdenv.isDarwin then
-      "/Users/${cfg.name}"
+      "/Users/${cfg.username}"
     else
-      "/home/${cfg.name}";
+      "/home/${cfg.username}";
 
   jdk = pkgs.jdk17;
   scala = pkgs.scala-next;
@@ -18,14 +18,13 @@ in
 {
   options.${namespace}.user = with types; {
     enable = mkBoolOpt false "Enable user programs";
-    name = mkOpt str defaultUsername "Name of the user";
-    fullName = mkOpt types.str "Oleksii Lisikh" "Full name of the user";
+    username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt types.str defaultHomeDir "The user's home directory";
   };
 
   config = mkIf cfg.enable {
     home = {
-      username = cfg.name;
+      username = cfg.username;
       homeDirectory = cfg.home;
 
       # don't ever change the stateversion value, it will break the state

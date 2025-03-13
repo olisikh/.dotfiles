@@ -23,8 +23,8 @@ in
 
   networking = {
     computerName = "Oleksii's MacBook Air";
-    hostName = "olisikh";
-    localHostName = "olisikh";
+    hostName = "olisikhmac";
+    localHostName = "olisikhmac";
   };
 
   # nix-darwin state version, DO NOT TOUCH!

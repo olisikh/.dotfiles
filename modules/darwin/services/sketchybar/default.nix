@@ -4,7 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.sketchybar;
-  user = config.${namespace}.user;
+  userCfg = config.${namespace}.user;
 in
 {
   options.${namespace}.services.sketchybar = {
@@ -30,7 +30,7 @@ in
       sbarlua
     ];
 
-    snowfallorg.users.${user.name}.home.config = {
+    snowfallorg.users.${userCfg.username}.home.config = {
       xdg.configFile = {
         "sketchybar".source = ./config;
       };

@@ -2,7 +2,9 @@
 let
   inherit (lib.${namespace}) enabled disabled;
 
-  username = "O.Lisikh";
+  username = "olisikh";
+  hostName = "olisikhmac";
+  localHostName = hostName;
 in
 {
   olisikh = {
@@ -21,6 +23,12 @@ in
       skhd = enabled;
       colima = enabled;
     };
+  };
+
+  networking = {
+    inherit hostName localHostName;
+
+    computerName = "Oleksii's MacBook Air";
   };
 
   # nix-darwin state version, DO NOT TOUCH!
