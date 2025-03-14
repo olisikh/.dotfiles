@@ -1,4 +1,4 @@
-{
+{...}:{
   conform-nvim = {
     enable = true;
 

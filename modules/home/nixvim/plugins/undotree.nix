@@ -1,4 +1,4 @@
-{
+{...}:{
   undotree = {
     enable = true;
     settings = {

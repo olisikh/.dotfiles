@@ -1,4 +1,4 @@
-{
+{...}:{
   lualine = {
     enable = true;
     settings = {

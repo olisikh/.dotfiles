@@ -1,4 +1,4 @@
-{
+{...}:{
   telescope = {
     enable = true;
     extensions = {

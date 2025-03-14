@@ -1,27 +1,34 @@
-{ pkgs, nixvimLib, ... }:
-import ./plugins/blink-cmp.nix { inherit nixvimLib; } //
-import ./plugins/dap.nix { inherit pkgs nixvimLib; } //
-import ./plugins/gitsigns.nix //
-import ./plugins/lsp.nix //
-import ./plugins/lint.nix //
-import ./plugins/conform-nvim.nix //
-import ./plugins/lualine.nix //
-import ./plugins/markdown-preview.nix //
-import ./plugins/neotest.nix { inherit pkgs nixvimLib; } //
-import ./plugins/none-ls.nix //
-import ./plugins/nvim-tree.nix { inherit nixvimLib; } //
-import ./plugins/telescope.nix //
-import ./plugins/treesitter.nix { inherit pkgs; } //
-import ./plugins/undotree.nix //
-import ./plugins/rustaceanvim.nix { inherit pkgs; } //
-import ./plugins/which-key.nix //
-import ./plugins/copilot-lua.nix //
-import ./plugins/todo-comments.nix //
-import ./plugins/colorizer.nix //
-import ./plugins/codecompanion.nix { inherit nixvimLib; } //
-import ./plugins/avante.nix { inherit nixvimLib; } //
-import ./plugins/obsidian.nix { inherit nixvimLib; } //
-import ./plugins/luasnip.nix { inherit nixvimLib; } //
+{ pkgs, nixvimLib, config, namespace, lib, ... }:
+let
+  # Helper function to import plugin with all common arguments
+  importPlugin = file: import file {
+    inherit pkgs nixvimLib config namespace lib;
+  };
+in
+lib.foldl' (acc: plugin: acc // importPlugin plugin) {} [
+  ./plugins/blink-cmp.nix
+  ./plugins/dap.nix
+  ./plugins/gitsigns.nix
+  ./plugins/lsp.nix
+  ./plugins/lint.nix
+  ./plugins/conform-nvim.nix
+  ./plugins/lualine.nix
+  ./plugins/markdown-preview.nix
+  ./plugins/neotest.nix
+  ./plugins/none-ls.nix
+  ./plugins/nvim-tree.nix
+  ./plugins/telescope.nix
+  ./plugins/treesitter.nix
+  ./plugins/undotree.nix
+  ./plugins/rustaceanvim.nix
+  ./plugins/which-key.nix
+  ./plugins/copilot-lua.nix
+  ./plugins/todo-comments.nix
+  ./plugins/colorizer.nix
+  ./plugins/avante.nix
+  ./plugins/obsidian.nix
+  ./plugins/luasnip.nix
+] //
 {
   lz-n.enable = true;
   web-devicons.enable = true;

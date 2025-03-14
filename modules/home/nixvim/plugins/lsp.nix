@@ -1,4 +1,4 @@
-{
+{...}:{
   lsp = {
     enable = true;
     inlayHints = false; # NOTE: disable inlay-hints by default

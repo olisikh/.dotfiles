@@ -15,7 +15,12 @@ in
     starship = enabled;
     git = enabled;
     mc = enabled;
-    nixvim = enabled;
+    nixvim = {
+      enable = true;
+      plugins = {
+        avante = disabled;
+      };
+    };
     user = enabled;
     sops = {
       enable = true;

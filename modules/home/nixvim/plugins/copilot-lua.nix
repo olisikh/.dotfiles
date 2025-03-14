@@ -1,8 +1,15 @@
+{ config, namespace, ... }:
+let
+  cfg = config.${namespace}.nixvim.plugins.copilot;
+in
 {
   copilot-lua = {
-    enable = true;
+    enable = cfg.enable;
     settings = {
-      suggestion.auto_trigger = true;
+      suggestion = {
+        enabled = true;
+        auto_trigger = true;
+      };
     };
   };
 }

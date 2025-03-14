@@ -1,4 +1,4 @@
-{
+{...}:{
   todo-comments = {
     enable = true;
     settings = {

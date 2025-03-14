@@ -1,6 +1,6 @@
 { lib, config, namespace, pkgs, inputs, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf mkOption types;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.nixvim;
@@ -16,6 +16,21 @@ in
 {
   options.${namespace}.nixvim = {
     enable = mkBoolOpt false "Enable nixvim program";
+
+    plugins = {
+      avante = {
+        enable = mkBoolOpt true "Enable Avante plugin";
+        provider = mkOption {
+          type = types.enum [ "claude" "openai" "ollama" "copilot" ];
+          default = "claude";
+          description = "AI provider to use with Avante";
+        };
+      };
+
+      copilot = {
+        enable = mkBoolOpt true "Enable GitHub Copilot";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -78,7 +93,7 @@ in
         ./keymaps.nix
       ];
 
-      plugins = import ./plugins.nix { inherit pkgs nixvimLib; };
+      plugins = import ./plugins.nix { inherit pkgs config namespace lib nixvimLib; };
 
       extraPackages = with pkgs; [
         gcc

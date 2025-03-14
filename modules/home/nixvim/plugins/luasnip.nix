@@ -1,4 +1,4 @@
-{ nixvimLib }: {
+{ ... }: {
   luasnip = {
     enable = true;
 

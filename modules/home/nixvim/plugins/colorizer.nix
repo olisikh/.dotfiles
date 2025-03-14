@@ -1,4 +1,4 @@
-{
+{...}:{
   colorizer = {
     enable = true;
     settings = {

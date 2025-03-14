@@ -1,4 +1,4 @@
-{
+{...}:{
   which-key = {
     enable = true;
     settings = {

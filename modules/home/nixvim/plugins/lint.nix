@@ -1,4 +1,4 @@
-{
+{...}:{
   lint = {
     enable = true;
     lintersByFt = {

@@ -1,4 +1,4 @@
-{
+{...}:{
   none-ls = {
     enable = true;
     sources = {

@@ -1,4 +1,4 @@
-{ nixvimLib }: {
+{ nixvimLib, ... }: {
   obsidian = {
     enable = true;
     settings = {
