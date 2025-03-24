@@ -38,7 +38,7 @@ in
 
   # Function to perform 'home update'
   home_update() {
-      nix flake update ~/.dotfiles "$@"
+      nix flake update --flake ~/.dotfiles "$@"
   }
 
   home_list_generations() {
@@ -46,7 +46,7 @@ in
   }
 
   home_rollback() {
-    gen_id=$(darwin-rebuild --list-generations | fzf | awk '{print $1}')
+    gen_id=$(darwin-rebuild --list-generations | fzf --tac | awk '{print $1}')
     if [[ -z ''${gen_id:+x} ]]; then
       echo "No generation selected, rollback aborted."
     else

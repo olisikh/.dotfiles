@@ -28,8 +28,12 @@ in
       };
 
       defaults = {
-        ".GlobalPreferences"."com.apple.mouse.scaling" = 2.0;
+        ".GlobalPreferences" = {
+          "com.apple.mouse.scaling" = 2.0;
+        };
+
         spaces.spans-displays = false;
+
         universalaccess = {
           reduceMotion = true;
           reduceTransparency = true;
