@@ -31,9 +31,8 @@ in
         ".GlobalPreferences"."com.apple.mouse.scaling" = 2.0;
         spaces.spans-displays = false;
         universalaccess = {
-          # FIXME: cannot write universal access
-          # reduceMotion = true;
-          # reduceTransparency = true;
+          reduceMotion = true;
+          reduceTransparency = true;
         };
 
         WindowManager.EnableTiledWindowMargins = true;
