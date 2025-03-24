@@ -86,6 +86,11 @@ in
           group = "user_lsp";
           command = "silent! lua vim.lsp.buf.clear_references()";
         }
+        {
+          event = "VimEnter";
+          group = "user_generic";
+          command = "TSUpdateSync";
+        }
       ];
 
       imports = [
