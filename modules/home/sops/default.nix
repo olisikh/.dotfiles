@@ -32,6 +32,7 @@ in
         userEmail = { };
         signingKey = { };
         claudeApiKey = { };
+        openaiApiKey = { };
       };
     };
 

@@ -89,6 +89,7 @@ in
           alias hist="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
 
           export ANTHROPIC_API_KEY=$(cat ${secrets.claudeApiKey.path});
+          export OPENAI_API_KEY=$(cat ${secrets.openaiApiKey.path});
 
           # overrides for work
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
