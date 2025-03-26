@@ -1,0 +1,5 @@
+{...}: {
+  aerial = {
+    enable = true;
+  };
+}

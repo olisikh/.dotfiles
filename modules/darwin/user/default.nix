@@ -34,10 +34,11 @@ in
 
         spaces.spans-displays = false;
 
-        universalaccess = {
-          reduceMotion = true;
-          reduceTransparency = true;
-        };
+        # WARN: fails on work mac, probably stopped working after OSX upgrade
+        # universalaccess = {
+        #   reduceMotion = true;
+        #   reduceTransparency = true;
+        # };
 
         WindowManager.EnableTiledWindowMargins = true;
 

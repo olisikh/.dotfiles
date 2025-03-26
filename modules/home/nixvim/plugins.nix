@@ -28,6 +28,7 @@ lib.foldl' (acc: plugin: acc // importPlugin plugin) {} [
   ./plugins/avante.nix
   ./plugins/obsidian.nix
   ./plugins/luasnip.nix
+  ./plugins/aerial.nix
 ] //
 {
   lz-n.enable = true;
