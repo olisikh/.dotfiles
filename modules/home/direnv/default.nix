@@ -16,9 +16,5 @@ in
       nix-direnv.enable = true;
       enableZshIntegration = true;
     };
-
-    home.file = {
-      ".envrc".text = "use_nix";
-    };
   };
 }
