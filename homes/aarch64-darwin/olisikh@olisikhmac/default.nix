@@ -13,7 +13,10 @@ in
     starship = enabled;
     git = enabled;
     mc = enabled;
-    nixvim = enabled;
+    nixvim = {
+      enable = true;
+      nightly = true;
+    };
     user = enabled;
     sops = enabled;
   };

@@ -17,6 +17,8 @@ in
   options.${namespace}.nixvim = {
     enable = mkBoolOpt false "Enable nixvim program";
 
+    nightly = mkBoolOpt false "Use nightly neovim";
+
     plugins = {
       avante = {
         enable = mkBoolOpt true "Enable Avante plugin";
@@ -40,7 +42,7 @@ in
 
       # NOTE: due to overlay, nixvim would install and use nightly
       # TODO: commented out because neotest-scala and ziofix plugins don't work properly on nightly
-      # package = pkgs.neovim;
+      package = mkIf cfg.nightly pkgs.neovim;
 
       colorschemes = import ./colorscheme.nix;
 
