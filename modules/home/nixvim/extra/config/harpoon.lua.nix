@@ -20,9 +20,9 @@
       :find()
   end
 
-  vim.keymap.set('n', '<leader>H', function() toggle_telescope(harpoon:list()) end, { desc = 'harpoon: Open harpoon window' })
-  vim.keymap.set('n', '<leader>h', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'harpoon: Toggle quick menu' })
-  vim.keymap.set('n', '<leader>a', function() harpoon:list():add() end, { desc = 'harpoon: Add file to list' })
+  vim.keymap.set('n', '<leader>hw', function() toggle_telescope(harpoon:list()) end, { desc = 'harpoon: Open harpoon window' })
+  vim.keymap.set('n', '<leader>ht', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'harpoon: Toggle quick menu' })
+  vim.keymap.set('n', '<leader>ha', function() harpoon:list():add() end, { desc = 'harpoon: Add file to list' })
   vim.keymap.set('n', '<leader>1', function() harpoon:list():select(1) end, { desc = 'harpoon: Open file 1' })
   vim.keymap.set('n', '<leader>2', function() harpoon:list():select(2) end, { desc = 'harpoon: Open file 2' })
   vim.keymap.set('n', '<leader>3', function() harpoon:list():select(3) end, { desc = 'harpoon: Open file 3' })

@@ -1,4 +1,4 @@
-{ lib, namespace, ... }:
+{ lib, namespace, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
 
@@ -29,6 +29,12 @@ in
     inherit hostName localHostName;
 
     computerName = "Oleksii's MacBook Air";
+  };
+
+  environment = {
+    systemPackages = with pkgs; [
+      cocoapods
+    ];
   };
 
   # nix-darwin state version, DO NOT TOUCH!

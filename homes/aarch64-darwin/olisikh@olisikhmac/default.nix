@@ -15,7 +15,7 @@ in
     mc = enabled;
     nixvim = {
       enable = true;
-      nightly = true;
+      nightly = false;
     };
     user = enabled;
     sops = enabled;
