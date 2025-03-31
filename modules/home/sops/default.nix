@@ -33,6 +33,7 @@ in
         signingKey = { };
         claudeApiKey = { };
         openaiApiKey = { };
+        openrouterApiKey = { };
       };
     };
 

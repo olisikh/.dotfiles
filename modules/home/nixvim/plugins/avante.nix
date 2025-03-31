@@ -9,17 +9,19 @@ in
     settings = {
       provider = cfg.provider;
 
+      vendors = {
+        openrouter = {
+          __inherited_from = "openai";
+          endpoint = "https://openrouter.ai/api/v1";
+          api_key_name = "OPENROUTER_API_KEY";
+          model = "anthropic/claude-3.5-sonnet";
+        };
+      };
+
       # auto_suggestions_provider = "copilot";
 
       behaviour = {
         auto_suggestions = false; # using copilot
-      };
-
-      claude = {
-        endpoint = "https://api.anthropic.com";
-        model = "claude-3-5-sonnet-20241022";
-        temperature = 0;
-        max_tokens = 4096;
       };
 
       mappings = {

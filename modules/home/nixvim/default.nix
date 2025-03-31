@@ -23,8 +23,8 @@ in
       avante = {
         enable = mkBoolOpt true "Enable Avante plugin";
         provider = mkOption {
-          type = types.enum [ "claude" "openai" "ollama" "copilot" ];
-          default = "claude";
+          type = types.enum [ "claude" "openai" "ollama" "copilot" "openrouter" ];
+          default = "openrouter";
           description = "AI provider to use with Avante";
         };
       };

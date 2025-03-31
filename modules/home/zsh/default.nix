@@ -90,6 +90,7 @@ in
 
           export ANTHROPIC_API_KEY=$(cat ${secrets.claudeApiKey.path});
           export OPENAI_API_KEY=$(cat ${secrets.openaiApiKey.path});
+          export OPENROUTER_API_KEY=$(cat ${secrets.openrouterApiKey.path});
 
           # overrides for work
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
