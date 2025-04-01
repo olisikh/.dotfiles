@@ -27,6 +27,7 @@ in
       echo "generations : List dotfiles generations"
       echo "rollback    : Rollback to previous generation"
       echo "secrets     : Edit secrets"
+      echo "mkshell     : Create shell.nix file"
       echo "gc          : Nix gc"
       echo "help        : Help"
   }

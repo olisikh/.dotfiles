@@ -1,9 +1,10 @@
-{...}:{
+{ ... }: {
   lualine = {
     enable = true;
     settings = {
       options = {
         theme = "catppuccin";
+        globalstatus = true; # show global statusline instead of showing it in each window
       };
       sections = {
         lualine_c = [
