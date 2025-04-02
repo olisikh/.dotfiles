@@ -44,7 +44,7 @@ in
       # TODO: commented out because neotest-scala and ziofix plugins don't work properly on nightly
       package = mkIf cfg.nightly pkgs.neovim;
 
-      colorschemes = import ./colorscheme.nix;
+      colorschemes = import ./colorscheme.nix { inherit nixvimLib; };
 
       autoGroups = {
         user_generic.clear = true;

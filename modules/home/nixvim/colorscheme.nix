@@ -1,4 +1,4 @@
-{
+{ nixvimLib, ... }: {
   catppuccin = {
     enable = true;
     settings = {
@@ -48,6 +48,13 @@
           };
         };
       };
+      custom_highlights = nixvimLib.mkRaw ''
+        function(colors)
+          return {
+            WinSeparator = { fg = colors.overlay0 } -- make window borders more visible
+          }
+        end
+      '';
     };
   };
 }
