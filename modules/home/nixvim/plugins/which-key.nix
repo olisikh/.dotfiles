@@ -6,7 +6,7 @@
         enabled = false;
       };
       win = {
-        border = "single";
+        border = "rounded";
       };
     };
   };
