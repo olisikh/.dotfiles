@@ -46,4 +46,6 @@ lib.foldl' (acc: plugin: acc // importPlugin plugin) {} [
   fidget.enable = true;
   nvim-surround.enable = true;
   lazygit.enable = true;
+  treesj.enable = true;
+  lazydev.enable = true;
 }

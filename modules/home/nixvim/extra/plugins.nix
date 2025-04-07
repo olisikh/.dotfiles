@@ -41,10 +41,8 @@ in
 with pkgs.vimPlugins; [
   nvim-metals
   nvim-jdtls
-  lazydev-nvim
   copilot-lualine
   harpoon2
-  treesj
   harpoon-lualine
   nvim-dap-kotlin
   nvim-scala-zio-quickfix

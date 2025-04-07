@@ -17,7 +17,6 @@
       desc = "lsp: [c]ode [f]ormat";
     };
   }
-
   # map('v', '<leader>cf', function()
   #   local vstart = vim.fn.getpos("'<")
   #   local vend = vim.fn.getpos("'>")
