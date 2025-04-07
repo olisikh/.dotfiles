@@ -41,7 +41,6 @@ in
       defaultEditor = true;
 
       # NOTE: due to overlay, nixvim would install and use nightly
-      # TODO: commented out because neotest-scala and ziofix plugins don't work properly on nightly
       package = mkIf cfg.nightly pkgs.neovim;
 
       colorschemes = import ./colorscheme.nix { inherit nixvimLib; };
@@ -51,13 +50,13 @@ in
         user_lsp.clear = true;
       };
 
-      # NOTE: supposed to be better, but experimental lua loader that uses cache, disable if you have issues
+      # NOTE: supposed to be better, this experimental lua loader uses cache; disable if you have issues
       luaLoader.enable = true;
       clipboard.register = "unnamedplus";
 
       # WARN: this could could improve performance by a lot, by repacking plugins into one,
       # but plugins must have unique names and files
-      # performance.combinePlugins.enable = true;
+      performance.combinePlugins.enable = false;
 
       autoCmd = [
         {
