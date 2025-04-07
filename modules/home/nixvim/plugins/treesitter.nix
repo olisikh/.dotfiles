@@ -2,8 +2,55 @@
   treesitter = {
     enable = true;
     gccPackage = pkgs.gcc;
+
+    # NOTE: add treesitter grammar here to install it
+    grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+      bash
+      diff
+      json
+      jsonc
+      lua
+      rust
+      query
+      make
+      markdown
+      markdown_inline
+      python
+      properties
+      java
+      c
+      css
+      html
+      dockerfile
+      git_config
+      git_rebase
+      gitattributes
+      gitignore
+      gitcommit
+      groovy
+      go
+      gosum
+      gomod
+      hocon
+      kotlin
+      javascript
+      typescript
+      python
+      toml
+      yaml
+      xml
+      tmux
+      terraform
+      scala
+      tsx
+      sql
+      scheme
+      vim
+      vimdoc
+      ini
+    ];
+
     settings = {
-      auto_install = true;
       highlight = { enable = true; };
       indent = { enable = true; disable = [ "python" ]; };
       incremental_selection = {

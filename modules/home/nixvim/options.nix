@@ -25,7 +25,6 @@
     number = true;
     relativenumber = true;
     mouse = "a";
-    clipboard = "unnamedplus";
     breakindent = true;
     swapfile = false;
     backup = false;

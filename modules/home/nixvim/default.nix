@@ -51,6 +51,14 @@ in
         user_lsp.clear = true;
       };
 
+      # NOTE: supposed to be better, but experimental lua loader that uses cache, disable if you have issues
+      luaLoader.enable = true;
+      clipboard.register = "unnamedplus";
+
+      # WARN: this could could improve performance by a lot, by repacking plugins into one,
+      # but plugins must have unique names and files
+      # performance.combinePlugins.enable = true;
+
       autoCmd = [
         {
           event = "TextYankPost";
@@ -87,11 +95,6 @@ in
           pattern = "*";
           group = "user_lsp";
           command = "silent! lua vim.lsp.buf.clear_references()";
-        }
-        {
-          event = "VimEnter";
-          group = "user_generic";
-          command = "TSUpdateSync";
         }
       ];
 
