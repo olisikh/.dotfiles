@@ -1,10 +1,13 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+let
+  grammars = pkgs.vimPlugins.nvim-treesitter.builtGrammars;
+in
+{
   treesitter = {
     enable = true;
-    gccPackage = pkgs.gcc;
 
     # NOTE: add treesitter grammar here to install it
-    grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+    grammarPackages = with grammars; [
       bash
       diff
       json
