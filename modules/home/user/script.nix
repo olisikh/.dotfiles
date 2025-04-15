@@ -39,7 +39,7 @@ in
 
   # Function to perform 'home update'
   home_update() {
-      nix flake update --flake ~/.dotfiles "$@"
+      nix flake update ~/.dotfiles "$@"
   }
 
   home_list_generations() {
