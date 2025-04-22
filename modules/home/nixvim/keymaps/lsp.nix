@@ -1,7 +1,7 @@
 [
   # nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
   {
-    key = "grd";
+    key = "grx";
     action = ":lua vim.diagnostic.open_float()<cr>";
     mode = "n";
     options = {
