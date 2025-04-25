@@ -9,6 +9,7 @@
       formatters_by_ft = {
         "_" = [ "trim_whitespace" ];
         go = [ "goimports" "gofumpt" ];
+        scala = [ "scalafmt" ];
         javascript = [ "prettierd" ];
         javascriptreact = [ "prettierd" ];
         typescript = [ "prettierd" ];
