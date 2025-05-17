@@ -82,11 +82,14 @@ in
         vscode
         cmatrix
         mkalias
+        pre-commit
 
         age
         sops
 
         discord
+        tflint
+        esbuild
 
         (writeShellScriptBin "home" (import ./script.nix))
       ];
