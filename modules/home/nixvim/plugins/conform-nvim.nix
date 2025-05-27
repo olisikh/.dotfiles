@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }: {
+{ ... }: {
   conform-nvim = {
     enable = true;
 
