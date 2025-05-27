@@ -1,10 +1,19 @@
-{...}:{
+{ pkgs, lib, ... }: {
   conform-nvim = {
     enable = true;
 
     settings = {
+      notify_on_error = true;
+      notify_no_formatters = true;
+      log_level = "info";
       default_format_opts = {
         lsp_format = "fallback";
+      };
+      formatters = {
+        scalafmt = {
+          # NOTE: Why is it suddenly so slow?
+          timeout_ms = 5000;
+        };
       };
       formatters_by_ft = {
         "_" = [ "trim_whitespace" ];
