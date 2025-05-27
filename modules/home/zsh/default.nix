@@ -13,6 +13,12 @@ let
     "rev" = "06d519c20798f0ebe275fc3a8101841faaeee8ea";
     "sha256" = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
   };
+
+
+  # NOTE: https://mynixos.com/home-manager/option/programs.zsh.initContent
+  # orders are as follows: before = 500, beforeCompInit = 550, default = 1000, after = 1500
+  mkBeforeCompInit = lib.mkOrder 550;
+  mkDefault = lib.mkOrder 1000;
 in
 {
   options.${namespace}.zsh = {
@@ -29,72 +35,75 @@ in
       enableCompletion = true;
       autosuggestion.enable = true;
 
-      initExtraBeforeCompInit =
-        #bash
-        ''
-          # init completions
-          autoload -U +X bashcompinit && bashcompinit
-          autoload -U +X compinit && compinit
-        '';
+      initContent =
+        let
+          zshBefore = mkBeforeCompInit
+            # bash
+            ''
+              # init completions
+              autoload -U +X bashcompinit && bashcompinit
+              autoload -U +X compinit && compinit
+            '';
+          zshDefault = mkDefault
+            # bash
+            ''
+              source ${catppuccinZshTheme}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
+              eval "$(kafkactl completion zsh)"
+              eval "$(fzf --zsh)"
 
-      initExtra =
-        #bash
-        ''
-          source ${catppuccinZshTheme}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
-          eval "$(kafkactl completion zsh)"
-          eval "$(fzf --zsh)"
+              # Preferred editor for local and remote sessions
+              if [[ -n $SSH_CONNECTION ]]; then
+                export EDITOR='vi'
+              else
+                export EDITOR='nvim'
+              fi
 
-          # Preferred editor for local and remote sessions
-          if [[ -n $SSH_CONNECTION ]]; then
-            export EDITOR='vi'
-          else
-            export EDITOR='nvim'
-          fi
+              bindkey -e # enable emacs mode
+              bindkey '^p' history-search-backward
+              bindkey '^n' history-search-forward
 
-          bindkey -e # enable emacs mode
-          bindkey '^p' history-search-backward
-          bindkey '^n' history-search-forward
+              # history settings
+              HISTSIZE=1000
+              HISTFILE=~/.zsh_history
+              SAVEHIST=$HISTSIZE
+              HISTDUP=erase
+              setopt appendhistory
+              setopt sharehistory
+              setopt hist_ignore_space
+              setopt hist_ignore_all_dups
+              setopt hist_save_no_dups
+              setopt hist_ignore_dups
+              setopt hist_find_no_dups
 
-          # history settings
-          HISTSIZE=1000
-          HISTFILE=~/.zsh_history
-          SAVEHIST=$HISTSIZE
-          HISTDUP=erase
-          setopt appendhistory
-          setopt sharehistory
-          setopt hist_ignore_space
-          setopt hist_ignore_all_dups
-          setopt hist_save_no_dups
-          setopt hist_ignore_dups
-          setopt hist_find_no_dups
+              # extra plugin settings
+              zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+              # zstyle ':completion:*' list-colors $${(s.:.)LS_COLORS}
+              zstyle ':completion:*' menu no
+              zstyle ':fzf-tab:complete:*' fzf-preview 'ls $realpath'
 
-          # extra plugin settings
-          zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-          # zstyle ':completion:*' list-colors $${(s.:.)LS_COLORS}
-          zstyle ':completion:*' menu no
-          zstyle ':fzf-tab:complete:*' fzf-preview 'ls $realpath'
+              export LIBRARY_PATH="${pkgs.libiconv}/lib:$LIBRARY_PATH";
 
-          export LIBRARY_PATH="${pkgs.libiconv}/lib:$LIBRARY_PATH";
+              alias tf=terraform
+              alias k=kubectl
 
-          alias tf=terraform
-          alias k=kubectl
+              # smart cd
+              alias zz="z -"
 
-          # smart cd
-          alias zz="z -"
+              # smart ls
+              alias ls="exa"
+              alias ll="exa -alh"
+              alias tree="exa --tree"
+              alias hist="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
 
-          # smart ls
-          alias ls="exa"
-          alias ll="exa -alh"
-          alias tree="exa --tree"
-          alias hist="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
+              export ANTHROPIC_API_KEY=$(cat ${secrets.claudeApiKey.path});
+              export OPENAI_API_KEY=$(cat ${secrets.openaiApiKey.path});
+              export OPENROUTER_API_KEY=$(cat ${secrets.openrouterApiKey.path});
 
-          export ANTHROPIC_API_KEY=$(cat ${secrets.claudeApiKey.path});
-          export OPENAI_API_KEY=$(cat ${secrets.openaiApiKey.path});
-          export OPENROUTER_API_KEY=$(cat ${secrets.openrouterApiKey.path});
-
-          # overrides for work
-          [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-        '';
+              # overrides for work
+              [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+            '';
+        in
+        lib.mkMerge [ zshBefore zshDefault ];
 
       antidote = {
         enable = true;

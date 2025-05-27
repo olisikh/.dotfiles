@@ -37,6 +37,10 @@ in
     ];
   };
 
-  # nix-darwin state version, DO NOT TOUCH!
-  system.stateVersion = 6;
+  system = {
+    primaryUser = username;
+
+    # nix-darwin state version, DO NOT TOUCH!
+    stateVersion = 6;
+  };
 }

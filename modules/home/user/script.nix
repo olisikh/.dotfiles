@@ -34,7 +34,7 @@ in
 
   # Function to perform 'home make'
   home_make() {
-      darwin-rebuild switch --flake ~/.dotfiles "$@"
+      sudo darwin-rebuild switch --flake ~/.dotfiles "$@"
   }
 
   # Function to perform 'home update'

@@ -6,9 +6,11 @@
     loaded_netrwPlugin = 1;
   };
 
-  diagnostics = {
-    virtual_text = {
-      current_line = true;
+  diagnostic = {
+    settings = {
+      virtual_text = {
+        current_line = true;
+      };
     };
   };
 
