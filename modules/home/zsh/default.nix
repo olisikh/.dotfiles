@@ -19,6 +19,7 @@ let
   # orders are as follows: before = 500, beforeCompInit = 550, default = 1000, after = 1500
   mkBeforeCompInit = lib.mkOrder 550;
   mkDefault = lib.mkOrder 1000;
+  mkAfter = lib.mkOrder 1500;
 in
 {
   options.${namespace}.zsh = {
@@ -41,8 +42,7 @@ in
             # bash
             ''
               # init completions
-              autoload -U +X bashcompinit && bashcompinit
-              autoload -U +X compinit && compinit
+              zmodload zsh/zprof
             '';
           zshDefault = mkDefault
             # bash
@@ -102,8 +102,14 @@ in
               # overrides for work
               [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
             '';
+          zshAfter = mkAfter
+            # bash
+            ''
+              # Collect zsh profiling data
+              export ZSH_PROF=$(zprof)
+            '';
         in
-        lib.mkMerge [ zshBefore zshDefault ];
+        lib.mkMerge [ zshBefore zshDefault zshAfter ];
 
       antidote = {
         enable = true;
