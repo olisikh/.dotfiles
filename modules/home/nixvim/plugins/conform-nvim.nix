@@ -11,11 +11,11 @@
       };
       formatters = {
         scalafmt = {
-          # NOTE: Why is it suddenly so slow?
           timeout_ms = 5000;
         };
       };
       formatters_by_ft = {
+        # Use the "*" filetype to run formatters on all filetypes.
         "_" = [ "trim_whitespace" ];
         go = [ "goimports" "gofumpt" ];
         scala = [ "scalafmt" ];

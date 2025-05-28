@@ -113,6 +113,7 @@ in
         vscode-extensions.davidanson.vscode-markdownlint
         vscode-extensions.vadimcn.vscode-lldb
         vscode-js-debug
+        codespell
         gofumpt
         gotools
         black
