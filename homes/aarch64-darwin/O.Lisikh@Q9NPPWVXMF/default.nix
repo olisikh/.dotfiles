@@ -10,6 +10,7 @@ in
     zsh = enabled;
     fzf = enabled;
     zoxide = enabled;
+    bat = enabled;
     wezterm = enabled;
     ripgrep = enabled;
     starship = enabled;

@@ -41,6 +41,7 @@ in
         eza
         jq
         zoxide
+        bat
         rustup
         tree-sitter
         luarocks-nix
