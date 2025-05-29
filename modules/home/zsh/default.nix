@@ -41,8 +41,6 @@ in
           zshBefore = mkBeforeCompInit
             # bash
             ''
-              # init completions
-              zmodload zsh/zprof
             '';
           zshDefault = mkDefault
             # bash
@@ -75,21 +73,17 @@ in
               setopt hist_ignore_dups
               setopt hist_find_no_dups
 
-              # extra plugin settings
+              # plugin settings
               zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-              # zstyle ':completion:*' list-colors $${(s.:.)LS_COLORS}
               zstyle ':completion:*' menu no
-              zstyle ':fzf-tab:complete:*' fzf-preview 'ls $realpath'
+
+              zstyle ':fzf-tab:*' use-fzf-default-opts yes
+              zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
 
               export LIBRARY_PATH="${pkgs.libiconv}/lib:$LIBRARY_PATH";
 
-              alias tf=terraform
-              alias k=kubectl
-
-              # smart cd
+              # aliases 
               alias zz="z -"
-
-              # smart ls
               alias ls="exa"
               alias ll="exa -alh"
               alias tree="exa --tree"
@@ -105,8 +99,6 @@ in
           zshAfter = mkAfter
             # bash
             ''
-              # Collect zsh profiling data
-              export ZSH_PROF=$(zprof)
             '';
         in
         lib.mkMerge [ zshBefore zshDefault zshAfter ];
@@ -122,6 +114,9 @@ in
           "chisui/zsh-nix-shell"
           "nix-community/nix-zsh-completions"
           "ohmyzsh/ohmyzsh path:plugins/git"
+          "ohmyzsh/ohmyzsh path:plugins/aws"
+          "ohmyzsh/ohmyzsh path:plugins/kubectl"
+          "ohmyzsh/ohmyzsh path:plugins/terraform"
           "Aloxaf/fzf-tab"
         ];
       };
