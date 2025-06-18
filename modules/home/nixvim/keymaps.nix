@@ -330,6 +330,14 @@
         silent = true;
       };
     }
+    {
+      key = "bd";
+      action = ":bd<cr>";
+      mode = "n";
+      options = {
+        desc = "[b]uffer [d]elete";
+      };
+    }
   ]
   ++ import ./keymaps/dap.nix
   ++ import ./keymaps/lsp.nix

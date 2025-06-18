@@ -44,7 +44,7 @@
     action = ":lua require('telescope.builtin').find_files()<cr>";
     mode = "n";
     options = {
-      desc = "telescope: search [p]roject [f]iles";
+      desc = "telescope: [s]earch [p]roject files";
     };
   }
   # nmap('<leader>sh', telescope_builtin.help_tags, { desc = 'telescope: [s]earch [h]elp' })
@@ -53,7 +53,7 @@
     action = ":lua require('telescope.builtin').help_tags()<cr>";
     mode = "n";
     options = {
-      desc = "telescope: search [h]elp";
+      desc = "telescope: [s]earch [h]elp";
     };
   }
   # nmap('<leader>sw', telescope_builtin.grep_string, { desc = 'telescope: [s]earch current [w]ord' })
@@ -63,6 +63,22 @@
     mode = "n";
     options = {
       desc = "telescope: [s]earch [w]ord";
+    };
+  }
+  {
+    key = "<leader>ss";
+    action = ":lua require('telescope.builtin').lsp_document_symbols()<cr>";
+    mode = "n";
+    options = {
+      desc = "telescope: [s]earch [s]ymbols";
+    };
+  }
+  {
+    key = "<leader>sS";
+    action = ":lua require('telescope.builtin').lsp_workspace_symbols()<cr>";
+    mode = "n";
+    options = {
+      desc = "telescope: [s]earch workspace [S]ymbols";
     };
   }
   # nmap('<leader>sg', telescope_builtin.live_grep, { desc = 'telescope: [s]earch by [g]rep' })

@@ -1,4 +1,4 @@
-let
+{ home }:let
   nixShell =
     # nix
     ''{ pkgs ? import <nixpkgs> {} }:
@@ -34,12 +34,12 @@ in
 
   # Function to perform 'home make'
   home_make() {
-      sudo darwin-rebuild switch --flake ~/.dotfiles "$@"
+      sudo darwin-rebuild switch --flake "${home}/.dotfiles" "$@"
   }
 
   # Function to perform 'home update'
   home_update() {
-      nix flake update ~/.dotfiles "$@"
+      nix flake update --flake "${home}/.dotfiles" "$@"
   }
 
   home_list_generations() {
@@ -85,7 +85,7 @@ in
               echo "${nixShell}" > shell.nix
               ;;
           secrets)
-              sops ~/.config/sops/secrets.yaml
+              sops ${home}/.config/sops/secrets.yaml
               ;;
           *)
               display_help

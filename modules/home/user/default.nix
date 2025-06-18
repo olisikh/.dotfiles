@@ -92,7 +92,7 @@ in
         tflint
         esbuild
 
-        (writeShellScriptBin "home" (import ./script.nix))
+        (writeShellScriptBin "home" (import ./script.nix { home = cfg.home; }))
       ];
 
       sessionVariables = {
