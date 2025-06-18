@@ -331,7 +331,7 @@
       };
     }
     {
-      key = "bd";
+      key = "<leader>bd";
       action = ":bd<cr>";
       mode = "n";
       options = {
