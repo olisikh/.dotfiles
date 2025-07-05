@@ -1,4 +1,5 @@
-{ home }:let
+{ home }:
+let
   nixShell =
     # nix
     ''{ pkgs ? import <nixpkgs> {} }:
@@ -14,22 +15,22 @@ in
 
 # bash
 ''
-  #!/bin/bash
+  #!/usr/bin/env bash
 
   # Function to display help message
   display_help() {
-      echo "Usage: home <command>"
+      echo -e "\033[1;36mUsage:\033[0m home <command>"
       echo
-      echo "Commands:"
-      echo
-      echo "make        : Rebuild dotfiles"
-      echo "update      : Update dotfiles"
-      echo "generations : List dotfiles generations"
-      echo "rollback    : Rollback to previous generation"
-      echo "secrets     : Edit secrets"
-      echo "mkshell     : Create shell.nix file"
-      echo "gc          : Nix gc"
-      echo "help        : Help"
+      echo -e "\033[1;36mCommands:\033[0m"
+      echo -e "  \033[1;32mmake\033[0m         Rebuild dotfiles"
+      echo -e "  \033[1;32mupdate\033[0m       Update dotfiles"
+      echo -e "  \033[1;32mupgrade\033[0m      Update and rebuild dotfiles"
+      echo -e "  \033[1;32mgenerations\033[0m  List dotfiles generations"
+      echo -e "  \033[1;32mrollback\033[0m     Rollback to previous generation"
+      echo -e "  \033[1;32msecrets\033[0m      Edit secrets"
+      echo -e "  \033[1;32mmkshell\033[0m      Create shell.nix file"
+      echo -e "  \033[1;32mgc\033[0m           Nix gc"
+      echo -e "  \033[1;32mhelp\033[0m         Help"
   }
 
   # Function to perform 'home make'
@@ -72,8 +73,11 @@ in
           update)
               home_update
               ;;
+          upgrade)
+              home_update && home_make
+              ;;
           generations)
-                home_list_generations "$@"
+              home_list_generations "$@"
               ;;
           rollback)
               home_rollback
