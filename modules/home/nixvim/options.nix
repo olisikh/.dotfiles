@@ -53,5 +53,8 @@
 
     completeopt = "menu,menuone,noinsert";
     termguicolors = true;
+
+    # NOTE: Avante says: views can only be fully collapsed with the global statusline
+    laststatus = 3;
   };
 }

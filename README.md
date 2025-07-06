@@ -30,8 +30,9 @@ access-tokens = github.com=<your_access_token>
 
 ## Nix fetchFromGithub: how to figure out SHA256 hash of a revision
 
-You may use nix-prefetch with fetchFromGithub command specifying the owner of the repository,
-name of the repository and revision:
+If you have access to `lib`, then set `sha256 = lib.fakeHash`, run the build, check the error message, it'd show the real hash value which you can then take and set.
+
+Otherwie you may use nix-prefetch with fetchFromGithub command specifying the repository details, as shown down below:
 
 ```
 nix-prefetch fetchFromGitHub --owner catppuccin --repo alacritty --rev main

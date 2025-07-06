@@ -19,7 +19,10 @@ in
     nixvim = {
       enable = true;
       plugins = {
-        avante = disabled;
+        avante = {
+          enable = true;
+          provider = "copilot";
+        };
       };
     };
     user = enabled;

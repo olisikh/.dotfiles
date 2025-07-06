@@ -142,7 +142,7 @@ in
 
       # TODO: all these plugins need to be installed
       # maybe some of them I could contribute to nixvim
-      extraPlugins = import ./extra/plugins.nix { inherit pkgs nixvimLib; };
+      extraPlugins = import ./extra/plugins.nix { inherit pkgs lib nixvimLib; };
       extraFiles = import ./extra/files.nix { inherit pkgs; };
       extraConfigLua = import ./extra/config.nix { inherit kotlin-dap-adapter; };
       extraConfigLuaPost = ''

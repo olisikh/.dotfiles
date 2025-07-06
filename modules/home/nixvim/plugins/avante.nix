@@ -1,4 +1,4 @@
-{ nixvimLib, lib, config, namespace, ... }:
+{ config, namespace, ... }:
 let
   cfg = config.${namespace}.nixvim.plugins.avante;
 in
