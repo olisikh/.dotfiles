@@ -74,10 +74,11 @@ in
         gnupg # tool for generating gpg keys
         watch
         (python3.withPackages (ps: with ps; [
-          pip
           pytest
           debugpy
         ]))
+        poetry # python package manager
+        uv # another python package manager, but in Rust
         ollama
         obsidian
         vscode
@@ -91,6 +92,10 @@ in
         discord
         tflint
         esbuild
+
+        (pulumi.withPackages (ps: with ps; [
+          pulumi-nodejs
+        ]))
 
         (writeShellScriptBin "home" (import ./script.nix { home = cfg.home; }))
       ];
