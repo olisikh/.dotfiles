@@ -44,7 +44,7 @@ in
   }
 
   home_list_generations() {
-      darwin-rebuild --list-generations "$@"
+      sudo darwin-rebuild --list-generations "$@"
   }
 
   home_rollback() {
@@ -52,7 +52,7 @@ in
     if [[ -z ''${gen_id:+x} ]]; then
       echo "No generation selected, rollback aborted."
     else
-      darwin-rebuild --switch-generation ''${gen_id}
+      sudo darwin-rebuild --switch-generation ''${gen_id}
     fi
   }
 

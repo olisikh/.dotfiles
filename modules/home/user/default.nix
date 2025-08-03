@@ -93,6 +93,8 @@ in
         tflint
         esbuild
 
+        bchunk
+
         (pulumi.withPackages (ps: with ps; [
           pulumi-nodejs
         ]))

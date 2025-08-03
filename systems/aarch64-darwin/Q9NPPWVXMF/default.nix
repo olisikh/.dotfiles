@@ -6,7 +6,7 @@ let
 in
 {
   olisikh = {
-    # NOTE: Determinate nix distro can't be managed by nix-darwin, hence disabled
+    # NOTE: Install Determinate Nix, don't rely on Darwin to manage Nix
     nix = disabled;
 
     user = {

@@ -1,7 +1,7 @@
 [
   {
     key = "<leader>so";
-    action = ":ObsidianSearch<cr>";
+    action = ":Obsidian search<cr>";
     mode = "n";
     options = {
       desc = "telescope: [s]earch [o]bsidian";
@@ -9,7 +9,7 @@
   }
   {
     key = "<leader>zd";
-    action = ":ObsidianDaily<cr>";
+    action = ":Obsidian daily<cr>";
     mode = "n";
     options = {
       desc = "obsidian: [z]k [d]aily";
@@ -17,7 +17,7 @@
   }
   {
     key = "<leader>zn";
-    action = ":ObsidianNew<cr>";
+    action = ":Obsidian new<cr>";
     mode = "n";
     options = {
       desc = "obsidian: [z]k [n]ew";
@@ -25,7 +25,7 @@
   }
   {
     key = "<leader>zo";
-    action = ":ObsidianOpen<cr>";
+    action = ":Obsidian open<cr>";
     mode = "n";
     options = {
       desc = "obsidian: [z]k [o]pen";
