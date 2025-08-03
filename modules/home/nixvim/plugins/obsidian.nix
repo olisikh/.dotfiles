@@ -1,6 +1,10 @@
-{ nixvimLib, ... }: {
+{ nixvimLib, config, namespace, ... }:
+let
+  cfg = config.${namespace}.nixvim.plugins.obsidian;
+in
+{
   obsidian = {
-    enable = true;
+    enable = cfg.enable;
     settings = {
       workspaces = [
         {

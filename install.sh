@@ -3,19 +3,12 @@
 # verify nix installation
 if ! command -v nix-env &> /dev/null
 then
-    echo "Nix is missing, will install Determinate Nix bundle, follow the guide"
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-else
-    echo "Nix is installed, good."
+    echo "Nix is missing, install Determinate Nix before proceeding."
 fi
 
-# copy nix.conf
-mkdir -p ~/.config/nix
-cp -fr ~/.dotfiles/nix.conf ~/.config/nix/nix.conf
-
-HOSTNAME=$(scutil --get LocalHostName)
+HOSTNAME=$(/usr/sbin/scutil --get LocalHostName)
 
 # download the internet and install flake
-nix build .#darwinConfigurations.${HOSTNAME}.system --show-trace && \
+sudo nix build .#darwinConfigurations.${HOSTNAME}.system --show-trace --print-build-logs -vvv && \
   ./result/sw/bin/darwin-rebuild switch --flake .
 

@@ -89,7 +89,6 @@ in
         age
         sops
 
-        discord
         tflint
         esbuild
 

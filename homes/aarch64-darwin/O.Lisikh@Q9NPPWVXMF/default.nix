@@ -19,10 +19,8 @@ in
     nixvim = {
       enable = true;
       plugins = {
-        avante = {
-          enable = true;
-          provider = "copilot";
-        };
+        # NOTE: Obsidian is disabled because it doesn't build and I don't use it at work anyway 
+        obsidian = disabled;
       };
     };
     user = enabled;

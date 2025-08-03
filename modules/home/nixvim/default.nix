@@ -29,6 +29,10 @@ in
         };
       };
 
+      obsidian = {
+        enable = mkBoolOpt true "Enable Obsidian plugin";
+      };
+
       copilot = {
         enable = mkBoolOpt true "Enable GitHub Copilot";
       };
@@ -106,6 +110,7 @@ in
 
       extraPackages = with pkgs; [
         gcc
+        fzf
         jdt-language-server
         vscode-extensions.vscjava.vscode-java-debug
         vscode-extensions.vscjava.vscode-java-test

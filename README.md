@@ -19,6 +19,67 @@ fi
 # End Nix
 ```
 
+## Importing ZScaler certificates and pointing Nix to use them
+
+1. Import certificates:
+```bash
+security export -t certs -f pemseq -k /Library/Keychains/System.keychain -o /tmp/certs-system.pem
+security export -t certs -f pemseq -k /System/Library/Keychains/SystemRootCertificates.keychain -o /tmp/certs-root.pem
+cat /tmp/certs-root.pem /tmp/certs-system.pem > /tmp/ca_cert.pem
+```
+
+2. Move the certificate:
+```bash
+sudo mv /tmp/ca_cert.pem /etc/nix/
+```
+
+3. Configure Nix daemon to know about cert whereabouts:
+```bash
+sudo vim /Library/LaunchDaemons/<depends_on_nix_installer>.nix-daemon.plist
+```
+add the following:
+```xml
+<key>EnvironmentVariables</key>
+<dict>
+  <key>NIX_SSL_CERT_FILE</key>
+  <string>/etc/nix/ca_cert.pem</string>
+  <key>SSL_CERT_FILE</key>
+  <string>/etc/nix/ca_cert.pem</string>
+  <key>REQUEST_CA_BUNDLE</key>
+  <string>/etc/nix/ca_cert.pem</string>
+</dict>
+```
+
+4. Restart nix daemon:
+```
+sudo launchctl unload /Library/LaunchDaemons/<depends_on_nix_installer>.nix-daemon.plist
+sudo launchctl load /Library/LaunchDaemons/<depends_on_nix_installer>.nix-daemon.plist
+```
+
+5. You may also need to make your current shell aware of the certificate, and add it to your nix config:
+Run in current shell:
+```bash
+export NIX_SSL_CERT_FILE=/etc/nix/ca_cert.pem
+export SSL_CERT_FILE=/etc/nix/ca_cert.pem
+```
+
+Add to nix:
+```nix
+environment.variables = {
+    NIX_SSL_CERT_FILE = "/etc/nix/ca_cert.pem";
+    SSL_CERT_FILE = "/etc/nix/ca_cert.pem";
+    REQUEST_CA_BUNDLE = "/etc/nix/ca_cert.pem";
+};
+```
+
+6. If Nix can't download libloading Rust library for treesitter (temporary hack):
+* Locate where the fetch-cargo-vendor-util is once the build fails
+* Replace the content of the file fetch-cargo-vendor-util content with the content of a file at hacks/fetch-cargo-vendor-util (keep the original shebang!!!)
+* Copy and paste the `libloading-{version}.tar.gz` file into the bin folder
+* The fetch-cargo-vendor-util would copy the file instead of downloading it and the build process should continue
+
+WARN: If the libloading lib gets upgraded, you'd need to download it and place it into hacks folder again.
+
 ## Nix and Github
 
 Nix downloads packages from Github and you may quickly get rate limited by Github.

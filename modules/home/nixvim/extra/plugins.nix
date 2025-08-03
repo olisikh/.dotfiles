@@ -5,11 +5,12 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "letieu";
       repo = "harpoon-lualine";
-      rev = "master";
-      hash = "sha256-pH7U1BYD7B1y611TJ+t8ggPM3KOaSIB3Jtuj3fPKqpc=";
+      rev = "bcdf833a6f42366357950c1b5ccaab84dccef1e4";
+      hash = "sha256-HGbz/b2AVl8145BCy8I47dDrhBVMSQQIr+mWbOrmj5Q=";
     };
     dependencies = with pkgs.vimPlugins; [ lualine-nvim ];
   });
+  
   nvim-scala-zio-quickfix = (pkgs.vimUtils.buildVimPlugin {
     name = "scala-zio-quickfix";
     src = pkgs.fetchFromGitHub {
@@ -18,6 +19,7 @@ let
       rev = "main";
       hash = "sha256-dVRVDBZWncEkBw6cLBJE2HZ8KhNSpffEn3Exvnllx78=";
     };
+
     # TODO: does plugin need treesitter dependency? it should be part of neovim now
     dependencies = with pkgs.vimPlugins; [
       nvim-treesitter
@@ -27,6 +29,7 @@ let
       none-ls-nvim
     ];
   });
+
   nvim-dap-kotlin = (pkgs.vimUtils.buildVimPlugin {
     name = "nvim-dap-kotlin";
     src = pkgs.fetchFromGitHub {
