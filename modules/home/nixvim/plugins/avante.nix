@@ -17,6 +17,7 @@ in
           model = "google/gemini-2.5-flash";
         };
         ollama = {
+          endpoint = "http://localhost:11434";
           model = "qwen3-coder:30b";
         };
       };

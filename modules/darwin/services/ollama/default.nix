@@ -24,11 +24,6 @@ in
         ollama
       ];
 
-      variables = {
-        OLLAMA_HOME = "${pkgs.ollama}";
-        OLLAMA_MODELS = "${userCfg.home}/.ollama/models";
-      };
-
       systemPath = [ "${pkgs.ollama}/bin" ];
     };
 
@@ -43,10 +38,6 @@ in
 
         StandardOutPath = "${ollamaDir}/ollama.stdout.log";
         StandardErrorPath = "${ollamaDir}/ollama.stderr.log";
-
-        EnvironmentVariables = {
-          OLLAMA_HOST = "localhost:${toString cfg.port}";
-        };
       };
     };
   };

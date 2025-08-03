@@ -47,9 +47,6 @@ in
 
         EnvironmentVariables = {
           HOME = userCfg.home;
-          # DOCKER_HOST = "unix://${colimaDir}/docker.sock";
-          # TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-          # PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
         };
       };
     };
