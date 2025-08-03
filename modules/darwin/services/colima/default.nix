@@ -6,7 +6,7 @@ let
   cfg = config.${namespace}.services.colima;
   userCfg = config.${namespace}.user;
 
-  # colimaDir = "${user.home}/.config/colima/default";
+  colimaDir = "${userCfg.home}/.colima";
 in
 {
   options.${namespace}.services.colima = {
@@ -23,8 +23,8 @@ in
       ];
 
       variables = {
+        DOCKER_HOST = "unix://${colimaDir}/docker.sock";
         TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
-        DOCKER_HOST = "unix://${userCfg.home}/.config/colima/default/docker.sock";
       };
 
       systemPath = [
@@ -33,30 +33,24 @@ in
       ];
     };
 
-    launchd = {
-      # NOTE: daemons are system-scoped services
-      daemons = { };
+    launchd.user.agents.colima = {
+      path = [ config.environment.systemPath ];
 
-      # NOTE: agents are user-scoped services
-      agents = {
-        # TODO: can't run colima as an agent because it is not designed to be run as root
-        #
-        # "com.colima.default" = {
-        #   command = "${pkgs.colima}/bin/colima start --foreground";
-        #   serviceConfig = {
-        #     Label = "com.colima.default";
-        #     RunAtLoad = true;
-        #     KeepAlive = true;
-        #
-        #     StandardOutPath = "${colimaDir}/colima.stdout.log";
-        #     StandardErrorPath = "${colimaDir}/colima.stderr.log";
-        #
-        #     EnvironmentVariables = {
-        #       DOCKER_HOST = "unix://${colimaDir}/docker.sock";
-        #       PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-        #     };
-        #   };
-        # };
+      serviceConfig = {
+        Label = "org.colima.default";
+        ProgramArguments = [ "${pkgs.colima}/bin/colima" "start" "--foreground" ];
+        RunAtLoad = true;
+        KeepAlive = true;
+
+        StandardOutPath = "${colimaDir}/colima.stdout.log";
+        StandardErrorPath = "${colimaDir}/colima.stderr.log";
+
+        EnvironmentVariables = {
+          HOME = userCfg.home;
+          # DOCKER_HOST = "unix://${colimaDir}/docker.sock";
+          # TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
+          # PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+        };
       };
     };
   };

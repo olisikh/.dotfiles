@@ -16,6 +16,9 @@ in
           api_key_name = "OPENROUTER_API_KEY";
           model = "google/gemini-2.5-flash";
         };
+        ollama = {
+          model = "qwen3-coder:30b";
+        };
       };
 
       behaviour = {

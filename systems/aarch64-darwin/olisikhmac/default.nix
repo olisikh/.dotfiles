@@ -22,6 +22,7 @@ in
       sketchybar = enabled;
       skhd = enabled;
       colima = enabled;
+      ollama = enabled;
     };
   };
 

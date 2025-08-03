@@ -21,6 +21,10 @@ in
       plugins = {
         # NOTE: Obsidian is disabled because it doesn't build and I don't use it at work anyway 
         obsidian = disabled;
+        avante = {
+          enable = true;
+          provider = "ollama";
+        };
       };
     };
     user = enabled;
