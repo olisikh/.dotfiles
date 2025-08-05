@@ -15,7 +15,7 @@ in
     ripgrep = enabled;
     starship = enabled;
     git = enabled;
-    mc = enabled;
+    yazi = enabled;
     nixvim = {
       enable = true;
       plugins = {

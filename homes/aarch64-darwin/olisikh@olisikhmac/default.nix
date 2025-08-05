@@ -1,6 +1,6 @@
 { lib, namespace, ... }:
 let
-  inherit (lib.${namespace}) enabled;
+  inherit (lib.${namespace}) enabled disabled;
 in
 {
   olisikh = {
@@ -13,10 +13,13 @@ in
     ripgrep = enabled;
     starship = enabled;
     git = enabled;
-    mc = enabled;
+    yazi = enabled;
     nixvim = {
       enable = true;
-      nightly = false;
+      nightly = true;
+      plugins = {
+        obsidian = disabled;
+      };
     };
     user = enabled;
     sops = enabled;
