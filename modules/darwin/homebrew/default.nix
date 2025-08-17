@@ -21,6 +21,7 @@ in
       brews = [ ];
       casks = [
         "raycast"
+        "betterdisplay"
       ];
       taps = [
         "homebrew/bundle"
