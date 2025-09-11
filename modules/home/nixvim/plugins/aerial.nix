@@ -1,5 +1,5 @@
 {...}: {
   aerial = {
-    enable = true;
+    enable = false; # TODO: can't build, requires fzf-lua
   };
 }
