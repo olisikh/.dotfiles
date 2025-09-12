@@ -80,7 +80,7 @@
 
       homes.modules = with inputs; [
         sops-nix.homeManagerModules.sops
-        nixvim.homeManagerModules.nixvim
+        nixvim.homeModules.nixvim
       ];
     };
 }

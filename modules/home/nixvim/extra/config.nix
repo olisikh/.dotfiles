@@ -49,5 +49,14 @@
     require('dap-kotlin').setup({
       dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
     })
+
+    -- NOTE: setup kotlin-lsp from Jetbrains
+    vim.lsp.config('kotlin-lsp', {
+      cmd = { 'kotlin-lsp', '--stdio' },
+      settings = {
+        kotlin_lsp = { }
+      }
+    })
+    vim.lsp.enable('kotlin-lsp')
   ''
 ) + import ./config/harpoon.lua.nix

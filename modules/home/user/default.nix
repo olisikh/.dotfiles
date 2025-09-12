@@ -66,7 +66,6 @@ in
         kotlin
         gradle
         xdg-utils # open apps from console/neovim
-        arc-browser
         wezterm
         lazygit
         lazydocker
@@ -77,8 +76,6 @@ in
           pytest
           debugpy
         ]))
-        poetry # python package manager
-        uv # another python package manager, but in Rust
         ollama
         obsidian
         vscode
