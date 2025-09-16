@@ -13,6 +13,7 @@ c.font_size = 14.0
 c.hide_tab_bar_if_only_one_tab = false
 c.window_background_opacity = bg_opacity
 c.macos_window_background_blur = 10
+c.audible_bell = "Disabled" -- or "SystemBeep"
 
 c.color_scheme = "Catppuccin " .. theme_style
 c.colors = {
