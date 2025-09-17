@@ -68,7 +68,7 @@
         };
       };
       # jdtls.enable = true;
-      kotlin_language_server.enable = false;
+      kotlin_language_server.enable = true;
       # kotlin-lsp = true; # NOTE: unavailable, not in nixpkgs
       pylsp.enable = true;
       # pylyzer.enable = true;

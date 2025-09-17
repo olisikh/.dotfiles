@@ -14,7 +14,7 @@ in
     starship = enabled;
     git = enabled;
     yazi = enabled;
-    kotlin-lsp = enabled;
+    kotlin-lsp = disabled;
     nixvim = {
       enable = true;
       nightly = false;
