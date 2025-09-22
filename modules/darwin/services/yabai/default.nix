@@ -38,7 +38,7 @@ in
           bottom_padding = 12;
           left_padding = 12;
           right_padding = 12;
-          window_gap = 12;
+          window_gap = 20;
           layout = "bsp"; # default "float" (windows are not managed)
         };
         # WARN: Yabai scription addition requires Security Integration Protection to be partially disabled.

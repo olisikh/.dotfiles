@@ -5,13 +5,12 @@ let
 
   cfg = config.${namespace}.yazi;
 
-
-  # catppuccinThemes = pkgs.fetchFromGitHub {
-  #   owner = "catppuccin";
-  #   repo = "yazi"; # Bat uses sublime syntax for its themes
-  #   rev = "1a8c939e47131f2c4bd07a2daea7773c29e2a774";
-  #   sha256 = "sha256-6fWoCH90IGumAMc4buLRWL0N61op+AuMNN9CAR9/OdI=";
-  # };
+  themes = pkgs.fetchFromGitHub {
+    owner = "catppuccin";
+    repo = "yazi";
+    rev = "043ffae14e7f7fcc136636d5f2c617b5bc2f5e31";
+    sha256 = "sha256-zkL46h1+U9ThD4xXkv1uuddrlQviEQD3wNZFRgv7M8Y=";
+  };
 in
 {
   options.${namespace}.yazi = {
@@ -19,21 +18,13 @@ in
   };
 
   config = mkIf cfg.enable {
-    # home.file = {
-    #   ".config/yazi/flavors".source = catppuccinThemes;
-    # };
+    home.file = {
+      ".config/yazi/theme.toml".source = "${themes}/themes/mocha/catppuccin-mocha-blue.toml";
+    };
 
     programs.yazi = {
       enable = true;
-      settings = {
-        yazi = { };
-        # theme = {
-        #   flavor = {
-        #     dark = "mocha";
-        #   };
-        # };
-        keymap = { };
-      };
+      settings = { };
       plugins = with pkgs.yaziPlugins; {
         inherit git sudo chmod lazygit starship;
       };

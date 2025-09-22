@@ -7,7 +7,7 @@ let
 
   secrets = config.sops.secrets;
 
-  catppuccinZshTheme = pkgs.fetchFromGitHub {
+  themes = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
     "repo" = "zsh-syntax-highlighting";
     "rev" = "06d519c20798f0ebe275fc3a8101841faaeee8ea";
@@ -28,7 +28,7 @@ in
 
   config = mkIf cfg.enable {
     home.file = {
-      ".config/zsh/catppuccin".source = catppuccinZshTheme;
+      ".config/zsh/catppuccin".source = themes;
     };
 
     programs.zsh = {
@@ -45,7 +45,7 @@ in
           zshDefault = mkDefault
             # bash
             ''
-              source ${catppuccinZshTheme}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
+              source ${themes}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
               eval "$(kafkactl completion zsh)"
               eval "$(fzf --zsh)"
 

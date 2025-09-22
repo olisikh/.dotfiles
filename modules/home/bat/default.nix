@@ -6,7 +6,7 @@ let
 
   cfg = config.${namespace}.bat;
 
-  catppuccinThemes = pkgs.fetchFromGitHub {
+  themes = pkgs.fetchFromGitHub {
     owner = "catppuccin";
     repo = "bat"; # Bat uses sublime syntax for its themes
     rev = "699f60fc8ec434574ca7451b444b880430319941";
@@ -28,22 +28,22 @@ in
 
       themes = {
         catppuccin-mocha = {
-          src = catppuccinThemes;
+          src = themes;
           file = "themes/Catppuccin Mocha.tmTheme";
         };
 
         catppuccin-latte = {
-          src = catppuccinThemes;
+          src = themes;
           file = "themes/Catppuccin Latte.tmTheme";
         };
 
         catppuccin-frappe = {
-          src = catppuccinThemes;
+          src = themes;
           file = "themes/Catppuccin Frappe.tmTheme";
         };
 
         catppuccin-macchiato = {
-          src = catppuccinThemes;
+          src = themes;
           file = "themes/Catppuccin Macchiato.tmTheme";
         };
       };
