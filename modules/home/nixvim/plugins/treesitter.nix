@@ -70,46 +70,48 @@ in
 
   treesitter-textobjects = {
     enable = true;
-    select = {
-      enable = true;
-      lookahead = true; # -- Automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        # -- You can use the capture groups defined in textobjects.scm
-        aa = "@parameter.outer";
-        ia = "@parameter.inner";
-        af = "@function.outer";
-        "if" = "@function.inner";
-        ac = "@class.outer";
-        ic = "@class.inner";
+    settings = {
+      select = {
+        enable = true;
+        lookahead = true; # -- Automatically jump forward to textobj, similar to targets.vim
+        keymaps = {
+          # -- You can use the capture groups defined in textobjects.scm
+          aa = "@parameter.outer";
+          ia = "@parameter.inner";
+          af = "@function.outer";
+          "if" = "@function.inner";
+          ac = "@class.outer";
+          ic = "@class.inner";
+        };
       };
-    };
-    move = {
-      enable = true;
-      setJumps = true;
-      gotoNextStart = {
-        "]m" = "@function.outer";
-        "]]" = "@class.outer";
+      move = {
+        enable = true;
+        set_jumps = true;
+        goto_next_start = {
+          "]m" = "@function.outer";
+          "]]" = "@class.outer";
+        };
+        goto_next_end = {
+          "]M" = "@function.outer";
+          "][" = "@class.outer";
+        };
+        goto_previous_start = {
+          "[m" = "@function.outer";
+          "[[" = "@class.outer";
+        };
+        goto_previous_end = {
+          "[M" = "@function.outer";
+          "[]" = "@class.outer";
+        };
       };
-      gotoNextEnd = {
-        "]M" = "@function.outer";
-        "][" = "@class.outer";
-      };
-      gotoPreviousStart = {
-        "[m" = "@function.outer";
-        "[[" = "@class.outer";
-      };
-      gotoPreviousEnd = {
-        "[M" = "@function.outer";
-        "[]" = "@class.outer";
-      };
-    };
-    swap = {
-      enable = true;
-      swapPrevious = {
-        "[p" = "@parameter.inner";
-      };
-      swapNext = {
-        "]p" = "@parameter.inner";
+      swap = {
+        enable = true;
+        swap_previous = {
+          "[p" = "@parameter.inner";
+        };
+        swap_next = {
+          "]p" = "@parameter.inner";
+        };
       };
     };
   };

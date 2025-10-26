@@ -49,6 +49,7 @@ in
         kubernetes-helm
         terraform
         nodejs
+        pnpm
         (yarn.override { nodejs = nodejs; })
         go
         jdk
@@ -76,6 +77,7 @@ in
           pytest
           debugpy
         ]))
+        uv # python utility belt
         ollama
         obsidian
         vscode

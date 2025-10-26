@@ -35,6 +35,7 @@ in
 
       copilot = {
         enable = mkBoolOpt true "Enable GitHub Copilot";
+        enable-nes = mkBoolOpt false "Enable GitHub Copilot 'Next Edit Suggestion'";
       };
     };
   };
