@@ -46,6 +46,8 @@ in
         tree-sitter
         luarocks-nix
         minikube
+        k9s
+        kubectl
         kubernetes-helm
         terraform
         nodejs
@@ -92,6 +94,7 @@ in
         esbuild
 
         bchunk
+        dos2unix
 
         (pulumi.withPackages (ps: with ps; [
           pulumi-nodejs
