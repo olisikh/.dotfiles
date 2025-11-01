@@ -28,6 +28,7 @@
         indent_blankline = {
           enabled = true;
           colored_indent_levels = false;
+          scope_color = "pink";
         };
         native_lsp = {
           enabled = true;

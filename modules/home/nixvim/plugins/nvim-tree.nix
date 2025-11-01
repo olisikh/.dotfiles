@@ -20,15 +20,14 @@
       filters = {
         dotfiles = true;
       };
-      on_attach = nixvimLib.mkRaw # lua
-        ''
-          function(bufnr)
-            require("nvim-tree.api")
-              .config
-              .mappings
-              .default_on_attach(bufnr)
-          end
-        '';
+      on_attach = nixvimLib.mkRaw ''
+        function(bufnr)
+          require("nvim-tree.api")
+            .config
+            .mappings
+            .default_on_attach(bufnr)
+        end
+      '';
     };
   };
 }

@@ -29,6 +29,8 @@ lib.foldl' (acc: plugin: acc // importPlugin plugin) {} [
   ./plugins/obsidian.nix
   ./plugins/luasnip.nix
   ./plugins/aerial.nix
+  ./plugins/indent-blankline.nix
+  ./plugins/visual-whitespace.nix
 ] //
 {
   lz-n.enable = true;

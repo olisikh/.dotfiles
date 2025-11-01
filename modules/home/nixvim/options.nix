@@ -54,6 +54,17 @@
     completeopt = "menu,menuone,noinsert";
     termguicolors = true;
 
+    list = false; # show whitespaces, tabs, etc as virtual text
+    listchars = {
+      tab = "↦↦";
+      space = "·";
+      # multispace = "·";
+      lead = "·";
+      trail = "·";   
+      nbsp = "␣";
+      # eol = "↲";
+    };
+
     # NOTE: Avante says: views can only be fully collapsed with the global statusline
     laststatus = 3;
   };
