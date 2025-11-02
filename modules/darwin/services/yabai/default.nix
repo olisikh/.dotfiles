@@ -34,6 +34,7 @@ in
           mouse_action1 = "move";
           mouse_action2 = "resize";
           mouse_drop_action = "swap";
+          external_bar = "all:35:0";
           top_padding = 12;
           bottom_padding = 12;
           left_padding = 12;

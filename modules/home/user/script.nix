@@ -48,7 +48,7 @@ in
   }
 
   home_rollback() {
-    gen_id=$(darwin-rebuild --list-generations | fzf --tac | awk '{print $1}')
+    gen_id=$(sudo darwin-rebuild --list-generations | fzf --tac | awk '{print $1}')
     if [[ -z ''${gen_id:+x} ]]; then
       echo "No generation selected, rollback aborted."
     else
