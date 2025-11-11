@@ -22,7 +22,7 @@ in
 
       age = {
         # NOTE: These 2 properties would generate a keys.txt file if it is not present:
-        # essentially doing sometihng like this:
+        # essentially doing something like this:
         # $ nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
         # $ nix-shell -p sops --run "sops ~/.config/sops/secrets.yaml"
         inherit (cfg) sshKeyPaths generateKey keyFile;
@@ -31,9 +31,10 @@ in
       secrets = {
         userEmail = { };
         signingKey = { };
-        claudeApiKey = { };
-        openaiApiKey = { };
-        openrouterApiKey = { };
+        claude = { };
+        openai = { };
+        openrouter = { };
+        gemini = { };
       };
     };
 

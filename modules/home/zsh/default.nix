@@ -5,7 +5,17 @@ let
 
   cfg = config.${namespace}.zsh;
 
-  secrets = config.sops.secrets;
+  secrets = lib.attrsets.mapAttrsToList
+    (name: value: { inherit name; inherit (value) path; })
+    config.sops.secrets;
+
+  exportSecrets =
+    lib.foldl'
+      (acc: secret:
+        acc + "export ${lib.strings.toUpper secret.name}_API_KEY=$(cat ${secret.path});\n"
+      )
+      ""
+      secrets;
 
   themes = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
@@ -89,9 +99,7 @@ in
               alias tree="exa --tree"
               alias hist="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
 
-              export ANTHROPIC_API_KEY=$(cat ${secrets.claudeApiKey.path});
-              export OPENAI_API_KEY=$(cat ${secrets.openaiApiKey.path});
-              export OPENROUTER_API_KEY=$(cat ${secrets.openrouterApiKey.path});
+              ${exportSecrets}
 
               # overrides for work
               [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

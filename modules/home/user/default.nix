@@ -81,6 +81,7 @@ in
         ]))
         uv # python utility belt
         ollama
+        gemini-cli
         obsidian
         vscode
         cmatrix
