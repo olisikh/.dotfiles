@@ -22,6 +22,7 @@ in
       casks = [
         "raycast"
         "betterdisplay"
+        "zen"
       ];
       taps = [
         "homebrew/bundle"
