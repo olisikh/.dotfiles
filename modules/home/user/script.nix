@@ -35,7 +35,8 @@ in
 
   # Function to perform 'home make'
   home_make() {
-      sudo darwin-rebuild switch --flake "${home}/.dotfiles" "$@"
+      # rebuild + enable yabai scription addition, since nix-darwin can't do that for some reason
+      sudo darwin-rebuild switch --flake "${home}/.dotfiles" "$@" && sudo yabai --load-sa
   }
 
   # Function to perform 'home update'

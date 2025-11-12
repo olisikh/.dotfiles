@@ -42,6 +42,7 @@ in
           window_gap = 20;
           layout = "bsp"; # default "float" (windows are not managed)
         };
+
         # WARN: Yabai scription addition requires Security Integration Protection to be partially disabled.
         # 1. In OSX Recovery mode terminal (long press power button during boot) run the following command:
         # > csrutil enable --without fs --without debug --without nvram
@@ -50,20 +51,13 @@ in
         # 3. Reboot again
         enableScriptingAddition = true;
         extraConfig = ''
-          # enable scripting addition
-          sudo yabai --load-sa
-
-          # apps to not manage (ignore)
+          # apps to ignore
           yabai -m rule --add app="^System Preferences$" manage=off
           yabai -m rule --add app="^Archive Utility$" manage=off
           yabai -m rule --add app="^Creative Cloud$" manage=off
           yabai -m rule --add app="^Login Options$" manage=off
           yabai -m rule --add app="^ClearVPN$" manage=off
-
-          # yabai -m rule --add app="^Wally$" manage=off
-          # yabai -m rule --add app="^Pika$" manage=off
-          # yabai -m rule --add app="^balenaEtcher$" manage=off
-          # yabai -m rule --add app="^Alfred Preferences$" manage=off
+          yabai -m rule --add app="^balenaEtcher$" manage=off
 
           echo "yabai configuration loaded.."
         '';
