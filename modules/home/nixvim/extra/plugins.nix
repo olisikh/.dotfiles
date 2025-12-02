@@ -10,7 +10,7 @@ let
     };
     dependencies = with pkgs.vimPlugins; [ lualine-nvim ];
   });
-  
+
   nvim-scala-zio-quickfix = (pkgs.vimUtils.buildVimPlugin {
     name = "scala-zio-quickfix";
     src = pkgs.fetchFromGitHub {
@@ -56,6 +56,7 @@ with pkgs.vimPlugins; [
   nvim-metals
   nvim-jdtls
   copilot-lualine
+  fzf-lua
   avante-lualine
   harpoon2
   harpoon-lualine

@@ -18,9 +18,6 @@ in
     nixvim = {
       enable = true;
       nightly = false;
-      plugins = {
-        obsidian = disabled;
-      };
     };
     user = enabled;
     sops = enabled;

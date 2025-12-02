@@ -6,7 +6,7 @@
       typescript = [ "eslint_d" ];
       javascriptreact = [ "eslint_d" ];
       typescriptreach = [ "eslint_d" ];
-      json = [ "jsonlint" ];
+      json = [ "eslint_d" ];
       yaml = [ "yamllint" ];
       dockerfile = [ "hadolint" ];
       terraform = [ "tflint" ];

@@ -1,7 +1,7 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt enabled;
+  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.ollama;
   userCfg = config.${namespace}.user;
@@ -20,11 +20,7 @@ in
 
   config = mkIf cfg.enable {
     environment = {
-      systemPackages = with pkgs; [
-        ollama
-      ];
-
-      systemPath = [ "${pkgs.ollama}/bin" ];
+      systemPath = [ "/opt/homebrew/bin" ];
     };
 
     launchd.user.agents.ollama = {
@@ -34,7 +30,7 @@ in
         Label = "org.ollama.default";
         KeepAlive = true;
         RunAtLoad = true;
-        ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
+        ProgramArguments = [ "/opt/homebrew/bin/ollama" "serve" ];
 
         StandardOutPath = "${ollamaDir}/ollama.stdout.log";
         StandardErrorPath = "${ollamaDir}/ollama.stderr.log";

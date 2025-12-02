@@ -132,7 +132,6 @@ in
         tflint
         pylint
         checkstyle
-        nodePackages.jsonlint
         shfmt
         rustfmt
         rust-analyzer

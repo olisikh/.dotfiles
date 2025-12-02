@@ -23,6 +23,8 @@ in
         "raycast"
         "betterdisplay"
         "zen"
+        "lm-studio"
+        "ollama"
       ];
       taps = [
         "homebrew/bundle"

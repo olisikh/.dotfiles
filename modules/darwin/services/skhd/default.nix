@@ -50,6 +50,7 @@ in
           ctrl - 7 : yabai -m space --focus 7
           ctrl - 8 : yabai -m space --focus 8
           ctrl - 9 : yabai -m space --focus 9
+          ctrl - 0 : yabai -m space --focus 10
 
           # toggle fullscreen zoom
           shift + alt - f : yabai -m window --toggle zoom-fullscreen
@@ -70,9 +71,10 @@ in
           alt + shift - 7 : yabai -m window --space 7; yabai -m space --focus 7
           alt + shift - 8 : yabai -m window --space 8; yabai -m space --focus 8
           alt + shift - 9 : yabai -m window --space 9; yabai -m space --focus 9
+          alt + shift - 0 : yabai -m window --space 10; yabai -m space --focus 10
 
           # fast focus desktop
-          shift + alt - 0 : yabai -m space --focus recent
+          # alt + shift - - : yabai -m space --focus recent
 
           # send window to monitor and follow focus
           shift + alt - n : yabai -m window --display next; yabai -m display --focus next

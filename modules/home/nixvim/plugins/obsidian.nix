@@ -1,10 +1,11 @@
-{ nixvimLib, config, namespace, ... }:
+{ nixvimLib, config, namespace, pkgs, ... }:
 let
   cfg = config.${namespace}.nixvim.plugins.obsidian;
 in
 {
   obsidian = {
     enable = cfg.enable;
+    package = pkgs.vimPlugins.obsidian-nvim; # NOTE: my overlay is not used otherwise, need this line
     settings = {
       workspaces = [
         {

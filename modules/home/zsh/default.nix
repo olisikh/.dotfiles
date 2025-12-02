@@ -98,6 +98,7 @@ in
               alias ll="exa -alh"
               alias tree="exa --tree"
               alias hist="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
+              alias avante='nvim -c "lua vim.defer_fn(function()require(\"avante.api\").zen_mode()end, 100)"'
 
               ${exportSecrets}
 
