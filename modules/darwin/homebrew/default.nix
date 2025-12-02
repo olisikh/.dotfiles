@@ -24,7 +24,7 @@ in
         "betterdisplay"
         "zen"
         "lm-studio"
-        "ollama"
+        "ollama-app"
       ];
       taps = [
         "homebrew/bundle"
