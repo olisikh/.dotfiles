@@ -17,7 +17,7 @@ in
 
       settings = {
         scala.symbol = " ";
-        java.symbol = " ";
+        java.symbol = "󰬷 ";
         nix_shell.symbol = " ";
         nodejs.symbol = " ";
         golang.symbol = " ";
@@ -27,7 +27,7 @@ in
         elixir.symbol = " ";
         lua.symbol = " ";
         terraform.symbol = " ";
-        aws.symbol = "  ";
+        aws.symbol ="󰸏 ";
         gradle.symbol = " ";
       };
     };
