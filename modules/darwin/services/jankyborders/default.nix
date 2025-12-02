@@ -11,14 +11,12 @@ in
   };
 
   config = mkIf cfg.enable {
-    services = {
-      # https://mynixos.com/nix-darwin/options/services.jankyborders
-      jankyborders = {
-        enable = true;
-        active_color = "0xffe1e3e4";
-        inactive_color = "0xff494d64";
-        width = 10.0;
-      };
+    # https://mynixos.com/nix-darwin/options/services.jankyborders
+    services.jankyborders = {
+      enable = true;
+      active_color = "0xffe1e3e4";
+      inactive_color = "0xff494d64";
+      width = 10.0;
     };
   };
 }

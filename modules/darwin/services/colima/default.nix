@@ -7,6 +7,9 @@ let
   userCfg = config.${namespace}.user;
 
   colimaDir = "${userCfg.home}/.colima";
+
+  colimaPkg = pkgs.colima;
+  dockerPkg = pkgs.docker;
 in
 {
   options.${namespace}.services.colima = {
@@ -28,8 +31,8 @@ in
       };
 
       systemPath = [
-        "${pkgs.colima}/bin"
-        "${pkgs.docker}/bin"
+        "${colimaPkg}/bin"
+        "${dockerPkg}/bin"
       ];
     };
 
@@ -38,7 +41,7 @@ in
 
       serviceConfig = {
         Label = "org.colima.default";
-        ProgramArguments = [ "${pkgs.colima}/bin/colima" "start" "--foreground" ];
+        ProgramArguments = [ "${colimaPkg}/bin/colima" "start" "--foreground" ];
         RunAtLoad = true;
         KeepAlive = true;
 

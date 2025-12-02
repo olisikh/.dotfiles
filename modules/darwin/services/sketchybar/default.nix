@@ -12,17 +12,14 @@ in
   };
 
   config = mkIf cfg.enable {
-    services = {
-      # NOTE: good example of sketchybar configuration
-      # https://github.com/khaneliman/khanelinix/blob/60bc9ff5b65ca7e107de3b288e16998fd2b01c88/modules/home/programs/graphical/bars/sketchybar/default.nix
-
-      sketchybar = {
-        enable = true;
-        extraPackages = with pkgs; [
-          jq
-          sketchybar-app-font
-        ];
-      };
+    # NOTE: good example of sketchybar configuration
+    # https://github.com/khaneliman/khanelinix/blob/60bc9ff5b65ca7e107de3b288e16998fd2b01c88/modules/home/programs/graphical/bars/sketchybar/default.nix
+    services.sketchybar = {
+      enable = true;
+      extraPackages = with pkgs; [
+        jq
+        sketchybar-app-font
+      ];
     };
 
     environment.systemPackages = with pkgs; with pkgs.${namespace}; [
