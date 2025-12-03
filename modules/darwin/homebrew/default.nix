@@ -23,7 +23,6 @@ in
         "raycast"
         "betterdisplay"
         "zen"
-        "lm-studio"
         "ollama-app"
       ];
       taps = [
