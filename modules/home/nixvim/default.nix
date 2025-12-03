@@ -1,4 +1,4 @@
-{ lib, config, namespace, pkgs, inputs, ... }:
+{ lib, config, namespace, pkgs, inputs, system, ... }:
 let
   inherit (lib) mkIf mkOption types;
   inherit (lib.${namespace}) mkBoolOpt;
@@ -6,6 +6,7 @@ let
   cfg = config.${namespace}.nixvim;
 
   nixvimLib = inputs.nixvim.lib.nixvim;
+  neovimNightlyPkg = inputs.nightly-neovim-overlay.packages.${system}.default;
 
   kotlin-dap-adapter = pkgs.fetchzip {
     name = "kotlin-dap-adapter-0.4.4";
@@ -46,7 +47,7 @@ in
       defaultEditor = true;
 
       # NOTE: due to overlay, nixvim would install and use nightly
-      package = mkIf cfg.nightly pkgs.neovim;
+      package = mkIf cfg.nightly neovimNightlyPkg;
 
       colorschemes = import ./colorscheme.nix { inherit nixvimLib; };
 

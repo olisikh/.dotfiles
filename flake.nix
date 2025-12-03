@@ -68,9 +68,8 @@
 
       src = ./.;
 
-      overlays = [
-        inputs.neovim-nightly-overlay.overlays.default
-      ];
+      # NOTE: add external overlays here
+      overlays = [];
 
       channels-config.allowUnfree = true;
 
