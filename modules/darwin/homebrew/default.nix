@@ -18,7 +18,9 @@ in
         upgrade = false;
         cleanup = "zap";
       };
-      brews = [ ];
+      brews = [
+        "tccutil"
+      ];
       casks = [
         "raycast"
         "betterdisplay"
