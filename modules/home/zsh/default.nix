@@ -58,6 +58,7 @@ in
               source ${themes}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
               eval "$(kafkactl completion zsh)"
               eval "$(fzf --zsh)"
+              eval "$(pay-respects zsh)"
 
               # Preferred editor for local and remote sessions
               if [[ -n $SSH_CONNECTION ]]; then

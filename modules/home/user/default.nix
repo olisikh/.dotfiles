@@ -42,6 +42,7 @@ in
         jq
         zoxide
         bat
+        pay-respects # thefuck alternative
         rustup
         tree-sitter
         luarocks-nix
