@@ -12,4 +12,4 @@ total_mem=$(sysctl -n hw.memsize)
 
 used_percent=$(printf "%.1f%%\n" "$(echo "$used_mem / $total_mem * 100" | bc -l)")
 
-sketchybar --set "$NAME" icon="󰘚 " label="${used_percent}"
+sketchybar --set "$NAME" icon="󰘚 " label="${used_percent/,/.}"
