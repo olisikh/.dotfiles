@@ -50,6 +50,7 @@ in
         k9s
         kubectl
         kubernetes-helm
+        kustomize
         etcd
         terraform
         nodejs
