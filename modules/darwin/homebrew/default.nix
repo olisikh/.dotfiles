@@ -24,8 +24,8 @@ in
       casks = [
         "raycast"
         "betterdisplay"
-        "zen"
         "ollama-app"
+        "vivaldi"
       ];
       taps = [
         "homebrew/bundle"

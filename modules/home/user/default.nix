@@ -83,7 +83,6 @@ in
           debugpy
         ]))
         uv # python utility belt
-        gemini-cli
         obsidian
         vscode
         cmatrix
@@ -98,6 +97,8 @@ in
 
         bchunk
         dos2unix
+
+        brave
 
         (pulumi.withPackages (ps: with ps; [
           pulumi-nodejs

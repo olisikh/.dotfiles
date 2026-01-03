@@ -113,3 +113,11 @@ sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=
 Most of the packages have home-manager support, for example \
 wezterm has this page that tells what options you have to configure it: \
 https://home-manager-options.extranix.com/?query=wezterm&release=master
+
+## If skhd and yabai not showing up in Accessibility
+```bash
+realpath "$(which yabai)"
+realpath "$(which skhd)"
+open /path/to/yabai # and then drag-and-drop binary onto Accessibility table, confirm with Touch ID if needed
+
+```
