@@ -46,6 +46,8 @@ in
       enableCompletion = true;
       autosuggestion.enable = true;
 
+      dotDir = config.home.homeDirectory;
+
       initContent =
         let
           zshBefore = mkBeforeCompInit

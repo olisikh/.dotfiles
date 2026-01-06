@@ -98,7 +98,11 @@ in
         bchunk
         dos2unix
 
+        opencode
+        code-cursor
+
         brave
+        bitwarden-desktop
 
         (pulumi.withPackages (ps: with ps; [
           pulumi-nodejs
