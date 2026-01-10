@@ -51,6 +51,9 @@ in
       # 3. Reboot again
       enableScriptingAddition = true;
       extraConfig = ''
+        sudo yabai --load-sa
+        echo "yabai scripting addition loaded..."
+
         # apps to ignore
         yabai -m rule --add app="^System Preferences$" manage=off
         yabai -m rule --add app="^Archive Utility$" manage=off
@@ -59,10 +62,7 @@ in
         yabai -m rule --add app="^ClearVPN$" manage=off
         yabai -m rule --add app="^balenaEtcher$" manage=off
 
-        echo "yabai configuration loaded.."
-
-        echo "yabai enabling scripting addition.."
-        sudo yabai --load-sa
+        echo "yabai configuration loaded..."
       '';
     };
 
