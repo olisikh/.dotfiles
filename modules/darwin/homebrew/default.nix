@@ -1,6 +1,6 @@
 { lib, config, namespace, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) optionals mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.homebrew;
@@ -34,8 +34,7 @@ in
         "homebrew/services"
       ];
 
-      casks = with lib;
-        (optionals cfg.common.enable [ "raycast" "betterdisplay" ]) ++
+      casks = (optionals cfg.common.enable [ "raycast" "betterdisplay" ]) ++
         (optionals cfg.personal.enable [ "ollama-app" "vivaldi" "vlc" ]) ++
         (optionals cfg.work.enable [
           # Add work-specific casks here

@@ -1,6 +1,6 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf types;
+  inherit (lib) mkIf types optionals;
   inherit (lib.${namespace}) mkOpt mkBoolOpt;
 
   cfg = config.${namespace}.user;
@@ -17,7 +17,7 @@ let
 in
 {
   options.${namespace}.user = with types; {
-    enable = mkBoolOpt false "Enable user programs";
+    enable = mkBoolOpt true "Enable user programs";
     username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt types.str defaultHomeDir "The user's home directory";
     personal = {
@@ -33,7 +33,7 @@ in
       # don't ever change the stateversion value, it will break the state
       stateVersion = "25.05";
 
-      packages = with lib; with pkgs;
+      packages = with pkgs;
         [
           nix-prefetch
           bash
@@ -68,7 +68,6 @@ in
           stern # kubectl pod log scraping tool
           htop
           pngpaste
-          nodejs
           scala
           (sbt.override { jre = jdk; })
           (metals.override { jre = jdk; })
@@ -98,7 +97,10 @@ in
           bchunk
           dos2unix
 
-          (writeShellScriptBin "home" (import ./script.nix { home = cfg.home; }))
+          (writeShellScriptBin "home" (import ./script.nix {
+            inherit config namespace lib;
+            home = cfg.home;
+          }))
         ] ++
         (optionals cfg.personal.enable [
           code-cursor

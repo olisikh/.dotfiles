@@ -23,6 +23,7 @@ in
     };
     opencode = enabled;
     user = {
+      enable = true;
       personal = {
         enable = true;
       };

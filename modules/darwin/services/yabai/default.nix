@@ -60,6 +60,9 @@ in
         yabai -m rule --add app="^balenaEtcher$" manage=off
 
         echo "yabai configuration loaded.."
+
+        echo "yabai enabling scripting addition.."
+        sudo yabai --load-sa
       '';
     };
 
