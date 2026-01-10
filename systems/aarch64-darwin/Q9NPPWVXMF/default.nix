@@ -10,10 +10,12 @@ in
     nix = disabled;
 
     user = {
-      inherit username;
       enable = true;
+      inherit username;
     };
-    homebrew = enabled;
+    homebrew = {
+      work = enabled;
+    };
     services = {
       jankyborders = enabled;
       yabai = enabled;

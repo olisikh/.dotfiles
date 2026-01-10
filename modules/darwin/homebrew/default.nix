@@ -1,17 +1,25 @@
 { lib, config, namespace, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) optionals mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.homebrew;
 in
 {
   options.${namespace}.homebrew = {
-    enable = mkBoolOpt false "Enable homebrew darwin module";
+    common = {
+      enable = mkBoolOpt true "Enable common homebrew darwin module";
+    };
+    personal = {
+      enable = mkBoolOpt false "Enable personal homebrew darwin module";
+    };
+    work = {
+      enable = mkBoolOpt false "Enable work homebrew darwin module";
+    };
   };
 
-  config = mkIf cfg.enable {
-    homebrew = {
+  config = {
+    homebrew = mkIf cfg.common.enable {
       enable = true;
       onActivation = {
         autoUpdate = false;
@@ -21,19 +29,19 @@ in
       brews = [
         "tccutil"
       ];
-      casks = [
-        "raycast"
-        "betterdisplay"
-        "ollama-app"
-        "vivaldi"
-        "vlc"
-      ];
       taps = [
         "homebrew/bundle"
         "homebrew/services"
       ];
+
+      casks = (optionals cfg.common.enable [ "raycast" "betterdisplay" ]) ++
+        (optionals cfg.personal.enable [ "ollama-app" "vivaldi" "vlc" ]) ++
+        (optionals cfg.work.enable [
+          # Add work-specific casks here
+        ]);
     };
 
-    environment.systemPath = [ "/opt/homebrew/bin" ];
+
+    environment.systemPath = mkIf cfg.common.enable [ "/opt/homebrew/bin" ];
   };
 }

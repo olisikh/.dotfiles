@@ -1,97 +1,113 @@
-{ home }:
+{ config, namespace, home, lib }:
 let
+  inherit (config.${namespace}) sops;
+  inherit (lib) optionals concatStringsSep;
+  inherit (lib.${namespace}) pad color;
+
   nixShell =
     # nix
     ''{ pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
-  nativBuildInputs = [
+  nativeBuildInputs = [
     # build dependencies
   ];
   buildInputs = [
     # runtime dependencies
   ];
 }'';
-in
 
+  allCommands = [
+    { name = "make"; desc = "Rebuild dotfiles"; action = "home_make \"$@\""; }
+    { name = "update"; desc = "Update dotfiles"; action = "home_update \"$@\""; }
+    { name = "upgrade"; desc = "Update and rebuild dotfiles"; action = "home_update && home_make"; }
+    { name = "generations"; desc = "List dotfiles generations"; action = "home_list_generations \"$@\""; }
+    { name = "rollback"; desc = "Rollback to previous generation"; action = "home_rollback"; }
+    { name = "gc"; desc = "Nix gc"; action = "home_gc"; }
+    { name = "mkshell"; desc = "Create shell.nix file"; action = "echo \"${nixShell}\" > shell.nix"; }
+    { name = "help"; desc = "Help"; action = "display_help"; }
+  ] ++ (optionals sops.enable
+    [
+      { name = "secrets"; desc = "Edit secrets"; action = "check_command sops && sops ${home}/.config/sops/secrets.yaml"; }
+    ]
+  );
+
+  usage = (color.cyan "Usage: ") + "home <command>";
+
+  commandsHeader = color.cyan "Commands:";
+
+  commandsList = concatStringsSep "\n"
+    (map
+      (c:
+        "  ${color.green (pad c.name 15)}${c.desc}"
+      )
+      allCommands);
+
+  helpText = ''\n${usage} \n\n${commandsHeader} \n${commandsList}'';
+
+  caseStatements = concatStringsSep "\n" (map
+    (c:
+      ''
+        ${c.name})
+            ${c.action}
+            ;;'')
+    allCommands);
+in
 # bash
 ''
-  #!/usr/bin/env bash
+  # Function to check if a command exists
+  check_command() {
+      if ! command -v "$1" >/dev/null 2>&1; then
+          echo "Error: $1 not found. Please install it or enable the corresponding module."
+          exit 1
+      fi
+  }
 
   # Function to display help message
   display_help() {
-      echo -e "\033[1;36mUsage:\033[0m home <command>"
-      echo
-      echo -e "\033[1;36mCommands:\033[0m"
-      echo -e "  \033[1;32mmake\033[0m         Rebuild dotfiles"
-      echo -e "  \033[1;32mupdate\033[0m       Update dotfiles"
-      echo -e "  \033[1;32mupgrade\033[0m      Update and rebuild dotfiles"
-      echo -e "  \033[1;32mgenerations\033[0m  List dotfiles generations"
-      echo -e "  \033[1;32mrollback\033[0m     Rollback to previous generation"
-      echo -e "  \033[1;32msecrets\033[0m      Edit secrets"
-      echo -e "  \033[1;32mmkshell\033[0m      Create shell.nix file"
-      echo -e "  \033[1;32mgc\033[0m           Nix gc"
-      echo -e "  \033[1;32mhelp\033[0m         Help"
+      echo -e "${helpText}"
   }
 
   # Function to perform 'home make'
   home_make() {
-      # rebuild + enable yabai scription addition, since nix-darwin can't do that for some reason
-      sudo darwin-rebuild switch --flake "${home}/.dotfiles" "$@" && sudo yabai --load-sa
+      check_command darwin-rebuild
+      sudo darwin-rebuild switch --flake "${home}/.dotfiles" "$@"
   }
 
   # Function to perform 'home update'
   home_update() {
+      check_command nix
       nix flake update --flake "${home}/.dotfiles" "$@"
   }
 
   home_list_generations() {
+      check_command darwin-rebuild
       sudo darwin-rebuild --list-generations "$@"
   }
 
   home_rollback() {
-    gen_id=$(sudo darwin-rebuild --list-generations | fzf --tac | awk '{print $1}')
-    if [[ -z ''${gen_id:+x} ]]; then
-      echo "No generation selected, rollback aborted."
-    else
-      sudo darwin-rebuild --switch-generation ''${gen_id}
-    fi
+      check_command darwin-rebuild
+      check_command fzf
+      gen_id=$(sudo darwin-rebuild --list-generations | fzf --tac | awk '{print $1}')
+      if [[ -z "$gen_id" ]]; then
+          echo "No generation selected, rollback aborted."
+      else
+          sudo darwin-rebuild --switch-generation "$gen_id"
+      fi
   }
 
   home_gc() {
-    nix-store --gc && nix-collect-garbage -d
+      check_command nix-store
+      check_command nix-collect-garbage
+      nix-store --gc && nix-collect-garbage -d
   }
 
   # Main function to handle input and execute corresponding action
   main() {
-      # shift
       item="$1"
       shift
 
       case "$item" in
-          make)
-              home_make "$@"
-              ;;
-          update)
-              home_update
-              ;;
-          upgrade)
-              home_update && home_make
-              ;;
-          generations)
-              home_list_generations "$@"
-              ;;
-          rollback)
-              home_rollback
-              ;;
-          gc)
-              home_gc
-              ;;
-          mkshell)
-              echo "${nixShell}" > shell.nix
-              ;;
-          secrets)
-              sops ${home}/.config/sops/secrets.yaml
-              ;;
+          ${caseStatements}
           *)
               display_help
               exit 1
