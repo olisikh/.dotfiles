@@ -17,6 +17,12 @@ let
       ""
       secrets;
 
+  loadYabaiScriptingAddition =
+    # if config.${namespace}.services.yabai.enable then
+      "sudo yabai --load-sa";
+    # else "";
+
+
   themes = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
     "repo" = "zsh-syntax-highlighting";
@@ -101,9 +107,9 @@ in
               alias ll="exa -alh"
               alias tree="exa --tree"
               alias h="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
-              alias avante='nvim -c "lua vim.defer_fn(function()require(\"avante.api\").zen_mode()end, 100)"'
 
               ${exportSecrets}
+              ${loadYabaiScriptingAddition}
 
               # overrides for work
               [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

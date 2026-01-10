@@ -4,11 +4,15 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.yabai;
-  yabaiPkg = pkgs.yabai;
 in
 {
   options.${namespace}.services.yabai = {
     enable = mkBoolOpt false "Enable yabai module";
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.yabai;
+      description = "Package to use for yabai window manager.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -66,6 +70,6 @@ in
       '';
     };
 
-    environment.systemPath = [ "${yabaiPkg}/bin" ];
+    environment.systemPath = [ "${cfg.package}/bin" ];
   };
 }

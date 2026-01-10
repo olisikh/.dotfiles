@@ -68,8 +68,8 @@
         };
       };
       # jdtls.enable = true;
-      kotlin_language_server.enable = true;
-      # kotlin-lsp = true; # NOTE: unavailable, not in nixpkgs
+      # kotlin_language_server.enable = true;
+      # kotlin-lsp = true; # NOTE: unavailable, not in nixpkgs, enabled manually in extra lua config
       pylsp.enable = true;
       # pylyzer.enable = true;
       terraformls.enable = true;

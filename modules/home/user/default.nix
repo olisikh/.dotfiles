@@ -20,12 +20,17 @@ in
     enable = mkBoolOpt true "Enable user programs";
     username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt types.str defaultHomeDir "The user's home directory";
+
     personal = {
       enable = mkBoolOpt false "Enable personal user programs";
     };
-  };
-  config = mkIf cfg.enable {
 
+    work = {
+      enable = mkBoolOpt false "Enable work user programs";
+    };
+  };
+
+  config = mkIf cfg.enable {
     home = {
       username = cfg.username;
       homeDirectory = cfg.home;

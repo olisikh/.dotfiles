@@ -14,20 +14,9 @@ in
     starship = enabled;
     git = enabled;
     yazi = enabled;
-    kotlin-lsp = disabled;
-    nixvim = {
-      enable = true;
-      plugins = {
-        avante = disabled;
-      };
-    };
+    nixvim = enabled;
     opencode = enabled;
-    user = {
-      enable = true;
-      personal = {
-        enable = true;
-      };
-    };
+    user.personal = enabled;
     sops = enabled;
   };
 }

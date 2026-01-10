@@ -26,21 +26,24 @@ in
         upgrade = false;
         cleanup = "zap";
       };
-      brews = [
-        "tccutil"
-      ];
+
       taps = [
         "homebrew/bundle"
         "homebrew/services"
       ];
 
+      brews = [
+        "tccutil"
+      ] ++ (optionals cfg.personal.enable [
+        "jetbrains/utils/kotlin-lsp"
+      ]);
+
       casks = (optionals cfg.common.enable [ "raycast" "betterdisplay" ]) ++
-        (optionals cfg.personal.enable [ "ollama-app" "vivaldi" "vlc" ]) ++
+        (optionals cfg.personal.enable [ "ollama-app" "vlc" ]) ++
         (optionals cfg.work.enable [
           # Add work-specific casks here
         ]);
     };
-
 
     environment.systemPath = mkIf cfg.common.enable [ "/opt/homebrew/bin" ];
   };
