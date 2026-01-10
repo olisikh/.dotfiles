@@ -40,6 +40,7 @@ in
         fd
         eza
         jq
+        stress
         zoxide
         bat
         pay-respects # thefuck alternative

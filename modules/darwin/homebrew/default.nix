@@ -26,6 +26,7 @@ in
         "betterdisplay"
         "ollama-app"
         "vivaldi"
+        "vlc"
       ];
       taps = [
         "homebrew/bundle"
