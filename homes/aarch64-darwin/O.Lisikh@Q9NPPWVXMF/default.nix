@@ -20,7 +20,7 @@ in
       enable = true;
       plugins = {
         avante = {
-          enable = true;
+          enable = false;
           provider = "ollama";
         };
       };

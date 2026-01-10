@@ -352,5 +352,6 @@
   ++ import ./keymaps/todo-comments.nix
   ++ import ./keymaps/treesj.nix
   ++ import ./keymaps/undotree.nix
-  ++ import ./keymaps/obsidian.nix;
+  ++ import ./keymaps/obsidian.nix
+  ++ import ./keymaps/opencode.nix;
 }

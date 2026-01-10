@@ -15,7 +15,12 @@ in
     git = enabled;
     yazi = enabled;
     kotlin-lsp = disabled;
-    nixvim = enabled;
+    nixvim = {
+      enable = true;
+      plugins = {
+        avante = disabled;
+      };
+    };
     opencode = enabled;
     user = enabled;
     sops = enabled;

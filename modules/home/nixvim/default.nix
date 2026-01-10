@@ -30,6 +30,10 @@ in
         };
       };
 
+      opencode = {
+        enable = mkBoolOpt true "Enable OpenCode plugin";
+      };
+
       obsidian = {
         enable = mkBoolOpt true "Enable Obsidian plugin";
       };
