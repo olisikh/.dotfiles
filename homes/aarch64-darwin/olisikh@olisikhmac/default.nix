@@ -22,7 +22,11 @@ in
       };
     };
     opencode = enabled;
-    user = enabled;
+    user = {
+      personal = {
+        enable = true;
+      };
+    };
     sops = enabled;
   };
 }
