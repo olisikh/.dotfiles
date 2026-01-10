@@ -7,6 +7,7 @@ in
     enable = cfg.enable;
     package = pkgs.vimPlugins.obsidian-nvim; # NOTE: my overlay is not used otherwise, need this line
     settings = {
+      legacy_commands = false;
       workspaces = [
         {
           name = "default";

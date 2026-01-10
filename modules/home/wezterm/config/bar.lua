@@ -326,7 +326,7 @@ wezterm.on("update-status", function(window, _pane)
 	window:set_left_status(leader .. mode .. divider)
 
 	if C.clock.enabled then
-		local time = wezterm.time.now():format(C.clock.format)
+		local time = wezterm.time.now():format(C.clock.format) .. " "
 		window:set_right_status(wezterm.format({
 			{ Background = { Color = palette.tab_bar.background } },
 			{ Foreground = { Color = palette.ansi[6] } },
