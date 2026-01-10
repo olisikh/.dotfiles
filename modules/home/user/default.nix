@@ -99,7 +99,6 @@ in
         bchunk
         dos2unix
 
-        opencode
         code-cursor
 
         brave

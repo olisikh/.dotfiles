@@ -16,6 +16,7 @@ in
     yazi = enabled;
     kotlin-lsp = disabled;
     nixvim = enabled;
+    opencode = enabled;
     user = enabled;
     sops = enabled;
   };
