@@ -29,22 +29,21 @@ sketchybar --add item spotify left \
 
 sketchybar --add item spotify.artwork popup.spotify \
 	--set spotify.artwork \
-	padding_left=10 \
-	padding_right=10 \
 	drawing=off \
 	background.image.drawing=off \
 	background.drawing=on \
 	background.color=0x00000000 \
+	background.image.scale=0.2 \
 	updates=on \
-	width=60 \
-	height=60
+	width=120
 
 # Add popup controls
 sketchybar --add item spotify.prev popup.spotify \
 	--set spotify.prev icon="󰒮 " \
 	icon.color="$COLOR" \
-	icon.width=20 \
-	icon.height=20 \
+	icon.width=40 \
+	icon.height=40 \
+	icon.font.size=20 \
 	label.drawing=off \
 	padding_left=10 \
 	padding_right=10 \
@@ -53,8 +52,9 @@ sketchybar --add item spotify.prev popup.spotify \
 sketchybar --add item spotify.play popup.spotify \
 	--set spotify.play icon="󰐊 " \
 	icon.color="$COLOR" \
-	icon.width=20 \
-	icon.height=20 \
+	icon.width=40 \
+	icon.height=40 \
+	icon.font.size=20 \
 	label.drawing=off \
 	padding_left=10 \
 	padding_right=10 \
@@ -63,8 +63,9 @@ sketchybar --add item spotify.play popup.spotify \
 sketchybar --add item spotify.next popup.spotify \
 	--set spotify.next icon="󰒭 " \
 	icon.color="$COLOR" \
-	icon.width=20 \
-	icon.height=20 \
+	icon.width=40 \
+	icon.height=40 \
+	icon.font.size=20 \
 	label.drawing=off \
 	padding_left=10 \
 	padding_right=10 \
