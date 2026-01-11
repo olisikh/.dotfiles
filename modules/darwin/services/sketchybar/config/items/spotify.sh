@@ -24,7 +24,7 @@ sketchybar --add item spotify left \
 	script="$PLUGIN_DIR/spotify.sh" \
 	popup.horizontal=on \
 	popup.align=center \
-	popup.height=70 \
+	popup.height=80 \
 	--subscribe spotify mouse.entered mouse.exited mouse.exited.global
 
 sketchybar --add item spotify.artwork popup.spotify \
@@ -33,9 +33,9 @@ sketchybar --add item spotify.artwork popup.spotify \
 	background.image.drawing=off \
 	background.drawing=on \
 	background.color=0x00000000 \
-	background.image.scale=0.2 \
+	background.image.scale=0.15 \
 	updates=on \
-	width=120
+	width=100
 
 # Add popup controls
 sketchybar --add item spotify.prev popup.spotify \
