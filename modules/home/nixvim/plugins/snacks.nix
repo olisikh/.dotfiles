@@ -1,8 +1,0 @@
-{ ... }:
-{
-  snacks = {
-    enable = true;
-
-    settings = { };
-  };
-}

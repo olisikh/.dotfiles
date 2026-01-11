@@ -38,7 +38,7 @@ sketchybar --bar height=30 \
 source "$ITEM_DIR/spaces.sh"
 source "$ITEM_DIR/front_app.sh"
 
-# Center (of notch)
+# Left
 source "$ITEM_DIR/spotify.sh"
 
 # Right
@@ -46,8 +46,12 @@ source "$ITEM_DIR/clock.sh"
 source "$ITEM_DIR/calendar.sh"
 source "$ITEM_DIR/battery.sh"
 source "$ITEM_DIR/volume.sh"
+source "$ITEM_DIR/pomodoro.sh"
+source "$ITEM_DIR/cron.sh"
 source "$ITEM_DIR/memory.sh"
 source "$ITEM_DIR/cpu.sh"
+source "$ITEM_DIR/caffeinate.sh"
+source "$ITEM_DIR/pomodoro.sh"
 
 #################### Finalizing Setup ####################
 

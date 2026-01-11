@@ -29,7 +29,10 @@ in
 
     snowfallorg.users.${userCfg.username}.home.config = {
       xdg.configFile = {
-        "sketchybar".source = ./config;
+        "sketchybar/sketchybarrc".source = ./config/sketchybarrc;
+        "sketchybar/variables.sh".source = ./config/variables.sh;
+        "sketchybar/items".source = ./config/items;
+        "sketchybar/plugins".source = ./config/plugins;
       };
     };
   };

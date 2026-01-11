@@ -4,11 +4,15 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.yabai;
-  yabaiPkg = pkgs.yabai;
 in
 {
   options.${namespace}.services.yabai = {
     enable = mkBoolOpt false "Enable yabai module";
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.yabai;
+      description = "Package to use for yabai window manager.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -51,6 +55,11 @@ in
       # 3. Reboot again
       enableScriptingAddition = true;
       extraConfig = ''
+        sudo ${pkgs.yabai}/bin/yabai --load-sa
+        ${pkgs.yabai}/bin/yabai -m signal --add event=dock_did_restart action="sudo ${pkgs.yabai}/bin/yabai --load-sa"
+
+        echo "yabai scripting addition loaded..."
+
         # apps to ignore
         yabai -m rule --add app="^System Preferences$" manage=off
         yabai -m rule --add app="^Archive Utility$" manage=off
@@ -59,10 +68,10 @@ in
         yabai -m rule --add app="^ClearVPN$" manage=off
         yabai -m rule --add app="^balenaEtcher$" manage=off
 
-        echo "yabai configuration loaded.."
+        echo "yabai configuration loaded..."
       '';
     };
 
-    environment.systemPath = [ "${yabaiPkg}/bin" ];
+    environment.systemPath = [ "${cfg.package}/bin" ];
   };
 }

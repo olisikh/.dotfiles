@@ -13,7 +13,6 @@
         lualine_x = [
           "harpoon2"
           "copilot"
-          "avante"
           "encoding"
           "filetype"
         ];

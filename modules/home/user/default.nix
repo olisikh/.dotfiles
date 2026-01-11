@@ -1,6 +1,6 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf types;
+  inherit (lib) mkIf types optionals;
   inherit (lib.${namespace}) mkOpt mkBoolOpt;
 
   cfg = config.${namespace}.user;
@@ -17,9 +17,17 @@ let
 in
 {
   options.${namespace}.user = with types; {
-    enable = mkBoolOpt false "Enable user programs";
+    enable = mkBoolOpt true "Enable user programs";
     username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt types.str defaultHomeDir "The user's home directory";
+
+    personal = {
+      enable = mkBoolOpt false "Enable personal user programs";
+    };
+
+    work = {
+      enable = mkBoolOpt false "Enable work user programs";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -30,88 +38,89 @@ in
       # don't ever change the stateversion value, it will break the state
       stateVersion = "25.05";
 
-      # the home.packages option allows you to install nix packages into your
-      # environment.
-      packages = with pkgs; [
-        nix-prefetch
-        bash
-        wget
-        nerd-fonts.jetbrains-mono
-        fd
-        eza
-        jq
-        stress
-        zoxide
-        bat
-        pay-respects # thefuck alternative
-        rustup
-        tree-sitter
-        luarocks-nix
-        minikube
-        k9s
-        kubectl
-        kubernetes-helm
-        kustomize
-        etcd
-        terraform
-        nodejs
-        pnpm
-        (yarn.override { nodejs = nodejs; })
-        go
-        jdk
-        kafkactl
-        awscli2
-        kcat
-        bun
-        stern # kubectl pod log scraping tool
-        htop
-        pngpaste
-        nodejs
-        scala
-        (sbt.override { jre = jdk; })
-        (metals.override { jre = jdk; })
-        kotlin
-        gradle
-        xdg-utils # open apps from console/neovim
-        wezterm
-        lazygit
-        lazydocker
-        gh
-        gnupg # tool for generating gpg keys
-        watch
-        (python3.withPackages (ps: with ps; [
-          pytest
-          debugpy
-        ]))
-        uv # python utility belt
-        obsidian
-        vscode
-        cmatrix
-        mkalias
-        pre-commit
+      packages = with pkgs;
+        [
+          nix-prefetch
+          bash
+          wget
+          nerd-fonts.jetbrains-mono
+          fd
+          eza
+          jq
+          stress
+          zoxide
+          bat
+          pay-respects # thefuck alternative
+          rustup
+          tree-sitter
+          luarocks-nix
+          minikube
+          k9s
+          kubectl
+          kubernetes-helm
+          kustomize
+          etcd
+          terraform
+          nodejs
+          pnpm
+          (yarn.override { nodejs = nodejs; })
+          go
+          jdk
+          kafkactl
+          awscli2
+          kcat
+          bun
+          stern # kubectl pod log scraping tool
+          htop
+          pngpaste
+          scala
+          (sbt.override { jre = jdk; })
+          (metals.override { jre = jdk; })
+          kotlin
+          gradle
+          xdg-utils # open apps from console/neovim
+          wezterm
+          lazygit
+          lazydocker
+          gh
+          gnupg # tool for generating gpg keys
+          watch
+          (python3.withPackages (ps: with ps; [
+            pytest
+            debugpy
+          ]))
+          uv # python utility belt
+          mkalias
+          pre-commit
 
-        age
-        sops
+          age
+          sops
 
-        tflint
-        esbuild
+          tflint
+          esbuild
 
-        bchunk
-        dos2unix
+          bchunk
+          dos2unix
 
-        code-cursor
+          (writeShellScriptBin "home" (import ./script.nix {
+            inherit config namespace lib;
+            home = cfg.home;
+          }))
+        ] ++
+        (optionals cfg.personal.enable [
+          code-cursor
+          brave
+          bitwarden-desktop
+          antigravity
+          obsidian
+          vscode
+          cmatrix
+          (pulumi.withPackages (ps: with ps; [
+            pulumi-nodejs
+          ]))
+        ]);
 
-        brave
-        bitwarden-desktop
-
-        (pulumi.withPackages (ps: with ps; [
-          pulumi-nodejs
-        ]))
-
-        (writeShellScriptBin "home" (import ./script.nix { home = cfg.home; }))
-      ];
-
-      sessionVariables = {
+      sessionVariables = mkIf cfg.personal.enable {
         SCALA_HOME = scala;
         SCALA_CLI_POWER = "true";
         JAVA_HOME = jdk;

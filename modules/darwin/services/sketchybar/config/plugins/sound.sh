@@ -6,15 +6,12 @@ MUTED=$(osascript -e "output muted of (get volume settings)")
 if [ "$MUTED" != "false" ]; then
 	ICON="󰖁"
 	VOLUME=0
+elif [ "$VOLUME" -le 33 ]; then
+	ICON=" "
 else
-	case ${VOLUME} in
-	100) ICON="" ;;
-	[5-9]*) ICON="" ;;
-	[0-9]*) ICON="" ;;
-	*) ICON="" ;;
-	esac
+	ICON=" "
 fi
-
 sketchybar -m \
-	--set "$NAME" icon=$ICON \
-	--set "$NAME" label="$VOLUME%"
+	--set "$NAME" \
+	icon="$ICON" \
+	label="$VOLUME%"

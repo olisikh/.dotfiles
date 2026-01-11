@@ -9,6 +9,7 @@ sketchybar \
 	icon.padding_left=10 \
 	label.color="$COLOR" \
 	label.padding_right=10 \
+	label.width=45 \
 	background.height=26 \
 	background.corner_radius="$CORNER_RADIUS" \
 	background.padding_right=5 \

@@ -2,7 +2,7 @@
 let
   inherit (lib.${namespace}) enabled disabled;
 
-  userCfg = config.${namespace}.user;
+  userCfg = config.${namespace}.user.common;
 in
 {
   olisikh = {
@@ -19,13 +19,11 @@ in
     nixvim = {
       enable = true;
       plugins = {
-        avante = {
-          enable = false;
-          provider = "ollama";
-        };
+        opencode = disabled;
+        obsidian = disabled;
       };
     };
-    user = enabled;
+    user.work = enabled;
     sops = {
       enable = true;
       sshKeyPaths = [

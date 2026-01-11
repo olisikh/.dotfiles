@@ -40,24 +40,12 @@ let
     };
     dependencies = with pkgs.vimPlugins; [ nvim-dap ];
   });
-
-  avante-lualine = (pkgs.vimUtils.buildVimPlugin {
-    name = "avante-lualine";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "avante-lualine.nvim";
-      rev = "v0.1";
-      hash = "sha256-InmNypercX05eXtxexnJ6m1Ad/TaLsREDUF2tIpNiBg=";
-    };
-    dependencies = with pkgs.vimPlugins; [ avante-nvim lualine-nvim ];
-  });
 in
 with pkgs.vimPlugins; [
   nvim-metals
   nvim-jdtls
   copilot-lualine
   fzf-lua
-  avante-lualine
   harpoon2
   harpoon-lualine
   nvim-dap-kotlin

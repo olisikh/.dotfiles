@@ -25,8 +25,6 @@ lib.foldl' (acc: plugin: acc // importPlugin plugin) {} [
   ./plugins/copilot-lua.nix
   ./plugins/todo-comments.nix
   ./plugins/colorizer.nix
-  ./plugins/avante.nix
-  ./plugins/snacks.nix
   ./plugins/opencode.nix
   ./plugins/obsidian.nix
   ./plugins/luasnip.nix
@@ -52,4 +50,5 @@ lib.foldl' (acc: plugin: acc // importPlugin plugin) {} [
   lazygit.enable = true;
   treesj.enable = true;
   lazydev.enable = true;
+  snacks.enable = true;
 }

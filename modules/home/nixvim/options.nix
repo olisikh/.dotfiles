@@ -65,7 +65,6 @@
       # eol = "↲";
     };
 
-    # NOTE: Avante says: views can only be fully collapsed with the global statusline
     laststatus = 3;
   };
 }
