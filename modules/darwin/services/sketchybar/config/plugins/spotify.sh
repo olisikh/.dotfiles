@@ -44,19 +44,22 @@ case "$SENDER" in
 	# Set album art
 	if [ -n "$ARTWORK_URL" ]; then
 		ARTWORK_FILE="/tmp/spotify_artwork.jpg"
-		echo "$(date): Downloading $ARTWORK_URL to $ARTWORK_FILE" >>"$LOG_FILE"
-		curl -s "$ARTWORK_URL" -o "$ARTWORK_FILE"
-		echo "$(date): Curl exit code: $?" >>"$LOG_FILE"
+		
+		LAST_URL_FILE="/tmp/spotify_last_url"
+		LAST_URL=$(cat "$LAST_URL_FILE" 2>/dev/null)
+
+		if [ "$ARTWORK_URL" != "$LAST_URL" ] || [ ! -f "$ARTWORK_FILE" ]; then
+			echo "$(date): Downloading new artwork..." >>"$LOG_FILE"
+			curl -s "$ARTWORK_URL" -o "$ARTWORK_FILE"
+			echo "$ARTWORK_URL" > "$LAST_URL_FILE"
+		fi
 
 		if [ -f "$ARTWORK_FILE" ] && [ -s "$ARTWORK_FILE" ]; then
-			echo "$(date): Setting image to $ARTWORK_FILE" >>"$LOG_FILE"
 			sketchybar --set spotify.artwork background.image="$ARTWORK_FILE" drawing=on background.image.drawing=on
 		else
-			echo "$(date): File not found or empty" >>"$LOG_FILE"
 			sketchybar --set spotify.artwork drawing=off background.image.drawing=off
 		fi
 	else
-		echo "$(date): No artwork URL" >>"$LOG_FILE"
 		sketchybar --set spotify.artwork drawing=off background.image.drawing=off
 	fi
 	;;
