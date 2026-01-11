@@ -111,6 +111,7 @@ in
           code-cursor
           brave
           bitwarden-desktop
+          antigravity
           obsidian
           vscode
           cmatrix

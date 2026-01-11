@@ -17,11 +17,6 @@ let
       ""
       secrets;
 
-  loadYabaiScriptingAddition =
-    # if config.${namespace}.services.yabai.enable then
-      "sudo yabai --load-sa";
-    # else "";
-
 
   themes = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
@@ -109,7 +104,6 @@ in
               alias h="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
 
               ${exportSecrets}
-              ${loadYabaiScriptingAddition}
 
               # overrides for work
               [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

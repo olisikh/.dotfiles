@@ -7,39 +7,41 @@ This file provides essential information for AI coding agents working in this Ni
 ### Build Commands
 - **Full system build**: `nix build .#darwinConfigurations.${HOSTNAME}.system --show-trace --print-build-logs -vvv`
   - Builds the complete Darwin system configuration
-  - Use `--show-trace` for detailed error logs
+  - Replace `${HOSTNAME}` with actual hostname (e.g., olisikhmac)
 - **Apply configuration**: `./result/sw/bin/darwin-rebuild switch --flake .`
-  - Switches to the new system configuration
-  - Requires sudo for system-level changes
+  - Switches to the new system configuration (requires sudo)
+- **Quick install**: `./install.sh` - Convenience script for build + switch
+- **Validate flake**: `nix flake check` - Verify flake outputs and checks
 - **Uninstall home-manager**: `home-manager uninstall`
-  - Removes all home-manager managed packages
 
-### Lint/Test Commands
-This repository uses Neovim plugins for linting and formatting rather than standalone scripts:
+### Linting Commands (via lint.nvim)
+- **JavaScript/TypeScript/JSON**: `eslint_d`
+- **YAML**: `yamllint`
+- **Python**: `pylint`
+- **Dockerfile**: `hadolint`
+- **Terraform**: `tflint`
+- **Java**: `checkstyle`
+- **Shell**: `shellcheck` (via LSP)
 
-- **Linting**: Via `lint.nvim` plugin with language-specific linters:
-  - JavaScript/TypeScript: `eslint_d`
-  - YAML: `yamllint`
-  - Python: `pylint`
-  - Terraform: `tflint`
-  - Shell: `shellcheck`
-- **Formatting**: Via `conform-nvim` plugin:
-  - JavaScript/TypeScript: `prettierd`
-  - Python: `black` (with `isort` for imports)
-  - Rust: `rustfmt`
-  - Nix: `nixpkgs_fmt`
-  - Lua: `stylua`
-- **Diagnostics and Code Actions**: Via `none-ls`:
-  - Nix: `statix` for diagnostics
-  - Spelling: `codespell`
-- **Additional Tools**: Available via Nix packages:
-  - `hadolint` (Dockerfile linting)
-  - `checkstyle` (Java)
-  - `shfmt` (Shell formatting)
-  - `ktlint` (Kotlin)
-  - `google-java-format` (Java)
+### Formatting Commands (via conform-nvim)
+- **Nix**: `nixpkgs_fmt`
+- **Lua**: `stylua`
+- **Python**: `isort` (imports), `black`
+- **Rust**: `rustfmt`
+- **Shell**: `shfmt`
+- **Go**: `goimports`, `gofumpt`
+- **Scala**: `scalafmt`
+- **Java**: `google-java-format`
+- **Kotlin**: `ktlint`
+- **Terraform**: `terraform_fmt`
+- **JSON**: `jq`
+- **JavaScript/TypeScript**: `prettierd` (fallback from LSP)
 
-No dedicated test runner exists; manual testing via Nix builds.
+### Diagnostics & Code Actions (via none-ls)
+- **Nix**: `statix` - Code actions for improvements
+- **Spelling**: `codespell`
+
+No automated test suite; verify changes via `./install.sh` and manual testing.
 
 ## Code Style Guidelines
 

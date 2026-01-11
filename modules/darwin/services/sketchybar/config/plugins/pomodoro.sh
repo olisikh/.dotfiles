@@ -26,7 +26,7 @@ timer_start() {
 		while [ "$time_left" -gt 0 ]; do
 			local minutes=$((time_left / 60))
 			local seconds=$((time_left % 60))
-			sketchybar --set "timer" label="$(printf "%02d:%02d" "$minutes" "$seconds")"
+			sketchybar --set "timer" label="$(printf "%02d:%02d" "$minutes" "$seconds")" label.drawing=on
 			sleep 1
 			time_left=$((time_left - 1))
 		done
@@ -38,14 +38,14 @@ timer_start() {
 			while [ "$time_left" -gt 0 ]; do
 				minutes=$((time_left / 60))
 				seconds=$((time_left % 60))
-				sketchybar --set "timer" label="$(printf "%02d:%02d" "$minutes" "$seconds")"
+				sketchybar --set "timer" label="$(printf "%02d:%02d" "$minutes" "$seconds")" label.drawing=on
 				sleep 1
 				time_left=$((time_left - 1))
 			done
 		fi
 
 		afplay "$SOUNDS_PATH/GuideSuccess.aiff"
-		sketchybar --set "timer" icon=🍅 label.color="$COLOR" label="Pomodoro"
+		sketchybar --set "timer" icon=🍅 label.color="$COLOR" label.drawing=off 
 		rm -f "$COOLDOWN_FILE"
 	) &
 	printf "%s\n" "$!" >"$COUNTDOWN_PID_FILE"
@@ -61,7 +61,7 @@ timer_stop() {
 		fi
 		rm -f "$COUNTDOWN_PID_FILE"
 	fi
-	sketchybar --set "timer" icon=🍅 label.color="$COLOR" label="Pomodoro"
+	sketchybar --set "timer" icon=🍅 label.color="$COLOR" label.drawing=off 
 	rm -f "$COOLDOWN_FILE"
 }
 
@@ -92,7 +92,7 @@ stop_countdown() {
 		fi
 		rm -f "$COUNTDOWN_PID_FILE"
 	fi
-	sketchybar --set "timer" icon=🍅 label.color="$COLOR" label="Pomodoro"
+	sketchybar --set "timer" icon=🍅 label.color="$COLOR" label.drawing=off 
 	rm -f "$COOLDOWN_FILE"
 }
 
