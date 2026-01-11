@@ -38,7 +38,7 @@ sketchybar --bar height=30 \
 source "$ITEM_DIR/spaces.sh"
 source "$ITEM_DIR/front_app.sh"
 
-# Center (of notch)
+# Left
 source "$ITEM_DIR/spotify.sh"
 
 # Right
