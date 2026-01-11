@@ -18,43 +18,47 @@ sketchybar --add item spotify left \
 	label.padding_right=10 \
 	label.max_chars=43 \
 	associated_display=active \
-	updates=interval \
+	updates=on \
 	update_freq=5 \
 	script="$PLUGIN_DIR/spotify.sh" \
 	popup.horizontal=on \
 	popup.align=center \
+	popup.height=60 \
 	--subscribe spotify mouse.entered mouse.exited mouse.exited.global
+
+sketchybar --set spotify.artwork image="$ARTWORK_FILE" drawing=on \
+	padding_lift=10 \
+	padding_right=10 \
+	drawing=off \
+	updates=on
 
 # Add popup controls
 sketchybar --add item spotify.prev popup.spotify \
 	--set spotify.prev icon="󰒮 " \
 	icon.color="$COLOR" \
+	icon.width=20 \
+	icon.height=20 \
 	label.drawing=off \
-	background.drawing=on \
-	background.color="$BAR_COLOR" \
-	background.border_color="$COLOR" \
-	background.border_width=1 \
-	background.corner_radius=5 \
+	padding_left=10 \
+	padding_right=10 \
 	click_script="osascript -e 'tell application \"Spotify\" to previous track' && $PLUGIN_DIR/spotify.sh"
 
 sketchybar --add item spotify.play popup.spotify \
 	--set spotify.play icon="󰐊 " \
 	icon.color="$COLOR" \
+	icon.width=20 \
+	icon.height=20 \
 	label.drawing=off \
-	background.drawing=on \
-	background.color="$BAR_COLOR" \
-	background.border_color="$COLOR" \
-	background.border_width=1 \
-	background.corner_radius=5 \
+	padding_left=10 \
+	padding_right=10 \
 	click_script="osascript -e 'tell application \"Spotify\" to playpause' && $PLUGIN_DIR/spotify.sh"
 
 sketchybar --add item spotify.next popup.spotify \
 	--set spotify.next icon="󰒭 " \
 	icon.color="$COLOR" \
+	icon.width=20 \
+	icon.height=20 \
 	label.drawing=off \
-	background.drawing=on \
-	background.color="$BAR_COLOR" \
-	background.border_color="$COLOR" \
-	background.border_width=1 \
-	background.corner_radius=5 \
+	padding_left=10 \
+	padding_right=10 \
 	click_script="osascript -e 'tell application \"Spotify\" to next track' && $PLUGIN_DIR/spotify.sh"

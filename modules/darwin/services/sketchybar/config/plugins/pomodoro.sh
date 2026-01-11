@@ -119,14 +119,12 @@ if [ "$SENDER" = "mouse.clicked" ]; then
 fi
 
 case "$SENDER" in
-"mouse.entered")
-	echo "$(date): Mouse entered $NAME" >> "$LOG_FILE"
-	sketchybar --set "$NAME" label.color="$COLOR" background.color="$POMODORO_HIGHLIGHT_COLOR"
-	sketchybar --set "timer" popup.drawing=on
-	;;
-"mouse.exited" | "mouse.exited.global")
-	echo "$(date): Mouse exited $NAME" >> "$LOG_FILE"
-	sketchybar --set "$NAME" label.color="$COLOR" background.color="$BAR_COLOR"
-	sketchybar --set "timer" popup.drawing=off
+	"mouse.entered")
+		sketchybar --set "$NAME" background.color="$POMODORO_HIGHLIGHT_COLOR"
+		sketchybar --set "timer" popup.drawing=on
+		;;
+	"mouse.exited" | "mouse.exited.global")
+		sketchybar --set "$NAME" background.color="$BAR_COLOR"
+		sketchybar --set "timer" popup.drawing=off
 	;;
 esac

@@ -45,6 +45,7 @@ for timer in "5" "15" "25" "50" "cancel"; do
         --set "$NAME" label="$label" \
         padding_left=16 \
         padding_right=16 \
-        --subscribe "$NAME" mouse.clicked mouse.entered mouse.exited mouse.exited.global \
-        click_script="$HOME/.config/sketchybar/plugins/pomodoro.sh $duration; sketchybar -m --set timer popup.drawing=off"
+        click_script="$HOME/.config/sketchybar/plugins/pomodoro.sh $duration; 
+    
+    sketchybar -m --set timer popup.drawing=off"
 done
