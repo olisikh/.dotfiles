@@ -10,8 +10,10 @@ This file provides essential information for AI coding agents working in this Ni
   - Replace `${HOSTNAME}` with actual hostname (e.g., olisikhmac)
 - **Apply configuration**: `./result/sw/bin/darwin-rebuild switch --flake .`
   - Switches to the new system configuration (requires sudo)
-- **Quick install**: `./install.sh` - Convenience script for build + switch
-- **Validate flake**: `nix flake check` - Verify flake outputs and checks
+- **Quick install**: `./install.sh`
+  - Convenience script for build + switch
+- **Validate flake**: `nix flake check`
+  - Verify flake outputs, checks, and CI integrations
 - **Uninstall home-manager**: `home-manager uninstall`
 
 ### Linting Commands (via lint.nvim)
@@ -37,76 +39,69 @@ This file provides essential information for AI coding agents working in this Ni
 - **JSON**: `jq`
 - **JavaScript/TypeScript**: `prettierd` (fallback from LSP)
 
-### Diagnostics & Code Actions (via none-ls)
-- **Nix**: `statix` - Code actions for improvements
-- **Spelling**: `codespell`
+### Test Commands
+- **Python**: `pytest path/to/test_file.py::test_name -q` or `pytest -q`
+- **JavaScript/TypeScript**: `npm test -- path/to/test.spec.ts` or `yarn test path/to/test.spec.ts`
+- **Lua/Neovim (Neotest)**: 
+  ```bash
+  nvim --headless -c 'lua require("neotest").run.run({vim.fn.expand("%")})' -c 'qa!'
+  ```
+- **Rust**: `cargo test test_name` (run a single test)
+- **Go**: `go test ./path/to/package -run TestName`
+- **Nix Flake tests**: `nix flake check`
+- To run a single Nix-defined test: `nix test .#<testName>`
 
-No automated test suite; verify changes via `./install.sh` and manual testing.
+### Diagnostics & Code Actions (via none-ls)
+- **Nix**: `statix` - provides code actions and fixes
+- **Spelling**: `codespell`
 
 ## Code Style Guidelines
 
 ### General Principles
 - Follow existing patterns in the codebase
 - Prioritize readability and maintainability
-- Use tools/plugins for consistent formatting
+- Use tooling and plugins for consistent formatting
 
 ### Imports
 - **Nix files**: Use `inherit (lib) mkIf mkOption types;` for common functions
-  - Namespace custom imports: `lib.${namespace}`
+  - Namespace custom imports as `lib.${namespace}`
   - Group related imports together
-- **Lua files**: Use `require('module')` for imports
-  - Localize requires at top of file: `local module = require('module')`
+- **Lua files**: Use `require("module")`
+  - Localize requires at the top: `local module = require("module")`
 
 ### Formatting
 - **Indentation**: 2 spaces (no tabs)
   - Expand tabs to spaces automatically
-- **Line Length**: ~120 characters
-  - Colorcolumn set to "121" in Neovim config
-- **Whitespace**: Trim trailing whitespace
-  - List characters configured but disabled by default
-- **Language-Specific**:
-  - **Nix**: Multi-line lists/attrs with consistent indentation
-    - Sort packages alphabetically where possible
-    - Use `mkIf` for conditional blocks
-  - **Lua**: Consistent 2-space indentation
-    - Use double quotes for strings unless escaping required
+- **Line length**: ~120 characters (colorcolumn set to 121)
+- **Trailing whitespace**: remove
+- **Language-specific**:
+  - **Nix**: Multi-line lists/attributes with consistent indentation; sort packages alphabetically; use `mkIf` for conditionals
+  - **Lua**: 2-space indentation; double quotes for strings unless escaping
 
 ### Types
-- **Nix**: Strict typing required
-  - Use `types.str`, `types.bool`, `types.int`, etc.
-  - Define options with `mkOpt` helper
-  - Avoid `types.any` unless necessary
-- **Lua**: Dynamic typing
-  - Use local variables consistently
-  - Type hints via comments if complex
+- **Nix**: Strict typing; use `types.str`, `types.bool`, `types.int`, etc.; define options via `mkOpt`; avoid `types.any`
+- **Lua**: Dynamic typing; use local variables; annotate complex logic with comments
 
 ### Naming Conventions
-- **Nix**: camelCase for variables and functions
-  - Options use snake_case: `enable`, `nightly`, `extra_packages`
-  - Module names: descriptive, e.g., `modules/home/git/default.nix`
-- **Lua**: camelCase for variables and functions
-  - Examples: `copy_file`, `folder_exists`
-  - Plugin configs: follow plugin naming
+- **Nix**: camelCase for variables/functions; snake_case for option names (`enable`, `extra_packages`);
+  modules should be descriptive (e.g., `modules/home/git/default.nix`)
+- **Lua**: camelCase for variables/functions; plugin configs follow plugin naming (e.g., `copy_file`)
 
 ### Error Handling
-- **Nix**: Use `mkIf` for conditional configuration
-  - Asserts for critical validation: `assert condition "message";`
-  - Graceful degradation with `mkIf`
-- **Lua**: Use `assert()` for error checking
-  - File operations: check return values
-  - Notify for warnings: `vim.notify("message", vim.log.levels.WARN)`
+- **Nix**: Use `mkIf` for conditional configuration; assert critical invariants with `assert condition "message"`;
+  graceful degradation via `mkIf`
+- **Lua**: Use `assert()` for runtime checks; inspect return values in file ops; warn via `vim.notify(..., vim.log.levels.WARN)`
 
-### Comments and Documentation
-- **Nix**: `# NOTE:`, `# TODO:`, `# WARN:` prefixes
-- **Lua**: `-- NOTE:`, `-- TODO:`, `-- WARN:` prefixes
-- Keep comments concise and actionable
-- Document complex logic or non-obvious decisions
+### Comments & Documentation
+- **Nix**: Prefix with `# NOTE:`, `# TODO:`, `# WARN:`
+- **Lua**: Prefix with `-- NOTE:`, `-- TODO:`, `-- WARN:`
+- Keep comments concise and actionable; document non-obvious logic
 
-### Booleans and Values
-- Use `true`/`false` consistently
+### Booleans & Values
+- Consistently use `true`/`false`
 - Prefer double quotes for strings
-- Lists/arrays: one item per line for readability
-- Functions: local in Lua, concise in Nix
+- List elements one-per-line for readability
+- Define helper functions as `local` in Lua
 
 ### File Organization
 - Follow existing directory structure
@@ -114,9 +109,9 @@ No automated test suite; verify changes via `./install.sh` and manual testing.
 - Use descriptive filenames
 
 ## Cursor/Copilot Rules
-No existing Cursor or Copilot rules found in this repository.
+No existing Cursor or Copilot rules detected in this repository.
 - No `.cursor/rules/` directory
 - No `.cursorrules` file
 - No `.github/copilot-instructions.md` file
 
-If adding rules in the future, place them in the appropriate locations and update this section.
+If adding rules in the future, place them in the appropriate location and update this section.
