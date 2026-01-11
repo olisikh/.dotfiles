@@ -12,12 +12,10 @@ sketchybar --add item wallet right \
 	background.corner_radius="$CORNER_RADIUS" \
 	background.border_width="$BORDER_WIDTH" \
 	background.border_color="$COLOR" \
-	background.padding_right=-5 \
+	background.padding_right=5 \
 	background.drawing=on \
 	label.padding_right=10 \
 	label.max_chars=30 \
 	updates=on \
 	update_freq=300 \
-	environment.OPENROUTER_API_KEY="$OPENROUTER_API_KEY" \
-	environment.OPENCODE_API_KEY="$OPENCODE_API_KEY" \
 	script="$PLUGIN_DIR/wallet.sh"

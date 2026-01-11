@@ -18,7 +18,6 @@ in
         sops
         age
         jq
-        yq
         sketchybar-app-font
       ];
     };
