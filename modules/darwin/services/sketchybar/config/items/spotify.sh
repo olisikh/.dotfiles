@@ -52,8 +52,7 @@ sketchybar --add item spotify.prev popup.spotify \
 	background.height=50 \
 	background.corner_radius=25 \
 	script="$PLUGIN_DIR/spotify_controls.sh" \
-	--subscribe spotify.prev mouse.entered mouse.exited \
-	click_script="osascript -e 'tell application \"Spotify\" to previous track' && $PLUGIN_DIR/spotify.sh"
+	--subscribe spotify.prev mouse.entered mouse.exited mouse.clicked
 
 sketchybar --add item spotify.play popup.spotify \
 	--set spotify.play icon="󰐊 " \
@@ -69,8 +68,7 @@ sketchybar --add item spotify.play popup.spotify \
 	background.height=50 \
 	background.corner_radius=25 \
 	script="$PLUGIN_DIR/spotify_controls.sh" \
-	--subscribe spotify.play mouse.entered mouse.exited \
-	click_script="osascript -e 'tell application \"Spotify\" to playpause' && $PLUGIN_DIR/spotify.sh"
+	--subscribe spotify.play mouse.entered mouse.exited mouse.clicked
 
 sketchybar --add item spotify.next popup.spotify \
 	--set spotify.next icon="󰒭 " \
@@ -86,5 +84,4 @@ sketchybar --add item spotify.next popup.spotify \
 	background.height=50 \
 	background.corner_radius=25 \
 	script="$PLUGIN_DIR/spotify_controls.sh" \
-	--subscribe spotify.next mouse.entered mouse.exited \
-	click_script="osascript -e 'tell application \"Spotify\" to next track' && $PLUGIN_DIR/spotify.sh"
+	--subscribe spotify.next mouse.entered mouse.exited mouse.clicked

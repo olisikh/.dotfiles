@@ -10,4 +10,17 @@ case "$SENDER" in
 "mouse.exited")
 	sketchybar --set "$NAME" background.color="$TRANSPARENT"
 	;;
+"mouse.clicked")
+	case "$NAME" in
+	"spotify.prev")
+		osascript -e 'tell application "Spotify" to previous track' && "$PLUGIN_DIR/spotify.sh"
+		;;
+	"spotify.play")
+		osascript -e 'tell application "Spotify" to playpause' && "$PLUGIN_DIR/spotify.sh"
+		;;
+	"spotify.next")
+		osascript -e 'tell application "Spotify" to next track' && "$PLUGIN_DIR/spotify.sh"
+		;;
+	esac
+	;;
 esac
