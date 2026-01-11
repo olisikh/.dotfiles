@@ -41,16 +41,16 @@ sketchybar --add item spotify.artwork popup.spotify \
 sketchybar --add item spotify.prev popup.spotify \
 	--set spotify.prev icon="󰒮 " \
 	icon.color="$COLOR" \
-	icon.width=40 \
-	icon.height=40 \
-	icon.font.size=20 \
+	icon.font.size=25 \
 	label.drawing=off \
-	padding_left=30 \
+	padding_left=20 \
 	padding_right=10 \
+	width=50 \
+	align=center \
 	background.drawing=on \
 	background.color=0x00000000 \
-	background.height=30 \
-	background.corner_radius=10 \
+	background.height=50 \
+	background.corner_radius=25 \
 	script="$PLUGIN_DIR/spotify_controls.sh" \
 	--subscribe spotify.prev mouse.entered mouse.exited \
 	click_script="osascript -e 'tell application \"Spotify\" to previous track' && $PLUGIN_DIR/spotify.sh"
@@ -58,16 +58,16 @@ sketchybar --add item spotify.prev popup.spotify \
 sketchybar --add item spotify.play popup.spotify \
 	--set spotify.play icon="󰐊 " \
 	icon.color="$COLOR" \
-	icon.width=40 \
-	icon.height=40 \
-	icon.font.size=20 \
+	icon.font.size=25 \
 	label.drawing=off \
 	padding_left=10 \
 	padding_right=10 \
+	width=50 \
+	align=center \
 	background.drawing=on \
 	background.color=0x00000000 \
-	background.height=30 \
-	background.corner_radius=10 \
+	background.height=50 \
+	background.corner_radius=25 \
 	script="$PLUGIN_DIR/spotify_controls.sh" \
 	--subscribe spotify.play mouse.entered mouse.exited \
 	click_script="osascript -e 'tell application \"Spotify\" to playpause' && $PLUGIN_DIR/spotify.sh"
@@ -75,16 +75,16 @@ sketchybar --add item spotify.play popup.spotify \
 sketchybar --add item spotify.next popup.spotify \
 	--set spotify.next icon="󰒭 " \
 	icon.color="$COLOR" \
-	icon.width=40 \
-	icon.height=40 \
-	icon.font.size=20 \
+	icon.font.size=25 \
 	label.drawing=off \
 	padding_left=10 \
 	padding_right=10 \
+	width=50 \
+	align=center \
 	background.drawing=on \
 	background.color=0x00000000 \
-	background.height=30 \
-	background.corner_radius=10 \
+	background.height=50 \
+	background.corner_radius=25 \
 	script="$PLUGIN_DIR/spotify_controls.sh" \
 	--subscribe spotify.next mouse.entered mouse.exited \
 	click_script="osascript -e 'tell application \"Spotify\" to next track' && $PLUGIN_DIR/spotify.sh"
