@@ -43,10 +43,15 @@ for timer in "5" "15" "25" "50" "cancel"; do
 
     sketchybar --add item "$NAME" popup.timer \
         --set "$NAME" label="$label" \
-        padding_left=16 \
-        padding_right=16 \
+        icon.drawing=off \
+        width=110 \
+        align=center \
+        padding_left=5 \
+        padding_right=5 \
         background.color="$POPUP_BACKGROUND_COLOR" \
         background.drawing=on \
+        background.height=30 \
+        background.corner_radius=5 \
         click_script="$HOME/.config/sketchybar/plugins/pomodoro.sh $duration; 
     
     sketchybar -m --set timer popup.drawing=off" \
