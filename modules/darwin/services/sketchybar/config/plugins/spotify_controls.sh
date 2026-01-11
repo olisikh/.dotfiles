@@ -18,8 +18,16 @@ case "$SENDER" in
 		"$PLUGIN_DIR/spotify.sh"
 		;;
 	"spotify.play")
+		# Optimistic update
+		CURRENT_ICON=$(sketchybar --query spotify.play | jq -r '.icon.value')
+		if [ "$CURRENT_ICON" = "󰐊 " ]; then
+			sketchybar --set spotify.play icon="󰏤 "
+		else
+			sketchybar --set spotify.play icon="󰐊 "
+		fi
+		
 		osascript -e 'tell application "Spotify" to playpause'
-		sleep 0.2
+		sleep 0.5
 		"$PLUGIN_DIR/spotify.sh"
 		;;
 	"spotify.next")
