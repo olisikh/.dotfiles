@@ -14,7 +14,7 @@ case "$SENDER" in
 	# Check if Spotify is running
 	if ! pgrep -x "Spotify" >/dev/null; then
 		echo "$(date): Spotify not running" >>"$LOG_FILE"
-		sketchybar --set "$NAME" drawing=off
+		sketchybar --set spotify drawing=off
 		exit 0
 	fi
 
@@ -29,7 +29,7 @@ case "$SENDER" in
 	if [ "$STATE" = "playing" ] || [ "$STATE" = "paused" ]; then
 		MEDIA="$TITLE - $ARTIST"
 		echo "$(date): Setting label to: $MEDIA" >>"$LOG_FILE"
-		sketchybar --set "$NAME" label="$MEDIA" drawing=on
+		sketchybar --set spotify label="$MEDIA" drawing=on
 
 		# Update play button icon
 		if [ "$STATE" = "playing" ]; then
@@ -39,7 +39,7 @@ case "$SENDER" in
 		fi
 	else
 		echo "$(date): Hiding widget (STATE: $STATE)" >>"$LOG_FILE"
-		sketchybar --set "$NAME" drawing=off background.image.drawing=off
+		sketchybar --set spotify drawing=off background.image.drawing=off
 	fi
 	# Set album art
 	if [ -n "$ARTWORK_URL" ]; then
