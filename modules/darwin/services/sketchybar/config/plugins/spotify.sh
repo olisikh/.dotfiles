@@ -39,7 +39,7 @@ case "$SENDER" in
 		fi
 	else
 		echo "$(date): Hiding widget (STATE: $STATE)" >>"$LOG_FILE"
-		sketchybar --set "$NAME" drawing=off
+		sketchybar --set "$NAME" drawing=off background.image.drawing=off
 	fi
 	# Set album art
 	if [ -n "$ARTWORK_URL" ]; then
@@ -50,14 +50,14 @@ case "$SENDER" in
 
 		if [ -f "$ARTWORK_FILE" ] && [ -s "$ARTWORK_FILE" ]; then
 			echo "$(date): Setting image to $ARTWORK_FILE" >>"$LOG_FILE"
-			sketchybar --set spotify.artwork image="$ARTWORK_FILE" drawing=on
+			sketchybar --set spotify.artwork background.image="$ARTWORK_FILE" drawing=on background.image.drawing=on
 		else
 			echo "$(date): File not found or empty" >>"$LOG_FILE"
-			sketchybar --set spotify.artwork drawing=off
+			sketchybar --set spotify.artwork drawing=off background.image.drawing=off
 		fi
 	else
 		echo "$(date): No artwork URL" >>"$LOG_FILE"
-		sketchybar --set spotify.artwork drawing=off
+		sketchybar --set spotify.artwork drawing=off background.image.drawing=off
 	fi
 	;;
 esac

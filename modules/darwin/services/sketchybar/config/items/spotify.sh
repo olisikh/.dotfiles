@@ -5,6 +5,7 @@ COLOR="$GREEN"
 sketchybar --add item spotify left \
 	--set spotify \
 	scroll_texts=on \
+	scroll_duration=99 \
 	icon="󰎆 " \
 	icon.color="$COLOR" \
 	icon.padding_left=10 \
@@ -23,14 +24,20 @@ sketchybar --add item spotify left \
 	script="$PLUGIN_DIR/spotify.sh" \
 	popup.horizontal=on \
 	popup.align=center \
-	popup.height=60 \
+	popup.height=70 \
 	--subscribe spotify mouse.entered mouse.exited mouse.exited.global
 
-sketchybar --set spotify.artwork image="$ARTWORK_FILE" drawing=on \
-	padding_lift=10 \
+sketchybar --add item spotify.artwork popup.spotify \
+	--set spotify.artwork \
+	padding_left=10 \
 	padding_right=10 \
 	drawing=off \
-	updates=on
+	background.image.drawing=off \
+	background.drawing=on \
+	background.color=0x00000000 \
+	updates=on \
+	width=60 \
+	height=60
 
 # Add popup controls
 sketchybar --add item spotify.prev popup.spotify \
