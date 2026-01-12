@@ -2,7 +2,7 @@
 let
   inherit (lib.${namespace}) enabled disabled;
 
-  userCfg = config.${namespace}.user.common;
+  userCfg = config.${namespace}.user;
 in
 {
   olisikh = {
