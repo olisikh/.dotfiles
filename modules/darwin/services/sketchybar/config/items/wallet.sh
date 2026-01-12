@@ -16,6 +16,7 @@ sketchybar --add item wallet right \
 	background.drawing=on \
 	label.padding_right=10 \
 	label.max_chars=30 \
+	label.color="$COLOR" \
 	updates=on \
 	update_freq=300 \
 	script="$PLUGIN_DIR/wallet.sh"
