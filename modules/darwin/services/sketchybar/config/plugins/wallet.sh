@@ -32,7 +32,7 @@ get_balance() {
 
 OR_BALANCE=$(get_balance "$OPENROUTER_API_KEY" "https://openrouter.ai/api/v1/credits")
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') OR: $OR_BALANCE" >>"$LOG_FILE"
+echo "$(date '+%Y-%m-%d %H:%M:%S') OR $OR_BALANCE" >>"$LOG_FILE"
 
 # Opencode balance can't be fetcvhed using API
-sketchybar --set "$NAME" label="OR: $OR_BALANCE"
+sketchybar --set "$NAME" label="OR $OR_BALANCE"
