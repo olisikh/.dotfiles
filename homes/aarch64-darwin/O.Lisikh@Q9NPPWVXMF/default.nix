@@ -23,6 +23,7 @@ in
         obsidian = disabled;
       };
     };
+    opencode = disabled;
     user.work = enabled;
     sops = {
       enable = true;
