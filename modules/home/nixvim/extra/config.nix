@@ -57,6 +57,5 @@
         kotlin_lsp = { }
       }
     })
-    vim.lsp.enable('kotlin-lsp')
   ''
 ) + import ./config/harpoon.lua.nix

@@ -1,1 +1,1 @@
--- vim.lsp.enable("kotlin-lsp")
+vim.lsp.enable("kotlin-lsp")

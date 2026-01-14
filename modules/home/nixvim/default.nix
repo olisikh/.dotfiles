@@ -134,6 +134,7 @@ in
         libiconv
         stylua
         jq
+        yq
         ktlint
         eslint_d
         google-java-format

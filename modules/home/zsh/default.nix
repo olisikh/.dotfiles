@@ -17,7 +17,6 @@ let
       ""
       secrets;
 
-
   themes = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
     "repo" = "zsh-syntax-highlighting";

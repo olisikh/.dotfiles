@@ -12,27 +12,30 @@ in
   };
 
   config = mkIf cfg.enable {
-    # NOTE: good example of sketchybar configuration
-    # https://github.com/khaneliman/khanelinix/blob/60bc9ff5b65ca7e107de3b288e16998fd2b01c88/modules/home/programs/graphical/bars/sketchybar/default.nix
     services.sketchybar = {
       enable = true;
       extraPackages = with pkgs; [
+        sops
+        age
         jq
         sketchybar-app-font
       ];
     };
 
-    environment.systemPackages = with pkgs; with pkgs.${namespace}; [
-      lua5_4
-      sbarlua
-    ];
+    environment = {
+      systemPackages = with pkgs; with pkgs.${namespace}; [
+        lua5_4
+        sbarlua
+      ];
+      variables = {
+        HOME = userCfg.home;
+        SOPS_AGE_KEY_FILE = "${userCfg.home}/.config/sops/age/keys.txt";
+      };
+    };
 
     snowfallorg.users.${userCfg.username}.home.config = {
       xdg.configFile = {
-        "sketchybar/sketchybarrc".source = ./config/sketchybarrc;
-        "sketchybar/variables.sh".source = ./config/variables.sh;
-        "sketchybar/items".source = ./config/items;
-        "sketchybar/plugins".source = ./config/plugins;
+        "sketchybar".source = ./config;
       };
     };
   };

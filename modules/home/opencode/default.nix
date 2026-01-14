@@ -18,16 +18,11 @@ in
         theme = "catppuccin";
         autoupdate = false;
         autoshare = false;
-
-        agent = {
-          plan = {
-            temperature = 0.1;
-          };
-          build = {
-            temperature = 0.1;
-          };
-        };
       };
+    };
+
+    home.file = {
+      ".config/opencode/oh-my-opencode.json".source = ./config/oh-my-opencode.json;
     };
   };
 }

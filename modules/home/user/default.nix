@@ -41,12 +41,14 @@ in
       packages = with pkgs;
         [
           nix-prefetch
+          nix-search-cli
           bash
           wget
           nerd-fonts.jetbrains-mono
           fd
           eza
           jq
+          yq
           stress
           zoxide
           bat
