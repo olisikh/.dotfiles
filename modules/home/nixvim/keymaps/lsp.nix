@@ -60,4 +60,14 @@
       desc = "lsp: [g]oto [d]efinition";
     };
   }
+  {
+    key = "grn";
+    action = "function() return ':IncRename ' .. vim.fn.expand('<cword>') end<cr>";
+    mode = "n";
+    options = {
+      expr = true;
+      desc = "lsp: [r]e[n]ame";
+    };
+  }
 ]
+

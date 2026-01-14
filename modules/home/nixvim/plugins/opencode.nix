@@ -2,13 +2,19 @@
 let
   inherit (lib) mkIf;
 
-  cfg = config.${namespace}.nixvim.plugins.opencode;
-  opencodeCfg = config.${namespace}.opencode;
+  # cfg = config.${namespace}.nixvim.plugins.opencode;
 in
 {
-  opencode = mkIf opencodeCfg.enable {
-    enable = cfg.enable;
+  # options.${namespace}.nixvim.plugins.opencode = {
+  #   enable = lib.mkBoolOpt true "Enable OpenCode plugin";
+  # };
 
-    settings = { };
+
+  plugins = {
+    opencode = {
+      enable = true;
+
+      settings = { };
+    };
   };
 }

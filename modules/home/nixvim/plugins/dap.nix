@@ -1,18 +1,18 @@
-{ pkgs, nixvimLib, ... }:
+{ pkgs, lib, ... }:
 let
   jsConfigs = [
     {
       type = "pwa-node";
       request = "launch";
       name = "Launch file";
-      program = ''''${file}'';
+      file = ''''${file}'';
       cwd = ''''${workspaceFolder}'';
     }
     {
       type = "pwa-node";
       request = "attach";
       name = "Attach";
-      processId = nixvimLib.mkRaw "require('dap.utils').pick_process";
+      processId = lib.nixvim.mkRaw "require('dap.utils').pick_process";
       cwd = ''''${workspaceFolder}'';
     }
     {
@@ -54,8 +54,8 @@ let
     #     "--threads"
     #     "false"
     #   ];
-    #   rootPath = ''''${workspaceFolder}'';
-    #   cwd = ''''${workspaceFolder}'';
+    #   rootPath = '''${workspaceFolder}'';
+    #   cwd = '''${workspaceFolder}'';
     #   console = "integratedTerminal";
     #   internalConsoleOptions = "neverOpen";
     #   autoAttachChildProcesses = false;
@@ -65,65 +65,73 @@ let
   ];
 in
 {
-  dap = {
-    enable = true;
-    signs = {
-      dapBreakpoint = {
-        text = "●";
-        texthl = "DapBreakpoint";
+  plugins = {
+    dap = {
+      enable = true;
+      signs = {
+        dapBreakpoint = {
+          text = "●";
+          texthl = "DapBreakpoint";
+        };
+        dapBreakpointCondition = {
+          text = "●";
+          texthl = "DapBreakpointCondition";
+        };
+        dapBreakpointRejected = {
+          text = "●";
+          texthl = "DapBreakpointRejected";
+        };
+        dapStopped = {
+          text = "→";
+          texthl = "DapStopped";
+        };
+        dapLogPoint = {
+          text = "◆";
+          texthl = "DapLogPoint";
+        };
       };
-      dapBreakpointCondition = {
-        text = "●";
-        texthl = "DapBreakpointCondition";
-      };
-      dapBreakpointRejected = {
-        text = "●";
-        texthl = "DapBreakpointRejected";
-      };
-      dapStopped = {
-        text = "→";
-        texthl = "DapStopped";
-      };
-      dapLogPoint = {
-        text = "◆";
-        texthl = "DapLogPoint";
-      };
-    };
-    adapters = {
-      servers = {
-        "pwa-node" = {
-          host = "localhost";
-          port = 8123;
-          executable = {
-            command = "${pkgs.vscode-js-debug}/bin/js-debug";
+      adapters = {
+        servers = {
+          "pwa-node" = {
+            host = "localhost";
+            port = 8123;
+            executable = {
+              command = "${pkgs.vscode-js-debug}/bin/js-debug";
+            };
           };
         };
       };
-    };
-    configurations = {
-      java = [
-        {
-          type = "java";
-          request = "launch";
-          name = "Debug (Attach) - Remote";
-          hostName = "127.0.0.1";
-          port = 5005;
-        }
-      ];
+      configurations = {
+        java = [
+          {
+            type = "java";
+            request = "launch";
+            name = "Debug (Attach) - Remote";
+            hostName = "127.0.0.1";
+            port = 5005;
+          }
+        ];
 
-      javascript = jsConfigs;
-      typescript = jsConfigs;
+        javascript = jsConfigs;
+        typescript = jsConfigs;
+      };
+    };
+
+    "dap-go" = {
+      enable = true;
+      settings = {
+        delve.path = "${pkgs.delve}/bin/dlv";
+      };
+    };
+
+    "dap-python" = {
+      enable = true;
+    };
+    "dap-ui" = {
+      enable = true;
+    };
+    "dap-virtual-text" = {
+      enable = true;
     };
   };
-
-
-  dap-go = {
-    enable = true;
-    settings = {
-      delve.path = "${pkgs.delve}/bin/dlv";
-    };
-  };
-  dap-python.enable = true;
-  dap-ui.enable = true;
-  dap-virtual-text.enable = true;
 }

@@ -1,10 +1,13 @@
-{...}:{
-  todo-comments = {
-    enable = true;
-    settings = {
-      keywords = {
-        TODO = {
-          color = "warning";
+{ ... }:
+{
+  plugins = {
+    "todo-comments" = {
+      enable = true;
+      settings = {
+        keywords = {
+          TODO = {
+            color = "warning";
+          };
         };
       };
     };

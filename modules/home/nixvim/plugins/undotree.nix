@@ -1,9 +1,12 @@
-{...}:{
-  undotree = {
-    enable = true;
-    settings = {
-      autoOpenDiff = true;
-      focusOnToggle = true;
+{ ... }:
+{
+  plugins = {
+    undotree = {
+      enable = true;
+      settings = {
+        autoOpenDiff = true;
+        focusOnToggle = true;
+      };
     };
   };
 }

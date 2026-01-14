@@ -1,11 +1,10 @@
 { lib, config, namespace, pkgs, inputs, system, ... }:
 let
-  inherit (lib) mkIf mkOption types;
+  inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.nixvim;
 
-  nixvimLib = inputs.nixvim.lib.nixvim;
   neovimNightlyPkg = inputs.nightly-neovim-overlay.packages.${system}.default;
 
   kotlin-dap-adapter = pkgs.fetchzip {
@@ -20,31 +19,33 @@ in
 
     nightly = mkBoolOpt false "Use nightly neovim";
 
-    plugins = {
-      opencode = {
-        enable = mkBoolOpt true "Enable OpenCode plugin";
-      };
-
-      obsidian = {
-        enable = mkBoolOpt true "Enable Obsidian plugin";
-      };
-
-      copilot = {
-        enable = mkBoolOpt true "Enable GitHub Copilot";
-        enable-nes = mkBoolOpt false "Enable GitHub Copilot 'Next Edit Suggestion'";
-      };
-    };
+    # plugins = {
+    #   obsidian = {
+    #     enable = mkBoolOpt true "Enable Obsidian plugin";
+    #   };
+    #
+    #   copilot = {
+    #     enable = mkBoolOpt true "Enable GitHub Copilot";
+    #     enable-nes = mkBoolOpt false "Enable GitHub Copilot 'Next Edit Suggestion'";
+    #   };
+    # };
   };
 
   config = mkIf cfg.enable {
     programs.nixvim = {
+      _module.args = {
+        # NOTE: propagate inputs to each module imported within this scope
+        inherit inputs lib namespace system;
+
+        # NOTE: use pkgs with applied snowfall overlays
+        pkgs = lib.mkForce pkgs;
+      };
+
       enable = true;
       defaultEditor = true;
 
       # NOTE: due to overlay, nixvim would install and use nightly
       package = mkIf cfg.nightly neovimNightlyPkg;
-
-      colorschemes = import ./colorscheme.nix { inherit nixvimLib; };
 
       autoGroups = {
         user_generic.clear = true;
@@ -98,12 +99,13 @@ in
         }
       ];
 
+
       imports = [
         ./options.nix
         ./keymaps.nix
+        ./plugins.nix
+        ./colorscheme.nix
       ];
-
-      plugins = import ./plugins.nix { inherit pkgs config namespace lib nixvimLib; };
 
       extraPackages = with pkgs; [
         gcc
@@ -144,9 +146,12 @@ in
 
       # TODO: all these plugins need to be installed
       # maybe some of them I could contribute to nixvim
-      extraPlugins = import ./extra/plugins.nix { inherit pkgs lib nixvimLib; };
+      extraPlugins = import ./extra/plugins.nix { inherit pkgs lib; };
       extraFiles = import ./extra/files.nix { inherit pkgs; };
+
+      # TODO: move kotlin-dap-adapter under dap configuration?
       extraConfigLua = import ./extra/config.nix { inherit kotlin-dap-adapter; };
+
       extraConfigLuaPost = ''
         -- This line is called a `modeline`. See `:help modeline`
         -- vim: ts=2 sts=2 sw=2 et
