@@ -11,8 +11,7 @@ in
       settings = {
         dap = {
           autoload_configurations = true;
-          adapter =
-            # lua
+          adapter = # lua
             ''
               function()
                 return require('rustaceanvim.config').get_codelldb_adapter("${codelldb_path}", "${liblldb_path}")

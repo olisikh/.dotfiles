@@ -17,7 +17,7 @@
     ./plugins/undotree.nix
     ./plugins/rustaceanvim.nix
     ./plugins/which-key.nix
-    ./plugins/copilot-lua.nix
+    ./plugins/copilot.nix
     ./plugins/todo-comments.nix
     ./plugins/colorizer.nix
     ./plugins/opencode.nix
@@ -27,16 +27,22 @@
     ./plugins/indent-blankline.nix
     ./plugins/visual-whitespace.nix
     ./plugins/snacks.nix
+    ./plugins/lazygit.nix
+    ./plugins/smart-splits.nix
+    ./plugins/nvim-jdtls.nix
+    ./plugins/oil.nix
+    ./plugins/smart-splits.nix
+    ./plugins/treesj.nix
+    ./plugins/trouble.nix
+    ./plugins/harpoon.nix
+    ./plugins/nvim-metals.nix
   ];
 
   plugins = {
     lz-n.enable = true;
     web-devicons.enable = true;
     mini-icons.enable = true;
-    oil.enable = true;
-    smart-splits.enable = true;
     nvim-autopairs.enable = true;
-    trouble.enable = true;
     sleuth.enable = true;
     render-markdown.enable = true;
     hardtime.enable = true;
@@ -45,8 +51,6 @@
     crates.enable = true;
     fidget.enable = true;
     nvim-surround.enable = true;
-    lazygit.enable = true;
-    treesj.enable = true;
     lazydev.enable = true;
     inc-rename.enable = true;
   };

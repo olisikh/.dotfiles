@@ -1,4 +1,10 @@
 { pkgs, ... }:
+let
+  jdtls = pkgs.jdt-language-server;
+  vscodeJavaDebug = pkgs.vscode-extensions.vscjava.vscode-java-debug;
+  vscodeJavaTest = pkgs.vscode-extensions.vscjava.vscode-java-test;
+  lombok = pkgs.lombok;
+in
 # lua
 ''
   local uv = vim.loop
@@ -42,10 +48,10 @@
 
   local jdtls = require('jdtls')
 
-  local java_lsp_path = "${pkgs.jdt-language-server}/share/java/jdtls"
-  local java_dap_path = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug"
-  local java_test_path = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test"
-  local lombok_path = "${pkgs.lombok}/share/java"
+  local java_lsp_path = "${jdtls}/share/java/jdtls"
+  local java_dap_path = "${vscodeJavaDebug}/share/vscode/extensions/vscjava.vscode-java-debug"
+  local java_test_path = "${vscodeJavaTest}/share/vscode/extensions/vscjava.vscode-java-test"
+  local lombok_path = "${lombok}/share/java"
 
   local bundles = {
     vim.fn.glob(java_dap_path .. '/server/com.microsoft.java.debug.plugin-*.jar', true),

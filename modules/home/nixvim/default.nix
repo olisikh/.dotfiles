@@ -6,29 +6,11 @@ let
   cfg = config.${namespace}.nixvim;
 
   neovimNightlyPkg = inputs.nightly-neovim-overlay.packages.${system}.default;
-
-  kotlin-dap-adapter = pkgs.fetchzip {
-    name = "kotlin-dap-adapter-0.4.4";
-    url = "https://github.com/fwcd/kotlin-debug-adapter/releases/download/0.4.4/adapter.zip";
-    hash = "sha256-gNbGomFcWqOLTa83/RWS4xpRGr+jmkovns9Sy7HX9bg=";
-  };
 in
 {
   options.${namespace}.nixvim = {
     enable = mkBoolOpt false "Enable nixvim program";
-
     nightly = mkBoolOpt false "Use nightly neovim";
-
-    # plugins = {
-    #   obsidian = {
-    #     enable = mkBoolOpt true "Enable Obsidian plugin";
-    #   };
-    #
-    #   copilot = {
-    #     enable = mkBoolOpt true "Enable GitHub Copilot";
-    #     enable-nes = mkBoolOpt false "Enable GitHub Copilot 'Next Edit Suggestion'";
-    #   };
-    # };
   };
 
   config = mkIf cfg.enable {
@@ -101,12 +83,13 @@ in
 
 
       imports = [
+        ./colorscheme.nix
         ./options.nix
         ./keymaps.nix
         ./plugins.nix
-        ./colorscheme.nix
       ];
 
+      # TODO: move each package to respective plugin that uses it
       extraPackages = with pkgs; [
         gcc
         fzf
@@ -144,13 +127,37 @@ in
         nixpkgs-fmt
       ];
 
-      # TODO: all these plugins need to be installed
-      # maybe some of them I could contribute to nixvim
-      extraPlugins = import ./extra/plugins.nix { inherit pkgs lib; };
-      extraFiles = import ./extra/files.nix { inherit pkgs; };
+      extraPlugins = with pkgs.vimPlugins; [ fzf-lua ];
 
-      # TODO: move kotlin-dap-adapter under dap configuration?
-      extraConfigLua = import ./extra/config.nix { inherit kotlin-dap-adapter; };
+      extraFiles = {
+        "ftplugin/scala.lua".source = ./ftplugin/scala.lua;
+        "ftplugin/terraform.lua".source = ./ftplugin/terraform.lua;
+        "ftplugin/kotlin.lua".source = ./ftplugin/kotlin.lua;
+
+        "ftplugin/java.lua".text = import ./ftplugin/java.lua.nix { inherit pkgs; };
+
+        "queries/lua/injections.scm".source = ./queries/lua/injections.scm;
+        "queries/scala/injections.scm".source = ./queries/scala/injections.scm;
+
+        # custom snippets
+        "snippets".source = ./snippets;
+      };
+
+      extraConfigLua = ''
+        vim.loop.fs_mkdir(vim.o.backupdir, 750)
+        vim.loop.fs_mkdir(vim.o.directory, 750)
+        vim.loop.fs_mkdir(vim.o.undodir, 750)
+
+        -- set backup directory to be a subdirectory of data to ensure that backups are not written to git repos
+        vim.o.backupdir = vim.fn.stdpath("data") .. "/backup"
+
+        -- Configure 'directory' to ensure that Neovim swap files are not written to repos.
+        vim.o.directory = vim.fn.stdpath("data") .. "/directory" 
+        vim.o.sessionoptions = vim.o.sessionoptions .. ",globals"
+
+        -- set undodir to ensure that the undofiles are not saved to git repos.
+        vim.o.undodir = vim.fn.stdpath("data") .. "/undo" 
+      '';
 
       extraConfigLuaPost = ''
         -- This line is called a `modeline`. See `:help modeline`

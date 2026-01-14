@@ -1,7 +1,4 @@
-{ config, namespace, ... }:
-let
-  # cfg = config.${namespace}.nixvim.plugins.copilot;
-in
+{ pkgs, ... }:
 {
   plugins = {
     "copilot-lsp" = {
@@ -38,4 +35,6 @@ in
       };
     };
   };
+
+  extraPlugins = [ pkgs.vimPlugins.copilot-lualine ];
 }
