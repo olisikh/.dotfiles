@@ -2,7 +2,4 @@
 
 set -e
 
-# uninstall home manager and all packages
-home-manager uninstall
-darwin-uninstaller
-
+sudo darwin-uninstaller
