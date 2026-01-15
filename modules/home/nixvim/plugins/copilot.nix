@@ -1,16 +1,13 @@
 { pkgs, ... }:
 {
   plugins = {
-    "copilot-lsp" = {
-      enable = true;
-    };
+    copilot-lsp.enable = true;
 
-    "copilot-lua" = {
+    copilot-lua = {
       enable = true;
       settings = {
-        panel = {
-          enabled = false;
-        };
+        panel.enabled = false;
+        nes.enabled = false;
         suggestion = {
           enabled = true;
           auto_trigger = true;
@@ -21,15 +18,6 @@
             next = "<M-]>";
             prev = "<M-[>";
             dismiss = "<C-]>";
-          };
-        };
-        nes = {
-          enabled = true; # requires copilot-lsp as a dependency
-          auto_trigger = true;
-          keymap = {
-            accept_and_goto = false;
-            accept = false;
-            dismiss = false;
           };
         };
       };

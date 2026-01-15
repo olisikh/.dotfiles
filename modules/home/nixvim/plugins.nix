@@ -36,6 +36,7 @@
     ./plugins/trouble.nix
     ./plugins/harpoon.nix
     ./plugins/nvim-metals.nix
+    ./plugins/inc-rename.nix
   ];
 
   plugins = {
@@ -52,6 +53,5 @@
     fidget.enable = true;
     nvim-surround.enable = true;
     lazydev.enable = true;
-    inc-rename.enable = true;
   };
 }
