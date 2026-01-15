@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source "$HOME/.config/sketchybar/variables.sh"
-
 COLOR=$POMODORO_COLOR
 
 sketchybar --remove timer
@@ -48,8 +46,6 @@ for timer in "5" "15" "25" "50" "cancel"; do
         icon.drawing=off \
         width=110 \
         align=center \
-        padding_left=5 \
-        padding_right=5 \
         background.color="$POPUP_BACKGROUND_COLOR" \
         background.drawing=on \
         background.height=30 \

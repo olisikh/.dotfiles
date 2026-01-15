@@ -1,22 +1,18 @@
-{ nixvimLib, config, namespace, pkgs, ... }:
-let
-  cfg = config.${namespace}.nixvim.plugins.obsidian;
-in
+{ pkgs, lib, ... }:
 {
-  obsidian = {
-    enable = cfg.enable;
-    package = pkgs.vimPlugins.obsidian-nvim; # NOTE: my overlay is not used otherwise, need this line
-    settings = {
-      legacy_commands = false;
-      workspaces = [
-        {
-          name = "default";
-          path = "~/notes";
-        }
-      ];
-      note_id_func = nixvimLib.mkRaw
-        # lua
-        ''
+  plugins = {
+    obsidian = {
+      enable = true;
+      package = pkgs.vimPlugins.obsidian-nvim;
+      settings = {
+        legacy_commands = false;
+        workspaces = [
+          {
+            name = "default";
+            path = "~/notes";
+          }
+        ];
+        note_id_func = lib.nixvim.mkRaw ''
           function(title)
             -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
             -- In this case a note with the title 'My new note' will be given an ID that looks
@@ -34,6 +30,42 @@ in
             return suffix .. "-" .. tostring(os.time())
           end
         '';
+      };
     };
   };
+
+  keymaps = [
+    {
+      key = "<leader>so";
+      action = ":Obsidian search<cr>";
+      mode = "n";
+      options = {
+        desc = "telescope: [s]earch [o]bsidian";
+      };
+    }
+    {
+      key = "<leader>zd";
+      action = ":Obsidian daily<cr>";
+      mode = "n";
+      options = {
+        desc = "obsidian: [z]k [d]aily";
+      };
+    }
+    {
+      key = "<leader>zn";
+      action = ":Obsidian new<cr>";
+      mode = "n";
+      options = {
+        desc = "obsidian: [z]k [n]ew";
+      };
+    }
+    {
+      key = "<leader>zo";
+      action = ":Obsidian open<cr>";
+      mode = "n";
+      options = {
+        desc = "obsidian: [z]k [o]pen";
+      };
+    }
+  ];
 }

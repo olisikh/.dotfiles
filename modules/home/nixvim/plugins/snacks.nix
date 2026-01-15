@@ -1,12 +1,11 @@
 { ... }:
 {
   plugins = {
-    colorizer = {
+    snacks = {
       enable = true;
       settings = {
-        user_default_options = {
-          names = false;
-        };
+        bigfile.enabled = true;
+        # dashboard.enabled = true;
       };
     };
   };

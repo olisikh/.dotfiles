@@ -16,14 +16,8 @@ in
     starship = enabled;
     git = enabled;
     yazi = enabled;
-    nixvim = {
-      enable = true;
-      plugins = {
-        opencode = disabled;
-        obsidian = disabled;
-      };
-    };
-    opencode = disabled;
+    nixvim = enabled;
+    opencode = enabled;
     user.work = enabled;
     sops = {
       enable = true;

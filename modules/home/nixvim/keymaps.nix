@@ -338,20 +338,5 @@
         desc = "[b]uffer [d]elete";
       };
     }
-  ]
-  ++ import ./keymaps/dap.nix
-  ++ import ./keymaps/lsp.nix
-  ++ import ./keymaps/telescope.nix
-  ++ import ./keymaps/smart-splits.nix
-  ++ import ./keymaps/oil.nix
-  ++ import ./keymaps/nvim-tree.nix
-  ++ import ./keymaps/neotest.nix
-  ++ import ./keymaps/trouble.nix
-  ++ import ./keymaps/nvim-jdtls.nix
-  ++ import ./keymaps/lazy-git.nix
-  ++ import ./keymaps/todo-comments.nix
-  ++ import ./keymaps/treesj.nix
-  ++ import ./keymaps/undotree.nix
-  ++ import ./keymaps/obsidian.nix
-  ++ import ./keymaps/opencode.nix;
+  ];
 }

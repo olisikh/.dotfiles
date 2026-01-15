@@ -1,6 +1,9 @@
-{ ... }: {
-  markdown-preview = {
-    enable = true;
-    settings.theme = "dark";
+{ ... }:
+{
+  plugins = {
+    "markdown-preview" = {
+      enable = true;
+      settings.theme = "dark";
+    };
   };
 }

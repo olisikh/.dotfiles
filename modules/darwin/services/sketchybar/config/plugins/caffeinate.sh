@@ -1,6 +1,7 @@
 #!/bin/bash
 
-COLOR="$BROWN"
+source "$HOME/.config/sketchybar/variables.sh"
+
 CAFFINATE_ID=$(pmset -g assertions | grep "caffeinate" | awk '{print $2}' | cut -d '(' -f1 | head -n 1)
 
 # It is an initial load

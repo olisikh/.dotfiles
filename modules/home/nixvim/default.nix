@@ -1,57 +1,38 @@
 { lib, config, namespace, pkgs, inputs, system, ... }:
 let
-  inherit (lib) mkIf mkOption types;
+  inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.nixvim;
 
-  nixvimLib = inputs.nixvim.lib.nixvim;
   neovimNightlyPkg = inputs.nightly-neovim-overlay.packages.${system}.default;
-
-  kotlin-dap-adapter = pkgs.fetchzip {
-    name = "kotlin-dap-adapter-0.4.4";
-    url = "https://github.com/fwcd/kotlin-debug-adapter/releases/download/0.4.4/adapter.zip";
-    hash = "sha256-gNbGomFcWqOLTa83/RWS4xpRGr+jmkovns9Sy7HX9bg=";
-  };
 in
 {
   options.${namespace}.nixvim = {
     enable = mkBoolOpt false "Enable nixvim program";
-
     nightly = mkBoolOpt false "Use nightly neovim";
-
-    plugins = {
-      opencode = {
-        enable = mkBoolOpt true "Enable OpenCode plugin";
-      };
-
-      obsidian = {
-        enable = mkBoolOpt true "Enable Obsidian plugin";
-      };
-
-      copilot = {
-        enable = mkBoolOpt true "Enable GitHub Copilot";
-        enable-nes = mkBoolOpt false "Enable GitHub Copilot 'Next Edit Suggestion'";
-      };
-    };
   };
 
   config = mkIf cfg.enable {
     programs.nixvim = {
+      _module.args = {
+        # NOTE: propagate inputs to each module imported within this scope
+        inherit inputs lib namespace system;
+
+        # NOTE: use pkgs with applied snowfall overlays
+        pkgs = lib.mkForce pkgs;
+      };
+
       enable = true;
       defaultEditor = true;
 
-      # NOTE: due to overlay, nixvim would install and use nightly
       package = mkIf cfg.nightly neovimNightlyPkg;
-
-      colorschemes = import ./colorscheme.nix { inherit nixvimLib; };
 
       autoGroups = {
         user_generic.clear = true;
         user_lsp.clear = true;
       };
 
-      # NOTE: supposed to be better, this experimental lua loader uses cache; disable if you have issues
       luaLoader.enable = true;
       clipboard.register = "unnamedplus";
 
@@ -59,52 +40,16 @@ in
       # but plugins must have unique names and files
       performance.combinePlugins.enable = false;
 
-      autoCmd = [
-        {
-          event = "TextYankPost";
-          pattern = "*";
-          group = "user_generic";
-          command = "silent! lua vim.highlight.on_yank()";
-        }
-        {
-          event = [ "BufRead" "BufNewFile" ];
-          pattern = [ "*.tf" " *.tfvars" " *.hcl" ];
-          group = "user_lsp";
-          command = "set filetype=terraform";
-        }
-        {
-          event = "FileType";
-          pattern = "helm";
-          group = "user_lsp";
-          command = "LspRestart";
-        }
-        {
-          event = [ "BufEnter" "CursorHold" "InsertLeave" ];
-          pattern = "*";
-          group = "user_lsp";
-          command = "silent! lua vim.lsp.codelens.refresh()";
-        }
-        {
-          event = [ "CursorHold" "CursorHoldI" ];
-          pattern = "*";
-          group = "user_lsp";
-          command = "silent! lua vim.lsp.buf.document_highlight()";
-        }
-        {
-          event = "CursorMoved";
-          pattern = "*";
-          group = "user_lsp";
-          command = "silent! lua vim.lsp.buf.clear_references()";
-        }
-      ];
-
       imports = [
+        ./colorscheme.nix
         ./options.nix
         ./keymaps.nix
+        ./plugins.nix
+        ./files.nix
+        ./autocmds.nix
       ];
 
-      plugins = import ./plugins.nix { inherit pkgs config namespace lib nixvimLib; };
-
+      # TODO: move each package to respective plugin that uses it
       extraPackages = with pkgs; [
         gcc
         fzf
@@ -142,11 +87,23 @@ in
         nixpkgs-fmt
       ];
 
-      # TODO: all these plugins need to be installed
-      # maybe some of them I could contribute to nixvim
-      extraPlugins = import ./extra/plugins.nix { inherit pkgs lib nixvimLib; };
-      extraFiles = import ./extra/files.nix { inherit pkgs; };
-      extraConfigLua = import ./extra/config.nix { inherit kotlin-dap-adapter; };
+
+      extraConfigLua = ''
+        vim.loop.fs_mkdir(vim.o.backupdir, 750)
+        vim.loop.fs_mkdir(vim.o.directory, 750)
+        vim.loop.fs_mkdir(vim.o.undodir, 750)
+
+        -- set backup directory to be a subdirectory of data to ensure that backups are not written to git repos
+        vim.o.backupdir = vim.fn.stdpath("data") .. "/backup"
+
+        -- Configure 'directory' to ensure that Neovim swap files are not written to repos.
+        vim.o.directory = vim.fn.stdpath("data") .. "/directory" 
+        vim.o.sessionoptions = vim.o.sessionoptions .. ",globals"
+
+        -- set undodir to ensure that the undofiles are not saved to git repos.
+        vim.o.undodir = vim.fn.stdpath("data") .. "/undo" 
+      '';
+
       extraConfigLuaPost = ''
         -- This line is called a `modeline`. See `:help modeline`
         -- vim: ts=2 sts=2 sw=2 et
