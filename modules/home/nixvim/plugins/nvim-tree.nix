@@ -36,7 +36,7 @@
   keymaps = [
     # nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
     {
-      key = "<leader>o";
+      key = "<leader>ft";
       action = ":lua require('nvim-tree.api').tree.toggle()<cr>";
       mode = "n";
       options = {
@@ -46,7 +46,7 @@
     }
     # nmap('<leader>O', ':NvimTreeFindFile<cr>', { desc = 'nvim-tree: locale file in a tree', noremap = true })
     {
-      key = "<leader>O";
+      key = "<leader>fn";
       action = ":NvimTreeFindFile<cr>";
       mode = "n";
       options = {

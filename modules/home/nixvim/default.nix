@@ -26,7 +26,6 @@ in
       enable = true;
       defaultEditor = true;
 
-      # NOTE: due to overlay, nixvim would install and use nightly
       package = mkIf cfg.nightly neovimNightlyPkg;
 
       autoGroups = {
@@ -34,7 +33,6 @@ in
         user_lsp.clear = true;
       };
 
-      # NOTE: supposed to be better, this experimental lua loader uses cache; disable if you have issues
       luaLoader.enable = true;
       clipboard.register = "unnamedplus";
 
@@ -42,51 +40,13 @@ in
       # but plugins must have unique names and files
       performance.combinePlugins.enable = false;
 
-      autoCmd = [
-        {
-          event = "TextYankPost";
-          pattern = "*";
-          group = "user_generic";
-          command = "silent! lua vim.highlight.on_yank()";
-        }
-        {
-          event = [ "BufRead" "BufNewFile" ];
-          pattern = [ "*.tf" " *.tfvars" " *.hcl" ];
-          group = "user_lsp";
-          command = "set filetype=terraform";
-        }
-        {
-          event = "FileType";
-          pattern = "helm";
-          group = "user_lsp";
-          command = "LspRestart";
-        }
-        {
-          event = [ "BufEnter" "CursorHold" "InsertLeave" ];
-          pattern = "*";
-          group = "user_lsp";
-          command = "silent! lua vim.lsp.codelens.refresh()";
-        }
-        {
-          event = [ "CursorHold" "CursorHoldI" ];
-          pattern = "*";
-          group = "user_lsp";
-          command = "silent! lua vim.lsp.buf.document_highlight()";
-        }
-        {
-          event = "CursorMoved";
-          pattern = "*";
-          group = "user_lsp";
-          command = "silent! lua vim.lsp.buf.clear_references()";
-        }
-      ];
-
-
       imports = [
         ./colorscheme.nix
         ./options.nix
         ./keymaps.nix
         ./plugins.nix
+        ./files.nix
+        ./autocmds.nix
       ];
 
       # TODO: move each package to respective plugin that uses it
@@ -127,21 +87,6 @@ in
         nixpkgs-fmt
       ];
 
-      extraPlugins = with pkgs.vimPlugins; [ fzf-lua ];
-
-      extraFiles = {
-        "ftplugin/scala.lua".source = ./ftplugin/scala.lua;
-        "ftplugin/terraform.lua".source = ./ftplugin/terraform.lua;
-        "ftplugin/kotlin.lua".source = ./ftplugin/kotlin.lua;
-
-        "ftplugin/java.lua".text = import ./ftplugin/java.lua.nix { inherit pkgs; };
-
-        "queries/lua/injections.scm".source = ./queries/lua/injections.scm;
-        "queries/scala/injections.scm".source = ./queries/scala/injections.scm;
-
-        # custom snippets
-        "snippets".source = ./snippets;
-      };
 
       extraConfigLua = ''
         vim.loop.fs_mkdir(vim.o.backupdir, 750)

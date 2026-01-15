@@ -3,7 +3,7 @@
   plugins = {
     obsidian = {
       enable = true;
-      package = pkgs.vimPlugins.obsidian-nvim; # NOTE: my overlay is not used otherwise, need this line
+      package = pkgs.vimPlugins.obsidian-nvim;
       settings = {
         legacy_commands = false;
         workspaces = [
