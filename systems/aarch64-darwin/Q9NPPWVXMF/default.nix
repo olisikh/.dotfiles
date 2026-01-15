@@ -13,9 +13,7 @@ in
       enable = true;
       inherit username;
     };
-    homebrew = {
-      work = enabled;
-    };
+    homebrew.work = enabled;
     services = {
       jankyborders = enabled;
       yabai = enabled;
