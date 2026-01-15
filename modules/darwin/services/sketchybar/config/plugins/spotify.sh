@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source "$HOME/.config/sketchybar/variables.sh" # Loads all defined colors
+
 LOG_FILE="/tmp/spotify_debug.log"
 echo "$(date): Script started with NAME=$NAME" >>"$LOG_FILE"
 

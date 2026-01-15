@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-HOVER_COLOR=0xff3b4261
-TRANSPARENT=0x00000000
+source "$HOME/.config/sketchybar/variables.sh"
 
 case "$SENDER" in
 "mouse.entered")

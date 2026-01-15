@@ -15,19 +15,8 @@ BROWN=0xff9c6f64
 BAR_COLOR=0xff1a1b26
 COMMENT=0xff565f89
 
-# Tokyonight Day
-# BLACK=0xffe9e9ed
-# WHITE=0xff3760bf
-# MAGENTA=0xff9854f1
-# BLUE=0xff2e7de9
-# CYAN=0xff007197
-# GREEN=0xff587539
-# YELLOW=0xff8c6c3e
-# ORANGE=0xffb15c00
-# RED=0xfff52a65
-# BAR_COLOR=0xffe1e2e7
-
 TRANSPARENT=0x00000000
+HOVER_COLOR=0xff3b4261
 
 # General bar colors
 ICON_COLOR=$WHITE  # Color of all icons
@@ -55,4 +44,3 @@ POMODORO_HIGHLIGHT_COLOR=0xff0a0b16
 CRON_COLOR=0xffc6a679
 
 SHADOW=on
-

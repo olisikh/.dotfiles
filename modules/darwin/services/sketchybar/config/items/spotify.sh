@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source "$HOME/.config/sketchybar/variables.sh"
+
 COLOR="$GREEN"
 
 sketchybar --add item spotify left \
@@ -30,10 +32,11 @@ sketchybar --add item spotify left \
 sketchybar --add item spotify.artwork popup.spotify \
 	--set spotify.artwork \
 	drawing=off \
-	background.image.drawing=off \
 	background.drawing=on \
-	background.color=0x00000000 \
+	background.image.drawing=off \
 	background.image.scale=0.15 \
+	background.color=0x00000000 \
+	background.padding_left=-2 \
 	updates=on \
 	width=100
 
