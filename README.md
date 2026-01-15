@@ -72,14 +72,6 @@ environment.variables = {
 };
 ```
 
-6. If Nix can't download libloading Rust library for treesitter (temporary hack):
-* Locate where the fetch-cargo-vendor-util is once the build fails
-* Replace the content of the file fetch-cargo-vendor-util content with the content of a file at hacks/fetch-cargo-vendor-util (keep the original shebang!!!)
-* Copy and paste the `libloading-{version}.tar.gz` file into the bin folder
-* The fetch-cargo-vendor-util would copy the file instead of downloading it and the build process should continue
-
-WARN: If the libloading lib gets upgraded, you'd need to download it and place it into hacks folder again.
-
 ## Nix and Github
 
 Nix downloads packages from Github and you may quickly get rate limited by Github.
@@ -114,7 +106,7 @@ Most of the packages have home-manager support, for example \
 wezterm has this page that tells what options you have to configure it: \
 https://home-manager-options.extranix.com/?query=wezterm&release=master
 
-## If skhd and yabai not showing up in Accessibility
+## If skhd and yabai not showing up in Accessibility (Tahoe shenanigans)
 ```bash
 realpath "$(which yabai)"
 realpath "$(which skhd)"

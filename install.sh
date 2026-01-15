@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+set -e
+
 # verify nix installation
 if ! command -v nix-env &> /dev/null
 then
