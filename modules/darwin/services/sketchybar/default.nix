@@ -23,10 +23,6 @@ in
     };
 
     environment = {
-      systemPackages = with pkgs; with pkgs.${namespace}; [
-        lua5_4
-        sketchybar-lua
-      ];
       variables = {
         HOME = userCfg.home;
         SOPS_AGE_KEY_FILE = "${userCfg.home}/.config/sops/age/keys.txt";

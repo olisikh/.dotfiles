@@ -6,7 +6,7 @@ let
 in
 {
   options.${namespace}.ralphy = {
-    enable = mkBoolOpt false "Enable ralphy loop CLI program";
+    enable = mkBoolOpt false "Enable ralphy AI coding loop CLI program";
   };
 
   config = mkIf cfg.enable {
