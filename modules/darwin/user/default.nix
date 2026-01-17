@@ -72,6 +72,7 @@ in
           AppleInterfaceStyle = "Dark";
           AppleKeyboardUIMode = 3;
           AppleScrollerPagingBehavior = true;
+          AppleSpacesSwitchOnActivate = false;
           AppleShowAllExtensions = true;
           AppleShowAllFiles = true;
           InitialKeyRepeat = 10;
