@@ -4,7 +4,7 @@ let
   lua = lua5_4;
 in
 stdenv.mkDerivation {
-  pname = "SBarLua";
+  pname = "sketchybar-lua";
   version = "unstable-2024-02-28";
 
   src = fetchFromGitHub {

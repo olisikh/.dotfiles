@@ -25,7 +25,7 @@ in
     environment = {
       systemPackages = with pkgs; with pkgs.${namespace}; [
         lua5_4
-        sbarlua
+        sketchybar-lua
       ];
       variables = {
         HOME = userCfg.home;
