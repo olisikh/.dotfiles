@@ -12,14 +12,14 @@ in
   };
 
   config = mkIf cfg.enable {
+    fonts.packages = with pkgs; [
+      nerd-fonts.jetbrains-mono
+      sketchybar-app-font
+    ];
+
     services.sketchybar = {
       enable = true;
-      extraPackages = with pkgs; [
-        sops
-        age
-        jq
-        sketchybar-app-font
-      ];
+      extraPackages = with pkgs; [ sops age jq ];
     };
 
     environment = {
@@ -31,7 +31,12 @@ in
 
     snowfallorg.users.${userCfg.username}.home.config = {
       xdg.configFile = {
-        "sketchybar".source = ./config;
+        "sketchybar/items".source = ./config/items;
+        "sketchybar/plugins".source = ./config/plugins;
+        "sketchybar/sketchybarrc".source = ./config/sketchybarrc;
+        "sketchybar/variables.sh".source = ./config/variables.sh;
+
+        "sketchybar/helpers/icon_map.sh".source = "${pkgs.sketchybar-app-font}/bin/icon_map.sh";
       };
     };
   };

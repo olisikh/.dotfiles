@@ -36,10 +36,6 @@ in
       luaLoader.enable = true;
       clipboard.register = "unnamedplus";
 
-      # WARN: this could could improve performance by a lot, by repacking plugins into one,
-      # but plugins must have unique names and files
-      performance.combinePlugins.enable = false;
-
       imports = [
         ./colorscheme.nix
         ./options.nix

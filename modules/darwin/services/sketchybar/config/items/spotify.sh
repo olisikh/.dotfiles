@@ -8,7 +8,8 @@ sketchybar --add item spotify left \
 	--set spotify \
 	scroll_texts=on \
 	scroll_duration=99 \
-	icon="󰎆 " \
+	icon=":spotify:" \
+	icon.font="$APP_ICON_FONT:13.0" \
 	icon.color="$COLOR" \
 	icon.padding_left=10 \
 	background.color="$BAR_COLOR" \

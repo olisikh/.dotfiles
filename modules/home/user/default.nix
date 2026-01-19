@@ -38,89 +38,90 @@ in
       # don't ever change the stateversion value, it will break the state
       stateVersion = "25.05";
 
-      packages = with pkgs;
-        [
-          nix-prefetch
-          nix-search-cli
-          bash
-          wget
-          nerd-fonts.jetbrains-mono
-          fd
-          eza
-          jq
-          yq
-          stress
-          zoxide
-          bat
-          pay-respects # thefuck alternative
-          rustup
-          tree-sitter
-          luarocks-nix
-          minikube
-          k9s
-          kubectl
-          kubernetes-helm
-          kustomize
-          etcd
-          terraform
-          nodejs
-          pnpm
-          (yarn.override { nodejs = nodejs; })
-          go
-          jdk
-          kafkactl
-          awscli2
-          kcat
-          bun
-          stern # kubectl pod log scraping tool
-          htop
-          pngpaste
-          scala
-          (sbt.override { jre = jdk; })
-          (metals.override { jre = jdk; })
-          kotlin
-          gradle
-          xdg-utils # open apps from console/neovim
-          wezterm
-          lazygit
-          lazydocker
-          gh
-          gnupg # tool for generating gpg keys
-          watch
-          (python3.withPackages (ps: with ps; [
-            pytest
-            debugpy
-          ]))
-          uv # python utility belt
-          mkalias
-          pre-commit
+      packages = with pkgs; [
+        nix-prefetch
+        nix-search-cli
+        bash
+        wget
+        nerd-fonts.jetbrains-mono
+        fd
+        eza
+        jq
+        yq
+        stress
+        zoxide
+        bat
+        pay-respects # thefuck alternative
+        rustup
+        tree-sitter
+        luarocks-nix
+        minikube
+        k9s
+        kubectl
+        kubernetes-helm
+        kustomize
+        podman
+        etcd
+        terraform
+        nodejs
+        pnpm
+        (yarn.override { nodejs = nodejs; })
+        go
+        jdk
+        kafkactl
+        awscli2
+        kcat
+        bun
+        stern # kubectl pod log scraping tool
+        htop
+        pngpaste
+        scala
+        (sbt.override { jre = jdk; })
+        (metals.override { jre = jdk; })
+        kotlin
+        gradle
+        xdg-utils # open apps from console/neovim
+        wezterm
+        lazygit
+        lazydocker
+        gh
+        gnupg # tool for generating gpg keys
+        watch
+        (python3.withPackages (ps: with ps; [
+          pytest
+          debugpy
+        ]))
+        uv # python utility belt
+        mkalias
+        pre-commit
 
-          age
-          sops
+        age
+        sops
 
-          tflint
-          esbuild
+        tflint
+        esbuild
 
-          bchunk
-          dos2unix
+        bchunk
+        dos2unix
 
-          (writeShellScriptBin "home" (import ./script.nix {
-            inherit config namespace lib;
-            home = cfg.home;
-          }))
-        ] ++
-        (optionals cfg.personal.enable [
-          code-cursor
-          brave
-          bitwarden-desktop
-          antigravity
-          obsidian
-          vscode
-          cmatrix
-          (pulumi.withPackages (ps: with ps; [
-            pulumi-nodejs
-          ]))
-        ]);
+
+        (writeShellScriptBin "home" (import ./script.nix {
+          inherit config namespace lib;
+          home = cfg.home;
+        }))
+      ] ++
+      (optionals cfg.personal.enable [
+        code-cursor
+        brave
+        bitwarden-desktop
+        antigravity
+        obsidian
+        vscode
+        cmatrix
+        (pulumi.withPackages (ps: with ps; [
+          pulumi-nodejs
+        ]))
+      ]);
 
       sessionVariables = mkIf cfg.personal.enable {
         SCALA_HOME = scala;
