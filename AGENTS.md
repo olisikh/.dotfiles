@@ -42,7 +42,7 @@ This file provides essential information for AI coding agents working in this Ni
 ### Test Commands
 - **Python**: `pytest path/to/test_file.py::test_name -q` or `pytest -q`
 - **JavaScript/TypeScript**: `npm test -- path/to/test.spec.ts` or `yarn test path/to/test.spec.ts`
-- **Lua/Neovim (Neotest)**: 
+- **Lua/Neovim (Neotest)**:
   ```bash
   nvim --headless -c 'lua require("neotest").run.run({vim.fn.expand("%")})' -c 'qa!'
   ```
@@ -50,6 +50,10 @@ This file provides essential information for AI coding agents working in this Ni
 - **Go**: `go test ./path/to/package -run TestName`
 - **Nix Flake tests**: `nix flake check`
 - To run a single Nix-defined test: `nix test .#<testName>`
+- If a command is missing (command not found), do not search for its store path and do not modify any config.
+  - Re-run the same command via nix-shell -p <missing>:
+  - nix-shell -p <missing> --run "<original command>".
+  - Never persist /nix/store/... paths into opencode.json or scripts unless explicitly asked.
 
 ### Diagnostics & Code Actions (via none-ls)
 - **Nix**: `statix` - provides code actions and fixes
