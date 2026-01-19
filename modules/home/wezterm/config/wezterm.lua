@@ -93,10 +93,7 @@ nav.apply_to_config(config)
 bar.apply_to_config(config, {
 	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
 	tabs = {
-		numerals = "arabic", -- or "roman"
-		pane_count = "superscript", -- or "subscript", false
 		process_icon = false,
-		zoom_icon = true, -- an icon "🔍", or boolean
 	},
 	clock = { -- note that this overrides the whole set_right_status
 		enabled = false,
