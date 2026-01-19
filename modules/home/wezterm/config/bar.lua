@@ -2,9 +2,8 @@ local wezterm = require("wezterm")
 local utils = require("utils")
 
 local M = {}
-
--- default configuration
-local config = {
+-- default config
+local default_config = {
 	max_width = 30,
 	dividers = "slant_right",
 	indicator = {
@@ -25,6 +24,8 @@ local config = {
 	tabs = {
 		numerals = "arabic",
 		pane_count = "superscript",
+		process_icon = true,
+		zoom_icon = true,
 		brackets = {
 			active = { "", ":" },
 			inactive = { "", ":" },
@@ -34,10 +35,14 @@ local config = {
 		enabled = true,
 		format = "%H:%M",
 	},
+	div = {
+		l = "",
+		r = "",
+	},
 }
 
 -- parsed config
-local C = {}
+local merged_config = {}
 
 local dividers = {
 	slant_right = {
@@ -60,86 +65,34 @@ local dividers = {
 
 -- conforming to https://github.com/wez/wezterm/commit/e4ae8a844d8feaa43e1de34c5cc8b4f07ce525dd
 -- exporting an apply_to_config function, even though we don't change the users config
-M.apply_to_config = function(c, opts)
+M.apply_to_config = function(global_config, user_config)
 	-- make the opts arg optional
-	if not opts then
-		opts = {}
+	if not user_config then
+		user_config = {}
 	end
 
 	-- combine user config with defaults
-	config = utils.table_merge(config, opts)
+	merged_config = utils.table_merge(default_config, user_config)
 
-	C.div = {
-		l = "",
-		r = "",
-	}
-
-	if config.dividers then
-		C.div.l = dividers[config.dividers].left
-		C.div.r = dividers[config.dividers].right
+	if merged_config.dividers then
+		merged_config.div.l = dividers[merged_config.dividers].left
+		merged_config.div.r = dividers[merged_config.dividers].right
 	end
 
-	C.leader = {
-		enabled = config.indicator.leader.enabled and true,
-		off = config.indicator.leader.off,
-		on = config.indicator.leader.on,
-	}
-
-	C.mode = {
-		enabled = config.indicator.mode.enabled,
-		names = config.indicator.mode.names,
-	}
-
-	C.tabs = {
-		numerals = config.tabs.numerals,
-		pane_count_style = config.tabs.pane_count,
-		brackets = {
-			active = config.tabs.brackets.active,
-			inactive = config.tabs.brackets.inactive,
-		},
-	}
-
-	C.clock = {
-		enabled = config.clock.enabled,
-		format = config.clock.format,
-	}
-
 	-- set the right-hand padding to 0 spaces, if the rounded style is active
-	C.p = (config.dividers == "rounded") and "" or " "
+	merged_config.p = merged_config.dividers == "rounded" and "" or " "
 
 	-- set wezterm config options according to the parsed config
-	c.use_fancy_tab_bar = false
-	c.show_new_tab_button_in_tab_bar = false
-	c.tab_max_width = config.max_width
+	global_config.use_fancy_tab_bar = false
+	global_config.show_new_tab_button_in_tab_bar = false
+	global_config.tab_max_width = merged_config.max_width
 end
 
 -- superscript/subscript
-local function numberStyle(number, script)
+local function pane_count_style(number, script)
 	local scripts = {
-		superscript = {
-			"⁰",
-			"¹",
-			"²",
-			"³",
-			"⁴",
-			"⁵",
-			"⁶",
-			"⁷",
-			"⁸",
-			"⁹",
-		},
-		subscript = {
-			"₀",
-			"₁",
-			"₂",
-			"₃",
-			"₄",
-			"₅",
-			"₆",
-			"₇",
-			"₈",
-			"₉",
-		},
+		superscript = { "⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹" },
+		subscript = { "₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉" },
 	}
 	local numbers = scripts[script]
 	local number_string = tostring(number)
@@ -156,20 +109,7 @@ local function numberStyle(number, script)
 	return result
 end
 
-local roman_numerals = {
-	"Ⅰ",
-	"Ⅱ",
-	"Ⅲ",
-	"Ⅳ",
-	"Ⅴ",
-	"Ⅵ",
-	"Ⅶ",
-	"Ⅷ",
-	"Ⅸ",
-	"Ⅹ",
-	"Ⅺ",
-	"Ⅻ",
-}
+local roman_numerals = { "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ" }
 
 local powerline_padding = 2
 
@@ -194,8 +134,8 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	}
 
 	local tab_colors
-	if config.tabs.colors and #config.tabs.colors > 0 then
-		tab_colors = config.tabs.colors
+	if merged_config.tabs.colors and #merged_config.tabs.colors > 0 then
+		tab_colors = merged_config.tabs.colors
 	else
 		tab_colors = default_colors
 	end
@@ -229,15 +169,15 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	end
 
 	local pane_count = ""
-	if C.tabs.pane_count_style then
+	if merged_config.tabs.pane_count then
 		local tabi = wezterm.mux.get_tab(tab.tab_id)
 		local muxpanes = tabi:panes()
 		local count = #muxpanes == 1 and "" or tostring(#muxpanes)
-		pane_count = numberStyle(count, C.tabs.pane_count_style)
+		pane_count = pane_count_style(count, merged_config.tabs.pane_count)
 	end
 
 	local index_i
-	if C.tabs.numerals == "roman" then
+	if merged_config.tabs.numerals == "roman" then
 		index_i = roman_numerals[tab.tab_index + 1]
 	else
 		index_i = tab.tab_index + 1
@@ -245,21 +185,34 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 
 	local index
 	if tab.is_active then
-		index = string.format("%s%s%s ", C.tabs.brackets.active[1], index_i, C.tabs.brackets.active[2])
+		index = string.format(
+			"%s%s%s",
+			merged_config.tabs.brackets.active[1],
+			index_i,
+			merged_config.tabs.brackets.active[2]
+		)
 	else
-		index = string.format("%s%s%s ", C.tabs.brackets.inactive[1], index_i, C.tabs.brackets.inactive[2])
+		index = string.format(
+			"%s%s%s",
+			merged_config.tabs.brackets.inactive[1],
+			index_i,
+			merged_config.tabs.brackets.inactive[2]
+		)
 	end
 
-	local tab_title = string.format("%s%s %s", index, utils.get_process(tab), utils.build_tab_title(tab))
+	local icon = merged_config.tabs.process_icon and (utils.get_process_icon(tab) .. " ") or ""
+	local name = utils.build_tab_title(tab, merged_config.tabs.zoom_icon)
+
+	local tab_title = string.format("%s%s%s", index, icon, name)
 
 	-- start and end hardcoded numbers are the Powerline + " " padding
 	local filler_width = powerline_padding * 2 + string.len(index) + string.len(pane_count)
-	local width = config.max_width - filler_width - 1
-	if (#tab_title + filler_width) > config.max_width then
+	local width = merged_config.max_width - filler_width - 1
+	if (#tab_title + filler_width) > merged_config.max_width then
 		tab_title = wezterm.truncate_right(tab_title, width) .. "…"
 	end
 
-	local title = string.format(" %s%s%s", tab_title, pane_count, C.p)
+	local title = string.format(" %s%s%s", tab_title, pane_count, merged_config.p)
 
 	return {
 		{ Background = { Color = s_bg } },
@@ -267,13 +220,13 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 		{ Text = title },
 		{ Background = { Color = e_bg } },
 		{ Foreground = { Color = e_fg } },
-		{ Text = C.div.r },
+		{ Text = merged_config.div.r },
 	}
 end)
 
 wezterm.on("update-status", function(window, _pane)
 	local active_kt = window:active_key_table() ~= nil
-	local show = C.leader.enabled or (active_kt and C.mode.enabled)
+	local show = merged_config.indicator.leader.enabled or (active_kt and merged_config.indicator.mode.enabled)
 	if not show then
 		window:set_left_status("")
 		return
@@ -286,24 +239,24 @@ wezterm.on("update-status", function(window, _pane)
 	local palette = conf.resolved_palette
 
 	local leader = ""
-	if C.leader.enabled then
-		local leader_text = C.leader.off
+	if merged_config.indicator.leader.enabled then
+		local leader_text = merged_config.indicator.leader.off
 		if window:leader_is_active() then
-			leader_text = C.leader.on
+			leader_text = merged_config.indicator.leader.on
 		end
 		leader = wezterm.format({
 			{ Foreground = { Color = palette.background } },
 			{ Background = { Color = palette.ansi[5] } },
-			{ Text = " " .. leader_text .. C.p },
+			{ Text = " " .. leader_text .. merged_config.p },
 		})
 	end
 
 	local mode = ""
-	if C.mode.enabled then
+	if merged_config.indicator.mode.enabled then
 		local mode_text = ""
 		local active = window:active_key_table()
-		if C.mode.names[active] ~= nil then
-			mode_text = C.mode.names[active] .. ""
+		if merged_config.indicator.mode.names[active] ~= nil then
+			mode_text = merged_config.indicator.mode.names[active] .. ""
 		end
 		mode = wezterm.format({
 			{ Foreground = { Color = palette.background } },
@@ -320,18 +273,20 @@ wezterm.on("update-status", function(window, _pane)
 	local divider = wezterm.format({
 		{ Background = { Color = divider_bg } },
 		{ Foreground = { Color = palette.ansi[5] } },
-		{ Text = C.div.r },
+		{ Text = merged_config.div.r },
 	})
 
 	window:set_left_status(leader .. mode .. divider)
 
-	if C.clock.enabled then
-		local time = wezterm.time.now():format(C.clock.format) .. " "
+	if merged_config.clock.enabled then
+		local time = wezterm.time.now():format(merged_config.clock.format) .. " "
 		window:set_right_status(wezterm.format({
 			{ Background = { Color = palette.tab_bar.background } },
 			{ Foreground = { Color = palette.ansi[6] } },
 			{ Text = time },
 		}))
+	else
+		window:set_right_status("")
 	end
 end)
 

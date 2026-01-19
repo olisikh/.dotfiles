@@ -61,6 +61,7 @@ local process_icons = {
 	["gh"] = nf.dev_github_badge,
 	["ruby"] = nf.cod_ruby,
 	["java"] = nf.dev_java,
+	["nix"] = "󱄅 ",
 	["gear"] = "",
 }
 
@@ -69,7 +70,7 @@ function M.is_vim(pane)
 	return pane:get_user_vars().IS_NVIM == "true"
 end
 
-function M.get_process(tab)
+function M.get_process_icon(tab)
 	if not tab.active_pane or tab.active_pane.foreground_process_name == "" then
 		return process_icons["gear"]
 	end
@@ -79,10 +80,10 @@ function M.get_process(tab)
 		process_name = "kubectl"
 	end
 
-	return process_icons[process_name] or string.format("[%s]", process_name)
+	return process_icons[process_name] or process_icons["gear"]
 end
 
-function M.build_tab_title(tab)
+function M.build_tab_title(tab, zoom_icon)
 	local tab_title = nil
 	if #tab.tab_title > 0 then
 		tab_title = tab.tab_title
@@ -90,8 +91,15 @@ function M.build_tab_title(tab)
 		tab_title = M.get_dir(tab) or tab.active_pane.title
 	end
 
-	if tab.active_pane.is_zoomed then
-		tab_title = " " .. tab_title
+	if zoom_icon and tab.active_pane.is_zoomed then
+		local icon = ""
+		if type(zoom_icon) == "string" then
+			icon = zoom_icon
+		else
+			icon = "🔍"
+		end
+
+		tab_title = icon .. tab_title
 	end
 
 	return tab_title

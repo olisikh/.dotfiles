@@ -4,19 +4,19 @@ local nav = require("nav")
 local theme_style = "Mocha"
 
 local w = require("wezterm")
-local c = w.config_builder()
+local config = w.config_builder()
 
-local bg_opacity = 1 -- 0.85
+local bg_opacity = 1
 
-c.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
-c.font_size = 14.0
-c.hide_tab_bar_if_only_one_tab = false
-c.window_background_opacity = bg_opacity
-c.macos_window_background_blur = 10
-c.audible_bell = "Disabled" -- or "SystemBeep"
+config.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
+config.font_size = 13.0
+config.hide_tab_bar_if_only_one_tab = false
+config.window_background_opacity = bg_opacity
+config.macos_window_background_blur = 10
+config.audible_bell = "Disabled" -- or "SystemBeep"
 
-c.color_scheme = "Catppuccin " .. theme_style
-c.colors = {
+config.color_scheme = "Catppuccin " .. theme_style
+config.colors = {
 	tab_bar = {
 		-- TODO: how to access catppuccin palette, take the color and apply opacity?
 		-- catppuccin mocha background
@@ -24,7 +24,7 @@ c.colors = {
 	},
 }
 
-c.keys = {
+config.keys = {
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
 	{ mods = "OPT", key = "LeftArrow", action = w.action({ SendString = "\x1bb" }) },
 	-- Make Option-Right equivalent to Alt-f; forward-word
@@ -89,37 +89,18 @@ c.keys = {
 	},
 }
 
-nav.apply_to_config(c)
-bar.apply_to_config(c, {
-	max_width = 30,
+nav.apply_to_config(config)
+bar.apply_to_config(config, {
 	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
-	indicator = {
-		leader = {
-			enabled = true,
-			off = " ",
-			on = " ",
-		},
-		mode = {
-			enabled = true,
-			names = {
-				resize_mode = "RESIZE",
-				copy_mode = "VISUAL",
-				search_mode = "SEARCH",
-			},
-		},
-	},
 	tabs = {
 		numerals = "arabic", -- or "roman"
 		pane_count = "superscript", -- or "subscript", false
-		brackets = {
-			active = { "", ":" },
-			inactive = { "", ":" },
-		},
+		process_icon = false,
+		zoom_icon = true, -- an icon "🔍", or boolean
 	},
 	clock = { -- note that this overrides the whole set_right_status
-		enabled = true,
-		format = "%H:%M", -- use https://wezfurlong.org/wezterm/config/lua/wezterm.time/Time/format.html
+		enabled = false,
 	},
 })
 
-return c
+return config
