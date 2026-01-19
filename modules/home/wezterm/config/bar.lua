@@ -1,4 +1,4 @@
-local wezterm = require("wezterm")
+local w = require("wezterm")
 local utils = require("utils")
 
 local M = {}
@@ -114,7 +114,7 @@ local roman_numerals = { "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ",
 local powerline_padding = 2
 
 -- custom tab bar
-wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
+w.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
 	local colors = conf.resolved_palette.tab_bar
 
 	local active_tab_index = 0
@@ -170,7 +170,7 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 
 	local pane_count = ""
 	if merged_config.tabs.pane_count then
-		local tabi = wezterm.mux.get_tab(tab.tab_id)
+		local tabi = w.mux.get_tab(tab.tab_id)
 		local muxpanes = tabi:panes()
 		local count = #muxpanes == 1 and "" or tostring(#muxpanes)
 		pane_count = pane_count_style(count, merged_config.tabs.pane_count)
@@ -209,7 +209,7 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	local filler_width = powerline_padding * 2 + string.len(index) + string.len(pane_count)
 	local width = merged_config.max_width - filler_width - 1
 	if (#tab_title + filler_width) > merged_config.max_width then
-		tab_title = wezterm.truncate_right(tab_title, width) .. "…"
+		tab_title = w.truncate_right(tab_title, width) .. "…"
 	end
 
 	local title = string.format(" %s%s%s", tab_title, pane_count, merged_config.p)
@@ -224,7 +224,7 @@ wezterm.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_wi
 	}
 end)
 
-wezterm.on("update-status", function(window, _pane)
+w.on("update-status", function(window, _pane)
 	local active_kt = window:active_key_table() ~= nil
 	local show = merged_config.indicator.leader.enabled or (active_kt and merged_config.indicator.mode.enabled)
 	if not show then
@@ -244,7 +244,7 @@ wezterm.on("update-status", function(window, _pane)
 		if window:leader_is_active() then
 			leader_text = merged_config.indicator.leader.on
 		end
-		leader = wezterm.format({
+		leader = w.format({
 			{ Foreground = { Color = palette.background } },
 			{ Background = { Color = palette.ansi[5] } },
 			{ Text = " " .. leader_text .. merged_config.p },
@@ -258,7 +258,7 @@ wezterm.on("update-status", function(window, _pane)
 		if merged_config.indicator.mode.names[active] ~= nil then
 			mode_text = merged_config.indicator.mode.names[active] .. ""
 		end
-		mode = wezterm.format({
+		mode = w.format({
 			{ Foreground = { Color = palette.background } },
 			{ Background = { Color = palette.ansi[5] } },
 			{ Attribute = { Intensity = "Bold" } },
@@ -270,7 +270,7 @@ wezterm.on("update-status", function(window, _pane)
 	local first_tab_active = window:mux_window():tabs_with_info()[1].is_active
 	local divider_bg = first_tab_active and palette.ansi[2] or palette.tab_bar.inactive_tab.bg_color
 
-	local divider = wezterm.format({
+	local divider = w.format({
 		{ Background = { Color = divider_bg } },
 		{ Foreground = { Color = palette.ansi[5] } },
 		{ Text = merged_config.div.r },
@@ -279,8 +279,8 @@ wezterm.on("update-status", function(window, _pane)
 	window:set_left_status(leader .. mode .. divider)
 
 	if merged_config.clock.enabled then
-		local time = wezterm.time.now():format(merged_config.clock.format) .. " "
-		window:set_right_status(wezterm.format({
+		local time = w.time.now():format(merged_config.clock.format) .. " "
+		window:set_right_status(w.format({
 			{ Background = { Color = palette.tab_bar.background } },
 			{ Foreground = { Color = palette.ansi[6] } },
 			{ Text = time },
