@@ -6,7 +6,6 @@ COLOR="$WHITE"
 
 sketchybar --add item keyboard right \
 	--set keyboard \
-	update_freq=15 \
 	icon=" " \
 	icon.color="$COLOR" \
 	icon.padding_left=10 \
@@ -21,4 +20,4 @@ sketchybar --add item keyboard right \
 	background.color="$BAR_COLOR" \
 	background.drawing=on \
 	script="$PLUGIN_DIR/keyboard.sh" \
-	--subscribe keyboard_layout_change
+	--subscribe keyboard keyboard_layout_change
