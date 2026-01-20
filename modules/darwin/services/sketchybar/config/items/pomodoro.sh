@@ -50,7 +50,7 @@ for timer in "5" "15" "25" "50" "cancel"; do
         background.drawing=on \
         background.height=30 \
         background.corner_radius=5 \
-        click_script="$HOME/.config/sketchybar/plugins/pomodoro.sh $duration; 
+        click_script="$PLUGIN_DIR/pomodoro.sh $duration;
     
     sketchybar -m --set timer popup.drawing=off" \
         script="$PLUGIN_DIR/pomodoro_highlight.sh" \
