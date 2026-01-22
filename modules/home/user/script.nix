@@ -8,7 +8,7 @@ let
     { name = "make"; desc = "Rebuild dotfiles"; action = "home_make \"$@\""; }
     { name = "update"; desc = "Update dotfiles"; action = "home_update \"$@\""; }
     { name = "upgrade"; desc = "Update and rebuild dotfiles"; action = "home_update && home_make"; }
-    { name = "template"; desc = "Instantiate nix template"; action = "home_template \"$@\""; }
+    { name = "tpl"; desc = "Instantiate nix template"; action = "home_template \"$@\""; }
     { name = "dev"; desc = "Run a dev shell"; action = "home_dev \"$@\""; }
     { name = "generations"; desc = "List dotfiles generations"; action = "home_list_generations \"$@\""; }
     { name = "rollback"; desc = "Rollback to previous generation"; action = "home_rollback"; }
