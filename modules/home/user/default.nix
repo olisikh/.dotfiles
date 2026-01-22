@@ -52,8 +52,6 @@ in
         zoxide
         bat
         pay-respects # thefuck alternative
-        rustup
-        tree-sitter
         luarocks-nix
         minikube
         k9s
@@ -63,39 +61,40 @@ in
         podman
         etcd
         terraform
+
         nodejs
         pnpm
         (yarn.override { nodejs = nodejs; })
-        go
+        bun
+
         jdk
         kafkactl
         awscli2
         kcat
-        bun
         stern # kubectl pod log scraping tool
+
         htop
         pngpaste
+
         scala
         (sbt.override { jre = jdk; })
         (metals.override { jre = jdk; })
+
         kotlin
         gradle
+
         xdg-utils # open apps from console/neovim
         wezterm
         lazygit
         lazydocker
         gh
-        gnupg # tool for generating gpg keys
         watch
-        (python3.withPackages (ps: with ps; [
-          pytest
-          debugpy
-        ]))
-        uv # python utility belt
+        python3
         mkalias
         pre-commit
 
         age
+        gnupg # tool for generating gpg keys
         sops
 
         tflint
@@ -103,7 +102,6 @@ in
 
         bchunk
         dos2unix
-
 
         (writeShellScriptBin "home" (import ./script.nix {
           inherit config namespace lib;

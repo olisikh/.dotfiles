@@ -9,6 +9,7 @@ let
     { name = "update"; desc = "Update dotfiles"; action = "home_update \"$@\""; }
     { name = "upgrade"; desc = "Update and rebuild dotfiles"; action = "home_update && home_make"; }
     { name = "template"; desc = "Instantiate nix template"; action = "home_template \"$@\""; }
+    { name = "dev"; desc = "Run a dev shell"; action = "home_dev \"$@\""; }
     { name = "generations"; desc = "List dotfiles generations"; action = "home_list_generations \"$@\""; }
     { name = "rollback"; desc = "Rollback to previous generation"; action = "home_rollback"; }
     { name = "gc"; desc = "Nix gc"; action = "home_gc"; }
@@ -84,14 +85,15 @@ in
   }
 
   home_gc() {
-      check_command nix-store
-      check_command nix-collect-garbage
       nix-store --gc && nix-collect-garbage -d
   }
 
   home_template() {
-      check_command nix
       nix flake init -t ${home}/.dotfiles#$@
+  }
+
+  home_dev() {
+      nix develop ${home}/.dotfiles#$@ --command zsh
   }
 
   # Main function to handle input and execute corresponding action
