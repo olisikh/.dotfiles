@@ -69,7 +69,7 @@
       src = ./.;
 
       # NOTE: add external overlays here
-      overlays = [];
+      overlays = [ ];
 
       channels-config.allowUnfree = true;
 
@@ -81,5 +81,25 @@
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
       ];
+
+      alias.templates.default = "empty";
+
+      templates = {
+        empty = {
+          description = "A Nix snowfall-lib flake";
+        };
+
+        shell = {
+          description = "A Nix flake with a shell.nix.";
+        };
+
+        darwin = {
+          description = "A Nix template with a dawrin module.";
+        };
+
+        home = {
+          description = "A Nix template with a home-manager module.";
+        };
+      };
     };
 }

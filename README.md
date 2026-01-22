@@ -113,3 +113,20 @@ realpath "$(which skhd)"
 open /path/to/yabai # and then drag-and-drop binary onto Accessibility table, confirm with Touch ID if needed
 
 ```
+
+## Available Nix templates:
+
+| Name      | Description                                       |
+| --------- | ------------------------------------------------- |
+| `empty`   | A NixOS system and modules ready to modify.       |
+| `home`    | A Nix Flake that exports home manager.            |
+| `system`  | A NixOS system and modules ready to modify.       |
+| `package` | A Nix Flake that exports packages and an overlay. |
+| `module`  | A Nix Flake that exports NixOS modules.           |
+| `lib`     | A Nix Flake that exports a custom `lib`           |
+
+
+To generate template files, run:
+```sh
+home template <name>
+```

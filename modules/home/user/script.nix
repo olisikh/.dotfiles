@@ -1,29 +1,17 @@
 { config, namespace, home, lib }:
 let
   inherit (config.${namespace}) sops;
-  inherit (lib) optionals concatStringsSep;
+  inherit (lib) optionals;
   inherit (lib.${namespace}) pad color;
-
-  nixShell =
-    # nix
-    ''{ pkgs ? import <nixpkgs> {} }:
-pkgs.mkShell {
-  nativeBuildInputs = [
-    # build dependencies
-  ];
-  buildInputs = [
-    # runtime dependencies
-  ];
-}'';
 
   allCommands = [
     { name = "make"; desc = "Rebuild dotfiles"; action = "home_make \"$@\""; }
     { name = "update"; desc = "Update dotfiles"; action = "home_update \"$@\""; }
     { name = "upgrade"; desc = "Update and rebuild dotfiles"; action = "home_update && home_make"; }
+    { name = "template"; desc = "Instantiate nix template"; action = "home_template \"$@\""; }
     { name = "generations"; desc = "List dotfiles generations"; action = "home_list_generations \"$@\""; }
     { name = "rollback"; desc = "Rollback to previous generation"; action = "home_rollback"; }
     { name = "gc"; desc = "Nix gc"; action = "home_gc"; }
-    { name = "mkshell"; desc = "Create shell.nix file"; action = "echo \"${nixShell}\" > shell.nix"; }
     { name = "help"; desc = "Help"; action = "display_help"; }
   ] ++ (optionals sops.enable
     [
@@ -35,7 +23,7 @@ pkgs.mkShell {
 
   commandsHeader = color.cyan "Commands:";
 
-  commandsList = concatStringsSep "\n"
+  commandsList = builtins.concatStringsSep "\n"
     (map
       (c:
         "  ${color.green (pad c.name 15)}${c.desc}"
@@ -44,7 +32,7 @@ pkgs.mkShell {
 
   helpText = ''\n${usage} \n\n${commandsHeader} \n${commandsList}'';
 
-  caseStatements = concatStringsSep "\n" (map
+  caseStatements = builtins.concatStringsSep "\n" (map
     (c:
       ''
         ${c.name})
@@ -99,6 +87,11 @@ in
       check_command nix-store
       check_command nix-collect-garbage
       nix-store --gc && nix-collect-garbage -d
+  }
+
+  home_template() {
+      check_command nix
+      nix flake init -t ${home}/.dotfiles#$@
   }
 
   # Main function to handle input and execute corresponding action
