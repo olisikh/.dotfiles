@@ -77,6 +77,7 @@
         terraformls.enable = true;
         marksman.enable = true;
         nil_ls.enable = true;
+        nixd.enable = true;
 
         helm_ls = {
           enable = true;
