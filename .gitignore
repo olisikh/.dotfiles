@@ -2,5 +2,6 @@ result
 .sops.yaml
 secrets.yaml
 .DS_Store
+.sisyphus/
 
 TODO.md
