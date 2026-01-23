@@ -38,6 +38,8 @@
     ./plugins/nvim-metals.nix
     ./plugins/inc-rename.nix
     ./plugins/cellular-automaton.nix
+    ./plugins/zen-mode.nix
+    ./plugins/neogen.nix
   ];
 
   plugins = {

@@ -14,6 +14,7 @@ config.hide_tab_bar_if_only_one_tab = false
 config.window_background_opacity = bg_opacity
 config.macos_window_background_blur = 10
 config.audible_bell = "Disabled" -- or "SystemBeep"
+config.unzoom_on_switch_pane = true
 
 config.color_scheme = "Catppuccin " .. theme_style
 config.colors = {
@@ -99,5 +100,31 @@ bar.apply_to_config(config, {
 		enabled = false,
 	},
 })
+
+w.on("user-var-changed", function(window, pane, name, value)
+	local overrides = window:get_config_overrides() or {}
+	if name == "ZEN_MODE" then
+		local zooming_in = value:find("+") ~= nil
+		local font_size = tonumber(value)
+
+		if zooming_in then
+			while font_size > 0 do
+				window:set_config_overrides(overrides)
+				window:perform_action(w.action.IncreaseFontSize, pane)
+				font_size = font_size - 1
+			end
+			overrides.enable_tab_bar = false
+		elseif font_size < 0 then
+			window:perform_action(w.action.ResetFontSize, pane)
+			overrides.font_size = nil
+			overrides.enable_tab_bar = true
+		else
+			overrides.font_size = font_size
+			overrides.enable_tab_bar = false
+		end
+
+		window:perform_action(w.action.SetPaneZoomState(zooming_in), pane)
+	end
+end)
 
 return config
