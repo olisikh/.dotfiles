@@ -37,6 +37,7 @@
     ./plugins/harpoon.nix
     ./plugins/nvim-metals.nix
     ./plugins/inc-rename.nix
+    ./plugins/cellular-automaton.nix
   ];
 
   plugins = {
