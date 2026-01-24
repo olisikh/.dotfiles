@@ -1,8 +1,8 @@
 { pkgs, ... }:
-
 let
+  name = "garbuliya";
   garbuliya = pkgs.vimUtils.buildVimPlugin {
-    name = "garbuliya";
+    inherit name;
     src = pkgs.writeTextDir "lua/garbuliya.lua" (builtins.readFile ./garbuliya/init.lua);
   };
 in

@@ -454,9 +454,7 @@ Quality gate (do not output):
 
 	local thinking_buf = ""
 
-	run_llm_streaming(prompt, function(line)
-		notify("LLM: " .. line)
-
+	local on_event = function(line)
 		if not M.config.show_thinking then
 			return
 		end
@@ -476,7 +474,9 @@ Quality gate (do not output):
 			thinking_buf = thinking_buf:sub(#thinking_buf - 89)
 		end
 		set_thinking_mark(bufnr, thinking_id, thinking_buf)
-	end, function(stdout, err)
+	end
+
+	local callback = function(stdout, err)
 		schedule(function()
 			local function cleanup(kind)
 				stop_spinner(bufnr, spinner_id, spinner_timer)
@@ -545,7 +545,9 @@ Quality gate (do not output):
 			notify("Applied implementation.")
 			cleanup("finish")
 		end)
-	end)
+	end
+
+	run_llm_streaming(prompt, on_event, callback)
 end
 
 function M.setup(opts)

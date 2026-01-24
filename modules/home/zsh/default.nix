@@ -61,6 +61,7 @@ in
               eval "$(kafkactl completion zsh)"
               eval "$(fzf --zsh)"
               eval "$(pay-respects zsh)"
+              eval "$(opencode completion)"
 
               # Preferred editor for local and remote sessions
               if [[ -n $SSH_CONNECTION ]]; then
