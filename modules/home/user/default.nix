@@ -52,7 +52,6 @@ in
         zoxide
         bat
         pay-respects # thefuck alternative
-        luarocks-nix
         minikube
         k9s
         kubectl

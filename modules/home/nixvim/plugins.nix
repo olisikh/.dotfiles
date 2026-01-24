@@ -40,6 +40,7 @@
     ./plugins/cellular-automaton.nix
     ./plugins/zen-mode.nix
     ./plugins/neogen.nix
+    ./plugins/garbuliya.nix
   ];
 
   plugins = {

@@ -20,10 +20,5 @@ in
         autoshare = false;
       };
     };
-
-    home.file = {
-      # NOTE: Since oh-my-opencode is under active development, it makes more sense to install it ad-hoc for flexibility.
-      # ".config/opencode/oh-my-opencode.json".source = ./config/oh-my-opencode.json;
-    };
   };
 }

@@ -19,10 +19,10 @@
   keymaps = [
     {
       mode = "n";
-      key = "<leader>o";
+      key = "<leader>co";
       action = ":AerialToggle!<cr>";
       options = {
-        desc = "aerial: toggle outline view";
+        desc = "aerial: toggle [c]ode [o]utline";
       };
     }
   ];

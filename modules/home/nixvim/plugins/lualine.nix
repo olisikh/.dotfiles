@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   plugins = {
     lualine = {
@@ -14,6 +14,9 @@
           ];
           lualine_x = [
             "harpoon2"
+            {
+              __unkeyed-1 = lib.nixvim.mkRaw ''require("opencode").statusline'';
+            }
             "copilot"
             "encoding"
             "filetype"
