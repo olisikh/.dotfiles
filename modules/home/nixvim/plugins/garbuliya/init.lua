@@ -5,23 +5,23 @@ local json = vim.json
 local log = vim.log
 local tbl_extend = vim.tbl_extend
 local schedule = vim.schedule
+local uv = vim.loop
 
 local ns = api.nvim_create_namespace("garbuliya")
 
 local M = {}
 
 M.config = {
-	endpoint = "http://localhost:11434/v1/chat/completions",
-	api_key = "",
-	model = "opencode/grok-code-fast-1",
-	temperature = 0.2,
-	keymap = "<leader>gi",
-	curl_path = "curl",
+	opencode_cmd = "opencode",
+	model = "opencode/gpt-5.1-codex-mini",
+	format = "json",
 	notify = true,
+	show_thinking = true,
+
 	system_prompt = [[
 You are an expert software engineer focused on correctness, performance, and simplicity.
 
-You write production-quality code.
+You write concise, readable, maintainable, performant, production-quality code.
 You do not explain your reasoning unless explicitly asked.
 You strictly follow instructions and constraints.
 ]],
@@ -69,7 +69,6 @@ local function fidget_progress(title, message)
 	})
 end
 
--- Spinner
 local SPINNER = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 
 local function update_mark(bufnr, mark_id, opts)
@@ -83,7 +82,7 @@ end
 
 local function start_spinner(bufnr, mark_id, label_fn)
 	local i = 1
-	local timer = vim.loop.new_timer()
+	local timer = uv.new_timer()
 
 	timer:start(0, 120, function()
 		schedule(function()
@@ -127,7 +126,26 @@ local function stop_spinner(bufnr, mark_id, timer)
 	end)
 end
 
--- Selection helpers
+local function set_thinking_mark(bufnr, mark_id, text)
+	if not (text and text ~= "") then
+		return
+	end
+	local pos = api.nvim_buf_get_extmark_by_id(bufnr, ns, mark_id, {})
+	if not pos or not pos[1] then
+		return
+	end
+	api.nvim_buf_set_extmark(bufnr, ns, pos[1], pos[2], {
+		id = mark_id,
+		virt_text = { { "LLM: " .. text, "Comment" } },
+		virt_text_pos = "eol",
+		hl_mode = "combine",
+	})
+end
+
+local function clear_mark(bufnr, mark_id)
+	pcall(api.nvim_buf_del_extmark, bufnr, ns, mark_id)
+end
+
 local function get_visual_range()
 	local mode = fn.mode()
 	if mode ~= "v" and mode ~= "V" and mode ~= "\22" then
@@ -139,7 +157,6 @@ local function get_visual_range()
 end
 
 local function ts_find_nearest_function_range()
-	-- No require(); just guard get_parser
 	local ok, parser = pcall(vim.treesitter.get_parser, 0)
 	if not ok or not parser then
 		return nil
@@ -185,91 +202,189 @@ local function compute_target_range()
 	return nil
 end
 
--- LLM plumbing
 local function buf_text(bufnr, sr, sc, er, ec)
 	local lines = api.nvim_buf_get_text(bufnr, sr, sc, er, ec, {})
 	return table.concat(lines, "\n")
 end
 
-local function build_payload(prompt)
-	return json.encode({
-		model = M.config.model,
-		messages = {
-			{ role = "system", content = M.config.system_prompt },
-			{ role = "user", content = prompt },
-		},
-		temperature = M.config.temperature,
-		stream = false,
-	})
-end
-
-local function strip_http_headers(raw)
-	local i = raw:find("\r\n\r\n", 1, true)
-	if i then
-		return raw:sub(i + 4)
-	end
-	i = raw:find("\n\n", 1, true)
-	if i then
-		return raw:sub(i + 2)
-	end
-	return raw
+local function strip_fences(s)
+	return (s or ""):gsub("^%s*```[%w_-]*%s*\n", ""):gsub("\n%s*```%s*$", "")
 end
 
 local function extract_code_from_response(raw_text)
-	local body = strip_http_headers(raw_text or "")
-	local trimmed = body:match("^%s*(.*)$") or ""
-	local first = trimmed:sub(1, 1)
-	if first ~= "{" and first ~= "[" then
-		return nil, "Non-JSON response (endpoint/auth). First bytes: " .. trimmed:sub(1, 80)
+	if type(raw_text) ~= "string" or raw_text == "" then
+		return nil, "Empty response from opencode"
 	end
 
-	local ok, obj = pcall(json.decode, body)
-	if not ok or type(obj) ~= "table" then
-		return nil, "LLM returned invalid JSON"
+	local acc = {}
+	local saw_any = false
+
+	for line in raw_text:gmatch("[^\n]+") do
+		line = line:gsub("^%s+", ""):gsub("%s+$", "")
+		if line ~= "" then
+			local ok, obj = pcall(json.decode, line)
+			if ok and type(obj) == "table" then
+				saw_any = true
+
+				if obj.error then
+					local msg = obj.error.message or vim.inspect(obj.error)
+					return nil, "opencode error: " .. tostring(msg)
+				end
+
+				local et = obj.type
+				local part = obj.part
+
+				if et == "text" and type(part) == "table" and type(part.text) == "string" and part.text ~= "" then
+					acc[#acc + 1] = part.text
+				else
+					local choice = obj.choices and obj.choices[1]
+					local delta = choice and choice.delta and choice.delta.content
+					if type(delta) == "string" and delta ~= "" then
+						acc[#acc + 1] = delta
+					end
+					local msg = choice and choice.message and choice.message.content
+					if type(msg) == "string" and msg ~= "" then
+						acc[#acc + 1] = msg
+					end
+					if type(obj.text) == "string" and obj.text ~= "" then
+						acc[#acc + 1] = obj.text
+					end
+					if type(obj.content) == "string" and obj.content ~= "" then
+						acc[#acc + 1] = obj.content
+					end
+					if type(part) == "table" and type(part.content) == "string" and part.content ~= "" then
+						acc[#acc + 1] = part.content
+					end
+				end
+			end
+		end
 	end
 
-	local choice = obj.choices and obj.choices[1]
-	local content = choice and ((choice.message and choice.message.content) or choice.text or choice.content)
-
-	if type(content) ~= "string" then
-		return nil, "Unexpected JSON shape (no choices[1].message.content/text)"
+	if not saw_any then
+		return nil, "No JSON events found in opencode output"
 	end
 
-	content = content:gsub("^%s*```[%w_-]*\n", ""):gsub("\n```%s*$", "")
+	local content = table.concat(acc, "\n"):gsub("\r\n", "\n")
+	content = strip_fences(content)
+
+	if content:gsub("%s+", "") == "" then
+		return nil, "Could not extract text from opencode events. First bytes: " .. raw_text:sub(1, 300)
+	end
+
 	return content, nil
 end
 
-local function run_llm(prompt, cb)
-	local payload = build_payload(prompt)
+local function run_llm_streaming(prompt, on_event, cb)
+	local message = table.concat({ M.config.system_prompt, "", prompt }, "\n")
 
+	local cmd = M.config.opencode_cmd or "opencode"
 	local args = {
-		M.config.curl_path,
-		"-sS",
-		"--fail-with-body",
-		"-X",
-		"POST",
-		M.config.endpoint,
-		"-H",
-		"Content-Type: application/json",
-		"-d",
-		payload,
+		"run",
+		"--format",
+		(M.config.format or "json"),
+		"--model",
+		M.config.model,
+		message,
 	}
 
-	if M.config.api_key and M.config.api_key ~= "" then
-		args[#args + 1] = "-H"
-		args[#args + 1] = "Authorization: Bearer " .. M.config.api_key
+	local stdout = uv.new_pipe(false)
+	local stderr = uv.new_pipe(false)
+
+	local out_chunks = {}
+	local err_chunks = {}
+	local out_buf = ""
+	local err_buf = ""
+
+	local function flush_lines(buf, sink, emit)
+		while true do
+			local nl = buf:find("\n", 1, true)
+			if not nl then
+				break
+			end
+			local line = buf:sub(1, nl - 1)
+			buf = buf:sub(nl + 1)
+			sink[#sink + 1] = line .. "\n"
+			if emit then
+				pcall(emit, line)
+			end
+		end
+		return buf
 	end
 
-	vim.system(args, { text = true }, function(res)
-		if res.code ~= 0 then
-			cb(nil, ("curl failed (%d): %s"):format(res.code, (res.stderr or ""):gsub("%s+$", "")))
+	local handle, pid
+	handle, pid = uv.spawn(cmd, { args = args, stdio = { nil, stdout, stderr } }, function(code, signal)
+		if stdout and not stdout:is_closing() then
+			stdout:read_stop()
+		end
+		if stderr and not stderr:is_closing() then
+			stderr:read_stop()
+		end
+
+		if out_buf ~= "" then
+			out_chunks[#out_chunks + 1] = out_buf
+			out_buf = ""
+		end
+		if err_buf ~= "" then
+			err_chunks[#err_chunks + 1] = err_buf
+			err_buf = ""
+		end
+
+		if stdout and not stdout:is_closing() then
+			stdout:close()
+		end
+		if stderr and not stderr:is_closing() then
+			stderr:close()
+		end
+		if handle and not handle:is_closing() then
+			handle:close()
+		end
+
+		local full_out = table.concat(out_chunks)
+		local full_err = table.concat(err_chunks)
+
+		schedule(function()
+			if code == 0 then
+				cb(full_out, nil)
+			else
+				local tail = (full_err ~= "" and full_err or full_out):gsub("%s+$", "")
+				if #tail > 800 then
+					tail = tail:sub(#tail - 799)
+				end
+				cb(nil, ("opencode failed (%d, sig=%d): %s"):format(code, signal or 0, tail))
+			end
+		end)
+	end)
+
+	if not handle then
+		cb(nil, ("Failed to spawn %s (is it in PATH?)"):format(cmd))
+		return
+	end
+
+	stdout:read_start(function(err, data)
+		if err then
+			err_chunks[#err_chunks + 1] = ("[stdout read error] %s\n"):format(err)
 			return
 		end
-		cb(res.stdout, nil)
+		if not data then
+			return
+		end
+		out_buf = out_buf .. data
+		out_buf = flush_lines(out_buf, out_chunks, on_event)
+	end)
+
+	stderr:read_start(function(err, data)
+		if err then
+			err_chunks[#err_chunks + 1] = ("[stderr read error] %s\n"):format(err)
+			return
+		end
+		if not data then
+			return
+		end
+		err_buf = err_buf .. data
+		err_buf = flush_lines(err_buf, err_chunks, nil)
 	end)
 end
 
--- Public
 function M.implement()
 	local bufnr = api.nvim_get_current_buf()
 	local filetype = bo[bufnr].filetype
@@ -280,30 +395,35 @@ function M.implement()
 		return
 	end
 
-	-- Anchors for applying edits (stable, tied to region)
 	local start_id = api.nvim_buf_set_extmark(bufnr, ns, sr, sc, { right_gravity = false })
 	local end_id = api.nvim_buf_set_extmark(bufnr, ns, er, ec, { right_gravity = true })
 
-	-- Separate anchor for UI: show next to cursor
 	local cur = api.nvim_win_get_cursor(0)
 	local cur_row = cur[1] - 1
 	local cur_col = cur[2]
+
 	local spinner_id = api.nvim_buf_set_extmark(bufnr, ns, cur_row, cur_col, { right_gravity = false })
+	local thinking_id = api.nvim_buf_set_extmark(bufnr, ns, cur_row, cur_col, { right_gravity = false })
 
 	local loc = mark_label(bufnr, start_id)
 
 	local spinner_timer = start_spinner(bufnr, spinner_id, function()
 		return "garbuliya thinking… (" .. loc .. ")"
 	end)
+
 	local progress = fidget_progress("garbuliya", ("Thinking… (%s)"):format(loc))
 
 	local orig = buf_text(bufnr, sr, sc, er, ec)
 	if orig:gsub("%s+", "") == "" then
 		notify("Selected region is empty.", log.levels.WARN)
-		stop_spinner(bufnr, start_id, spinner_timer)
+		stop_spinner(bufnr, spinner_id, spinner_timer)
 		if progress then
 			progress:cancel()
 		end
+		clear_mark(bufnr, start_id)
+		clear_mark(bufnr, end_id)
+		clear_mark(bufnr, spinner_id)
+		clear_mark(bufnr, thinking_id)
 		return
 	end
 
@@ -321,6 +441,7 @@ Hard constraints:
 - Among equally fast solutions, minimize auxiliary space and allocations.
 - Prefer iterative solutions over recursion unless recursion is required for optimal asymptotics.
 - Handle edge cases and invalid inputs correctly and minimally.
+- Do NOT run any tools/commands. Output only code.
 
 Quality gate (do not output):
 - Sanity-check correctness on edge cases.
@@ -331,12 +452,38 @@ Quality gate (do not output):
 		"=== REGION END ===",
 	}, "\n")
 
-	run_llm(prompt, function(stdout, err)
+	local thinking_buf = ""
+
+	run_llm_streaming(prompt, function(line)
+		notify("LLM: " .. line)
+
+		if not M.config.show_thinking then
+			return
+		end
+		local ok, obj = pcall(json.decode, line)
+		if not ok or type(obj) ~= "table" then
+			return
+		end
+		if obj.type ~= "text" or type(obj.part) ~= "table" or type(obj.part.text) ~= "string" then
+			return
+		end
+		local chunk = obj.part.text
+		if chunk == "" then
+			return
+		end
+		thinking_buf = (thinking_buf .. chunk):gsub("%s+", " ")
+		if #thinking_buf > 90 then
+			thinking_buf = thinking_buf:sub(#thinking_buf - 89)
+		end
+		set_thinking_mark(bufnr, thinking_id, thinking_buf)
+	end, function(stdout, err)
 		schedule(function()
 			local function cleanup(kind)
-				-- kind: "cancel" | "finish" | nil
 				stop_spinner(bufnr, spinner_id, spinner_timer)
-				pcall(api.nvim_buf_del_extmark, bufnr, ns, spinner_id)
+				update_mark(bufnr, spinner_id, { virt_text = nil })
+				update_mark(bufnr, thinking_id, { virt_text = nil })
+				clear_mark(bufnr, spinner_id)
+				clear_mark(bufnr, thinking_id)
 
 				if progress then
 					if kind == "cancel" then
@@ -346,8 +493,8 @@ Quality gate (do not output):
 					end
 				end
 
-				pcall(api.nvim_buf_del_extmark, bufnr, ns, start_id)
-				pcall(api.nvim_buf_del_extmark, bufnr, ns, end_id)
+				clear_mark(bufnr, start_id)
+				clear_mark(bufnr, end_id)
 			end
 
 			if err then
@@ -384,9 +531,8 @@ Quality gate (do not output):
 
 			local sr2, sc2 = s[1], s[2]
 			local er2, ec2 = e[1], e[2]
-
 			if (er2 < sr2) or (er2 == sr2 and ec2 < sc2) then
-				notify("Target region became invalid (edits moved anchors); not applying.", log.levels.WARN)
+				notify("Target region became invalid; not applying.", log.levels.WARN)
 				cleanup("cancel")
 				return
 			end
@@ -397,7 +543,6 @@ Quality gate (do not output):
 
 			api.nvim_buf_set_text(bufnr, sr2, sc2, er2, ec2, split_lines(code))
 			notify("Applied implementation.")
-
 			cleanup("finish")
 		end)
 	end)
@@ -409,12 +554,6 @@ function M.setup(opts)
 	api.nvim_create_user_command("GarbuliyaImplement", function()
 		M.implement()
 	end, {})
-
-	if M.config.keymap and M.config.keymap ~= "" then
-		vim.keymap.set({ "n", "v" }, M.config.keymap, function()
-			M.implement()
-		end, { desc = "garbuliya: implement (async)" })
-	end
 end
 
 return M

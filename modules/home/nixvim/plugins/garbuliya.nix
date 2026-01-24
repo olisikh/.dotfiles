@@ -12,10 +12,8 @@ in
   ];
 
   extraConfigLua = ''
-    require("garbuliya").setup({
-      endpoint = "https://opencode.ai/zen/v1/chat/completions",
-      api_key  = os.getenv("OPENCODE_API_KEY"),
-      model    = "grok-code",
-    })
+    require("garbuliya").setup({})
+
+    vim.keymap.set( { "n", "v" }, "<leader>gi", ":GarbuliyaImplement<cr>", { desc = "garbuliya: implement at cursor" })
   '';
 }
