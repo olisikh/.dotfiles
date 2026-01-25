@@ -20,9 +20,47 @@ local ERROR_TAIL_MAX_CHARS = 800
 -- Track active process handles so they can be cancelled
 local active_processes = {}
 
+-- Store the garbuliya session ID to reuse across multiple calls
+-- This prevents cluttering the sessions list with multiple sessions
+local garbuliya_session_id = nil
+
 -- ============================================================================
 -- Response Parsing
 -- ============================================================================
+
+-- ============================================================================
+-- Session Management
+-- ============================================================================
+
+--- Extract session ID from opencode response
+-- The first response typically contains the session ID for reuse
+-- @param raw_text JSON lines from opencode stdout
+-- @return session_id string or nil
+function M.extract_session_id_from_response(raw_text)
+	if type(raw_text) ~= "string" or raw_text == "" then
+		return nil
+	end
+
+	-- Look through all JSON objects for sessionID
+	for line in raw_text:gmatch("[^\n]+") do
+		line = line:gsub("^%s+", ""):gsub("%s+$", "")
+		if line ~= "" then
+			local ok, obj = pcall(json.decode, line)
+			if ok and type(obj) == "table" then
+				-- Check for sessionID at top level
+				if obj.sessionID then
+					return obj.sessionID
+				end
+				-- Check in nested structures (e.g., session object)
+				if obj.session and type(obj.session) == "table" and obj.session.id then
+					return obj.session.id
+				end
+			end
+		end
+	end
+
+	return nil
+end
 
 -- ============================================================================
 -- Cost Extraction
@@ -230,8 +268,20 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 		config.model,
 		-- "-f",
 		-- file,
-		message,
 	}
+
+	-- Handle session ID for reuse
+	if garbuliya_session_id then
+		-- Reuse existing session
+		table.insert(args, "-s")
+		table.insert(args, garbuliya_session_id)
+	else
+		-- Create new session with a meaningful title
+		table.insert(args, "--title")
+		table.insert(args, "Garbuliya")
+	end
+
+	table.insert(args, message)
 
 	local stdout = uv.new_pipe(false)
 	local stderr = uv.new_pipe(false)
@@ -305,6 +355,13 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 
 		schedule(function()
 			if code == 0 then
+				-- Extract and store session ID on first successful run
+				if not garbuliya_session_id then
+					local session_id = M.extract_session_id_from_response(full_out)
+					if session_id then
+						garbuliya_session_id = session_id
+					end
+				end
 				cb(full_out, nil)
 			else
 				-- Use stderr if available, otherwise stdout
