@@ -39,7 +39,7 @@ in
       ]);
 
       casks = (optionals cfg.common.enable [ "raycast" "betterdisplay" ]) ++
-        (optionals cfg.personal.enable [ "ollama-app" "vlc" ]) ++
+        (optionals cfg.personal.enable [ "ollama-app" "iina" ]) ++
         (optionals cfg.work.enable [
           # Add work-specific casks here
         ]);

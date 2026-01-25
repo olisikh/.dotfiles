@@ -45,6 +45,25 @@ function M.clear_mark(bufnr, ns, mark_id)
 	pcall(api.nvim_buf_del_extmark, bufnr, ns, mark_id)
 end
 
+--- Clear all virtual text from garbuliya namespace in a buffer
+-- Ensures no orphaned spinners or text remain
+function M.clear_all_virt_text(bufnr, ns)
+	if not api.nvim_buf_is_valid(bufnr) then
+		return
+	end
+
+	-- Get all extmarks in the namespace
+	local marks = api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, { details = true })
+	for _, mark in ipairs(marks) do
+		local mark_id = mark[1]
+		-- Remove virtual text from each mark
+		pcall(api.nvim_buf_set_extmark, bufnr, ns, mark[2], mark[3], {
+			id = mark_id,
+			virt_text = nil,
+		})
+	end
+end
+
 -- ============================================================================
 -- Spinner Animation
 -- ============================================================================
@@ -92,8 +111,10 @@ end
 --- Stop and clean up a spinner animation
 function M.stop_spinner(bufnr, ns, mark_id, timer)
 	if timer then
-		timer:stop()
-		timer:close()
+		pcall(function()
+			timer:stop()
+			timer:close()
+		end)
 	end
 	schedule(function()
 		if api.nvim_buf_is_valid(bufnr) then

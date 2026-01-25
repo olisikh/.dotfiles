@@ -14,8 +14,118 @@ local utils = require("garbuliya.utils")
 local ERROR_TAIL_MAX_CHARS = 800
 
 -- ============================================================================
+-- State Management
+-- ============================================================================
+
+-- Track active process handles so they can be cancelled
+local active_processes = {}
+
+-- ============================================================================
 -- Response Parsing
 -- ============================================================================
+
+-- ============================================================================
+-- Cost Extraction
+-- ============================================================================
+
+--- Extract cost from the last JSON event in response
+-- @param raw_text JSON lines from opencode stdout
+-- @return cost table or nil (contains usage, tokens, etc.)
+function M.extract_cost_from_response(raw_text)
+	if type(raw_text) ~= "string" or raw_text == "" then
+		return nil
+	end
+
+	local last_obj = nil
+	local all_objects = {}
+
+	for line in raw_text:gmatch("[^\n]+") do
+		line = line:gsub("^%s+", ""):gsub("%s+$", "")
+		if line ~= "" then
+			local ok, obj = pcall(json.decode, line)
+			if ok and type(obj) == "table" then
+				last_obj = obj
+				table.insert(all_objects, obj)
+			end
+		end
+	end
+
+	-- Try to find cost in various locations
+	-- 1. Check last object first
+	if last_obj then
+		-- Cost in part (nested structure - opencode API)
+		if last_obj.part and type(last_obj.part) == "table" then
+			if last_obj.part.cost then
+				return {
+					cost = last_obj.part.cost,
+					tokens = last_obj.part.tokens,
+					type = last_obj.type,
+					reason = last_obj.part.reason
+				}
+			end
+		end
+		
+		-- Direct cost field
+		if last_obj.cost then
+			return {
+				cost = last_obj.cost,
+				tokens = last_obj.tokens,
+				type = last_obj.type
+			}
+		end
+		
+		-- Usage field
+		if last_obj.usage then
+			return last_obj.usage
+		end
+		
+		-- Check nested data structures
+		if last_obj.data and type(last_obj.data) == "table" then
+			if last_obj.data.cost then
+				return last_obj.data.cost
+			end
+			if last_obj.data.usage then
+				return last_obj.data.usage
+			end
+		end
+	end
+
+	-- 2. Search backwards through all objects for cost data
+	for i = #all_objects, 1, -1 do
+		local obj = all_objects[i]
+		
+		-- Check for cost in part (most likely for opencode API)
+		if obj.part and type(obj.part) == "table" and obj.part.cost then
+			return {
+				cost = obj.part.cost,
+				tokens = obj.part.tokens,
+				type = obj.type,
+				reason = obj.part.reason
+			}
+		end
+		
+		-- Direct cost
+		if obj.cost then
+			return {
+				cost = obj.cost,
+				tokens = obj.tokens,
+				type = obj.type
+			}
+		end
+		
+		if obj.usage then
+			return obj.usage
+		end
+		
+		if obj.type == "message_stop" and obj.message then
+			if obj.message.usage then
+				return obj.message.usage
+			end
+		end
+	end
+
+	return nil
+end
 
 --- Extract text content from streaming JSON response
 -- Handles multiple response formats (streaming, choices, parts, etc.)
@@ -109,12 +219,17 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 	local message = table.concat({ config.system_prompt, "", prompt }, "\n")
 
 	local cmd = config.opencode_cmd or "opencode"
+	local file = vim.api.nvim_buf_get_name(0)
+	assert(file ~= "", "active buffer has no file")
+
 	local args = {
 		"run",
 		"--format",
-		(config.format or "json"),
+		"json",
 		"--model",
 		config.model,
+		-- "-f",
+		-- file,
 		message,
 	}
 
@@ -146,13 +261,17 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 
 	--- Handle process completion and collect output
 	local function on_exit(code, signal)
-		-- Stop reading from pipes
-		if stdout and not stdout:is_closing() then
-			stdout:read_stop()
-		end
-		if stderr and not stderr:is_closing() then
-			stderr:read_stop()
-		end
+		-- Stop reading from pipes (safely, as they may already be closed)
+		pcall(function()
+			if stdout and not stdout:is_closing() then
+				stdout:read_stop()
+			end
+		end)
+		pcall(function()
+			if stderr and not stderr:is_closing() then
+				stderr:read_stop()
+			end
+		end)
 
 		-- Flush remaining buffers
 		if out_buf ~= "" then
@@ -164,16 +283,22 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 			err_buf = ""
 		end
 
-		-- Close pipes and handle
-		if stdout and not stdout:is_closing() then
-			stdout:close()
-		end
-		if stderr and not stderr:is_closing() then
-			stderr:close()
-		end
-		if handle and not handle:is_closing() then
-			handle:close()
-		end
+		-- Close pipes and handle (safely, as they may already be closed)
+		pcall(function()
+			if stdout and not stdout:is_closing() then
+				stdout:close()
+			end
+		end)
+		pcall(function()
+			if stderr and not stderr:is_closing() then
+				stderr:close()
+			end
+		end)
+		pcall(function()
+			if handle and not handle:is_closing() then
+				handle:close()
+			end
+		end)
 
 		local full_out = table.concat(out_chunks)
 		local full_err = table.concat(err_chunks)
@@ -199,8 +324,16 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 
 	if not handle then
 		cb(nil, ("Failed to spawn %s (is it in PATH?)"):format(cmd))
-		return
+		return nil
 	end
+
+	-- Track this process so it can be cancelled
+	local process_id = handle
+	active_processes[process_id] = {
+		handle = handle,
+		stdout = stdout,
+		stderr = stderr,
+	}
 
 	-- Handle stdout data
 	stdout:read_start(function(err, data)
@@ -227,6 +360,27 @@ function M.run_llm_streaming(config, prompt, on_event, cb)
 		err_buf = err_buf .. data
 		err_buf = flush_lines(err_buf, err_chunks, nil)
 	end)
+
+	-- Return process ID so caller can cancel if needed
+	return process_id
+end
+
+-- ============================================================================
+-- Process Cancellation
+-- ============================================================================
+
+--- Cancel all active LLM processes
+function M.cancel_all_processes()
+	for process_id, proc_data in pairs(active_processes) do
+		pcall(function()
+			if proc_data.handle and not proc_data.handle:is_closing() then
+				-- Send SIGTERM to gracefully terminate
+				proc_data.handle:kill(15) -- SIGTERM
+			end
+		end)
+	end
+	-- Clear the table after sending kill signals
+	active_processes = {}
 end
 
 return M
