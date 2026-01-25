@@ -3,7 +3,10 @@ let
   name = "garbuliya";
   garbuliya = pkgs.vimUtils.buildVimPlugin {
     inherit name;
-    src = pkgs.writeTextDir "lua/garbuliya.lua" (builtins.readFile ./garbuliya/init.lua);
+    src = pkgs.runCommand "garbuliya-src" {} ''
+      mkdir -p $out/lua/garbuliya
+      cp ${./garbuliya}/*.lua $out/lua/garbuliya/
+    '';
   };
 in
 {
