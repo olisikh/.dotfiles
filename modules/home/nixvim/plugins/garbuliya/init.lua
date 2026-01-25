@@ -16,7 +16,7 @@ M.config = {
 	model = "opencode/gpt-5.1-codex-mini",
 	format = "json",
 	notify = true,
-	show_thinking = true,
+	show_fidget = false,
 
 	system_prompt = [[
 You are an expert software engineer focused on correctness, performance, and simplicity.
@@ -124,22 +124,6 @@ local function stop_spinner(bufnr, mark_id, timer)
 			update_mark(bufnr, mark_id, { virt_text = nil })
 		end
 	end)
-end
-
-local function set_thinking_mark(bufnr, mark_id, text)
-	if not (text and text ~= "") then
-		return
-	end
-	local pos = api.nvim_buf_get_extmark_by_id(bufnr, ns, mark_id, {})
-	if not pos or not pos[1] then
-		return
-	end
-	api.nvim_buf_set_extmark(bufnr, ns, pos[1], pos[2], {
-		id = mark_id,
-		virt_text = { { "LLM: " .. text, "Comment" } },
-		virt_text_pos = "eol",
-		hl_mode = "combine",
-	})
 end
 
 local function clear_mark(bufnr, mark_id)
@@ -403,15 +387,17 @@ function M.implement()
 	local cur_col = cur[2]
 
 	local spinner_id = api.nvim_buf_set_extmark(bufnr, ns, cur_row, cur_col, { right_gravity = false })
-	local thinking_id = api.nvim_buf_set_extmark(bufnr, ns, cur_row, cur_col, { right_gravity = false })
 
 	local loc = mark_label(bufnr, start_id)
 
 	local spinner_timer = start_spinner(bufnr, spinner_id, function()
-		return "garbuliya thinking… (" .. loc .. ")"
+		return "garbuliya: generating… (" .. loc .. ")"
 	end)
 
-	local progress = fidget_progress("garbuliya", ("Thinking… (%s)"):format(loc))
+	local progress = nil
+	if M.config.show_fidget then
+		progress = fidget_progress("garbuliya", ("generating… (%s)"):format(loc))
+	end
 
 	local orig = buf_text(bufnr, sr, sc, er, ec)
 	if orig:gsub("%s+", "") == "" then
@@ -423,7 +409,6 @@ function M.implement()
 		clear_mark(bufnr, start_id)
 		clear_mark(bufnr, end_id)
 		clear_mark(bufnr, spinner_id)
-		clear_mark(bufnr, thinking_id)
 		return
 	end
 
@@ -452,38 +437,14 @@ Quality gate (do not output):
 		"=== REGION END ===",
 	}, "\n")
 
-	local thinking_buf = ""
-
-	local on_event = function(line)
-		if not M.config.show_thinking then
-			return
-		end
-		local ok, obj = pcall(json.decode, line)
-		if not ok or type(obj) ~= "table" then
-			return
-		end
-		if obj.type ~= "text" or type(obj.part) ~= "table" or type(obj.part.text) ~= "string" then
-			return
-		end
-		local chunk = obj.part.text
-		if chunk == "" then
-			return
-		end
-		thinking_buf = (thinking_buf .. chunk):gsub("%s+", " ")
-		if #thinking_buf > 90 then
-			thinking_buf = thinking_buf:sub(#thinking_buf - 89)
-		end
-		set_thinking_mark(bufnr, thinking_id, thinking_buf)
-	end
+	local on_event = function(line) end
 
 	local callback = function(stdout, err)
 		schedule(function()
 			local function cleanup(kind)
 				stop_spinner(bufnr, spinner_id, spinner_timer)
 				update_mark(bufnr, spinner_id, { virt_text = nil })
-				update_mark(bufnr, thinking_id, { virt_text = nil })
 				clear_mark(bufnr, spinner_id)
-				clear_mark(bufnr, thinking_id)
 
 				if progress then
 					if kind == "cancel" then
