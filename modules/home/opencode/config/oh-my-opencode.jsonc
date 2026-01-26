@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
   "agents": {
-    "Sisyphus": {
+    "sisyphus": {
       "model": "opencode/glm-4.7"
     },
     "oracle": {
@@ -15,26 +15,20 @@
     "explore": {
       "model": "opencode/grok-code-fast-1"
     },
-    "frontend-ui-ux-engineer": {
-      "model": "opencode/gpt-5.1-codex-mini"
-    },
-    "document-writer": {
-      "model": "opencode/gpt-5.1-codex-mini"
-    },
     "multimodal-looker": {
       "model": "google/gemini-3-pro-preview"
     },
-    "Prometheus (Planner)": {
+    "prometheus": {
       "model": "opencode/glm-4.7"
     },
-    "Metis (Plan Consultant)": {
+    "metis": {
       "model": "opencode/glm-4.7"
     },
-    "Momus (Plan Reviewer)": {
+    "momus": {
       "model": "opencode/gpt-5.2-codex",
       "variant": "medium"
     },
-    "Atlas": {
+    "atlas": {
       "model": "opencode/glm-4.7"
     }
   },
