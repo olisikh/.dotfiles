@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "google_auth": false,
+  "agents": {
+    "Sisyphus": {
+      "model": "opencode/glm-4.7"
+    },
+    "oracle": {
+      "model": "opencode/gpt-5.2-codex",
+      "variant": "high"
+    },
+    "librarian": {
+      "model": "opencode/glm-4.7"
+    },
+    "explore": {
+      "model": "opencode/grok-code-fast-1"
+    },
+    "frontend-ui-ux-engineer": {
+      "model": "opencode/gpt-5.1-codex-mini"
+    },
+    "document-writer": {
+      "model": "opencode/gpt-5.1-codex-mini"
+    },
+    "multimodal-looker": {
+      "model": "google/gemini-3-pro-preview"
+    },
+    "Prometheus (Planner)": {
+      "model": "opencode/glm-4.7"
+    },
+    "Metis (Plan Consultant)": {
+      "model": "opencode/glm-4.7"
+    },
+    "Momus (Plan Reviewer)": {
+      "model": "opencode/gpt-5.2-codex",
+      "variant": "medium"
+    },
+    "Atlas": {
+      "model": "opencode/glm-4.7"
+    }
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "google/gemini-3-pro-preview"
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.2-codex"
+    },
+    "artistry": {
+      "model": "google/gemini-3-pro-preview",
+      "variant": "max"
+    },
+    "quick": {
+      "model": "opencode/gpt-5.1-codex-mini"
+    },
+    "unspecified-low": {
+      "model": "opencode/gpt-5.2"
+    },
+    "unspecified-high": {
+      "model": "opencode/gpt-5.2"
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview"
+    }
+  }
+}

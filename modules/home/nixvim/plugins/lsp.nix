@@ -86,7 +86,7 @@
 
         yamlls = {
           enable = true;
-          filetypes = [ "yaml" ];
+          filetypes = [ "yaml" "json" "jsonc" ];
           settings = {
             yaml = {
               keyOrdering = false; # -- disable alphabetic ordering of keys
