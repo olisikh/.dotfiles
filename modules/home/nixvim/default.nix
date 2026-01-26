@@ -83,7 +83,6 @@ in
         nixpkgs-fmt
       ];
 
-
       extraConfigLua = ''
         vim.loop.fs_mkdir(vim.o.backupdir, 750)
         vim.loop.fs_mkdir(vim.o.directory, 750)

@@ -3,9 +3,7 @@
   plugins = {
     lsp = {
       enable = true;
-      inlayHints = false; # NOTE: disable inlay-hints by default
-      capabilities = # lua
-        ''require('blink.cmp').get_lsp_capabilities(capabilities)'';
+      inlayHints = false;
       servers = {
         lua_ls = {
           enable = true;
@@ -84,9 +82,52 @@
           filetypes = [ "helm" ];
         };
 
+        jsonls = {
+          enable = true;
+          filetypes = [ "json" "jsonc" ];
+          settings = {
+            json = {
+              schemas = [
+                {
+                  fileMatch = [ "package.json" ];
+                  url = "https://json.schemastore.org/package.json";
+                }
+                {
+                  fileMatch = [ "tsconfig*.json" ];
+                  url = "https://json.schemastore.org/tsconfig.json";
+                }
+                {
+                  fileMatch = [ "jsconfig.json" ];
+                  url = "https://json.schemastore.org/jsconfig.json";
+                }
+                {
+                  fileMatch = [ ".prettierrc" ".prettierrc.json" "prettier.config.json" ];
+                  url = "https://json.schemastore.org/prettierrc.json";
+                }
+                {
+                  fileMatch = [ "lerna.json" ];
+                  url = "https://json.schemastore.org/lerna.json";
+                }
+                {
+                  fileMatch = [ "nodemon.json" "nodemon.jsonc" ];
+                  url = "https://json.schemastore.org/nodemon.json";
+                }
+                {
+                  fileMatch = [ "oh-my-opencode.json" "oh-my-opencode.jsonc" ];
+                  url = "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/refs/heads/dev/assets/oh-my-opencode.schema.json";
+                }
+                {
+                  fileMatch = [ "opencode.json" "opencode.jsonc" ];
+                  url = "https://opencode.ai/config.json";
+                }
+              ];
+            };
+          };
+        };
+
         yamlls = {
           enable = true;
-          filetypes = [ "yaml" "json" "jsonc" ];
+          filetypes = [ "yaml" ];
           settings = {
             yaml = {
               keyOrdering = false; # -- disable alphabetic ordering of keys

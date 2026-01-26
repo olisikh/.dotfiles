@@ -27,6 +27,7 @@
           typescriptreact = [ "prettierd" ];
           java = [ "google-java-format" ];
           json = [ "jq" ];
+          yaml = [ "yq" ];
           lua = [ "stylua" ];
           python = [ "isort" "black" ];
           rust = [ "rustfmt" ];
