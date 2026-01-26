@@ -118,9 +118,12 @@ in
         (pulumi.withPackages (ps: with ps; [
           pulumi-nodejs
         ]))
+      ]) ++
+      (optionals cfg.work.enable [
+        slack
       ]);
 
-      sessionVariables = mkIf cfg.personal.enable {
+      sessionVariables = {
         SCALA_HOME = scala;
         SCALA_CLI_POWER = "true";
         JAVA_HOME = jdk;

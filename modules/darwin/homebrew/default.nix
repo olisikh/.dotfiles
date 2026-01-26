@@ -7,19 +7,19 @@ let
 in
 {
   options.${namespace}.homebrew = {
-    common = {
-      enable = mkBoolOpt true "Enable common homebrew darwin module";
-    };
+    enable = mkBoolOpt true "Enable common homebrew darwin module";
+
     personal = {
       enable = mkBoolOpt false "Enable personal homebrew darwin module";
     };
+
     work = {
       enable = mkBoolOpt false "Enable work homebrew darwin module";
     };
   };
 
-  config = {
-    homebrew = mkIf cfg.common.enable {
+  config = mkIf cfg.enable {
+    homebrew = {
       enable = true;
       onActivation = {
         autoUpdate = false;
@@ -38,13 +38,13 @@ in
         "jetbrains/utils/kotlin-lsp"
       ]);
 
-      casks = (optionals cfg.common.enable [ "raycast" "betterdisplay" ]) ++
+      casks = [ "raycast" "betterdisplay" ] ++
         (optionals cfg.personal.enable [ "ollama-app" "iina" ]) ++
         (optionals cfg.work.enable [
           # Add work-specific casks here
         ]);
     };
 
-    environment.systemPath = mkIf cfg.common.enable [ "/opt/homebrew/bin" ];
+    environment.systemPath = [ "/opt/homebrew/bin" ];
   };
 }
