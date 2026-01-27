@@ -89,7 +89,7 @@ in
           alias ll="exa -alh"
           alias tree="exa --tree"
           alias h="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
-          alias ocralphy="ralphy --opencode"
+          alias p="podman"
 
           ${exportSecrets}
 
