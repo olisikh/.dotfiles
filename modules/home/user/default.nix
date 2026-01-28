@@ -57,7 +57,6 @@ in
         kubectl
         kubernetes-helm
         kustomize
-        podman
         etcd
         terraform
 
@@ -108,6 +107,8 @@ in
         }))
       ] ++
       (optionals cfg.personal.enable [
+        podman
+        claude-code
         code-cursor
         brave
         bitwarden-desktop
