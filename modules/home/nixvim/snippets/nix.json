@@ -2,7 +2,7 @@
   "snowfall-module": {
     "prefix": "module",
     "body": [
-      "{ lib, config, namespcae, pkgs, ... }:",
+      "{ lib, config, namespace, pkgs, ... }:",
       "with lib;",
       "let",
       "  inherit (lib.\\${namespace}) mkOpt mkBoolOpt;",

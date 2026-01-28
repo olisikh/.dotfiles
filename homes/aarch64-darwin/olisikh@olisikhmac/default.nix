@@ -16,7 +16,6 @@ in
     yazi = enabled;
     nixvim = enabled;
     opencode = enabled;
-    ralphy = enabled;
     user.personal = enabled;
     sops = enabled;
   };
