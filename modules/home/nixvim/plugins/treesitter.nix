@@ -20,7 +20,7 @@ in
             init_selection = "<C-space>";
             node_incremental = "<C-space>";
             node_decremental = "<C-b>";
-            # -- scope_incremental = "<C-b>";
+            scope_incremental = false;
           };
         };
       };
