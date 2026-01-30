@@ -12,7 +12,7 @@ in
       src = pkgs.fetchFromGitHub {
         owner = "olisikh";
         repo = "nvim-scala-zio-quickfix";
-        rev = "main";
+        rev = "e1f1b182ce994e3ba5dfa9941cadee79e07c5877";
         hash = "sha256-dVRVDBZWncEkBw6cLBJE2HZ8KhNSpffEn3Exvnllx78=";
       };
 
@@ -31,8 +31,8 @@ in
       src = pkgs.fetchFromGitHub {
         owner = "olisikh";
         repo = "nvim-dap-kotlin";
-        rev = "fix/bugs_and_deprecations";
-        hash = "sha256-slmMBcg44Bwo8QIJp467eQt5/lojRsWqoxZxMR5wCLA=";
+        rev = "b78dcea24fb304d7e2f1058683abc5593719cf5e";
+        hash = "sha256-a2P3USCuK+e2cDixJpS4ZKgqEiRuWfmzGOP+oxoRyJo=";
       };
       dependencies = with pkgs.vimPlugins; [ nvim-dap ];
     });

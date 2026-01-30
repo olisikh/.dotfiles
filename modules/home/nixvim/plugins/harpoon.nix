@@ -5,7 +5,7 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "letieu";
       repo = "harpoon-lualine";
-      rev = "bcdf833a6f42366357950c1b5ccaab84dccef1e4";
+      rev = "215c0847dfb787b19268f7b42eed83bdcf06b966";
       hash = "sha256-HGbz/b2AVl8145BCy8I47dDrhBVMSQQIr+mWbOrmj5Q=";
     };
     dependencies = with pkgs.vimPlugins; [ lualine-nvim ];

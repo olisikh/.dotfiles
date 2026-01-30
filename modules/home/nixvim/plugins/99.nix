@@ -6,7 +6,7 @@ let
       owner = "theprimeagen";
       repo = "99";
       rev = "2c771814e1d95280ee99545de61b28dfa773c5fa";
-      hash = "";
+      hash = "sha256-Gzh7YMWJtBzacy1ivOZhGrTVXhwMI2Yz3SiEWzET+PM=";
     };
   });
 in
@@ -24,39 +24,39 @@ in
 
     _99.setup({
     	logger = {
-    		level = _99.DEBUG,
-    		path = "/tmp/" .. basename .. ".99.debug",
-    		print_on_error = true,
+            level = _99.DEBUG,
+            path = "/tmp/" .. basename .. ".99.debug",
+            print_on_error = true,
     	},
 
     	--- A new feature that is centered around tags
     	completion = {
-    		--- Defaults to .cursor/rules
-    		-- I am going to disable these until i understand the
-    		-- problem better.  Inside of cursor rules there is also
-    		-- application rules, which means i need to apply these
-    		-- differently
-    		-- cursor_rules = "<custom path to cursor rules>"
+            --- Defaults to .cursor/rules
+            -- I am going to disable these until i understand the
+            -- problem better.  Inside of cursor rules there is also
+            -- application rules, which means i need to apply these
+            -- differently
+            -- cursor_rules = "<custom path to cursor rules>"
 
-    		--- A list of folders where you have your own SKILL.md
-    		--- Expected format:
-    		--- /path/to/dir/<skill_name>/SKILL.md
-    		---
-    		--- Example:
-    		--- Input Path:
-    		--- "scratch/custom_rules/"
-    		---
-    		--- Output Rules:
-    		--- {path = "scratch/custom_rules/vim/SKILL.md", name = "vim"},
-    		--- ... the other rules in that dir ...
-    		---
-    		custom_rules = {
-    			"scratch/custom_rules/",
-    		},
+            --- A list of folders where you have your own SKILL.md
+            --- Expected format:
+            --- /path/to/dir/<skill_name>/SKILL.md
+            ---
+            --- Example:
+            --- Input Path:
+            --- "scratch/custom_rules/"
+            ---
+            --- Output Rules:
+            --- {path = "scratch/custom_rules/vim/SKILL.md", name = "vim"},
+            --- ... the other rules in that dir ...
+            ---
+            custom_rules = {
+                "scratch/custom_rules/",
+            },
 
-    		--- What autocomplete do you use.  We currently only
-    		--- support cmp right now
-    		source = "cmp",
+            --- What autocomplete do you use.  We currently only
+            --- support cmp right now
+            -- source = "cmp",
     	},
 
     	--- WARNING: if you change cwd then this is likely broken
@@ -69,8 +69,8 @@ in
     	--- /foo/AGENT.md
     	--- assuming that /foo is project root (based on cwd)
     	md_files = {
-    		"AGENT.md",
-    		"AGENTS.md",
+            "AGENT.md",
+            "AGENTS.md",
     	},
     })
 

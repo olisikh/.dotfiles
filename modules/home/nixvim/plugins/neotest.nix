@@ -6,7 +6,7 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "olisikh";
       repo = "neotest-scala";
-      rev = "main";
+      rev = "5a8619c4af08ebb824c735bb36032be856d9aa69";
       hash = "sha256-RFEPtWPVHKehfc6PMF6ya0UaDpFIJDD8bFG8xwXPpsk=";
     };
     dependencies = with pkgs.vimPlugins; [
@@ -21,8 +21,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "olisikh";
       repo = "neotest-gradle";
-      rev = "fix/no_tests_found";
-      hash = "sha256-ZRI5fMGqKK5BaMPU38Dtl8A+XmWBzBI9af6wld/V0Q0=";
+      rev = "cfb5d5d7d193631fc2a60244adc78313561c5d0d";
+      hash = "sha256-u+A9yQDSEYOGD9Bw6umoS1MnTkPE5DJSo/PtSI04Lt8=";
     };
     dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
   });

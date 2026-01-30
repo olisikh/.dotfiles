@@ -1,58 +1,15 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 let
-  grammars = pkgs.vimPlugins.nvim-treesitter.builtGrammars;
+  grammars = pkgs.vimPlugins.nvim-treesitter.allGrammars;
 in
 {
   plugins = {
     treesitter = {
       enable = true;
-
-      # NOTE: add treesitter grammar here to install it
-      grammarPackages = with grammars; [
-        bash
-        diff
-        json
-        jsonc
-        lua
-        rust
-        query
-        make
-        markdown
-        markdown_inline
-        python
-        properties
-        java
-        c
-        css
-        html
-        dockerfile
-        git_config
-        git_rebase
-        gitattributes
-        gitignore
-        gitcommit
-        groovy
-        go
-        gosum
-        gomod
-        hocon
-        kotlin
-        javascript
-        typescript
-        python
-        toml
-        yaml
-        xml
-        tmux
-        terraform
-        scala
-        tsx
-        sql
-        scheme
-        vim
-        vimdoc
-        ini
-      ];
+      highlight.enable = true;
+      indent.enable = true;
+      folding.enable = false;
+      grammarPackages = grammars;
 
       settings = {
         highlight = { enable = true; };

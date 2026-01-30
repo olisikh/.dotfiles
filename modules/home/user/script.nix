@@ -4,6 +4,8 @@ let
   inherit (lib) optionals;
   inherit (lib.${namespace}) pad color;
 
+  dotDir = "${home}/.dotfiles";
+
   allCommands = [
     { name = "make"; desc = "Rebuild dotfiles"; action = "home_make \"$@\""; }
     { name = "update"; desc = "Update dotfiles"; action = "home_update \"$@\""; }
@@ -16,7 +18,11 @@ let
     { name = "help"; desc = "Help"; action = "display_help"; }
   ] ++ (optionals sops.enable
     [
-      { name = "secrets"; desc = "Edit secrets"; action = "check_command sops && sops ${home}/.config/sops/secrets.yaml"; }
+      {
+        name = "secrets";
+        desc = "Edit secrets";
+        action = "check_command sops && sops ${home}/.config/sops/secrets.yaml";
+      }
     ]
   );
 
@@ -59,13 +65,14 @@ in
   # Function to perform 'home make'
   home_make() {
       check_command darwin-rebuild
-      sudo darwin-rebuild switch --flake "${home}/.dotfiles" "$@"
+      sudo darwin-rebuild switch --flake ${dotDir} "$@"
   }
 
   # Function to perform 'home update'
   home_update() {
       check_command nix
-      nix flake update --flake "${home}/.dotfiles" "$@"
+      ${dotDir}/scripts/nix-update-gh.sh ${dotDir}
+      nix flake update --flake ${dotDir} "$@"
   }
 
   home_list_generations() {
@@ -89,11 +96,11 @@ in
   }
 
   home_template() {
-      nix flake init -t ${home}/.dotfiles#$@
+      nix flake init -t ${dotDir}#$@
   }
 
   home_dev() {
-      nix develop ${home}/.dotfiles#$@ --command zsh
+      nix develop ${dotDir}#$@ --command zsh
   }
 
   # Main function to handle input and execute corresponding action

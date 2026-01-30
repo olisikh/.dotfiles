@@ -40,7 +40,7 @@
     ./plugins/cellular-automaton.nix
     ./plugins/zen-mode.nix
     ./plugins/neogen.nix
-    ./plugins/octools.nix
+    ./plugins/99.nix
   ];
 
   plugins = {

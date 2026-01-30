@@ -9,8 +9,8 @@ let
   themes = pkgs.fetchFromGitHub {
     owner = "catppuccin";
     repo = "bat"; # Bat uses sublime syntax for its themes
-    rev = "699f60fc8ec434574ca7451b444b880430319941";
-    sha256 = "sha256-6fWoCH90IGumAMc4buLRWL0N61op+AuMNN9CAR9/OdI=";
+    rev = "6810349b28055dce54076712fc05fc68da4b8ec0";
+    sha256 = "sha256-lJapSgRVENTrbmpVyn+UQabC9fpV1G1e+CdlJ090uvg=";
   };
 in
 {
