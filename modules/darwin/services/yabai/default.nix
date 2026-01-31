@@ -67,6 +67,7 @@ in
         yabai -m rule --add app="^Login Options$" manage=off
         yabai -m rule --add app="^ClearVPN$" manage=off
         yabai -m rule --add app="^balenaEtcher$" manage=off
+        yabai -m rule --add app="^PSI Bridge Secure Browser$" manage=off
 
         echo "yabai configuration loaded..."
       '';
