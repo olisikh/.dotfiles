@@ -3,14 +3,14 @@
   "google_auth": false,
   "agents": {
     "sisyphus": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/gpt-5.1-codex-mini"
     },
     "oracle": {
       "model": "opencode/gpt-5.2-codex",
       "variant": "high"
     },
     "librarian": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/gpt-5.1-codex-mini"
     },
     "explore": {
       "model": "opencode/grok-code-fast-1"
@@ -19,17 +19,17 @@
       "model": "google/gemini-3-pro-preview"
     },
     "prometheus": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/gpt-5.1-codex-mini"
     },
     "metis": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/gpt-5.1-codex-mini"
     },
     "momus": {
       "model": "opencode/gpt-5.2-codex",
       "variant": "medium"
     },
     "atlas": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/gpt-5.1-codex-mini"
     }
   },
   "categories": {

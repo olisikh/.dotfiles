@@ -74,24 +74,10 @@ in
     	},
     })
 
-    -- Create your own short cuts for the different types of actions
     vim.keymap.set("n", "<leader>of", function() _99.fill_in_function() end)
-    -- take extra note that i have visual selection only in v mode
-    -- technically whatever your last visual selection is, will be used
-    -- so i have this set to visual mode so i dont screw up and use an
-    -- old visual selection
-    --
-    -- likely ill add a mode check and assert on required visual mode
-    -- so just prepare for it now
+    vim.keymap.set("n", "<leader>op", function() _99.fill_in_function_prompt() end)
     vim.keymap.set("v", "<leader>ov", function() _99.visual() end)
-
-    --- if you have a request you dont want to make any changes, just cancel it
+    vim.keymap.set("v", "<leader>ol", function() _99.view_logs() end)
     vim.keymap.set("v", "<leader>os", function() _99.stop_all_requests() end)
-
-    --- Example: Using rules + actions for custom behaviors
-    --- Create a rule file like ~/.rules/debug.md that defines custom behavior.
-    --- For instance, a "debug" rule could automatically add printf statements
-    --- throughout a function to help debug its execution flow.
-    --- vim.keymap.set("n", "<leader>ofd", function() _99.fill_in_function() end)
   '';
 }
