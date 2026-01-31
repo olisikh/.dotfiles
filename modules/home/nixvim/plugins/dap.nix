@@ -157,9 +157,6 @@ in
     require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
     require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
 
-    -- TODO: requires a plugin to be installed
-    require('scala-zio-quickfix').setup({});
-
     -- TODO: configure nvim-dap-kotlin
     -- polyfil a function that is used by plugin
     require('dap-kotlin').setup({

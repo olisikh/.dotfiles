@@ -100,6 +100,22 @@ in
       '';
 
       extraConfigLuaPost = ''
+        local root = "/Users/olisikh/Develop/nvim-plugins"
+
+        -- If you have nested dirs or want only some, adjust the pattern.
+        for name, t in vim.fs.dir(root) do
+          if t == "directory" then
+            local p = root .. "/" .. name
+
+            -- Optional: ignore dot dirs
+            if name:sub(1, 1) ~= "." then
+              -- Add plugin to runtimepath.
+              -- Use prepend if you want local plugins to override Nix-provided ones.
+              vim.opt.rtp:prepend(p)
+            end
+          end
+        end  
+
         -- This line is called a `modeline`. See `:help modeline`
         -- vim: ts=2 sts=2 sw=2 et
       '';
