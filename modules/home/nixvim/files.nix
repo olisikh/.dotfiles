@@ -2,7 +2,6 @@
 {
 
   extraFiles = {
-    "ftplugin/scala.lua".source = ./ftplugin/scala.lua;
     "ftplugin/terraform.lua".source = ./ftplugin/terraform.lua;
     "ftplugin/kotlin.lua".source = ./ftplugin/kotlin.lua;
 

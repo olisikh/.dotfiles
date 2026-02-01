@@ -6,17 +6,14 @@
       "model": "opencode/gpt-5.1-codex-mini"
     },
     "oracle": {
-      "model": "opencode/gpt-5.2-codex",
+      "model": "opencode/gpt-5.1-codex-max",
       "variant": "high"
     },
     "librarian": {
       "model": "opencode/gpt-5.1-codex-mini"
     },
     "explore": {
-      "model": "opencode/grok-code-fast-1"
-    },
-    "multimodal-looker": {
-      "model": "google/gemini-3-pro-preview"
+      "model": "opencode/kimi-k2-thinking"
     },
     "prometheus": {
       "model": "opencode/gpt-5.1-codex-mini"
@@ -25,35 +22,36 @@
       "model": "opencode/gpt-5.1-codex-mini"
     },
     "momus": {
-      "model": "opencode/gpt-5.2-codex",
-      "variant": "medium"
+      "model": "opencode/gpt-5.1-codex-mini"
     },
     "atlas": {
       "model": "opencode/gpt-5.1-codex-mini"
+    },
+    "multimodal-looker": {
+      "model": "google/gemini-3-flash-preview"
     }
   },
   "categories": {
-    "visual-engineering": {
-      "model": "google/gemini-3-pro-preview"
-    },
-    "ultrabrain": {
-      "model": "opencode/gpt-5.2-codex"
-    },
-    "artistry": {
-      "model": "google/gemini-3-pro-preview",
-      "variant": "max"
-    },
     "quick": {
       "model": "opencode/gpt-5.1-codex-mini"
     },
-    "unspecified-low": {
-      "model": "opencode/gpt-5.2"
+    "ultrabrain": {
+      "model": "opencode/gpt-5.1-codex-max"
     },
-    "unspecified-high": {
-      "model": "opencode/gpt-5.2"
+    "visual-engineering": {
+      "model": "google/gemini-3-flash-preview"
+    },
+    "artistry": {
+      "model": "google/gemini-3-flash-preview"
     },
     "writing": {
       "model": "google/gemini-3-flash-preview"
+    },
+    "unspecified-low": {
+      "model": "opencode/gpt-5.1-codex-mini"
+    },
+    "unspecified-high": {
+      "model": "opencode/gpt-5.1-codex-max"
     }
   }
 }

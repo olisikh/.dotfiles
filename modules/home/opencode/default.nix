@@ -23,6 +23,7 @@ in
         small_model = "opencode/gpt-5.1-codex-mini";
 
         plugin = [ "opencode-antigravity-auth" "oh-my-opencode" ];
+        enabled_providers = ["openrouter" "opencode" "google"];
 
         provider = {
           google = {

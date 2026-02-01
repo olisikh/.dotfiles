@@ -56,7 +56,7 @@ in
       enableScriptingAddition = true;
       extraConfig = ''
         sudo ${pkgs.yabai}/bin/yabai --load-sa
-        ${pkgs.yabai}/bin/yabai -m signal --add event=dock_did_restart action="sudo ${pkgs.yabai}/bin/yabai --load-sa"
+        sudo ${pkgs.yabai}/bin/yabai -m signal --add event=dock_did_restart action="sudo ${pkgs.yabai}/bin/yabai --load-sa"
 
         echo "yabai scripting addition loaded..."
 
@@ -67,6 +67,7 @@ in
         yabai -m rule --add app="^Login Options$" manage=off
         yabai -m rule --add app="^ClearVPN$" manage=off
         yabai -m rule --add app="^balenaEtcher$" manage=off
+        yabai -m rule --add app="^Transmission$" manage=off
         yabai -m rule --add app="^PSI Bridge Secure Browser$" manage=off
 
         echo "yabai configuration loaded..."
