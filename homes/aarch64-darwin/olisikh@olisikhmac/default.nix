@@ -16,6 +16,8 @@ in
     yazi = enabled;
     nixvim = enabled;
     opencode = enabled;
+    codex = enabled;
+    claude-code = enabled;
     user.personal = enabled;
     sops = enabled;
   };

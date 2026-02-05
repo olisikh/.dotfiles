@@ -108,8 +108,6 @@ in
       ] ++
       (optionals cfg.personal.enable [
         podman
-        claude-code
-        code-cursor
         brave
         bitwarden-desktop
         antigravity

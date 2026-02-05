@@ -1,4 +1,10 @@
-{ lib, config, namespace, options, pkgs, ... }:
+{ lib
+, config
+, namespace
+, options
+, pkgs
+, ...
+}:
 with lib;
 let
   inherit (lib.${namespace}) mkOpt;
