@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   plugins = {
     "conform-nvim" = {
@@ -14,6 +14,10 @@
         formatters = {
           scalafmt = {
             timeout_ms = 5000;
+            args = [ "--stdin" "--assume-filename" "$FILENAME" ];
+            command = "scala fmt";
+            cwd = lib.nixvim.mkRaw ''require("conform.util").root_file({ ".scalafmt.conf", "build.sbt" })'';
+            stdin = true;
           };
         };
         formatters_by_ft = {

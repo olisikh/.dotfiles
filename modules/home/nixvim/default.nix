@@ -63,7 +63,6 @@ in
         isort
         delve
         prettierd
-        scalafmt
         yamllint
         hadolint
         tflint

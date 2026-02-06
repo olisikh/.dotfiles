@@ -3,10 +3,13 @@
   "google_auth": false,
   "agents": {
     "sisyphus": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/kimi-k2.5"
+    },
+    "sisyphus-junior": {
+      "model": "opencode/glm-4.7"
     },
     "oracle": {
-      "model": "opencode/gpt-5.1-codex-max",
+      "model": "opencode/kimi-k2.5",
       "variant": "high"
     },
     "librarian": {
@@ -16,7 +19,7 @@
       "model": "opencode/kimi-k2-thinking"
     },
     "prometheus": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/kimi-k2.5"
     },
     "metis": {
       "model": "opencode/gpt-5.1-codex-mini"
@@ -25,7 +28,7 @@
       "model": "opencode/gpt-5.1-codex-mini"
     },
     "atlas": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/kimi-k2.5"
     },
     "multimodal-looker": {
       "model": "google/gemini-3-flash-preview"
