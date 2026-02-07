@@ -39,6 +39,7 @@
     ./plugins/inc-rename.nix
     ./plugins/cellular-automaton.nix
     ./plugins/zen-mode.nix
+    ./plugins/guess-indent.nix
     ./plugins/neogen.nix
     ./plugins/99.nix
   ];

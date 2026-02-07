@@ -7,13 +7,13 @@ in
     treesitter = {
       enable = true;
       highlight.enable = true;
-      indent.enable = true;
+      indent.enable = false;
       folding.enable = false;
       grammarPackages = grammars;
 
       settings = {
         highlight = { enable = true; };
-        indent = { enable = true; disable = [ "python" ]; };
+        indent = { enable = false; disable = [ "python" ]; };
         incremental_selection = {
           enable = true;
           keymaps = {

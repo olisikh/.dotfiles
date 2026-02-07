@@ -114,7 +114,6 @@
       pattern = { "scala", "sbt" },
       callback = function()
         require("metals").initialize_or_attach(metals_config)
-        vim.opt_local.indentexpr = ""
 
         -- TODO: uncomment when plugin works again
         -- local ok, scala_hints = pcall(require, 'scala-hints')
