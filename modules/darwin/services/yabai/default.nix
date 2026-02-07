@@ -55,8 +55,8 @@ in
       # 3. Reboot again
       enableScriptingAddition = true;
       extraConfig = ''
-        sudo ${pkgs.yabai}/bin/yabai --load-sa
-        sudo ${pkgs.yabai}/bin/yabai -m signal --add event=dock_did_restart action="sudo ${pkgs.yabai}/bin/yabai --load-sa"
+        sudo yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+        sudo yabai --load-sa
 
         echo "yabai scripting addition loaded..."
 
