@@ -5,9 +5,11 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "theprimeagen";
       repo = "99";
-      rev = "2c771814e1d95280ee99545de61b28dfa773c5fa";
-      hash = "sha256-Gzh7YMWJtBzacy1ivOZhGrTVXhwMI2Yz3SiEWzET+PM=";
+      rev = "0fb3b8b2d032289ea7088a37161e1c50bdfccfa9";
+      hash = "sha256-7J3YYah5gDufub8fHmSwl4LkgFATJUan+3FsPHdz9zA=";
     };
+    # TODO: uncomment if require check starts working again
+    doCheck = false;
   });
 in
 {

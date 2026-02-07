@@ -90,9 +90,5 @@ in
         # on_attach = null;
       };
     };
-
-    treesitter-refactor = {
-      enable = true;
-    };
   };
 }
