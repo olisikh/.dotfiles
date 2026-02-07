@@ -12,7 +12,7 @@ let
     else
       "/home/${cfg.username}";
 
-  jdk = pkgs.jdk17;
+  jdk = pkgs.jdk21;
   scala = pkgs.scala-next;
 in
 {
@@ -87,7 +87,10 @@ in
         lazydocker
         gh
         watch
-        python3
+        (python3.withPackages (ps: with ps; [
+          pytest
+          debugpy
+        ]))
         mkalias
         pre-commit
 

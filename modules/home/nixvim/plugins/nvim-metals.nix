@@ -115,10 +115,11 @@
       callback = function()
         require("metals").initialize_or_attach(metals_config)
 
-        local ok, scala_hints = pcall(require, 'scala-hints')
-        if ok then
-          scala_hints.setup({})
-        end
+        -- TODO: uncomment when plugin works again
+        -- local ok, scala_hints = pcall(require, 'scala-hints')
+        -- if ok then
+        --   scala_hints.setup({})
+        -- end
       end,
     })
   '';
