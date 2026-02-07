@@ -4,6 +4,7 @@
     obsidian = {
       enable = true;
       package = pkgs.vimPlugins.obsidian-nvim;
+      doCheck = false;
       settings = {
         legacy_commands = false;
         workspaces = [

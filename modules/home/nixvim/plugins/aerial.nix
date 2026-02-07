@@ -3,6 +3,7 @@
   plugins.aerial = {
     enable = true;
     package = pkgs.vimPlugins.aerial-nvim;
+    doCheck = false;
 
     settings = {
       on_attach = lib.nixvim.mkRaw
