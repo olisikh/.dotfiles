@@ -39,7 +39,12 @@ in
       ]);
 
       casks = [ "raycast" "betterdisplay" ] ++
-        (optionals cfg.personal.enable [ "ollama-app" "iina" ]) ++
+        (optionals cfg.personal.enable [
+          "intellij-idea"
+          "intellij-idea-ce"
+          "ollama-app"
+          "iina"
+        ]) ++
         (optionals cfg.work.enable [
           # Add work-specific casks here
         ]);
