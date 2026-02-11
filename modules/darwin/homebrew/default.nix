@@ -40,8 +40,6 @@ in
 
       casks = [ "raycast" "betterdisplay" ] ++
         (optionals cfg.personal.enable [
-          "intellij-idea"
-          "intellij-idea-ce"
           "ollama-app"
           "iina"
         ]) ++

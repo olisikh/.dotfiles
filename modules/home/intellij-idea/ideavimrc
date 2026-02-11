@@ -1,0 +1,95 @@
+" =========================
+" IdeaVim config (~/.ideavimrc)
+" =========================
+
+" If your ~/.vimrc is Neovim-specific, sourcing it often breaks IdeaVim.
+" Prefer a tiny shared file instead, e.g. ~/.vimrc_shared
+" source ~/.vimrc
+
+" ---- leader ----
+let mapleader=" "
+nnoremap <silent> <Space> <Nop>
+vnoremap <silent> <Space> <Nop>
+
+" ---- sane defaults ----
+set scrolloff=5
+set incsearch
+set clipboard+=unnamedplus
+
+" IdeaVim mapping timeout behavior:
+" notimeout can make multi-key mappings awkward; use timeoutlen instead.
+set timeout
+set timeoutlen=500
+
+" line numbers (ignored if unsupported; harmless)
+set number
+set relativenumber
+
+" ---- disable Ex-mode ----
+nnoremap Q <Nop>
+
+" ---- IdeaVim plugin emulations ----
+Plug 'machakann/vim-highlightedyank'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+
+set highlightedyank
+set commentary
+set surround
+let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"
+
+" ---- wrapped-line friendly j/k (expr) ----
+nnoremap <silent> <expr> k (v:count == 0 ? 'gk' : 'kzz')
+nnoremap <silent> <expr> j (v:count == 0 ? 'gj' : 'jzz')
+
+" ---- join lines ----
+set ideajoin
+
+" ---- move visual selection up/down ----
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" ---- half-page jumps keep cursor centered ----
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+
+" ---- search next/prev keep cursor centered + open folds ----
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" ---- paste over selection without yanking it ----
+xnoremap <leader>p "_dP
+
+" ---- yank to system clipboard explicitly (optional; clipboard+=unnamedplus already helps) ----
+nnoremap <leader>y "+y
+vnoremap <leader>y "+y
+nnoremap <leader>Y "+Y
+
+" ---- indent/unindent with Tab / Shift-Tab ----
+nnoremap <silent> <Tab> >>
+nnoremap <silent> <S-Tab> <<
+vnoremap <silent> <Tab> >gv
+vnoremap <silent> <S-Tab> <gv
+
+" ---- disable arrow keys in insert ----
+inoremap <silent> <Up> <Nop>
+inoremap <silent> <Down> <Nop>
+inoremap <silent> <Left> <Nop>
+inoremap <silent> <Right> <Nop>
+
+" ---- buffer delete ----
+nnoremap <leader>bd :bd<CR>
+
+" ---- IDE actions ----
+nnoremap <leader>rf :action ReformatCode<CR>
+nnoremap <leader>rn :action RenameElement<CR>
+nnoremap <leader>ca :action ShowIntentionActions<CR>
+nnoremap K :action QuickJavaDoc<CR>
+
+nnoremap <leader>oi :action OptimizeImports<CR>
+nnoremap <leader>em :action ExtractMethod<CR>
+nnoremap <leader>iv :action IntroduceVariable<CR>
+
+" ---- search ----
+nnoremap <leader>sg :action FindInPath<CR>
+nnoremap <leader>sf :action GotoFile<CR>

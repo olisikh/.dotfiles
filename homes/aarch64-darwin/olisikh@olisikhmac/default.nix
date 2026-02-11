@@ -15,6 +15,20 @@ in
     git = enabled;
     yazi = enabled;
     nixvim = enabled;
+    intellij-idea = {
+      enable = true;
+      plugins = [
+        "com.github.catppuccin.jetbrains"
+        "com.github.catppuccin.jetbrains_icons"
+        "org.intellij.scala"
+        "org.jetbrains.kotlin"
+        "org.intellij.plugins.hcl"
+        "Docker"
+        "IdeaVIM"
+        "Lombook Plugin"
+        "youngstead.relative-line-numbers"
+      ];
+    };
     opencode = enabled;
     codex = enabled;
     claude-code = enabled;
