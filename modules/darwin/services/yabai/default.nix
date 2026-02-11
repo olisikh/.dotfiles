@@ -62,6 +62,7 @@ in
 
         # apps to ignore
         yabai -m rule --add app="^System Preferences$" manage=off
+        yabai -m rule --add app="^Activity Monitor$" manage=off
         yabai -m rule --add app="^Archive Utility$" manage=off
         yabai -m rule --add app="^Creative Cloud$" manage=off
         yabai -m rule --add app="^Login Options$" manage=off
@@ -69,6 +70,7 @@ in
         yabai -m rule --add app="^balenaEtcher$" manage=off
         yabai -m rule --add app="^Transmission$" manage=off
         yabai -m rule --add app="^PSI Bridge Secure Browser$" manage=off
+        yabai -m rule --add app="^IntelliJ IDEA$" manage=off
 
         echo "yabai configuration loaded..."
       '';
