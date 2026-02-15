@@ -1,11 +1,5 @@
 { pkgs, lib, ... }:
 let
-  kotlin-dap-adapter = pkgs.fetchzip {
-    name = "kotlin-dap-adapter-0.4.4";
-    url = "https://github.com/fwcd/kotlin-debug-adapter/releases/download/0.4.4/adapter.zip";
-    hash = "sha256-gNbGomFcWqOLTa83/RWS4xpRGr+jmkovns9Sy7HX9bg=";
-  };
-
   jsConfigs = [
     {
       type = "pwa-node";
@@ -123,19 +117,17 @@ in
       };
     };
 
-    "dap-go" = {
+    dap-go = {
       enable = true;
       settings = {
         delve.path = "${pkgs.delve}/bin/dlv";
       };
     };
 
-    "dap-python".enable = true;
-    "dap-ui".enable = true;
-    "dap-virtual-text".enable = true;
+    dap-python.enable = true;
+    dap-ui.enable = true;
+    dap-virtual-text.enable = true;
   };
-
-  extraPlugins = [ pkgs.vimPlugins.nvim-dap-kotlin ];
 
   extraConfigLua = ''
     vim.diagnostic.config { 
@@ -156,21 +148,6 @@ in
     require('dap').listeners.after.event_initialized['dapui_config'] = require('dapui').open
     require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
     require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
-
-    -- TODO: configure nvim-dap-kotlin
-    -- polyfil a function that is used by plugin
-    require('dap-kotlin').setup({
-      dap_command = "${kotlin-dap-adapter}/bin/kotlin-debug-adapter"
-    })
-
-    -- NOTE: setup kotlin-lsp from Jetbrains
-    vim.lsp.config('kotlin-lsp', {
-      cmd = { 'kotlin-lsp', '--stdio' },
-      settings = {
-        kotlin_lsp = { }
-      }
-    })
-    vim.lsp.enable("kotlin-lsp")
   '';
 
   keymaps = [

@@ -68,8 +68,6 @@
           };
         };
         jdtls.enable = true;
-        # kotlin_language_server.enable = true;
-        kotlin-lsp = true;
         pylsp.enable = true;
         # pylyzer.enable = true;
         terraformls.enable = true;
@@ -157,6 +155,14 @@
 
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
     vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
+
+    -- Configure kotlin-lsp
+    vim.lsp.config('kotlin-lsp', {
+      cmd = { 'kotlin-lsp', '--stdio' },
+      settings = {
+        kotlin_lsp = { }
+      }
+    })
   '';
 
   keymaps = [
