@@ -170,6 +170,7 @@ in
         kotlin_lsp = { }
       }
     })
+    vim.lsp.enable("kotlin-lsp")
   '';
 
   keymaps = [

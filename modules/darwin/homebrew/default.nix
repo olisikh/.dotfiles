@@ -34,18 +34,14 @@ in
 
       brews = [
         "tccutil"
-      ] ++ (optionals cfg.personal.enable [
-        "jetbrains/utils/kotlin-lsp"
-      ]);
+        "JetBrains/utils/kotlin-lsp"
+      ] ++
+      (optionals cfg.personal.enable [ ]) ++
+      (optionals cfg.work.enable [ ]);
 
       casks = [ "raycast" "betterdisplay" ] ++
-        (optionals cfg.personal.enable [
-          "ollama-app"
-          "iina"
-        ]) ++
-        (optionals cfg.work.enable [
-          # Add work-specific casks here
-        ]);
+        (optionals cfg.personal.enable [ "ollama-app" "iina" ]) ++
+        (optionals cfg.work.enable [ ]);
     };
 
     environment.systemPath = [ "/opt/homebrew/bin" ];

@@ -120,9 +120,8 @@
     local ok, scala_hints = pcall(require, "scala-hints")
     if ok then
     scala_hints.setup({
-      hover = {
+      type_definition = {
         timeouts_ms = { "800", "2000", "5000" },
-        log_misses = true,
         max_inflight = 8,
       },
       actions = {
@@ -132,7 +131,7 @@
         excluded_libs = {},
       },
       logging = {
-        level = "DEBUG",
+        level = "INFO",
       },
     })
     end

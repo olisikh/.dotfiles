@@ -16,6 +16,7 @@
     ./plugins/treesitter.nix
     ./plugins/undotree.nix
     ./plugins/rustaceanvim.nix
+    ./plugins/nvim-java.nix
     ./plugins/which-key.nix
     ./plugins/copilot.nix
     ./plugins/todo-comments.nix
@@ -29,7 +30,6 @@
     ./plugins/snacks.nix
     ./plugins/lazygit.nix
     ./plugins/smart-splits.nix
-    ./plugins/nvim-jdtls.nix
     ./plugins/oil.nix
     ./plugins/smart-splits.nix
     ./plugins/treesj.nix
