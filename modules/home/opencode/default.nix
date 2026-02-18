@@ -22,7 +22,7 @@ in
         model = "opencode/glm-4.7";
         small_model = "opencode/gpt-5.1-codex-mini";
 
-        plugin = [ "opencode-antigravity-auth" ]; # oh-my-opencode plugin is broken
+        plugin = [ "opencode-antigravity-auth" "oh-my-opencode" ];
         enabled_providers = ["openrouter" "opencode" "google"];
 
         provider = {

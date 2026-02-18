@@ -5,7 +5,7 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "JavaHello";
       repo = "spring-boot.nvim";
-      rev = "main";
+      rev = "5d206bdfeb0865ea97bfbc18f9e08e2f26ac4707";
       sha256 = "sha256-ioGlxjZIqtNlPedwI/HX3xA3HOWJ50WmWFyYIQPHDrg="; 
     };
   };

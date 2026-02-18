@@ -5,8 +5,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "theprimeagen";
       repo = "99";
-      rev = "0fb3b8b2d032289ea7088a37161e1c50bdfccfa9";
-      hash = "sha256-7J3YYah5gDufub8fHmSwl4LkgFATJUan+3FsPHdz9zA=";
+      rev = "82e5573f753793e89ab614429e3a390c808b1048";
+      hash = "sha256-l2yQEkwUCC3QX2PBGkZXeiq71JcLeIH99XxE07dY64Y=";
     };
     # TODO: uncomment if require check starts working again
     doCheck = false;

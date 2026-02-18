@@ -3,32 +3,32 @@
   "google_auth": false,
   "agents": {
     "sisyphus": {
-      "model": "opencode/kimi-k2.5"
+      "model": "opencode/glm-5-free",
     },
     "sisyphus-junior": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/kimi-k2.5"
     },
     "oracle": {
-      "model": "opencode/kimi-k2.5",
+      "model": "opencode/glm-5",
       "variant": "high"
     },
     "librarian": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/glm-5-free"
     },
     "explore": {
-      "model": "opencode/kimi-k2-thinking"
+      "model": "opencode/kimi-k2.5-thinking",
     },
     "prometheus": {
-      "model": "opencode/kimi-k2.5"
+      "model": "opencode/minimax-m2.5"
     },
     "metis": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/glm-5-free"
     },
     "momus": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/kimi-k2.5"
     },
     "atlas": {
-      "model": "opencode/kimi-k2.5"
+      "model": "opencode/glm-5-free"
     },
     "multimodal-looker": {
       "model": "google/gemini-3-flash-preview"
@@ -36,10 +36,11 @@
   },
   "categories": {
     "quick": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/kimi-k2.5"
     },
     "ultrabrain": {
-      "model": "opencode/gpt-5.1-codex-max"
+      "model": "opencode/glm-5",
+      "variant": "high"
     },
     "visual-engineering": {
       "model": "google/gemini-3-flash-preview"
@@ -48,13 +49,13 @@
       "model": "google/gemini-3-flash-preview"
     },
     "writing": {
-      "model": "google/gemini-3-flash-preview"
+      "model": "opencode/glm-5-free"
     },
     "unspecified-low": {
-      "model": "opencode/gpt-5.1-codex-mini"
+      "model": "opencode/kimi-k2.5"
     },
     "unspecified-high": {
-      "model": "opencode/gpt-5.1-codex-max"
+      "model": "opencode/glm-5-free"
     }
   }
 }

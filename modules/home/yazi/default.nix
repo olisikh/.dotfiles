@@ -24,6 +24,7 @@ in
 
     programs.yazi = {
       enable = true;
+      shellWrapperName = "y";
       settings = { };
       plugins = with pkgs.yaziPlugins; {
         inherit git sudo chmod lazygit starship;
