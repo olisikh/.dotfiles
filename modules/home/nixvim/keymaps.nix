@@ -6,15 +6,7 @@
     {
       key = "<Space>";
       action = "<nop>";
-      mode = "n";
-      options = {
-        silent = true;
-      };
-    }
-    {
-      key = "<Space>";
-      action = "<nop>";
-      mode = "v";
+      mode = ["n" "v"];
       options = {
         silent = true;
       };

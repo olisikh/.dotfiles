@@ -175,15 +175,8 @@
         desc = "lsp: [c]ode [d]iagnostic";
       };
     }
+
     # nmap('<leader>cf', function() vim.lsp.buf.format() end, { desc = 'lsp: [c]ode [f]ormat' })
-    {
-      key = "grf";
-      action = ":lua require('conform').format()<cr>";
-      mode = "n";
-      options = {
-        desc = "lsp: [c]ode [f]ormat";
-      };
-    }
     # map('v', '<leader>cf', function()
     #   local vstart = vim.fn.getpos("'<")
     #   local vend = vim.fn.getpos("'>")
@@ -193,11 +186,12 @@
     {
       key = "grf";
       action = ":lua require('conform').format()<cr>";
-      mode = "v";
+      mode = ["n" "v"];
       options = {
         desc = "lsp: [c]ode [f]ormat";
       };
     }
+
     # nmap('<leader>ci', function()
     #   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
     # end, { desc = 'lsp: toggle inlay hints (buffer)' })

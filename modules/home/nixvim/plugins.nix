@@ -13,6 +13,7 @@
     ./plugins/none-ls.nix
     ./plugins/nvim-tree.nix
     ./plugins/telescope.nix
+    ./plugins/actions-preview.nix
     ./plugins/treesitter.nix
     ./plugins/undotree.nix
     ./plugins/rustaceanvim.nix
