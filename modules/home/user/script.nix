@@ -65,7 +65,7 @@ in
   # Function to perform 'home make'
   home_make() {
       check_command darwin-rebuild
-      sudo darwin-rebuild switch --flake ${dotDir} "$@"
+      sudo darwin-rebuild switch --flake ${dotDir} "$@" && sudo yabai --load-sa
   }
 
   # Function to perform 'home update'
