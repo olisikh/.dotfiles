@@ -4,6 +4,9 @@
   "agents": {
     "sisyphus": {
       "model": "opencode/glm-5-free",
+      "fallback": [
+        "opencode/glm-5",
+      ]
     },
     "sisyphus-junior": {
       "model": "opencode/kimi-k2.5"
@@ -13,22 +16,32 @@
       "variant": "high"
     },
     "librarian": {
-      "model": "opencode/glm-5-free"
+      "model": "opencode/glm-5-free",
+      "fallback": [
+        "opencode/glm-5",
+      ]
     },
     "explore": {
-      "model": "opencode/kimi-k2.5-thinking",
+      "model": "opencode/kimi-k2.5",
+      "variant": "thinking"
     },
     "prometheus": {
       "model": "opencode/minimax-m2.5"
     },
     "metis": {
-      "model": "opencode/glm-5-free"
+      "model": "opencode/glm-5-free",
+      "fallback": [
+        "opencode/glm-5",
+      ]
     },
     "momus": {
       "model": "opencode/kimi-k2.5"
     },
     "atlas": {
-      "model": "opencode/glm-5-free"
+      "model": "opencode/glm-5-free",
+      "fallback": [
+        "opencode/glm-5",
+      ]
     },
     "multimodal-looker": {
       "model": "google/gemini-3-flash-preview"
@@ -49,13 +62,19 @@
       "model": "google/gemini-3-flash-preview"
     },
     "writing": {
-      "model": "opencode/glm-5-free"
+      "model": "opencode/glm-5-free",
+      "fallback": [
+        "opencode/glm-5",
+      ]
     },
     "unspecified-low": {
       "model": "opencode/kimi-k2.5"
     },
     "unspecified-high": {
-      "model": "opencode/glm-5-free"
+      "model": "opencode/glm-5-free",
+      "fallback": [
+        "opencode/glm-5",
+      ]
     }
   }
 }
