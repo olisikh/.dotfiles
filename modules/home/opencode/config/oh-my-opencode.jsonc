@@ -3,13 +3,14 @@
   "google_auth": false,
   "agents": {
     "sisyphus": {
-      "model": "opencode/glm-5-free",
-      "fallback": [
-        "opencode/glm-5",
-      ]
+      "model": "opencode/glm-5-free"
     },
     "sisyphus-junior": {
       "model": "opencode/kimi-k2.5"
+    },
+    "hephaestus": {
+      "model": "opencode/gpt-5.3-codex-medium",
+      "variant": "high"
     },
     "oracle": {
       "model": "opencode/glm-5",
@@ -18,54 +19,44 @@
     "librarian": {
       "model": "opencode/glm-5-free",
       "fallback": [
-        "opencode/glm-5",
+        "opencode/glm-5"
       ]
     },
     "explore": {
-      "model": "opencode/kimi-k2.5",
-      "variant": "thinking"
+      "model": "opencode/kimi-k2.5-thinking"
     },
     "prometheus": {
-      "model": "opencode/minimax-m2.5"
+      "model": "opencode/glm-5-free"
     },
     "metis": {
       "model": "opencode/glm-5-free",
       "fallback": [
-        "opencode/glm-5",
+        "opencode/glm-5"
       ]
     },
     "momus": {
-      "model": "opencode/kimi-k2.5"
+      "model": "opencode/glm-5-free"
     },
     "atlas": {
-      "model": "opencode/glm-5-free",
-      "fallback": [
-        "opencode/glm-5",
-      ]
-    },
-    "multimodal-looker": {
-      "model": "google/gemini-3-flash-preview"
+      "model": "opencode/glm-5-free"
     }
   },
   "categories": {
     "quick": {
-      "model": "opencode/kimi-k2.5"
+      "model": "opencode/minimax-m2.5"
     },
     "ultrabrain": {
       "model": "opencode/glm-5",
       "variant": "high"
     },
     "visual-engineering": {
-      "model": "google/gemini-3-flash-preview"
+      "model": "google/gemini-3.1-pro"
     },
     "artistry": {
-      "model": "google/gemini-3-flash-preview"
+      "model": "google/gemini-3.1-pro"
     },
     "writing": {
-      "model": "opencode/glm-5-free",
-      "fallback": [
-        "opencode/glm-5",
-      ]
+      "model": "opencode/kimi-k2.5"
     },
     "unspecified-low": {
       "model": "opencode/kimi-k2.5"
@@ -73,7 +64,7 @@
     "unspecified-high": {
       "model": "opencode/glm-5-free",
       "fallback": [
-        "opencode/glm-5",
+        "opencode/glm-5"
       ]
     }
   }

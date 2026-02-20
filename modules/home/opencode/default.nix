@@ -16,7 +16,7 @@ in
 
       settings = {
         theme = "catppuccin";
-        autoupdate = false;
+        autoupdate = true;
         autoshare = false;
 
         model = "opencode/glm-5";

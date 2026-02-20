@@ -186,7 +186,7 @@
     {
       key = "grf";
       action = ":lua require('conform').format()<cr>";
-      mode = ["n" "v"];
+      mode = [ "n" "v" ];
       options = {
         desc = "lsp: [c]ode [f]ormat";
       };
