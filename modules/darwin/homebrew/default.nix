@@ -33,6 +33,7 @@ in
       ];
 
       brews = [
+        "ffmpeg"
         "tccutil"
         "JetBrains/utils/kotlin-lsp"
       ] ++
