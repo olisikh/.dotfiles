@@ -19,8 +19,8 @@ in
         autoupdate = false;
         autoshare = false;
 
-        model = "opencode/glm-4.7";
-        small_model = "opencode/gpt-5.1-codex-mini";
+        model = "opencode/glm-5";
+        small_model = "opencode/kimi-k2.5";
 
         plugin = [ "opencode-antigravity-auth" "oh-my-opencode" ];
         enabled_providers = ["openrouter" "opencode" "google"];
