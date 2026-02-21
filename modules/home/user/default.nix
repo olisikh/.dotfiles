@@ -61,8 +61,8 @@ in
         terraform
 
         nodejs
-        pnpm
-        (yarn.override { nodejs = nodejs; })
+        (pnpm.override { inherit nodejs; })
+        (yarn.override { inherit nodejs; })
         bun
 
         jdk
@@ -77,6 +77,7 @@ in
         scala
         (sbt.override { jre = jdk; })
         (metals.override { jre = jdk; })
+        (bloop.override { jre = jdk; })
 
         kotlin
         gradle
