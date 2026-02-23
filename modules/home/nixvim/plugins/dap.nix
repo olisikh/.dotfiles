@@ -130,7 +130,23 @@ in
   };
 
   extraConfigLua = ''
-    vim.diagnostic.config { 
+    local function first_line(msg)
+      if not msg then return "" end
+      msg = msg:gsub("\r", "")         -- normalize CRLF
+      local line = msg:match("([^\n]*)") or msg
+      -- Optional: trim and add ellipsis if the first line is too long
+      if #line > 120 then
+        line = line:sub(1, 117) .. "..."
+      end
+      return line
+    end
+
+    vim.diagnostic.config {
+      virtual_text = {
+        format = function(diagnostic)
+          return first_line(diagnostic.message)
+        end,
+      },
       float = { border = border },
       signs = { 
         text = {
