@@ -23,7 +23,8 @@
       ]
     },
     "explore": {
-      "model": "opencode/kimi-k2.5-thinking"
+      "model": "opencode/kimi-k2.5",
+      "variant": "thinking"
     },
     "prometheus": {
       "model": "opencode/glm-5-free"
