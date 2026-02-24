@@ -6,8 +6,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "olisikh";
       repo = "neotest-scala";
-      rev = "ae2800f699a0c5cd2b1b7ef36b43a1bc6aac5de4";
-      hash = "sha256-DW35xwURUDObx3kLnCvQ8mqCD/4aA6to37uNEB5Vd8c=";
+      rev = "32c01286771394739a321ba9d89c07cfb86f616e";
+      hash = "sha256-HyjDD5HSezf5QVpgNWxv7t11F5u7lrv66UNF/7x+kKc=";
     };
     dependencies = with pkgs.vimPlugins; [
       plenary-nvim

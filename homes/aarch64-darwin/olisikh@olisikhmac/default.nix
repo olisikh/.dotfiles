@@ -30,8 +30,8 @@ in
       ];
     };
     opencode = enabled;
-    codex = enabled;
-    claude-code = enabled;
+    # codex = enabled;
+    # claude-code = enabled;
     user.personal = enabled;
     sops = enabled;
   };

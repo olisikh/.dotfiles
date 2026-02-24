@@ -12,88 +12,13 @@ in
 
   config = mkIf cfg.enable {
     programs.opencode = {
-      enable = true;
-
-      settings = {
-        theme = "catppuccin";
-        autoupdate = true;
-        autoshare = false;
-
-        model = "opencode/glm-5";
-        small_model = "opencode/kimi-k2.5";
-
-        plugin = [ "opencode-antigravity-auth" "oh-my-opencode" ];
-        enabled_providers = ["openrouter" "opencode" "google"];
-
-        provider = {
-          google = {
-            name = "Google";
-            models = {
-              antigravity-gemini-3-pro-high = {
-                name = "Gemini 3 Pro High (Antigravity)";
-                thinking = true;
-                attachment = true;
-                limit = {
-                  context = 1048576;
-                  output = 65535;
-                };
-                modalities = {
-                  input = [
-                    "text"
-                    "image"
-                    "pdf"
-                  ];
-                  output = [
-                    "text"
-                  ];
-                };
-              };
-              antigravity-gemini-3-pro-low = {
-                name = "Gemini 3 Pro Low (Antigravity)";
-                thinking = true;
-                attachment = true;
-                limit = {
-                  context = 1048576;
-                  output = 65535;
-                };
-                modalities = {
-                  input = [
-                    "text"
-                    "image"
-                    "pdf"
-                  ];
-                  output = [
-                    "text"
-                  ];
-                };
-              };
-              antigravity-gemini-3-flash = {
-                name = "Gemini 3 Flash (Antigravity)";
-                attachment = true;
-                limit = {
-                  context = 1048576;
-                  output = 65536;
-                };
-                modalities = {
-                  input = [
-                    "text"
-                    "image"
-                    "pdf"
-                  ];
-                  output = [
-                    "text"
-                  ];
-                };
-              };
-            };
-          };
-        };
-      };
+      enable = false; # installed with homebrew, to get latest versions
     };
 
     home = {
       file = {
         ".config/opencode/oh-my-opencode.jsonc".source = ./config/oh-my-opencode.jsonc;
+        ".config/opencode/config.json".source = ./config/opencode.json;
       };
 
       sessionVariables = {

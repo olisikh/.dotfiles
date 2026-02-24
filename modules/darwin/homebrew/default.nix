@@ -35,13 +35,19 @@ in
       brews = [
         "ffmpeg"
         "tccutil"
+        "opencode"
         "JetBrains/utils/kotlin-lsp"
       ] ++
       (optionals cfg.personal.enable [ ]) ++
       (optionals cfg.work.enable [ ]);
 
       casks = [ "raycast" "betterdisplay" ] ++
-        (optionals cfg.personal.enable [ "ollama-app" "iina" ]) ++
+        (optionals cfg.personal.enable [
+          "ollama-app"
+          "iina"
+          "claude-code"
+          "codex"
+        ]) ++
         (optionals cfg.work.enable [ ]);
     };
 

@@ -68,7 +68,7 @@ in
         jdk
         kafkactl
         awscli2
-        kcat
+        # kcat
         stern # kubectl pod log scraping tool
 
         htop
