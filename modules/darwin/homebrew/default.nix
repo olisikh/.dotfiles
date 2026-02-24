@@ -47,6 +47,7 @@ in
           "iina"
           "claude-code"
           "codex"
+          "chatgpt"
         ]) ++
         (optionals cfg.work.enable [ ]);
     };
