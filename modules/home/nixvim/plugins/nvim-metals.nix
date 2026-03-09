@@ -103,9 +103,9 @@
         },
       }
 
-      dap.listeners.after["event_terminated"]["nvim-metals"] = function(_, _)
-        dap.repl.open()
-      end
+      -- dap.listeners.after["event_terminated"]["nvim-metals"] = function(_, _)
+      --   dap.repl.open()
+      -- end
       metals.setup_dap()
     end
 

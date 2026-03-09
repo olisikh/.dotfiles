@@ -88,6 +88,10 @@ in
         scala = {
           enable = true;
           package = neotest-scala; # NOTE: replace with my neotest-scala plugin
+          settings = {
+            log_run_spec = false;
+            build_tool = "auto";
+          };
         };
         golang.enable = true;
         rust.enable = true; # NOTE: rustacean's neotest integration is used instead
