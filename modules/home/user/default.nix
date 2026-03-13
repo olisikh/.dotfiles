@@ -82,6 +82,8 @@ in
         kotlin
         gradle
 
+        dotnet-sdk_10
+
         xdg-utils # open apps from console/neovim
         wezterm
         lazygit
