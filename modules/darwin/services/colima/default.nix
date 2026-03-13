@@ -42,8 +42,9 @@ in
       serviceConfig = {
         Label = "org.colima.default";
         ProgramArguments = [ "${colimaPkg}/bin/colima" "start" "--foreground" ];
+
         RunAtLoad = true;
-        KeepAlive = true;
+        KeepAlive.SuccessfulExit = true;
 
         StandardOutPath = "${colimaDir}/colima.stdout.log";
         StandardErrorPath = "${colimaDir}/colima.stderr.log";
