@@ -18,12 +18,7 @@ in
 
   config = mkIf cfg.enable {
     environment = {
-      systemPackages = with pkgs; [
-        lima
-        colima
-        docker
-        docker-compose
-      ];
+      systemPackages = with pkgs; [ lima colima ];
 
       variables = {
         DOCKER_HOST = "unix://${colimaDir}/docker.sock";

@@ -82,10 +82,14 @@ in
         kotlin
         gradle
 
-        dotnet-sdk_10
-
         xdg-utils # open apps from console/neovim
         wezterm
+
+
+        docker
+        docker-compose
+        docker-buildx
+
         lazygit
         lazydocker
         gh
@@ -123,6 +127,7 @@ in
         (pulumi.withPackages (ps: with ps; [
           pulumi-nodejs
         ]))
+        dotnet-sdk_10
       ]) ++
       (optionals cfg.work.enable [
         slack

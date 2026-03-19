@@ -28,8 +28,8 @@ in
       };
 
       taps = [
-        "homebrew/bundle"
-        "homebrew/services"
+        # "homebrew/bundle"
+        # "homebrew/services"
       ];
 
       brews = [
