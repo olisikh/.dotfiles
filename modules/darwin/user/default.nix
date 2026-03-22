@@ -83,6 +83,48 @@ in
           "com.apple.sound.beep.feedback" = 0;
           "com.apple.trackpad.scaling" = 2.0;
         };
+
+        CustomUserPreferences = {
+          "com.apple.symbolichotkeys" = {
+            AppleSymbolicHotKeys = {
+              # 60: Select the previous input source (⌘ Space)
+              "60" = {
+                enabled = true;
+                value = {
+                  parameters = [
+                    32
+                    49
+                    1048576
+                  ];
+                  type = "standard";
+                };
+              };
+
+              # 61: Select next source in Input menu (⌘⌥ Space)
+              "61" = {
+                enabled = true;
+                value = {
+                  parameters = [
+                    32
+                    49
+                    1572864
+                  ];
+                  type = "standard";
+                };
+              };
+
+              # 64: Spotlight search (disable)
+              "64" = {
+                enabled = false;
+              };
+
+              # 65: Finder search window / Spotlight finder search (disable)
+              "65" = {
+                enabled = false;
+              };
+            };
+          };
+        };
       };
     };
 
