@@ -1,12 +1,16 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf recursiveUpdate types;
+  inherit (lib) mkIf recursiveUpdate types optionalAttrs;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.openclaw;
 
   mkEnvSecretRef = envVar: "$" + "{${envVar}}";
   managedConfigPath = "${config.home.homeDirectory}/.openclaw/openclaw.json";
+
+  gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.gatewayTokenSopsName}";
+  telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.telegramBotTokenSopsName}";
+  memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.memorySearchApiKeySopsName}";
 
   defaultOpenClawConfig = {
     auth = {
@@ -153,10 +157,16 @@ in
     acpxExtensionPath = mkOpt str "/opt/homebrew/lib/node_modules/openclaw/extensions/acpx" "Path to ACPX plugin";
 
     # NOTE: Secrets are intentionally externalized using OpenClaw env SecretRefs like ${OPENCLAW_GATEWAY_TOKEN}.
-    # NOTE: Set these environment variables outside git (shell profile, launchd env, sops integration, etc.).
+    # NOTE: This module can bootstrap those env vars from sops-nix decrypted files at runtime.
     memorySearchApiKeyEnvVar = mkOpt str "GEMINI_API_KEY" "Env var name used for agents.defaults.memorySearch.remote.apiKey";
     telegramBotTokenEnvVar = mkOpt str "OPENCLAW_TELEGRAM_BOT_TOKEN" "Env var name used for channels.telegram.botToken";
     gatewayTokenEnvVar = mkOpt str "OPENCLAW_GATEWAY_TOKEN" "Env var name used for gateway.auth.token";
+
+    useSopsSecrets = mkBoolOpt true "Load OpenClaw secret env vars from sops-nix decrypted files";
+    sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
+    memorySearchApiKeySopsName = mkOpt str "gemini" "sops secret filename containing the memory embedding API key";
+    telegramBotTokenSopsName = mkOpt str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
+    gatewayTokenSopsName = mkOpt str "openclawGatewayToken" "sops secret filename containing OpenClaw gateway token";
 
     extraConfig = mkOpt attrs { } "Additional OpenClaw config recursively merged over the module defaults";
   };
@@ -165,9 +175,34 @@ in
     home = {
       packages = [ pkgs.openclaw ];
 
-      file.".openclaw/openclaw.json".text = builtins.toJSON (
-        recursiveUpdate defaultOpenClawConfig cfg.extraConfig
-      );
+      file = {
+        ".openclaw/openclaw.json".text = builtins.toJSON (
+          recursiveUpdate defaultOpenClawConfig cfg.extraConfig
+        );
+      } // optionalAttrs cfg.useSopsSecrets {
+        ".local/bin/openclaw-with-secrets" = {
+          executable = true;
+          text = ''
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            read_secret() {
+              local file="$1"
+              if [[ ! -r "$file" ]]; then
+                echo "openclaw-with-secrets: missing readable secret file: $file" >&2
+                exit 1
+              fi
+              tr -d '\r\n' < "$file"
+            }
+
+            export ${cfg.gatewayTokenEnvVar}="$(read_secret '${gatewayTokenSecretPath}')"
+            export ${cfg.telegramBotTokenEnvVar}="$(read_secret '${telegramBotTokenSecretPath}')"
+            export ${cfg.memorySearchApiKeyEnvVar}="$(read_secret '${memoryApiKeySecretPath}')"
+
+            exec ${pkgs.openclaw}/bin/openclaw "$@"
+          '';
+        };
+      };
 
       sessionVariables = {
         OPENCLAW_CONFIG_PATH = managedConfigPath;

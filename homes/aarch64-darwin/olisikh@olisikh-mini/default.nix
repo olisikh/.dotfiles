@@ -32,7 +32,11 @@ in
     opencode = enabled;
     # openclaw = {
     #   enable = true;
-    #   # NOTE: export OPENCLAW_GATEWAY_TOKEN, OPENCLAW_TELEGRAM_BOT_TOKEN, and GEMINI_API_KEY before use.
+    #   # NOTE: with sops module enabled, provide secret files:
+    #   # ~/.config/sops-nix/secrets/openclawGatewayToken
+    #   # ~/.config/sops-nix/secrets/openclawTelegramBotToken
+    #   # ~/.config/sops-nix/secrets/gemini
+    #   # then run OpenClaw via: ~/.local/bin/openclaw-with-secrets
     # };
     # codex = enabled;
     # claude-code = enabled;
