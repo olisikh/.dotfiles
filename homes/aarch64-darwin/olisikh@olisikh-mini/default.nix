@@ -30,6 +30,10 @@ in
       ];
     };
     opencode = enabled;
+    # openclaw = {
+    #   enable = true;
+    #   # NOTE: export OPENCLAW_GATEWAY_TOKEN, OPENCLAW_TELEGRAM_BOT_TOKEN, and GEMINI_API_KEY before use.
+    # };
     # codex = enabled;
     # claude-code = enabled;
     user = {
