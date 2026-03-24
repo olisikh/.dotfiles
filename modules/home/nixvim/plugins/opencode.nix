@@ -1,7 +1,4 @@
-{ config, lib, namespace, ... }:
-let
-  inherit (lib) mkIf;
-in
+{ ... }:
 {
   plugins.opencode = {
     enable = true;
@@ -19,27 +16,7 @@ in
       vim.keymap.set('n', '<S-C-d>', function() require('opencode').command('session.half.page.down') end, { desc = 'opencode: half page down' })
         
       vim.g.opencode_opts = {
-        provider = {
-          enabled = "wezterm",
-          wezterm = { }
-        }
+        -- NOTE: provide any special configuration here
       }
-
-      -- vim.api.nvim_create_autocmd("User", {
-      --   pattern = "OpencodeEvent:*", -- Optionally filter event types
-      --   callback = function(args)
-      --     ---@type opencode.cli.client.Event
-      --     local event = args.data.event
-      --     ---@type number
-      --     local port = args.data.port
-      --
-      --     -- See the available event types and their properties
-      --     vim.notify(vim.inspect(event))
-      --     -- Do something useful
-      --     if event.type == "session.idle" then
-      --       vim.notify("`opencode` finished responding")
-      --     end
-      --   end,
-      -- })
     '';
 }

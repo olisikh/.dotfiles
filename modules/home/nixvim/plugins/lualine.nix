@@ -5,7 +5,7 @@
       enable = true;
       settings = {
         options = {
-          theme = "catppuccin";
+          theme = "catppuccin-nvim";
           globalstatus = true; # show global statusline instead of showing it in each window
         };
         sections = {

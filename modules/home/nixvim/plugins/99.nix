@@ -76,10 +76,10 @@ in
     	},
     })
 
-    vim.keymap.set("n", "<leader>of", function() _99.fill_in_function() end)
-    vim.keymap.set("n", "<leader>op", function() _99.fill_in_function_prompt() end)
-    vim.keymap.set("v", "<leader>ov", function() _99.visual() end)
-    vim.keymap.set("v", "<leader>ol", function() _99.view_logs() end)
-    vim.keymap.set("v", "<leader>os", function() _99.stop_all_requests() end)
+    vim.keymap.set("n", "<leader>of", function() _99.fill_in_function() end, { desc = "99: fill in function" })
+    vim.keymap.set("n", "<leader>op", function() _99.fill_in_function_prompt() end, { desc = "99: fill in function (prompt)" })
+    vim.keymap.set("v", "<leader>ov", function() _99.visual() end, { desc = "99: visual (prompt)" })
+    vim.keymap.set("v", "<leader>ol", function() _99.view_logs() end, { desc = "99: view logs" })
+    vim.keymap.set("v", "<leader>os", function() _99.stop_all_requests() end, { desc = "99: stop all requests" })
   '';
 }
