@@ -21,7 +21,6 @@ in
       skhd = enabled;
       colima = enabled;
       ollama = enabled;
-      tailscale = enabled;
     };
   };
 
