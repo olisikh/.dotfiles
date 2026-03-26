@@ -1,4 +1,4 @@
-{ lib, namespace, config, ... }:
+{ lib, namespace, config, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
 
@@ -32,7 +32,10 @@ in
       ];
     };
     opencode = enabled;
-    user.work = enabled;
+    user = {
+      enable = true;
+      packages = with pkgs; [ slack ];
+    };
     sops = {
       enable = true;
       sshKeyPaths = [

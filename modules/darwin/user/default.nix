@@ -15,7 +15,7 @@ let
 in
 {
   options.${namespace}.user = with types; {
-    enable = mkBoolOpt false "Enable user darwin module";
+    enable = mkBoolOpt false "Enable darwin user module";
     username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt str defaultHomeDir "Home directory of the user";
   };

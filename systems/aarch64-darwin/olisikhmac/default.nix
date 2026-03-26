@@ -15,7 +15,18 @@ in
       enable = true;
       inherit username;
     };
-    homebrew.personal = enabled;
+    homebrew = {
+      enable = true;
+      brews = [ ];
+      casks = [
+        "ollama-app"
+        "iina"
+        "claude-code"
+        "codex"
+        "chatgpt"
+      ];
+      taps = [ ];
+    };
     services = {
       jankyborders = enabled;
       yabai = enabled;

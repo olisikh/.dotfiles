@@ -7,14 +7,24 @@ let
 in
 {
   options.${namespace}.homebrew = {
-    enable = mkBoolOpt true "Enable common homebrew darwin module";
+    enable = mkBoolOpt false "Enable common homebrew darwin module";
 
-    personal = {
-      enable = mkBoolOpt false "Enable personal homebrew darwin module";
+    brews = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Homebrew brews to enable";
     };
 
-    work = {
-      enable = mkBoolOpt false "Enable work homebrew darwin module";
+    casks = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Homebrew casks to enable";
+    };
+
+    taps = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Homebrew taps to enable";
     };
   };
 
@@ -27,29 +37,30 @@ in
         cleanup = "zap";
       };
 
-      taps = [
-        # "homebrew/bundle"
-        # "homebrew/services"
-      ];
-
       brews = [
         "ffmpeg"
         "tccutil"
         "opencode"
         "JetBrains/utils/kotlin-lsp"
-      ] ++
-      (optionals cfg.personal.enable [ ]) ++
-      (optionals cfg.work.enable [ ]);
+      ] ++ cfg.brews;
+      # (optionals cfg.personal.enable [ ]) ++
+      # (optionals cfg.work.enable [ ]);
 
-      casks = [ "raycast" "betterdisplay" ] ++
-        (optionals cfg.personal.enable [
-          "ollama-app"
-          "iina"
-          "claude-code"
-          "codex"
-          "chatgpt"
-        ]) ++
-        (optionals cfg.work.enable [ ]);
+      casks = [ "raycast" "betterdisplay" ] ++ cfg.casks;
+
+      # (optionals cfg.personal.enable [
+      #   "ollama-app"
+      #   "iina"
+      #   "claude-code"
+      #   "codex"
+      #   "chatgpt"
+      # ]) ++
+      # (optionals cfg.work.enable [ ]);
+
+      taps = [
+        # "homebrew/bundle"
+        # "homebrew/services"
+      ] ++ cfg.taps;
     };
 
     environment.systemPath = [ "/opt/homebrew/bin" ];

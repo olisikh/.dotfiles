@@ -1,6 +1,6 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf types optionals;
+  inherit (lib) mkIf types;
   inherit (lib.${namespace}) mkOpt mkBoolOpt;
 
   cfg = config.${namespace}.user;
@@ -17,16 +17,14 @@ let
 in
 {
   options.${namespace}.user = with types; {
-    enable = mkBoolOpt true "Enable user programs";
+    enable = mkBoolOpt false "Enable user programs";
     username = mkOpt str defaultUsername "Name of the user";
     home = mkOpt types.str defaultHomeDir "The user's home directory";
 
-    personal = {
-      enable = mkBoolOpt false "Enable personal user programs";
-    };
-
-    work = {
-      enable = mkBoolOpt false "Enable work user programs";
+    packages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Home manager packages to enable";
     };
   };
 
@@ -115,23 +113,12 @@ in
           inherit config namespace lib;
           home = cfg.home;
         }))
-      ] ++
-      (optionals cfg.personal.enable [
-        podman
-        brave
-        bitwarden-desktop
-        antigravity
-        obsidian
-        vscode
-        cmatrix
-        (pulumi.withPackages (ps: with ps; [
-          pulumi-nodejs
-        ]))
-        dotnet-sdk_10
-      ]) ++
-      (optionals cfg.work.enable [
-        slack
-      ]);
+      ] ++ cfg.packages;
+      # (optionals cfg.personal.enable [
+      # ]) ++
+      # (optionals cfg.work.enable [
+      #   slack
+      # ]);
 
       sessionVariables = {
         SCALA_HOME = scala;

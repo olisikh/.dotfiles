@@ -1,4 +1,4 @@
-{ lib, namespace, ... }:
+{ lib, namespace, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
 in
@@ -32,7 +32,22 @@ in
     opencode = enabled;
     # codex = enabled;
     # claude-code = enabled;
-    user.personal = enabled;
+    user = {
+      enable = true;
+      packages = with pkgs; [
+        podman
+        brave
+        bitwarden-desktop
+        antigravity
+        obsidian
+        vscode
+        cmatrix
+        (pulumi.withPackages (ps: with ps; [
+          pulumi-nodejs
+        ]))
+        dotnet-sdk_10
+      ];
+    };
     sops = enabled;
   };
 }
