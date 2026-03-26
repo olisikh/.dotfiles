@@ -114,11 +114,6 @@ in
           home = cfg.home;
         }))
       ] ++ cfg.packages;
-      # (optionals cfg.personal.enable [
-      # ]) ++
-      # (optionals cfg.work.enable [
-      #   slack
-      # ]);
 
       sessionVariables = {
         SCALA_HOME = scala;

@@ -43,24 +43,10 @@ in
         "opencode"
         "JetBrains/utils/kotlin-lsp"
       ] ++ cfg.brews;
-      # (optionals cfg.personal.enable [ ]) ++
-      # (optionals cfg.work.enable [ ]);
 
       casks = [ "raycast" "betterdisplay" ] ++ cfg.casks;
 
-      # (optionals cfg.personal.enable [
-      #   "ollama-app"
-      #   "iina"
-      #   "claude-code"
-      #   "codex"
-      #   "chatgpt"
-      # ]) ++
-      # (optionals cfg.work.enable [ ]);
-
-      taps = [
-        # "homebrew/bundle"
-        # "homebrew/services"
-      ] ++ cfg.taps;
+      taps = cfg.taps;
     };
 
     environment.systemPath = [ "/opt/homebrew/bin" ];
