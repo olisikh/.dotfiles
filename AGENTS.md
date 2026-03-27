@@ -7,7 +7,7 @@ This file provides essential information for AI coding agents working in this Ni
 ### Build Commands
 - **Full system build**: `nix build .#darwinConfigurations.${HOSTNAME}.system --show-trace --print-build-logs -vvv`
   - Builds the complete Darwin system configuration
-  - Replace `${HOSTNAME}` with actual hostname (e.g., olisikhmac)
+  - Replace `${HOSTNAME}` with actual hostname (e.g., olisikh-mbair)
 - **Apply configuration**: `./result/sw/bin/darwin-rebuild switch --flake .`
   - Switches to the new system configuration (requires sudo)
 - **Quick install**: `./install.sh`

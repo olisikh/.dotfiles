@@ -3,7 +3,7 @@ let
   inherit (lib.${namespace}) enabled disabled;
 
   username = "olisikh";
-  hostName = "olisikhmac";
+  hostName = "olisikh-mbair";
   localHostName = hostName;
 in
 {
