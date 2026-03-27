@@ -90,6 +90,7 @@ in
           alias tree="exa --tree"
           alias h="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
           alias p="podman"
+          alias ts="tailscale"
 
           ${exportSecrets}
 
