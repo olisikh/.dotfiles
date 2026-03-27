@@ -10,19 +10,19 @@ in
     enable = mkBoolOpt false "Enable common homebrew darwin module";
 
     brews = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
+      type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "Homebrew brews to enable";
     };
 
     casks = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
+      type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "Homebrew casks to enable";
     };
 
     taps = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
+      type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "Homebrew taps to enable";
     };
