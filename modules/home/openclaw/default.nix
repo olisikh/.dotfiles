@@ -12,7 +12,18 @@ let
   telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.telegramBotTokenSopsName}";
   memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.memorySearchApiKeySopsName}";
 
+  mkModelEntries = models:
+    builtins.listToAttrs (map (model: {
+      name = model;
+      value = { };
+    }) models);
+
   defaultOpenClawConfig = {
+    meta = {
+      # NOTE: Runtime-specific timestamps are intentionally not pinned in Nix.
+      lastTouchedVersion = "2026.3.23-2";
+    };
+
     auth = {
       profiles = {
         "openai-codex:default" = {
@@ -24,32 +35,47 @@ let
 
     agents = {
       defaults = {
-        model = {
-          primary = cfg.modelPrimary;
-        };
-        models = {
-          "${cfg.modelPrimary}" = { };
-        };
-        workspace = "${config.home.homeDirectory}/.openclaw/workspace";
-        compaction = {
-          mode = "safeguard";
-        };
+        model = cfg.modelPrimary;
+        models = mkModelEntries cfg.models;
+        workspace = cfg.mainWorkspace;
         memorySearch = {
           enabled = true;
           provider = "gemini";
-          model = "gemini-embedding-2-preview";
           remote = {
             apiKey = mkEnvSecretRef cfg.memorySearchApiKeyEnvVar;
           };
+          model = "gemini-embedding-2-preview";
+        };
+        compaction = {
+          mode = "safeguard";
         };
       };
+      list =
+        [
+          {
+            id = "main";
+            default = true;
+            workspace = cfg.mainWorkspace;
+          }
+        ]
+        ++ lib.optional cfg.enableWifeAgent {
+          id = "wife";
+          default = false;
+          workspace = cfg.wifeWorkspace;
+          sandbox = {
+            mode = "off";
+          };
+          tools = {
+            deny = cfg.wifeToolsDeny;
+          };
+        };
     };
 
     tools = {
       profile = "coding";
       web = {
         search = {
-          provider = "brave";
+          provider = "gemini";
         };
       };
       sessions = {
@@ -96,6 +122,12 @@ let
         allowFrom = cfg.telegramAllowFrom;
         groupPolicy = "allowlist";
         streaming = "partial";
+        groupAllowFrom = cfg.telegramGroupAllowFrom;
+        groups = {
+          "*" = {
+            requireMention = false;
+          };
+        };
       };
     };
 
@@ -103,9 +135,17 @@ let
       port = 18789;
       mode = "local";
       bind = "auto";
+      controlUi = {
+        allowedOrigins = cfg.controlUiAllowedOrigins;
+      };
       auth = {
         mode = "token";
         token = mkEnvSecretRef cfg.gatewayTokenEnvVar;
+        rateLimit = {
+          maxAttempts = 10;
+          windowMs = 60000;
+          lockoutMs = 300000;
+        };
       };
       tailscale = {
         mode = "off";
@@ -128,11 +168,15 @@ let
       allow = [
         "acpx"
         "telegram"
+        "ollama"
         "openclaw-web-search"
+        "google"
       ];
       load = {
         paths = [
           cfg.acpxExtensionPath
+          cfg.ollamaExtensionPath
+          cfg.googleExtensionPath
         ];
       };
       entries = {
@@ -145,6 +189,28 @@ let
         openclaw-web-search = {
           enabled = true;
         };
+        ollama = {
+          enabled = true;
+        };
+        google = {
+          enabled = true;
+          config = {
+            webSearch = {
+              apiKey = mkEnvSecretRef cfg.memorySearchApiKeyEnvVar;
+            };
+          };
+        };
+      };
+    };
+
+    bindings = lib.optional cfg.enableWifeAgent {
+      agentId = "wife";
+      match = {
+        channel = "telegram";
+        peer = {
+          kind = "direct";
+          id = cfg.wifeTelegramPeerId;
+        };
       };
     };
   };
@@ -152,26 +218,72 @@ in
 {
   options.${namespace}.openclaw = with types; {
     enable = mkBoolOpt false "Enable OpenClaw with a Nix-managed ~/.openclaw/openclaw.json";
-    modelPrimary = mkOpt str "openai-codex/gpt-5.3-codex" "Primary OpenClaw model reference";
-    telegramAllowFrom = mkOpt (listOf str) [ "3942079" ] "Telegram allowlist user IDs";
-    acpxExtensionPath = mkOpt str "/opt/homebrew/lib/node_modules/openclaw/extensions/acpx" "Path to ACPX plugin";
+
+    modelPrimary = mkOpt str "openai-codex/gpt-5.4" "Primary OpenClaw model reference";
+    models = mkOpt (listOf str) [ "openai-codex/gpt-5.4" "openai-codex/gpt-5.3-codex" ] "OpenClaw model entries to register";
+
+    mainWorkspace = mkOpt str "${config.home.homeDirectory}/.openclaw/workspace" "Main OpenClaw workspace path";
+    enableWifeAgent = mkBoolOpt true "Enable secondary restricted OpenClaw agent bound to a direct Telegram peer";
+    wifeWorkspace = mkOpt str "${config.home.homeDirectory}/.openclaw/workspace-wife" "Secondary agent workspace path";
+    wifeTelegramPeerId = mkOpt str "13252999" "Telegram direct peer ID routed to wife agent";
+    wifeToolsDeny = mkOpt (listOf str) [
+      "exec"
+      "process"
+      "write"
+      "edit"
+      "apply_patch"
+      "cron"
+      "gateway"
+      "nodes"
+      "sessions_spawn"
+      "sessions_send"
+      "sessions_history"
+      "sessions_list"
+      "memory_get"
+      "memory_search"
+      "read"
+      "browser"
+      "image"
+      "image_generate"
+      "canvas"
+      "subagents"
+    ] "Strict deny list for wife agent tools. Keep web_search and web_fetch allowed.";
+
+    telegramAllowFrom = mkOpt (listOf str) [ "3942079" "13252999" ] "Telegram DM allowlist user IDs";
+    telegramGroupAllowFrom = mkOpt (listOf str) [ "3942079" "13252999" ] "Telegram group allowlist user IDs";
+    controlUiAllowedOrigins = mkOpt (listOf str) [
+      "http://127.0.0.1:18789"
+      "http://localhost:18789"
+      "http://192.168.2.30:18789"
+    ] "Gateway control UI allowed origins";
+
+    acpxExtensionPath = mkOpt str "/opt/homebrew/lib/node_modules/openclaw/dist/extensions/acpx" "Path to ACPX plugin";
+    ollamaExtensionPath = mkOpt str "/opt/homebrew/lib/node_modules/openclaw/dist/extensions/ollama" "Path to Ollama plugin";
+    googleExtensionPath = mkOpt str "/opt/homebrew/lib/node_modules/openclaw/dist/extensions/google" "Path to Google plugin";
 
     # NOTE: Secrets are intentionally externalized using OpenClaw env SecretRefs like ${OPENCLAW_GATEWAY_TOKEN}.
-    # NOTE: This module can bootstrap those env vars from sops-nix decrypted files at runtime.
-    memorySearchApiKeyEnvVar = mkOpt str "GEMINI_API_KEY" "Env var name used for agents.defaults.memorySearch.remote.apiKey";
+    # NOTE: This module bootstraps those env vars from sops-nix decrypted files at runtime.
+    memorySearchApiKeyEnvVar = mkOpt str "GEMINI_API_KEY" "Env var name used for embedding and Google webSearch API keys";
     telegramBotTokenEnvVar = mkOpt str "OPENCLAW_TELEGRAM_BOT_TOKEN" "Env var name used for channels.telegram.botToken";
     gatewayTokenEnvVar = mkOpt str "OPENCLAW_GATEWAY_TOKEN" "Env var name used for gateway.auth.token";
 
     useSopsSecrets = mkBoolOpt true "Load OpenClaw secret env vars from sops-nix decrypted files";
     sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
-    memorySearchApiKeySopsName = mkOpt str "gemini" "sops secret filename containing the memory embedding API key";
+    memorySearchApiKeySopsName = mkOpt str "gemini" "sops secret filename containing Gemini API key";
     telegramBotTokenSopsName = mkOpt str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
     gatewayTokenSopsName = mkOpt str "openclawGatewayToken" "sops secret filename containing OpenClaw gateway token";
 
-    extraConfig = mkOpt attrs { } "Additional OpenClaw config recursively merged over the module defaults";
+    extraConfig = mkOpt attrs { } "Additional OpenClaw config recursively merged over module defaults";
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !(builtins.elem "web_search" cfg.wifeToolsDeny || builtins.elem "web_fetch" cfg.wifeToolsDeny);
+        message = "olisikh.openclaw.wifeToolsDeny must not include web_search or web_fetch.";
+      }
+    ];
+
     home = {
       packages = [ pkgs.openclaw ];
 

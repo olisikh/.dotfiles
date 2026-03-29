@@ -32,11 +32,19 @@ in
     opencode = enabled;
     # openclaw = {
     #   enable = true;
+    #
     #   # NOTE: with sops module enabled, provide secret files:
     #   # ~/.config/sops-nix/secrets/openclawGatewayToken
     #   # ~/.config/sops-nix/secrets/openclawTelegramBotToken
     #   # ~/.config/sops-nix/secrets/gemini
-    #   # then run OpenClaw via: ~/.local/bin/openclaw-with-secrets
+    #
+    #   # NOTE: this mirrors current live setup defaults:
+    #   # - model: openai-codex/gpt-5.4
+    #   # - telegram allowFrom/groupAllowFrom: 3942079, 13252999
+    #   # - secondary restricted wife agent + direct telegram binding for 13252999
+    #   #
+    #   # Run OpenClaw with secret bootstrap:
+    #   # ~/.local/bin/openclaw-with-secrets
     # };
     # codex = enabled;
     # claude-code = enabled;
