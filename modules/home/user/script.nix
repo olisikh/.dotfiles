@@ -21,7 +21,7 @@ let
       {
         name = "secrets";
         desc = "Edit secrets";
-        action = "check_command sops && sops ${home}/.config/sops/secrets.yaml";
+        action = "home_secrets";
       }
     ]
   );
@@ -101,6 +101,36 @@ in
 
   home_dev() {
       nix develop ${dotDir}#$@ --command zsh
+  }
+
+  home_secrets() {
+      check_command sops
+      local secrets_file="${home}/.config/sops/secrets.yaml"
+
+      mkdir -p "$(dirname "$secrets_file")"
+
+      if [[ ! -s "$secrets_file" ]]; then
+          check_command age-keygen
+
+          if [[ -z "$SOPS_AGE_KEY_FILE" || ! -r "$SOPS_AGE_KEY_FILE" ]]; then
+              echo "Error: SOPS_AGE_KEY_FILE is missing or unreadable: $SOPS_AGE_KEY_FILE"
+              exit 1
+          fi
+
+          local recipient
+          recipient="$(age-keygen -y "$SOPS_AGE_KEY_FILE")"
+
+          if [[ -z "$recipient" ]]; then
+              echo "Error: failed to derive age recipient from $SOPS_AGE_KEY_FILE"
+              exit 1
+          fi
+
+          echo "Bootstrapping encrypted secrets file at $secrets_file"
+          printf '{}\n' > "$secrets_file"
+          sops --encrypt --in-place --age "$recipient" "$secrets_file"
+      fi
+
+      sops "$secrets_file"
   }
 
   # Main function to handle input and execute corresponding action
