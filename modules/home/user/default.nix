@@ -91,6 +91,7 @@ in
         lazygit
         lazydocker
         gh
+        github-copilot-cli
         watch
         (python3.withPackages (ps: with ps; [
           pytest
