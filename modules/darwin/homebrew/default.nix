@@ -40,7 +40,6 @@ in
       brews = [
         "ffmpeg"
         "tccutil"
-        "opencode"
         "JetBrains/utils/kotlin-lsp"
       ] ++ cfg.brews;
 

@@ -12,7 +12,7 @@ in
 
   config = mkIf cfg.enable {
     programs.opencode = {
-      enable = false; # installed with homebrew, to get latest versions
+      enable = true;
     };
 
     home = {
