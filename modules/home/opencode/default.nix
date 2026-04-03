@@ -17,7 +17,6 @@ in
 
     home = {
       file = {
-        ".config/opencode/oh-my-opencode.jsonc".source = ./config/oh-my-opencode.jsonc;
         ".config/opencode/config.json".source = ./config/opencode.json;
       };
 
