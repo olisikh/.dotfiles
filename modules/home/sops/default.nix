@@ -36,6 +36,8 @@ in
         openrouter = { };
         gemini = { };
         opencode = { };
+        openclawGatewayToken = { };
+        openclawTelegramBotToken = { };
       };
     };
 
