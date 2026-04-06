@@ -41,6 +41,8 @@ in
         RunAtLoad = true;
         KeepAlive.SuccessfulExit = true;
 
+        ExitTimeOut = 120;
+
         StandardOutPath = "${colimaDir}/colima.stdout.log";
         StandardErrorPath = "${colimaDir}/colima.stderr.log";
 
