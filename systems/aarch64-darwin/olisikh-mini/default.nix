@@ -28,10 +28,10 @@ in
       taps = [ ];
     };
     services = {
-      jankyborders = enabled;
-      yabai = enabled;
-      sketchybar = enabled;
-      skhd = enabled;
+      jankyborders = disabled;
+      yabai = disabled;
+      sketchybar = disabled;
+      skhd = disabled;
       colima = enabled;
       ollama = enabled;
       tailscale = enabled;
