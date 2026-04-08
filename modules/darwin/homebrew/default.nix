@@ -43,7 +43,11 @@ in
         "JetBrains/utils/kotlin-lsp"
       ] ++ cfg.brews;
 
-      casks = [ "raycast" "betterdisplay" ] ++ cfg.casks;
+      casks = [
+        "raycast"
+        "betterdisplay"
+        "steipete/tap/codexbar"
+      ] ++ cfg.casks;
 
       taps = cfg.taps;
     };

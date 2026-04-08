@@ -53,6 +53,7 @@ in
         minikube
         k9s
         kubectl
+        kubectx
         kubernetes-helm
         kustomize
         etcd
