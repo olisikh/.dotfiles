@@ -4,6 +4,11 @@
     enable = true;
     settings = {
       bigfile.enabled = true;
+      image.enabled = true;
+
+      lazygit = {
+        configure = true;
+      };
 
       dashboard = {
         enabled = true;
@@ -62,4 +67,39 @@
       };
     };
   };
+
+  keymaps = [
+    {
+      key = "<leader>gg";
+      action = '':lua require("snacks").lazygit.open()<cr>'';
+      mode = "n";
+      options = {
+        desc = "snacks: lazygit open";
+      };
+    }
+    {
+      key = "<leader>gl";
+      action = '':lua require("snacks").lazygit.log()<cr>'';
+      mode = "n";
+      options = {
+        desc = "snacks: lazygit log";
+      };
+    }
+    {
+      key = "<leader>gL";
+      action = '':lua require("snacks").lazygit.log_file()<cr>'';
+      mode = "n";
+      options = {
+        desc = "snacks: lazygit current file";
+      };
+    }
+    {
+      key = "<leader>gb";
+      action = '':lua require("snacks").git.blame_line()<cr>'';
+      mode = "n";
+      options = {
+        desc = "snacks: git blame";
+      };
+    }
+  ];
 }

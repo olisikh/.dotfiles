@@ -29,7 +29,6 @@
     ./plugins/indent-blankline.nix
     ./plugins/visual-whitespace.nix
     ./plugins/snacks.nix
-    ./plugins/lazygit.nix
     ./plugins/smart-splits.nix
     ./plugins/oil.nix
     ./plugins/smart-splits.nix
@@ -39,7 +38,6 @@
     ./plugins/nvim-metals.nix
     ./plugins/inc-rename.nix
     ./plugins/cellular-automaton.nix
-    ./plugins/zen-mode.nix
     ./plugins/guess-indent.nix
     ./plugins/neogen.nix
     ./plugins/99.nix

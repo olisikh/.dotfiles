@@ -27,6 +27,10 @@
           dap = true;
           dap_ui = true;
           markdown = true;
+          snacks = {
+            enabled = true;
+            indent_scope_color = "";
+          };
           indent_blankline = {
             enabled = true;
             colored_indent_levels = false;
