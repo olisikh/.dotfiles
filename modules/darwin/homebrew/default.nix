@@ -1,6 +1,6 @@
 { lib, config, namespace, ... }:
 let
-  inherit (lib) optionals mkIf;
+  inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.homebrew;
@@ -46,7 +46,7 @@ in
       casks = [
         "raycast"
         "betterdisplay"
-        "steipete/tap/codexbar"
+        "codexbar"
       ] ++ cfg.casks;
 
       taps = cfg.taps;
