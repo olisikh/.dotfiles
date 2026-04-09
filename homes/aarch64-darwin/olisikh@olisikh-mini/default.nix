@@ -39,6 +39,7 @@ in
         brave
         bitwarden-desktop
         antigravity
+        gemini-cli
         obsidian
         vscode
         cmatrix
