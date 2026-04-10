@@ -38,10 +38,12 @@ in
       enable = true;
 
       # NOTE: with sops module enabled, provide secret files:
-      # ~/.config/sops-nix/secrets/openclawGatewayToken
-      # ~/.config/sops-nix/secrets/openclawTelegramBotToken
+      # ~/.config/sops-nix/secrets/openclaw/gatewayToken
+      # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
       # ~/.config/sops-nix/secrets/gemini
       config = openclawConfig;
+      gatewayTokenSopsName = "openclaw/gatewayToken";
+      telegramBotTokenSopsName = "openclaw/telegramBotToken";
     };
     user = {
       enable = true;
@@ -65,28 +67,30 @@ in
       enable = true;
       secrets = {
         userEmail = {
-          path = "git/userEmail";
+          key = "git/userEmail";
         };
         signingKey = {
-          path = "git/signingKey";
+          key = "git/signingKey";
         };
         opencode = {
-          path = "ai/opencode/apiKey";
+          key = "ai/opencode/apiKey";
         };
         openai = {
-          path = "ai/openai/apiKey";
+          key = "ai/openai/apiKey";
         };
         openrouter = {
-          path = "ai/openrouter/apiKey";
+          key = "ai/openrouter/apiKey";
         };
         gemini = {
-          path = "ai/gemini/apiKey";
+          key = "ai/gemini/apiKey";
         };
         openclawGatewayToken = {
-          path = "ai/openclaw/gatewayToken";
+          key = "ai/openclaw/gatewayToken";
+          name = "openclaw/gatewayToken";
         };
         openclawTelegramBotToken = {
-          path = "ai/openclaw/telegramBotToken";
+          key = "ai/openclaw/telegramBotToken";
+          name = "openclaw/telegramBotToken";
         };
       };
     };

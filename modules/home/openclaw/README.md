@@ -25,6 +25,11 @@ Current host file:
 
 - `homes/aarch64-darwin/olisikh@olisikh-mini/openclaw-config.nix`
 
+## Tool Collisions
+
+The module defaults `olisikh.openclaw.excludeTools = [ "nodejs_22" "python3" ]` to avoid Home Manager `buildEnv`
+conflicts with user-provided Node/Python packages. Override per host if you want OpenClaw-provided runtimes instead.
+
 ## Secrets Injection
 
 If `olisikh.openclaw.useSopsSecrets = true` and `injectSecrets = true`, the module injects:

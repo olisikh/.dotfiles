@@ -55,6 +55,7 @@ in
     documents = mkOpt (nullOr path) null "Optional directory with AGENTS.md/SOUL.md/TOOLS.md for OpenClaw workspace bootstrap";
     bundledPlugins = mkOpt attrs { } "Optional overrides for programs.openclaw.bundledPlugins";
     customPlugins = mkOpt (listOf attrs) [ ] "Extra programs.openclaw.customPlugins entries";
+    excludeTools = mkOpt (listOf str) [ "nodejs_22" "python3" ] "OpenClaw bundled tool names to exclude (defaults avoid /bin/node and python collisions with user toolchain)";
 
     useSopsSecrets = mkBoolOpt true "Inject secret refs/token files from sops-nix decrypted files";
     injectSecrets = mkBoolOpt true "Inject gateway/token/memory-search secret refs into the OpenClaw config";
@@ -67,7 +68,7 @@ in
   config = mkIf cfg.enable {
     programs.openclaw = {
       enable = true;
-      inherit (cfg) documents bundledPlugins customPlugins;
+      inherit (cfg) documents bundledPlugins customPlugins excludeTools;
       config = recursiveUpdate (recursiveUpdate cfg.config cfg.extraConfig) secretConfig;
 
       # NOTE: Work around nix-openclaw default-instance appDefaults bug by setting nixMode explicitly.
