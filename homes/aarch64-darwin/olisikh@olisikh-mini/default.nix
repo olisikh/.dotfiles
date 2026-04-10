@@ -1,6 +1,6 @@
 { lib, namespace, pkgs, config, ... }:
 let
-  inherit (lib.${namespace}) enabled disabled;
+  inherit (lib.${namespace}) enabled;
 
   openclawConfig = import ./openclaw-config.nix {
     inherit (config.home) homeDirectory;
@@ -83,7 +83,7 @@ in
           path = "ai/gemini/apiKey";
         };
         openclawGatewayToken = {
-          path = "ai/opencode/gatewayToken";
+          path = "ai/openclaw/gatewayToken";
         };
         openclawTelegramBotToken = {
           path = "ai/openclaw/telegramBotToken";
