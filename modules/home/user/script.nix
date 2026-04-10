@@ -135,6 +135,9 @@ in
       fi
 
       sops "$secrets_file"
+
+      # echo "Syncing secrets into ~/.config/sops-nix/secrets folder"
+      # launchctl kickstart -k gui/$(id -u)/org.nix-community.home.sops-nix
   }
 
   # Main function to handle input and execute corresponding action

@@ -35,6 +35,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-openclaw = {
+      url = "github:openclaw/nix-openclaw";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     snowfall-lib = {
       url = "github:snowfallorg/lib";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,6 +60,14 @@
 
   outputs = inputs:
     let
+      openclawSourceInfo = {
+        owner = "openclaw";
+        repo = "openclaw";
+        rev = "9fd08f9d0f54bc1f811d6dfbcc619cb7e565fca9";
+        hash = "sha256-QQMRhT2rWned1aZFDF4RsUjL1JRtCFFEJW0KRb9AZts=";
+        pnpmDepsHash = "sha256-89AzV0cVwKmfxlUTbVmYuYbygMw5ES0FtFcjlc37IwY=";
+      };
+
       lib = inputs.snowfall-lib.mkLib {
         inherit inputs;
 
@@ -74,7 +88,36 @@
       src = ./.;
 
       # NOTE: add external overlays here
-      overlays = [ ];
+      overlays = with inputs; [
+        nix-openclaw.overlays.default
+        (
+          final: prev:
+            let
+              mkPackages = args: import "${nix-openclaw}/nix/packages" ({
+                pkgs = prev;
+                sourceInfo = openclawSourceInfo;
+              } // args);
+
+              packages = mkPackages { };
+
+              toolNames = (import "${nix-openclaw}/nix/tools/extended.nix" { pkgs = prev; }).toolNames;
+              withTools =
+                { toolNamesOverride ? null
+                , excludeToolNames ? [ ]
+                ,
+                }:
+                mkPackages {
+                  inherit toolNamesOverride excludeToolNames;
+                };
+            in
+            packages
+            // {
+              openclawPackages = packages // {
+                inherit toolNames withTools;
+              };
+            }
+        )
+      ];
 
       channels-config.allowUnfree = true;
 
@@ -85,6 +128,7 @@
       homes.modules = with inputs; [
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
+        nix-openclaw.homeManagerModules.openclaw
       ];
 
       alias.templates.default = "empty";

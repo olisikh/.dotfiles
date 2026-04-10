@@ -38,6 +38,26 @@ in
     };
     sops = {
       enable = true;
+      secrets = {
+        userEmail = {
+          path = "git/userEmail";
+        };
+        signingKey = {
+          path = "git/signingKey";
+        };
+        opencode = {
+          path = "ai/opencode";
+        };
+        openai = {
+          path = "ai/openai";
+        };
+        openrouter = {
+          path = "ai/openrouter";
+        };
+        gemini = {
+          path = "ai/gemini";
+        };
+      };
       sshKeyPaths = [
         "${userCfg.home}/.ssh/id_rsa"
       ];

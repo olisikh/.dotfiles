@@ -5,6 +5,14 @@ let
 
   cfg = config.${namespace}.sops;
   home = config.${namespace}.user.home;
+
+  normalizedSecrets = lib.mapAttrs (
+    _secretName: secret:
+    secret
+    // (lib.optionalAttrs (!(secret ? path) && (secret ? name)) {
+      path = "${home}/.config/sops-nix/secrets/${secret.name}";
+    })
+  ) cfg.secrets;
 in
 {
   options.${namespace}.sops = with lib.types; {
@@ -13,6 +21,7 @@ in
     secretsFile = mkOpt str "${home}/.config/sops/secrets.yaml" "Path to the sops secrets file";
     generateKey = mkBoolOpt true "Generate a new sops age key";
     sshKeyPaths = mkOpt (listOf str) [ "${home}/.ssh/id_ed25519" ] "List of ssh key paths to convert to age keys";
+    secrets = mkOpt (attrsOf attrs) { } "Per-system sops-nix secrets to materialize (keys become filenames under ~/.config/sops-nix/secrets)";
   };
 
   config = mkIf cfg.enable {
@@ -28,15 +37,7 @@ in
         inherit (cfg) sshKeyPaths generateKey keyFile;
       };
 
-      secrets = {
-        userEmail = { };
-        signingKey = { };
-        claude = { };
-        openai = { };
-        openrouter = { };
-        gemini = { };
-        opencode = { };
-      };
+      secrets = normalizedSecrets;
     };
 
     home.sessionVariables = {

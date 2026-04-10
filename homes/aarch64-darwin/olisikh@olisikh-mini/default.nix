@@ -1,6 +1,10 @@
-{ lib, namespace, pkgs, ... }:
+{ lib, namespace, pkgs, config, ... }:
 let
-  inherit (lib.${namespace}) enabled disabled;
+  inherit (lib.${namespace}) enabled;
+
+  openclawConfig = import ./openclaw-config.nix {
+    inherit (config.home) homeDirectory;
+  };
 in
 {
   olisikh = {
@@ -30,8 +34,22 @@ in
       ];
     };
     opencode = enabled;
-    # codex = enabled;
-    # claude-code = enabled;
+    openclaw = {
+      enable = true;
+
+      # NOTE: with sops module enabled, provide secret files:
+      # ~/.config/sops-nix/secrets/openclaw/gatewayToken
+      # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
+      # ~/.config/sops-nix/secrets/ai/gemini
+      # ~/.config/sops-nix/secrets/ai/elevenlabs
+      config = openclawConfig;
+      sops = {
+        memorySearchApiKey = "ai/gemini";
+        elevenlabsApiKey = "ai/elevenlabs";
+        gatewayToken = "openclaw/gatewayToken";
+        telegramBotToken = "openclaw/telegramBotToken";
+      };
+    };
     user = {
       enable = true;
       packages = with pkgs; [
@@ -50,6 +68,37 @@ in
         dotnet-sdk_10
       ];
     };
-    sops = enabled;
+    sops = {
+      enable = true;
+      secrets = {
+        userEmail = {
+          key = "git/userEmail";
+          name = "git/userEmail";
+        };
+        # signingKey = {
+        #   key = "git/signingKey";
+        # };
+        opencode = {
+          key = "ai/opencode";
+          name = "ai/opencode";
+        };
+        gemini = {
+          key = "ai/gemini";
+          name = "ai/gemini";
+        };
+        elevenlabs = {
+          key = "ai/elevenlabs";
+          name = "ai/elevenlabs";
+        };
+        openclawGatewayToken = {
+          key = "openclaw/gatewayToken";
+          name = "openclaw/gatewayToken";
+        };
+        openclawTelegramBotToken = {
+          key = "openclaw/telegramBotToken";
+          name = "openclaw/telegramBotToken";
+        };
+      };
+    };
   };
 }
