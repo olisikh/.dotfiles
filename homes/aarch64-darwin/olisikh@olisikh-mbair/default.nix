@@ -63,10 +63,6 @@ in
           key = "ai/opencode";
           name = "ai/opencode";
         };
-        openai = {
-          key = "ai/openai";
-          name = "ai/openai";
-        };
         openrouter = {
           key = "ai/openrouter";
           name = "ai/openrouter";
