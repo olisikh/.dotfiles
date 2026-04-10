@@ -52,22 +52,28 @@ in
       enable = true;
       secrets = {
         userEmail = {
-          path = "git/userEmail";
+          key = "git/userEmail";
+          name = "git/userEmail";
         };
         signingKey = {
-          path = "git/signingKey";
+          key = "git/signingKey";
+          name = "git/signingKey";
         };
         opencode = {
-          path = "ai/opencode/apiKey";
+          key = "ai/opencode";
+          name = "ai/opencode";
         };
         openai = {
-          path = "ai/openai/apiKey";
+          key = "ai/openai";
+          name = "ai/openai";
         };
         openrouter = {
-          path = "ai/openrouter/apiKey";
+          key = "ai/openrouter";
+          name = "ai/openrouter";
         };
         gemini = {
-          path = "ai/gemini/apiKey";
+          key = "ai/gemini";
+          name = "ai/gemini";
         };
       };
     };
