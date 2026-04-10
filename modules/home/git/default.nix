@@ -5,6 +5,10 @@ let
 
   cfg = config.${namespace}.git;
   secrets = config.sops.secrets;
+  userEmailPath = lib.attrByPath [ "userEmail" "path" ] "" secrets;
+  signingKeyPath = lib.attrByPath [ "signingKey" "path" ] "" secrets;
+
+  personalName = "Oleksii Lisikh";
 in
 {
   options.${namespace}.git = with types; {
@@ -13,14 +17,21 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = userEmailPath != "";
+        message = "olisikh.git.enable requires sops secret 'userEmail' (set olisikh.sops.secrets.userEmail = { };).";
+      }
+    ];
+
     programs.git = enabled;
 
     home.activation.writeGitConfig = lib.mkAfter ''
       cat > ~/.gitconfig <<EOF
       [user]
-          name = Oleksii Lisikh 
-          email = $(cat ${secrets.userEmail.path})
-          ${if (secrets.signingKey.path != "") then "signingkey = $(cat ${secrets.signingKey.path})" else ""}
+          name = ${personalName}
+          email = $(cat ${userEmailPath})
+          ${if (signingKeyPath != "") then "signingkey = $(cat ${signingKeyPath})" else ""}
       [commit]
           gpgSign = ${toString cfg.signByDefault}
       [core]

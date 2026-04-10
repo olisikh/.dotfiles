@@ -1,52 +1,38 @@
 # OpenClaw Home Module
 
-This module is now a thin compatibility layer over `nix-openclaw` (`programs.openclaw`), instead of manually
-writing `~/.openclaw/openclaw.json` and wiring `pkgs.openclaw` ourselves.
+This module is intentionally thin. Host-specific `openclaw.json`-equivalent config now lives outside this module and
+is provided per system via `olisikh.openclaw.config`.
 
-## What It Does
+## Per-System Config
 
-- Uses the upstream `nix-openclaw` Home Manager module for:
-  - OpenClaw package/app wiring
-  - launchd/systemd service management
-  - generated config file lifecycle
-  - bundled/custom plugin plumbing
-- Keeps local defaults for:
-  - Telegram allowlists
-  - local gateway mode/auth
-  - two-agent setup (`main` + restricted `wife`)
-  - live-aligned shape from `~/.openclaw/openclaw.json` (2026.4.10-era fields)
-
-## Package Pin
-
-The flake overlay pins OpenClaw source to upstream `openclaw/openclaw` commit:
-
-- `9fd08f9d0f54bc1f811d6dfbcc619cb7e565fca9` (version `2026.4.10`)
-
-with fixed hashes for reproducibility.
-
-## Secrets
-
-By default (`olisikh.openclaw.useSopsSecrets = true`) the module expects:
-
-- `~/.config/sops-nix/secrets/openclawGatewayToken`
-- `~/.config/sops-nix/secrets/openclawTelegramBotToken`
-- `~/.config/sops-nix/secrets/gemini`
-
-Gateway auth token is configured through OpenClaw `SecretRef` + file provider.
-Telegram bot token is passed via `channels.telegram.tokenFile`.
-Gemini API key is configured through OpenClaw `SecretRef` + file provider.
-
-## Enable Example
+Example wiring in a home config:
 
 ```nix
-olisikh = {
-  sops.enable = true;
-  openclaw.enable = true;
-};
+let
+  openclawConfig = import ./openclaw-config.nix {
+    homeDirectory = "/Users/olisikh";
+  };
+in
+{
+  olisikh.openclaw = {
+    enable = true;
+    config = openclawConfig;
+  };
+}
 ```
 
-## Optional Overrides
+Current host file:
 
-- `olisikh.openclaw.documents` to manage AGENTS/SOUL/TOOLS docs in workspace
-- `olisikh.openclaw.bundledPlugins` and `olisikh.openclaw.customPlugins`
-- `olisikh.openclaw.extraConfig` for raw recursive config overrides
+- `homes/aarch64-darwin/olisikh@olisikh-mini/openclaw-config.nix`
+
+## Secrets Injection
+
+If `olisikh.openclaw.useSopsSecrets = true` and `injectSecrets = true`, the module injects:
+
+- `channels.telegram.tokenFile` from `~/.config/sops-nix/secrets/openclawTelegramBotToken`
+- `gateway.auth.token` as file-based SecretRef from `~/.config/sops-nix/secrets/openclawGatewayToken`
+- Gemini key SecretRef from `~/.config/sops-nix/secrets/gemini` for:
+  - `agents.defaults.memorySearch.remote.apiKey`
+  - `plugins.entries.google.config.webSearch.apiKey`
+
+That keeps secrets out of git and out of static Nix config values.

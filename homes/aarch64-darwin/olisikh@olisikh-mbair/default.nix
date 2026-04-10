@@ -30,8 +30,6 @@ in
       ];
     };
     opencode = enabled;
-    # codex = enabled;
-    # claude-code = enabled;
     user = {
       enable = true;
       packages = with pkgs; [
@@ -50,6 +48,28 @@ in
         dotnet-sdk_10
       ];
     };
-    sops = enabled;
+    sops = {
+      enable = true;
+      secrets = {
+        userEmail = {
+          path = "git/userEmail";
+        };
+        signingKey = {
+          path = "git/signingKey";
+        };
+        opencode = {
+          path = "ai/opencode/apiKey";
+        };
+        openai = {
+          path = "ai/openai/apiKey";
+        };
+        openrouter = {
+          path = "ai/openrouter/apiKey";
+        };
+        gemini = {
+          path = "ai/gemini/apiKey";
+        };
+      };
+    };
   };
 }

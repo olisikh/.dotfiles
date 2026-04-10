@@ -13,6 +13,7 @@ in
     secretsFile = mkOpt str "${home}/.config/sops/secrets.yaml" "Path to the sops secrets file";
     generateKey = mkBoolOpt true "Generate a new sops age key";
     sshKeyPaths = mkOpt (listOf str) [ "${home}/.ssh/id_ed25519" ] "List of ssh key paths to convert to age keys";
+    secrets = mkOpt (attrsOf attrs) { } "Per-system sops-nix secrets to materialize (keys become filenames under ~/.config/sops-nix/secrets)";
   };
 
   config = mkIf cfg.enable {
@@ -28,17 +29,7 @@ in
         inherit (cfg) sshKeyPaths generateKey keyFile;
       };
 
-      secrets = {
-        userEmail = { };
-        signingKey = { };
-        claude = { };
-        openai = { };
-        openrouter = { };
-        gemini = { };
-        opencode = { };
-        openclawGatewayToken = { };
-        openclawTelegramBotToken = { };
-      };
+      inherit (cfg) secrets;
     };
 
     home.sessionVariables = {

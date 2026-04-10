@@ -5,18 +5,6 @@ let
 
   cfg = config.${namespace}.zsh;
 
-  secrets = lib.attrsets.mapAttrsToList
-    (name: value: { inherit name; inherit (value) path; })
-    config.sops.secrets;
-
-  exportSecrets =
-    lib.foldl'
-      (acc: secret:
-        acc + "export ${lib.strings.toUpper secret.name}_API_KEY=$(cat ${secret.path});\n"
-      )
-      ""
-      secrets;
-
   themes = pkgs.fetchFromGitHub {
     "owner" = "catppuccin";
     "repo" = "zsh-syntax-highlighting";
@@ -91,8 +79,6 @@ in
           alias h="history | fzf | awk '{\$1=\"\"; print substr(\$0, 2)}' | sh"
           alias p="podman"
           alias ts="tailscale"
-
-          ${exportSecrets}
 
           # overrides for work
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

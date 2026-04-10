@@ -1,6 +1,10 @@
-{ lib, namespace, pkgs, ... }:
+{ lib, namespace, pkgs, config, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
+
+  openclawConfig = import ./openclaw-config.nix {
+    inherit (config.home) homeDirectory;
+  };
 in
 {
   olisikh = {
@@ -30,22 +34,15 @@ in
       ];
     };
     opencode = enabled;
-    # openclaw = {
-    #   enable = true;
-    #
-    #   # NOTE: with sops module enabled, provide secret files:
-    #   # ~/.config/sops-nix/secrets/openclawGatewayToken
-    #   # ~/.config/sops-nix/secrets/openclawTelegramBotToken
-    #   # ~/.config/sops-nix/secrets/gemini
-    #
-    #   # NOTE: this mirrors current live setup defaults:
-    #   # - model: openai-codex/gpt-5.4
-    #   # - telegram allowFrom/groupAllowFrom: 3942079, 13252999
-    #   # - secondary restricted wife agent + direct telegram binding for 13252999
-    #   # - nix-openclaw-managed launchd/systemd + config lifecycle
-    # };
-    # codex = enabled;
-    # claude-code = enabled;
+    openclaw = {
+      enable = true;
+
+      # NOTE: with sops module enabled, provide secret files:
+      # ~/.config/sops-nix/secrets/openclawGatewayToken
+      # ~/.config/sops-nix/secrets/openclawTelegramBotToken
+      # ~/.config/sops-nix/secrets/gemini
+      config = openclawConfig;
+    };
     user = {
       enable = true;
       packages = with pkgs; [
@@ -64,6 +61,34 @@ in
         dotnet-sdk_10
       ];
     };
-    sops = enabled;
+    sops = {
+      enable = true;
+      secrets = {
+        userEmail = {
+          path = "git/userEmail";
+        };
+        signingKey = {
+          path = "git/signingKey";
+        };
+        opencode = {
+          path = "ai/opencode/apiKey";
+        };
+        openai = {
+          path = "ai/openai/apiKey";
+        };
+        openrouter = {
+          path = "ai/openrouter/apiKey";
+        };
+        gemini = {
+          path = "ai/gemini/apiKey";
+        };
+        openclawGatewayToken = {
+          path = "ai/opencode/gatewayToken";
+        };
+        openclawTelegramBotToken = {
+          path = "ai/openclaw/telegramBotToken";
+        };
+      };
+    };
   };
 }
