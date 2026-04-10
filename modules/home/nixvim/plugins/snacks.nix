@@ -1,5 +1,36 @@
 { lib, ... }:
 {
+  extraConfigLuaPre = ''
+    local function format_duration_ms(ms)
+      if ms < 1000 then
+        return string.format("%d ms", math.floor(ms + 0.5))
+      end
+
+      local seconds = math.floor(ms / 1000)
+      local millis = math.floor((ms % 1000) + 0.5)
+
+      if millis == 1000 then
+        seconds = seconds + 1
+        millis = 0
+      end
+
+      return string.format("%d.%03d s", seconds, millis)
+    end
+
+    vim.g.start_time = vim.uv.hrtime()
+    vim.g.startup_time_text = "…"
+
+    vim.api.nvim_create_autocmd("VimEnter", {
+      once = true,
+      callback = function()
+        local ms = (vim.uv.hrtime() - vim.g.start_time) / 1e6
+        vim.g.startup_time_text = format_duration_ms(ms)
+
+        pcall(function() Snacks.dashboard.update() end)
+      end,
+    })
+  '';
+
   plugins.snacks = {
     enable = true;
     settings = {
@@ -13,6 +44,17 @@
       dashboard = {
         enabled = true;
         sections = [
+          (lib.nixvim.mkRaw ''
+            function()
+              return {
+                icon = "⚡",
+                title = "Startup",
+                desc = " " .. vim.g.startup_time_text or "…",
+                padding = 1
+              }
+            end
+          '')
+
           {
             section = "keys";
             padding = 1;
@@ -42,7 +84,7 @@
                 },
                 {
                   icon = " ",
-                  title = "Issues",
+                  title = "Open Issues",
                   cmd = "gh issue list -L 5",
                   key = "i",
                   action = function()
@@ -102,4 +144,6 @@
       };
     }
   ];
+
+
 }
