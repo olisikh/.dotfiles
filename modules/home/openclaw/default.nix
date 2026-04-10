@@ -7,10 +7,12 @@ let
 
   gatewayTokenProvider = "gatewayToken";
   geminiApiKeyProvider = "geminiApiKey";
+  elevenlabsApiKeyProvider = "elevenlabsApiKey";
 
-  gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.gatewayTokenSopsName}";
-  telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.telegramBotTokenSopsName}";
-  memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.memorySearchApiKeySopsName}";
+  gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.gatewayToken}";
+  telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.telegramBotToken}";
+  memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.memorySearchApiKey}";
+  elevenlabsApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.elevenlabsApiKey}";
 
   mkEnvSecretRef = provider: id: {
     source = "env";
@@ -30,6 +32,8 @@ let
 
         plugins.entries.google.config.webSearch.apiKey = mkEnvSecretRef geminiApiKeyProvider "GEMINI_API_KEY";
 
+        messages.tts.providers.elevenlabs.apiKey = mkEnvSecretRef elevenlabsApiKeyProvider "ELEVENLABS_API_KEY";
+
         secrets.providers = {
           "${gatewayTokenProvider}" = {
             source = "env";
@@ -38,6 +42,10 @@ let
           "${geminiApiKeyProvider}" = {
             source = "env";
             allowlist = [ "GEMINI_API_KEY" ];
+          };
+          "${elevenlabsApiKeyProvider}" = {
+            source = "env";
+            allowlist = [ "ELEVENLABS_API_KEY" ];
           };
         };
       };
@@ -57,9 +65,26 @@ in
 
       useSopsSecrets = mkBoolOpt true "Inject secret refs/token files from sops-nix decrypted files";
       sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
-      memorySearchApiKeySopsName = mkOpt str "gemini" "sops secret filename containing Gemini API key";
-      telegramBotTokenSopsName = mkOpt str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
-      gatewayTokenSopsName = mkOpt str "openclawGatewayToken" "sops secret filename containing OpenClaw gateway token";
+
+      sops = lib.mkOption {
+        type = types.submodule {
+          options = {
+            memorySearchApiKey =
+              mkOpt types.str "gemini" "sops secret filename containing Gemini API key";
+
+            elevenlabsApiKey =
+              mkOpt types.str "elevenlabs" "sops secret filename containing ElevenLabs API key";
+
+            telegramBotToken =
+              mkOpt types.str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
+
+            gatewayToken =
+              mkOpt types.str "openclawGatewayToken" "sops secret filename containing OpenClaw gateway token";
+          };
+        };
+        default = { };
+        description = "SOPS secret names used by the service.";
+      };
     };
 
   config = mkIf cfg.enable {
@@ -78,6 +103,9 @@ in
       fi
       if [ -f "${memoryApiKeySecretPath}" ] && [ -s "${memoryApiKeySecretPath}" ]; then
         /bin/launchctl setenv GEMINI_API_KEY "$(${lib.getExe' pkgs.coreutils "cat"} "${memoryApiKeySecretPath}")"
+      fi
+      if [ -f "${elevenlabsApiKeySecretPath}" ] && [ -s "${elevenlabsApiKeySecretPath}" ]; then
+        /bin/launchctl setenv ELEVENLABS_API_KEY "$(${lib.getExe' pkgs.coreutils "cat"} "${elevenlabsApiKeySecretPath}")"
       fi
     '');
   };

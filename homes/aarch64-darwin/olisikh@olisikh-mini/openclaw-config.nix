@@ -268,7 +268,7 @@
           enabled = true;
           voiceId = "MFZUKuGQUsGJPQjTS4wC";
         };
-        microsoft = {
+        edge = {
           enabled = true;
           voice = "en-US-AvaMultilingualNeural";
         };

@@ -41,10 +41,14 @@ in
       # ~/.config/sops-nix/secrets/openclaw/gatewayToken
       # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
       # ~/.config/sops-nix/secrets/ai/gemini
+      # ~/.config/sops-nix/secrets/ai/elevenlabs
       config = openclawConfig;
-      memorySearchApiKeySopsName = "ai/gemini";
-      gatewayTokenSopsName = "openclaw/gatewayToken";
-      telegramBotTokenSopsName = "openclaw/telegramBotToken";
+      sops = {
+        memorySearchApiKey = "ai/gemini";
+        elevenlabsApiKey = "ai/elevenlabs";
+        gatewayToken = "openclaw/gatewayToken";
+        telegramBotToken = "openclaw/telegramBotToken";
+      };
     };
     user = {
       enable = true;
