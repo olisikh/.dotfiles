@@ -41,21 +41,19 @@ in
       secrets = {
         userEmail = {
           path = "git/userEmail";
+          key = "git/userEmail";
         };
         signingKey = {
           path = "git/signingKey";
+          key = "git/signingKey";
         };
         opencode = {
           path = "ai/opencode";
-        };
-        openai = {
-          path = "ai/openai";
-        };
-        openrouter = {
-          path = "ai/openrouter";
+          key = "ai/opencode";
         };
         gemini = {
           path = "ai/gemini";
+          key = "ai/gemini";
         };
       };
       sshKeyPaths = [
