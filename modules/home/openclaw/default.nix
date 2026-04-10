@@ -6,64 +6,48 @@ let
   cfg = config.${namespace}.openclaw;
 
   gatewayTokenProvider = "gatewayToken";
-  geminiApiKeyProvider = "geminiApiKey";
 
-  gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.gatewayTokenSopsName}";
   telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.telegramBotTokenSopsName}";
-  memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.memorySearchApiKeySopsName}";
 
-  mkFileSecretRef = provider: id: {
-    source = "file";
+  mkEnvSecretRef = provider: id: {
+    source = "env";
     inherit provider id;
   };
 
   secretConfig =
-    if !cfg.injectSecrets then { }
-    else if cfg.useSopsSecrets then
+    if !cfg.useSopsSecrets then
+      { }
+    else
       {
         channels.telegram.tokenFile = telegramBotTokenSecretPath;
 
-        gateway.auth.token = mkFileSecretRef gatewayTokenProvider "value";
-
-        agents.defaults.memorySearch.remote.apiKey = mkFileSecretRef geminiApiKeyProvider "value";
-
-        plugins.entries.google.config.webSearch.apiKey = mkFileSecretRef geminiApiKeyProvider "value";
+        gateway.auth.token = mkEnvSecretRef gatewayTokenProvider "OPENCLAW_GATEWAY_TOKEN";
 
         secrets.providers = {
           "${gatewayTokenProvider}" = {
-            source = "file";
-            path = gatewayTokenSecretPath;
-            mode = "singleValue";
-          };
-          "${geminiApiKeyProvider}" = {
-            source = "file";
-            path = memoryApiKeySecretPath;
-            mode = "singleValue";
+            source = "env";
+            allowlist = [ "OPENCLAW_GATEWAY_TOKEN" ];
           };
         };
-      }
-    else
-      { };
+      };
 in
 {
-  options.${namespace}.openclaw = with types; {
-    enable = mkBoolOpt false "Enable OpenClaw via nix-openclaw Home Manager module";
+  options.${namespace}.openclaw = with types;
+    {
+      enable = mkBoolOpt false "Enable OpenClaw via nix-openclaw Home Manager module";
 
-    config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
-    extraConfig = mkOpt attrs { } "Additional OpenClaw config recursively merged over openclaw.config";
+      config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
+      extraConfig = mkOpt attrs { } "Additional OpenClaw config recursively merged over openclaw.config";
 
-    documents = mkOpt (nullOr path) null "Optional directory with AGENTS.md/SOUL.md/TOOLS.md for OpenClaw workspace bootstrap";
-    bundledPlugins = mkOpt attrs { } "Optional overrides for programs.openclaw.bundledPlugins";
-    customPlugins = mkOpt (listOf attrs) [ ] "Extra programs.openclaw.customPlugins entries";
-    excludeTools = mkOpt (listOf str) [ "nodejs_22" "python3" ] "OpenClaw bundled tool names to exclude (defaults avoid /bin/node and python collisions with user toolchain)";
+      documents = mkOpt (nullOr path) null "Optional directory with AGENTS.md/SOUL.md/TOOLS.md for OpenClaw workspace bootstrap";
+      bundledPlugins = mkOpt attrs { } "Optional overrides for programs.openclaw.bundledPlugins";
+      customPlugins = mkOpt (listOf attrs) [ ] "Extra programs.openclaw.customPlugins entries";
+      excludeTools = mkOpt (listOf str) [ "nodejs_22" "python3" ] "OpenClaw bundled tool names to exclude (defaults avoid /bin/node and python collisions with user toolchain)";
 
-    useSopsSecrets = mkBoolOpt true "Inject secret refs/token files from sops-nix decrypted files";
-    injectSecrets = mkBoolOpt true "Inject gateway/token/memory-search secret refs into the OpenClaw config";
-    sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
-    memorySearchApiKeySopsName = mkOpt str "gemini" "sops secret filename containing Gemini API key";
-    telegramBotTokenSopsName = mkOpt str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
-    gatewayTokenSopsName = mkOpt str "openclawGatewayToken" "sops secret filename containing OpenClaw gateway token";
-  };
+      useSopsSecrets = mkBoolOpt true "Inject secret refs/token files from sops-nix decrypted files";
+      sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
+      telegramBotTokenSopsName = mkOpt str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
+    };
 
   config = mkIf cfg.enable {
     programs.openclaw = {

@@ -38,12 +38,13 @@ in
       enable = true;
 
       # NOTE: with sops module enabled, provide secret files:
-      # ~/.config/sops-nix/secrets/openclaw/gatewayToken
       # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
       # ~/.config/sops-nix/secrets/ai/gemini
+      # ...
+      # Gateway token has to be provided by OPENCLAW_GATEWAY_TOKEN env var, i.e.:
+      # export OPENCLAW_GATEWAY_TOKEN=$(cat ~/.config/sops-nix/secrets/openclaw/gatewayToken)
       config = openclawConfig;
-      memorySearchApiKeySopsName = "ai/gemini";
-      gatewayTokenSopsName = "openclaw/gatewayToken";
+
       telegramBotTokenSopsName = "openclaw/telegramBotToken";
     };
     user = {
@@ -89,6 +90,10 @@ in
         gemini = {
           key = "ai/gemini";
           name = "ai/gemini";
+        };
+        elevenlabs = {
+          key = "ai/elevenlabs";
+          name = "ai/elevenlabs";
         };
         openclawGatewayToken = {
           key = "openclaw/gatewayToken";
