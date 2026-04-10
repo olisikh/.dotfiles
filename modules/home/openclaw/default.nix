@@ -5,8 +5,6 @@ let
 
   cfg = config.${namespace}.openclaw;
 
-  gatewayTokenProvider = "gateway";
-
   gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.gatewayToken}";
   telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.telegramBotToken}";
   memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.memorySearchApiKey}";
