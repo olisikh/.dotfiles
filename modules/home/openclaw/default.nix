@@ -5,9 +5,7 @@ let
 
   cfg = config.${namespace}.openclaw;
 
-  gatewayTokenProvider = "gatewayToken";
-  geminiApiKeyProvider = "geminiApiKey";
-  elevenlabsApiKeyProvider = "elevenlabsApiKey";
+  gatewayTokenProvider = "gateway";
 
   gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.gatewayToken}";
   telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.telegramBotToken}";
@@ -19,36 +17,32 @@ let
     inherit provider id;
   };
 
-  secretConfig =
-    if !cfg.useSopsSecrets then
-      { }
-    else
-      {
-        channels.telegram.tokenFile = telegramBotTokenSecretPath;
+  secretConfig = {
+    channels.telegram.tokenFile = telegramBotTokenSecretPath;
 
-        gateway.auth.token = mkEnvSecretRef gatewayTokenProvider "OPENCLAW_GATEWAY_TOKEN";
+    gateway.auth.token = mkEnvSecretRef "gateway" "OPENCLAW_GATEWAY_TOKEN";
 
-        agents.defaults.memorySearch.remote.apiKey = mkEnvSecretRef geminiApiKeyProvider "GEMINI_API_KEY";
+    agents.defaults.memorySearch.remote.apiKey = mkEnvSecretRef "gemini" "GEMINI_API_KEY";
 
-        plugins.entries.google.config.webSearch.apiKey = mkEnvSecretRef geminiApiKeyProvider "GEMINI_API_KEY";
+    plugins.entries.google.config.webSearch.apiKey = mkEnvSecretRef "gemini" "GEMINI_API_KEY";
 
-        messages.tts.providers.elevenlabs.apiKey = mkEnvSecretRef elevenlabsApiKeyProvider "ELEVENLABS_API_KEY";
+    messages.tts.providers.elevenlabs.apiKey = mkEnvSecretRef "elevenlabs" "ELEVENLABS_API_KEY";
 
-        secrets.providers = {
-          "${gatewayTokenProvider}" = {
-            source = "env";
-            allowlist = [ "OPENCLAW_GATEWAY_TOKEN" ];
-          };
-          "${geminiApiKeyProvider}" = {
-            source = "env";
-            allowlist = [ "GEMINI_API_KEY" ];
-          };
-          "${elevenlabsApiKeyProvider}" = {
-            source = "env";
-            allowlist = [ "ELEVENLABS_API_KEY" ];
-          };
-        };
+    secrets.providers = {
+      gateway = {
+        source = "env";
+        allowlist = [ "OPENCLAW_GATEWAY_TOKEN" ];
       };
+      gemini = {
+        source = "env";
+        allowlist = [ "GEMINI_API_KEY" ];
+      };
+      elevenlabs = {
+        source = "env";
+        allowlist = [ "ELEVENLABS_API_KEY" ];
+      };
+    };
+  };
 in
 {
   options.${namespace}.openclaw = with types;
@@ -63,7 +57,6 @@ in
       customPlugins = mkOpt (listOf attrs) [ ] "Extra programs.openclaw.customPlugins entries";
       excludeTools = mkOpt (listOf str) [ "nodejs_22" "python3" ] "OpenClaw bundled tool names to exclude (defaults avoid /bin/node and python collisions with user toolchain)";
 
-      useSopsSecrets = mkBoolOpt true "Inject secret refs/token files from sops-nix decrypted files";
       sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
 
       sops = lib.mkOption {
@@ -88,16 +81,21 @@ in
     };
 
   config = mkIf cfg.enable {
+    # NOTE: Upstream currently merges instance config over global config, and the
+    # default instance config expands to many null fields, which can erase the
+    # global config after stripNulls. Put our full config on the default instance.
+    # Keep top-level config empty to avoid being overwritten.
     programs.openclaw = {
       enable = true;
       inherit (cfg) documents bundledPlugins customPlugins excludeTools;
-      config = recursiveUpdate (recursiveUpdate cfg.config cfg.extraConfig) secretConfig;
+      config = { };
+      instances.default.config = recursiveUpdate (recursiveUpdate cfg.config cfg.extraConfig) secretConfig;
 
       # NOTE: Work around nix-openclaw default-instance appDefaults bug by setting nixMode explicitly.
       instances.default.appDefaults.nixMode = lib.mkDefault true;
     };
 
-    home.activation.openclawLoadSecretEnv = mkIf (cfg.useSopsSecrets && pkgs.stdenv.isDarwin) (lib.mkAfter ''
+    home.activation.openclawLoadSecretEnv = mkIf (pkgs.stdenv.isDarwin) (lib.mkAfter ''
       if [ -f "${gatewayTokenSecretPath}" ] && [ -s "${gatewayTokenSecretPath}" ]; then
         /bin/launchctl setenv OPENCLAW_GATEWAY_TOKEN "$(${lib.getExe' pkgs.coreutils "cat"} "${gatewayTokenSecretPath}")"
       fi

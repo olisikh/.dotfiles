@@ -32,12 +32,14 @@ conflicts with user-provided Node/Python packages. Override per host if you want
 
 ## Secrets Injection
 
-If `olisikh.openclaw.useSopsSecrets = true` and `injectSecrets = true`, the module injects:
+The module injects:
 
-- `channels.telegram.tokenFile` from `~/.config/sops-nix/secrets/openclawTelegramBotToken`
-- `gateway.auth.token` as file-based SecretRef from `~/.config/sops-nix/secrets/openclawGatewayToken`
-- Gemini key SecretRef from `~/.config/sops-nix/secrets/gemini` for:
+- `channels.telegram.tokenFile` from `~/.config/sops-nix/secrets/openclaw/telegramBotToken`
+- `gateway.auth.token` as env SecretRef (`OPENCLAW_GATEWAY_TOKEN`) loaded from `~/.config/sops-nix/secrets/openclaw/gatewayToken`
+- Gemini key SecretRef (`GEMINI_API_KEY`) loaded from `~/.config/sops-nix/secrets/ai/gemini` for:
   - `agents.defaults.memorySearch.remote.apiKey`
   - `plugins.entries.google.config.webSearch.apiKey`
+- ElevenLabs key SecretRef (`ELEVENLABS_API_KEY`) loaded from `~/.config/sops-nix/secrets/ai/elevenlabs` for:
+  - `messages.tts.providers.elevenlabs.apiKey`
 
 That keeps secrets out of git and out of static Nix config values.

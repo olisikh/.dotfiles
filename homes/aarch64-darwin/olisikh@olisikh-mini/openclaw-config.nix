@@ -263,16 +263,6 @@
     tts = {
       auto = "inbound";
       provider = "elevenlabs";
-      providers = {
-        elevenlabs = {
-          enabled = true;
-          voiceId = "MFZUKuGQUsGJPQjTS4wC";
-        };
-        edge = {
-          enabled = true;
-          voice = "en-US-AvaMultilingualNeural";
-        };
-      };
     };
   };
 
