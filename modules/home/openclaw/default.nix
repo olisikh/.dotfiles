@@ -1,13 +1,16 @@
-{ lib, config, namespace, ... }:
+{ lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf optionalAttrs recursiveUpdate types;
+  inherit (lib) mkIf recursiveUpdate types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.openclaw;
 
   gatewayTokenProvider = "gatewayToken";
+  geminiApiKeyProvider = "geminiApiKey";
 
+  gatewayTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.gatewayTokenSopsName}";
   telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.telegramBotTokenSopsName}";
+  memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.memorySearchApiKeySopsName}";
 
   mkEnvSecretRef = provider: id: {
     source = "env";
@@ -23,10 +26,18 @@ let
 
         gateway.auth.token = mkEnvSecretRef gatewayTokenProvider "OPENCLAW_GATEWAY_TOKEN";
 
+        agents.defaults.memorySearch.remote.apiKey = mkEnvSecretRef geminiApiKeyProvider "GEMINI_API_KEY";
+
+        plugins.entries.google.config.webSearch.apiKey = mkEnvSecretRef geminiApiKeyProvider "GEMINI_API_KEY";
+
         secrets.providers = {
           "${gatewayTokenProvider}" = {
             source = "env";
             allowlist = [ "OPENCLAW_GATEWAY_TOKEN" ];
+          };
+          "${geminiApiKeyProvider}" = {
+            source = "env";
+            allowlist = [ "GEMINI_API_KEY" ];
           };
         };
       };
@@ -46,7 +57,9 @@ in
 
       useSopsSecrets = mkBoolOpt true "Inject secret refs/token files from sops-nix decrypted files";
       sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
+      memorySearchApiKeySopsName = mkOpt str "gemini" "sops secret filename containing Gemini API key";
       telegramBotTokenSopsName = mkOpt str "openclawTelegramBotToken" "sops secret filename containing Telegram bot token";
+      gatewayTokenSopsName = mkOpt str "openclawGatewayToken" "sops secret filename containing OpenClaw gateway token";
     };
 
   config = mkIf cfg.enable {
@@ -58,5 +71,14 @@ in
       # NOTE: Work around nix-openclaw default-instance appDefaults bug by setting nixMode explicitly.
       instances.default.appDefaults.nixMode = lib.mkDefault true;
     };
+
+    home.activation.openclawLoadSecretEnv = mkIf (cfg.useSopsSecrets && pkgs.stdenv.isDarwin) (lib.mkAfter ''
+      if [ -f "${gatewayTokenSecretPath}" ] && [ -s "${gatewayTokenSecretPath}" ]; then
+        /bin/launchctl setenv OPENCLAW_GATEWAY_TOKEN "$(${lib.getExe' pkgs.coreutils "cat"} "${gatewayTokenSecretPath}")"
+      fi
+      if [ -f "${memoryApiKeySecretPath}" ] && [ -s "${memoryApiKeySecretPath}" ]; then
+        /bin/launchctl setenv GEMINI_API_KEY "$(${lib.getExe' pkgs.coreutils "cat"} "${memoryApiKeySecretPath}")"
+      fi
+    '');
   };
 }
