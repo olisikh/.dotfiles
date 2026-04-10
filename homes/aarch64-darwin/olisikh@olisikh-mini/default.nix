@@ -42,9 +42,7 @@ in
     #   # - model: openai-codex/gpt-5.4
     #   # - telegram allowFrom/groupAllowFrom: 3942079, 13252999
     #   # - secondary restricted wife agent + direct telegram binding for 13252999
-    #   #
-    #   # Run OpenClaw with secret bootstrap:
-    #   # ~/.local/bin/openclaw-with-secrets
+    #   # - nix-openclaw-managed launchd/systemd + config lifecycle
     # };
     # codex = enabled;
     # claude-code = enabled;
