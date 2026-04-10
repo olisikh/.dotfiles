@@ -1,24 +1,21 @@
 { ... }:
 {
-  plugins.treesj.enable = true;
+  plugins.treesj = {
+    enable = true;
+    settings = {
+      use_default_keymaps = false;
+    };
+  };
 
   keymaps = [
-    # -- For default preset
-    # vim.keymap.set('n', '<leader>m', require('treesj').toggle)
-    # -- For extending default preset with `recursive = true`
     {
-      key = "<leader>m";
+      key = "<leader>j";
       action = ":lua require('treesj').toggle()<cr>";
       mode = "n";
-      options = {
-        desc = "treesj: toggle";
-      };
+      options = { desc = "treesj: toggle"; };
     }
-    # vim.keymap.set('n', '<leader>M', function()
-    #     require('treesj').toggle({ split = { recursive = true } })
-    # end)
     {
-      key = "<leader>M";
+      key = "<leader>J";
       action = ":lua require('treesj').toggle({ split = { recursive = true } })<cr>";
       mode = "n";
       options = {

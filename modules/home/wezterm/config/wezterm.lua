@@ -101,30 +101,4 @@ bar.apply_to_config(config, {
 	},
 })
 
-w.on("user-var-changed", function(window, pane, name, value)
-	local overrides = window:get_config_overrides() or {}
-	if name == "ZEN_MODE" then
-		local zooming_in = value:find("+") ~= nil
-		local font_size = tonumber(value)
-
-		if zooming_in then
-			while font_size > 0 do
-				window:set_config_overrides(overrides)
-				window:perform_action(w.action.IncreaseFontSize, pane)
-				font_size = font_size - 1
-			end
-			overrides.enable_tab_bar = false
-		elseif font_size < 0 then
-			window:perform_action(w.action.ResetFontSize, pane)
-			overrides.font_size = nil
-			overrides.enable_tab_bar = true
-		else
-			overrides.font_size = font_size
-			overrides.enable_tab_bar = false
-		end
-
-		window:perform_action(w.action.SetPaneZoomState(zooming_in), pane)
-	end
-end)
-
 return config

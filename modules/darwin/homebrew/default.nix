@@ -1,6 +1,6 @@
 { lib, config, namespace, ... }:
 let
-  inherit (lib) optionals mkIf;
+  inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.homebrew;
@@ -40,11 +40,14 @@ in
       brews = [
         "ffmpeg"
         "tccutil"
-        "opencode"
         "JetBrains/utils/kotlin-lsp"
       ] ++ cfg.brews;
 
-      casks = [ "raycast" "betterdisplay" ] ++ cfg.casks;
+      casks = [
+        "raycast"
+        "betterdisplay"
+        "codexbar"
+      ] ++ cfg.casks;
 
       taps = cfg.taps;
     };

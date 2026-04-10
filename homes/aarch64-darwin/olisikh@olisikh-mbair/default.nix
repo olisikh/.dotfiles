@@ -38,7 +38,9 @@ in
         podman
         brave
         bitwarden-desktop
+        openai-whisper
         antigravity
+        gemini-cli
         obsidian
         vscode
         cmatrix

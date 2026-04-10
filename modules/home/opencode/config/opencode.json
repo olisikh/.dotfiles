@@ -2,16 +2,10 @@
   "theme": "catppuccin",
   "autoupdate": false,
   "autoshare": false,
-  "model": "opencode/glm-5",
-  "small_model": "opencode/kimi-k2.5",
+  "model": "opencode-go/kimi-k2.5",
+  "small_model": "opencode-go/kimi-k2.5",
   "plugin": [
-    "opencode-antigravity-auth",
-    "oh-my-opencode"
-  ],
-  "enabled_providers": [
-    "openrouter",
-    "opencode",
-    "google"
+    "opencode-antigravity-auth"
   ],
   "provider": {
     "google": {

@@ -12,12 +12,11 @@ in
 
   config = mkIf cfg.enable {
     programs.opencode = {
-      enable = false; # installed with homebrew, to get latest versions
+      enable = true;
     };
 
     home = {
       file = {
-        ".config/opencode/oh-my-opencode.jsonc".source = ./config/oh-my-opencode.jsonc;
         ".config/opencode/config.json".source = ./config/opencode.json;
       };
 

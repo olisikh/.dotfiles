@@ -53,6 +53,7 @@ in
         minikube
         k9s
         kubectl
+        kubectx
         kubernetes-helm
         kustomize
         etcd
@@ -91,6 +92,7 @@ in
         lazygit
         lazydocker
         gh
+        github-copilot-cli
         watch
         (python3.withPackages (ps: with ps; [
           pytest
