@@ -46,16 +46,16 @@ in
           path = "git/signingKey";
         };
         opencode = {
-          path = "ai/opencode/apiKey";
+          path = "ai/opencode";
         };
         openai = {
-          path = "ai/openai/apiKey";
+          path = "ai/openai";
         };
         openrouter = {
-          path = "ai/openrouter/apiKey";
+          path = "ai/openrouter";
         };
         gemini = {
-          path = "ai/gemini/apiKey";
+          path = "ai/gemini";
         };
       };
       sshKeyPaths = [

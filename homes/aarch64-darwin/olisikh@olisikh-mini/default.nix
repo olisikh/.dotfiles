@@ -40,8 +40,9 @@ in
       # NOTE: with sops module enabled, provide secret files:
       # ~/.config/sops-nix/secrets/openclaw/gatewayToken
       # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
-      # ~/.config/sops-nix/secrets/gemini
+      # ~/.config/sops-nix/secrets/ai/gemini
       config = openclawConfig;
+      memorySearchApiKeySopsName = "ai/gemini";
       gatewayTokenSopsName = "openclaw/gatewayToken";
       telegramBotTokenSopsName = "openclaw/telegramBotToken";
     };
@@ -68,28 +69,33 @@ in
       secrets = {
         userEmail = {
           key = "git/userEmail";
+          name = "git/userEmail";
         };
-        signingKey = {
-          key = "git/signingKey";
-        };
+        # signingKey = {
+        #   key = "git/signingKey";
+        # };
         opencode = {
-          key = "ai/opencode/apiKey";
+          key = "ai/opencode";
+          name = "ai/opencode";
         };
         openai = {
-          key = "ai/openai/apiKey";
+          key = "ai/openai";
+          name = "ai/openai";
         };
         openrouter = {
-          key = "ai/openrouter/apiKey";
+          key = "ai/openrouter";
+          name = "ai/openrouter";
         };
         gemini = {
-          key = "ai/gemini/apiKey";
+          key = "ai/gemini";
+          name = "ai/gemini";
         };
         openclawGatewayToken = {
-          key = "ai/openclaw/gatewayToken";
+          key = "openclaw/gatewayToken";
           name = "openclaw/gatewayToken";
         };
         openclawTelegramBotToken = {
-          key = "ai/openclaw/telegramBotToken";
+          key = "openclaw/telegramBotToken";
           name = "openclaw/telegramBotToken";
         };
       };

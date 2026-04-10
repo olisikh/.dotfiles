@@ -5,6 +5,14 @@ let
 
   cfg = config.${namespace}.sops;
   home = config.${namespace}.user.home;
+
+  normalizedSecrets = lib.mapAttrs (
+    _secretName: secret:
+    secret
+    // (lib.optionalAttrs (!(secret ? path) && (secret ? name)) {
+      path = "${home}/.config/sops-nix/secrets/${secret.name}";
+    })
+  ) cfg.secrets;
 in
 {
   options.${namespace}.sops = with lib.types; {
@@ -29,7 +37,7 @@ in
         inherit (cfg) sshKeyPaths generateKey keyFile;
       };
 
-      inherit (cfg) secrets;
+      secrets = normalizedSecrets;
     };
 
     home.sessionVariables = {
