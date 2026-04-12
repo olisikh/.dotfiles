@@ -7,10 +7,10 @@ let
 in
 {
   options.${namespace}.home = {
-    enabled = mkBoolOpt true "Enable integration with home-manager";
+    enable = mkBoolOpt true "Enable integration with home-manager";
   };
 
-  config = mkIf cfg.enabled {
+  config = mkIf cfg.enable {
     home-manager = {
       useUserPackages = true;
       useGlobalPkgs = true;
