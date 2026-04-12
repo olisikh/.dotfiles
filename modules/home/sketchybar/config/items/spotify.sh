@@ -17,7 +17,6 @@ sketchybar --add item spotify left \
 	background.corner_radius="$CORNER_RADIUS" \
 	background.border_width="$BORDER_WIDTH" \
 	background.border_color="$COLOR" \
-	background.padding_right=-5 \
 	background.drawing=on \
 	label.padding_right=10 \
 	label.max_chars=43 \
@@ -26,7 +25,7 @@ sketchybar --add item spotify left \
 	update_freq=5 \
 	script="$PLUGIN_DIR/spotify.sh" \
 	popup.horizontal=on \
-	popup.align=center \
+	popup.align=left \
 	popup.height=80 \
 	--subscribe spotify mouse.entered mouse.exited mouse.exited.global
 
@@ -35,11 +34,14 @@ sketchybar --add item spotify.artwork popup.spotify \
 	drawing=off \
 	background.drawing=on \
 	background.image.drawing=off \
-	background.image.scale=0.15 \
+	background.image.scale=0.2 \
+	background.image.corner_radius="$CORNER_RADIUS,0,0,$CORNER_RADIUS" \
 	background.color=0x00000000 \
-	background.padding_left=-2 \
+	padding_right=30 \
 	updates=on \
-	width=100
+	width=100 \
+	script="$PLUGIN_DIR/spotify.sh" \
+	--subscribe spotify.artwork mouse.entered mouse.exited
 
 # Add popup controls
 sketchybar --add item spotify.prev popup.spotify \
@@ -47,7 +49,7 @@ sketchybar --add item spotify.prev popup.spotify \
 	icon.color="$COLOR" \
 	icon.font.size=25 \
 	label.drawing=off \
-	padding_left=20 \
+	padding_left=10 \
 	padding_right=10 \
 	width=50 \
 	align=center \

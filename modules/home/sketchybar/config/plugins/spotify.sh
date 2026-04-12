@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-source "$HOME/.config/sketchybar/variables.sh" # Loads all defined colors
+source "$HOME/.config/sketchybar/variables.sh"
 
 LOG_FILE="/tmp/spotify_debug.log"
-echo "$(date): Script started with NAME=$NAME" >>"$LOG_FILE"
+
+echo "$(date): Script started with NAME=$NAME, SENDER=$SENDER" >>"$LOG_FILE"
 
 case "$SENDER" in
 "mouse.entered")

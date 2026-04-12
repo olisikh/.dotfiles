@@ -6,7 +6,7 @@ case "$SENDER" in
 "mouse.entered")
 	sketchybar --set "$NAME" background.color="$HOVER_COLOR"
 	;;
-"mouse.exited")
+"mouse.exited" | "mouse.exited.global")
 	sketchybar --set "$NAME" background.color="$TRANSPARENT"
 	;;
 "mouse.clicked")
@@ -24,7 +24,7 @@ case "$SENDER" in
 		else
 			sketchybar --set spotify.play icon="󰐊 "
 		fi
-		
+
 		osascript -e 'tell application "Spotify" to playpause'
 		sleep 0.5
 		"$PLUGIN_DIR/spotify.sh"
