@@ -36,6 +36,7 @@
     settings = {
       bigfile.enabled = true;
       image.enabled = true;
+      input.enabled = true;
 
       lazygit = {
         configure = true;
