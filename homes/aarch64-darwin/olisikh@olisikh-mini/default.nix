@@ -43,8 +43,15 @@ in
         inherit (config.home) homeDirectory;
       };
 
-      # NOTE: build can fail if a tool defined in nix-openclaw is also declared for the system, in that case we need to tell nix-openclaw to exclude their tool, and use ours instead.
-      excludeTools = [ "python3" "node_22" ];
+      # NOTE: nix-openclaw's generated schema currently only allows
+      # messages.tts.providers.<name>.apiKey, while OpenClaw 2026.4.11 accepts
+      # richer provider config. Keep schema drift isolated in this raw layer.
+      extraConfig = {
+        messages.tts.providers.microsoft = {
+          voice = "en-US-JennyNeural";
+          lang = "en-US";
+        };
+      };
 
       sops = {
         memorySearchApiKey = "ai/gemini";

@@ -1,4 +1,4 @@
-{ lib, config, namespace, pkgs, ... }:
+{ inputs, system, lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
@@ -9,6 +9,9 @@ let
   telegramBotTokenSecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.telegramBotToken}";
   memoryApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.memorySearchApiKey}";
   elevenlabsApiKeySecretPath = "${cfg.sopsSecretsDir}/${cfg.sops.elevenlabsApiKey}";
+
+  defaultStateDir = "${config.home.homeDirectory}/.openclaw";
+  defaultWorkspaceDir = "${defaultStateDir}/workspace";
 
   mkEnvSecretRef = provider: id: {
     source = "env";
@@ -24,7 +27,8 @@ let
 
     plugins.entries.google.config.webSearch.apiKey = mkEnvSecretRef "gemini" "GEMINI_API_KEY";
 
-    messages.tts.providers.elevenlabs.apiKey = mkEnvSecretRef "elevenlabs" "ELEVENLABS_API_KEY";
+    # BUG: for some reason secret is read implicitly, if we set the ref, nothing works.
+    # messages.tts.providers.elevenlabs.apiKey = mkEnvSecretRef "elevenlabs" "ELEVENLABS_API_KEY";
 
     secrets.providers = {
       gateway = {
@@ -41,6 +45,7 @@ let
       };
     };
   };
+  typedConfig = recursiveUpdate cfg.config secretConfig;
 in
 {
   options.${namespace}.openclaw = with types;
@@ -48,7 +53,7 @@ in
       enable = mkBoolOpt false "Enable OpenClaw via nix-openclaw Home Manager module";
 
       config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
-      extraConfig = mkOpt attrs { } "Additional OpenClaw config recursively merged over openclaw.config";
+      extraConfig = mkOpt attrs { } "Raw OpenClaw config merged after nix-openclaw's schema-typed config";
 
       documents = mkOpt (nullOr path) null "Optional directory with AGENTS.md/SOUL.md/TOOLS.md for OpenClaw workspace bootstrap";
       bundledPlugins = mkOpt attrs { } "Optional overrides for programs.openclaw.bundledPlugins";
@@ -86,16 +91,37 @@ in
     # Keep top-level config empty to avoid being overwritten.
     programs.openclaw = {
       enable = true;
-      inherit (cfg) documents bundledPlugins customPlugins excludeTools toolNames;
-      config = { };
-      instances.default.config = recursiveUpdate (recursiveUpdate cfg.config cfg.extraConfig) secretConfig;
+      package = inputs.nix-openclaw.packages.${system}.openclaw-gateway;
 
-      # NOTE: Work around nix-openclaw default-instance appDefaults bug by setting nixMode explicitly.
-      instances.default.appDefaults.nixMode = lib.mkDefault true;
+      inherit (cfg) documents bundledPlugins customPlugins excludeTools toolNames;
+
+      instances.default = {
+        config = typedConfig;
+
+        appDefaults.nixMode = lib.mkDefault true;
+      };
     };
 
     # NOTE: OpenClaw may rewrite this file at runtime. Keep Home Manager authoritative.
     home.file.".openclaw/openclaw.json".force = lib.mkDefault true;
+
+    home.activation.openclawExtraConfig = mkIf (cfg.extraConfig != { }) (
+      let
+        finalConfig = recursiveUpdate
+          (recursiveUpdate
+            {
+              gateway.mode = "local";
+              agents.defaults.workspace = defaultWorkspaceDir;
+            }
+            typedConfig)
+          cfg.extraConfig;
+        finalConfigFile = pkgs.writeText "openclaw-default-extra-config.json" (builtins.toJSON finalConfig);
+      in
+      config.lib.dag.entryAfter [ "openclawConfigFiles" ] ''
+        run --quiet ${lib.getExe' pkgs.coreutils "mkdir"} -p ${lib.escapeShellArg defaultStateDir}
+        run --quiet ${lib.getExe' pkgs.coreutils "ln"} -sfn ${finalConfigFile} ${lib.escapeShellArg "${defaultStateDir}/openclaw.json"}
+      ''
+    );
 
     home.activation.openclawLoadSecretEnv = mkIf (pkgs.stdenv.isDarwin) (lib.mkAfter ''
       if [ -f "${gatewayTokenSecretPath}" ] && [ -s "${gatewayTokenSecretPath}" ]; then

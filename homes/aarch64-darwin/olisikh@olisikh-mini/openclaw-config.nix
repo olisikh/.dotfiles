@@ -117,6 +117,10 @@
     dmScope = "per-channel-peer";
   };
 
+  memory = {
+    backend = "qmd";
+  };
+
   hooks = {
     internal = {
       enabled = true;
@@ -202,9 +206,13 @@
   plugins = {
     allow = [
       "acpx"
+      "browser"
+      "active-memory"
       "telegram"
       "ollama"
       "google"
+      "microsoft"
+      "elevenlabs"
       "opencode-go"
       "opencode"
       "openai"
@@ -218,6 +226,14 @@
         enabled = true;
         config = { };
       };
+      browser = {
+        enabled = true;
+        config = { };
+      };
+      active-memory = {
+        enabled = true;
+        config = { };
+      };
       ollama = {
         enabled = true;
         config = { };
@@ -227,6 +243,14 @@
         config = {
           webSearch = { };
         };
+      };
+      microsoft = {
+        enabled = true;
+        config = { };
+      };
+      elevenlabs = {
+        enabled = true;
+        config = { };
       };
       opencode-go = {
         enabled = true;
@@ -260,7 +284,7 @@
     ackReactionScope = "group-mentions";
     tts = {
       auto = "inbound";
-      provider = "elevenlabs";
+      provider = "microsoft";
     };
   };
 
