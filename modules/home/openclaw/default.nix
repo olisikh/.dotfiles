@@ -53,7 +53,8 @@ in
       documents = mkOpt (nullOr path) null "Optional directory with AGENTS.md/SOUL.md/TOOLS.md for OpenClaw workspace bootstrap";
       bundledPlugins = mkOpt attrs { } "Optional overrides for programs.openclaw.bundledPlugins";
       customPlugins = mkOpt (listOf attrs) [ ] "Extra programs.openclaw.customPlugins entries";
-      excludeTools = mkOpt (listOf str) [ "nodejs_22" "python3" ] "OpenClaw bundled tool names to exclude (defaults avoid /bin/node and python collisions with user toolchain)";
+      excludeTools = mkOpt (listOf str) [ ] "OpenClaw bundled tool names to exclude";
+      toolNames = mkOpt (listOf str) [ ] "Tool names to enable in OpenClaw";
 
       sopsSecretsDir = mkOpt str "${config.home.homeDirectory}/.config/sops-nix/secrets" "Directory where sops-nix writes decrypted secrets";
 
@@ -85,7 +86,7 @@ in
     # Keep top-level config empty to avoid being overwritten.
     programs.openclaw = {
       enable = true;
-      inherit (cfg) documents bundledPlugins customPlugins excludeTools;
+      inherit (cfg) documents bundledPlugins customPlugins excludeTools toolNames;
       config = { };
       instances.default.config = recursiveUpdate (recursiveUpdate cfg.config cfg.extraConfig) secretConfig;
 

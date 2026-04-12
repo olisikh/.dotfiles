@@ -43,6 +43,9 @@ in
         inherit (config.home) homeDirectory;
       };
 
+      # NOTE: build can fail if a tool defined in nix-openclaw is also declared for the system, in that case we need to tell nix-openclaw to exclude their tool, and use ours instead.
+      excludeTools = [ "python3" "node_22" ];
+
       sops = {
         memorySearchApiKey = "ai/gemini";
         elevenlabsApiKey = "ai/elevenlabs";
