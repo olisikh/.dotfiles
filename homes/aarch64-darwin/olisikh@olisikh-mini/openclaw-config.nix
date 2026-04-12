@@ -232,7 +232,13 @@
       };
       active-memory = {
         enabled = true;
-        config = { };
+        config = {
+          enabled = true;
+          agents = [ "main" ];
+          model = "gemini/gemini-2.0-flash";
+          timeoutMs = 5000;
+          logging = true;
+        };
       };
       ollama = {
         enabled = true;
