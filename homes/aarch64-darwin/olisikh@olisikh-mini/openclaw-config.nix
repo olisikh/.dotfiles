@@ -240,12 +240,7 @@
           agents = [ "main" ];
           allowedChatTypes = [ "direct" ];
           model = "gemini/gemini-2.5-flash";
-          modelFallback = "gemini/gemini-2.0-flash";
-          queryMode = "recent";
-          promptStyle = "balanced";
           timeoutMs = 15000;
-          maxSummaryChars = 220;
-          persistTranscripts = false;
           logging = true;
         };
       };
