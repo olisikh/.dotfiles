@@ -48,8 +48,7 @@
     timeout = true;
     timeoutlen = 300;
 
-    # TODO: this does not work too well yet, adding extra borders messing up the UIs
-    # winborder = "rounded";
+    winborder = "rounded";
 
     completeopt = "menu,menuone,noinsert";
     termguicolors = true;

@@ -24,7 +24,7 @@
     # map('n', 'Q', '<nop>')
     {
       key = "Q";
-      action = "<nop>";
+      action = ":lua vim.lsp.buf.signature_help()<cr>";
       mode = "n";
       options = {
         silent = true;

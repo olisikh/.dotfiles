@@ -37,10 +37,8 @@
       bigfile.enabled = true;
       image.enabled = true;
       input.enabled = true;
-
-      lazygit = {
-        configure = true;
-      };
+      picker.enabled = true;
+      lazygit.configure = true;
 
       dashboard = {
         enabled = true;

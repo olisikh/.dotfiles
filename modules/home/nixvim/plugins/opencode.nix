@@ -10,7 +10,7 @@
       local opencode = require('opencode')
 
       vim.keymap.set('n', '<leader>oa', function() opencode.ask('@this: ', { submit = true }) end, { desc = 'opencode: ask' })
-      vim.keymap.set('n', '<leader>oc', function() opencode.select() end, { desc = 'opencode: execute command' })
+      vim.keymap.set('n', '<leader>oc', function() opencode.select() end, { desc = 'opencode: commands' })
       vim.keymap.set('n', '<leader>ot', function() opencode.toggle() end, { desc = 'opencode: toggle' })
       vim.keymap.set({ 'x', 'n', 'v' }, 'go', function() return opencode.operator('@this ') end, { expr = true, desc = 'opencode: add range' })
 

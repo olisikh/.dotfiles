@@ -150,12 +150,6 @@
   };
 
   extraConfigLua = ''
-    -- NOTE: setup border for ui elements
-    local border = "rounded"
-
-    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
-    vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
-
     -- Configure kotlin-lsp
     vim.lsp.config('kotlin-lsp', {
       cmd = { 'kotlin-lsp', '--stdio' },
@@ -220,6 +214,40 @@
       options = {
         desc = "lsp: [g]oto [d]efinition";
       };
+    }
+  ];
+
+
+  autoCmd = [
+    {
+      event = [ "BufRead" "BufNewFile" ];
+      pattern = [ "*.tf" " *.tfvars" " *.hcl" ];
+      group = "user_lsp";
+      command = "set filetype=terraform";
+    }
+    {
+      event = "FileType";
+      pattern = "helm";
+      group = "user_lsp";
+      command = "LspRestart";
+    }
+    {
+      event = [ "BufEnter" ];
+      pattern = "*";
+      group = "user_lsp";
+      command = "silent! lua vim.lsp.codelens.enable(true)";
+    }
+    {
+      event = [ "CursorHold" "CursorHoldI" ];
+      pattern = "*";
+      group = "user_lsp";
+      command = "silent! lua vim.lsp.buf.document_highlight()";
+    }
+    {
+      event = "CursorMoved";
+      pattern = "*";
+      group = "user_lsp";
+      command = "silent! lua vim.lsp.buf.clear_references()";
     }
   ];
 }

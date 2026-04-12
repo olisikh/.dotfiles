@@ -29,10 +29,6 @@ in
 
       package = mkIf cfg.nightly neovimNightlyPkg;
 
-      autoGroups = {
-        user_generic.clear = true;
-        user_lsp.clear = true;
-      };
 
       luaLoader.enable = true;
       clipboard.register = "unnamedplus";
@@ -44,6 +40,7 @@ in
         ./plugins.nix
         ./files.nix
         ./autocmds.nix
+        ./autogroups.nix
       ];
 
       # TODO: move each package to respective plugin that uses it
