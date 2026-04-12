@@ -19,6 +19,7 @@ in
     git = enabled;
     yazi = enabled;
     nixvim = enabled;
+    sketchybar = enabled;
     intellij-idea = {
       enable = true;
       plugins = [

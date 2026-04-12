@@ -1,14 +1,13 @@
 { lib, namespace, ... }:
 let
-  inherit (lib.${namespace}) enabled disabled;
+  inherit (lib.${namespace}) enabled;
 
   username = "O.Lisikh";
 in
 {
-  olisikh = {
-    # NOTE: Install Determinate Nix, don't rely on Darwin to manage Nix
-    nix = disabled;
+  nix.enable = false;
 
+  olisikh = {
     user = {
       enable = true;
       inherit username;

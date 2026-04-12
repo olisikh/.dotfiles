@@ -1,22 +1,16 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf types;
-  inherit (lib.${namespace}) mkBoolOpt mkOpt;
+  inherit (lib.${namespace}) mkBoolOpt mkOpt mkOptRequired;
 
   cfg = config.${namespace}.user;
 
-  # WARN: if config.snowfallorg is accessed here, an infinite recursion occurs
-  defaultUsername = "O.Lisikh";
-  defaultHomeDir =
-    if pkgs.stdenv.isDarwin then
-      "/Users/${cfg.username}"
-    else
-      "/home/${cfg.username}";
+  defaultHomeDir = config.snowfallorg.users."${cfg.username}".home.path;
 in
 {
   options.${namespace}.user = with types; {
     enable = mkBoolOpt false "Enable darwin user module";
-    username = mkOpt str defaultUsername "Name of the user";
+    username = mkOptRequired str "Name of the user";
     home = mkOpt str defaultHomeDir "Home directory of the user";
   };
 

@@ -4,13 +4,12 @@ let
 
   username = "olisikh";
   hostName = "olisikh-mbair";
-  localHostName = hostName;
+  computerName = "Oleksii's MacBook Air";
 in
 {
-  olisikh = {
-    # NOTE: Install Determinate Nix, don't rely on Darwin to manage Nix
-    nix = disabled;
+  nix.enable = false;
 
+  olisikh = {
     user = {
       enable = true;
       inherit username;
@@ -39,9 +38,8 @@ in
   };
 
   networking = {
-    inherit hostName localHostName;
-
-    computerName = "Oleksii's MacBook Air";
+    inherit hostName computerName;
+    localHostName = hostName;
   };
 
   environment = {

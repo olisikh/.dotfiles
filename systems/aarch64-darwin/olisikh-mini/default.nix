@@ -1,16 +1,15 @@
 { lib, namespace, pkgs, ... }:
 let
-  inherit (lib.${namespace}) enabled disabled;
+  inherit (lib.${namespace}) enabled;
 
   username = "olisikh";
   hostName = "olisikh-mini";
-  localHostName = hostName;
+  computerName = "Oleksii's Mac Mini";
 in
 {
-  olisikh = {
-    # NOTE: Install Determinate Nix, don't rely on Darwin to manage Nix
-    nix = disabled;
+  nix.enable = false;
 
+  olisikh = {
     user = {
       enable = true;
       inherit username;
@@ -39,9 +38,8 @@ in
   };
 
   networking = {
-    inherit hostName localHostName;
-
-    computerName = "Oleksii's Mac Mini";
+    inherit hostName computerName;
+    localHostName = hostName;
   };
 
   environment = {

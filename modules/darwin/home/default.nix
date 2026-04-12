@@ -1,33 +1,16 @@
-{ lib
-, config
-, namespace
-, options
-, pkgs
-, ...
-}:
+{ lib, config, namespace, ... }:
 with lib;
 let
-  inherit (lib.${namespace}) mkOpt;
+  inherit (lib.${namespace}) mkBoolOpt;
 
-  userCfg = config.${namespace}.user;
+  cfg = config.${namespace}.home;
 in
 {
-  options.${namespace}.home = with types; {
-    file = mkOpt attrs { } "A set of files to be managed by home-manager's <option>home.file</option>.";
-    configFile = mkOpt attrs { } "A set of files to be managed by home-manager's <option>xdg.configFile</option>.";
-    extraOptions = mkOpt attrs { } "Options to pass directly to home-manager.";
+  options.${namespace}.home = {
+    enabled = mkBoolOpt true "Enable integration with home-manager";
   };
 
-  config = {
-    olisikh.home.extraOptions = {
-      home.stateVersion = mkDefault "25.05";
-      home.file = mkAliasDefinitions options.${namespace}.home.file;
-      xdg.enable = true;
-      xdg.configFile = mkAliasDefinitions options.${namespace}.home.configFile;
-    };
-
-    snowfallorg.users.${userCfg.username}.home.config = mkAliasDefinitions options.${namespace}.home.extraOptions;
-
+  config = mkIf cfg.enabled {
     home-manager = {
       useUserPackages = true;
       useGlobalPkgs = true;

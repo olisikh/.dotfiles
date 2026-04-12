@@ -4,11 +4,11 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt enabled;
 
   cfg = config.${namespace}.git;
+  userCfg = config.${namespace}.user;
+
   secrets = config.sops.secrets;
   userEmailPath = lib.attrByPath [ "userEmail" "path" ] "" secrets;
   signingKeyPath = lib.attrByPath [ "signingKey" "path" ] "" secrets;
-
-  personalName = "Oleksii Lisikh";
 in
 {
   options.${namespace}.git = with types; {
@@ -29,7 +29,7 @@ in
     home.activation.writeGitConfig = lib.mkAfter ''
       cat > ~/.gitconfig <<EOF
       [user]
-          name = ${personalName}
+          name = ${userCfg.name}
           email = $(cat ${userEmailPath})
           ${if (signingKeyPath != "") then "signingkey = $(cat ${signingKeyPath})" else ""}
       [commit]

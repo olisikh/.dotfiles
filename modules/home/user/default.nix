@@ -5,21 +5,18 @@ let
 
   cfg = config.${namespace}.user;
 
-  defaultUsername = config.snowfallorg.user.name or "O.Lisikh";
-  defaultHomeDir =
-    if pkgs.stdenv.isDarwin then
-      "/Users/${cfg.username}"
-    else
-      "/home/${cfg.username}";
+  defaultUsername = config.snowfallorg.user.name;
+  defaultHomeDir = config.snowfallorg.user.home.directory;
 
-  jdk = pkgs.jdk21;
+  jdk = pkgs.jdk25;
   scala = pkgs.scala-next;
 in
 {
   options.${namespace}.user = with types; {
     enable = mkBoolOpt false "Enable user programs";
-    username = mkOpt str defaultUsername "Name of the user";
-    home = mkOpt types.str defaultHomeDir "The user's home directory";
+    username = mkOpt str defaultUsername "Username of the user";
+    name = mkOpt str "Oleksii Lisikh" "Name of the user";
+    home = mkOpt str defaultHomeDir "The user's home directory";
 
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
