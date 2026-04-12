@@ -111,6 +111,7 @@
     nativeSkills = "auto";
     restart = true;
     ownerDisplay = "raw";
+    debug = true;
   };
 
   session = {
@@ -232,6 +233,8 @@
       };
       active-memory = {
         enabled = true;
+
+        # NOTE: configuration reference: https://github.com/openclaw/openclaw/blob/main/docs/concepts/active-memory.md
         config = {
           enabled = true;
           agents = [ "main" ];
