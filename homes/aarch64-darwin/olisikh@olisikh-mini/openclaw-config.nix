@@ -28,7 +28,9 @@
         fallbacks = [ "opencode-go/kimi-k2.5" ];
       };
       models = {
-        "openai-codex/gpt-5.3-codex" = { };
+        "openai-codex/gpt-5.3-codex" = {
+          alias = "Codex";
+        };
         "opencode-go/kimi-k2.5" = {
           alias = "Kimi";
         };
