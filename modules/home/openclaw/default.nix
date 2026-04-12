@@ -93,6 +93,9 @@ in
       instances.default.appDefaults.nixMode = lib.mkDefault true;
     };
 
+    # NOTE: OpenClaw may rewrite this file at runtime. Keep Home Manager authoritative.
+    home.file.".openclaw/openclaw.json".force = lib.mkDefault true;
+
     home.activation.openclawLoadSecretEnv = mkIf (pkgs.stdenv.isDarwin) (lib.mkAfter ''
       if [ -f "${gatewayTokenSecretPath}" ] && [ -s "${gatewayTokenSecretPath}" ]; then
         /bin/launchctl setenv OPENCLAW_GATEWAY_TOKEN "$(${lib.getExe' pkgs.coreutils "cat"} "${gatewayTokenSecretPath}")"

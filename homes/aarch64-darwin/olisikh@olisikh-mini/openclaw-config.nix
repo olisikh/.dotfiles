@@ -1,9 +1,5 @@
 { homeDirectory }:
 {
-  meta = {
-    lastTouchedVersion = "2026.4.10";
-  };
-
   auth = {
     profiles = {
       "openai-codex:default" = {

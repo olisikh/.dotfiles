@@ -1,10 +1,6 @@
 { lib, namespace, pkgs, config, ... }:
 let
   inherit (lib.${namespace}) enabled;
-
-  openclawConfig = import ./openclaw-config.nix {
-    inherit (config.home) homeDirectory;
-  };
 in
 {
   olisikh = {
@@ -43,7 +39,10 @@ in
       # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
       # ~/.config/sops-nix/secrets/ai/gemini
       # ~/.config/sops-nix/secrets/ai/elevenlabs
-      config = openclawConfig;
+      config = import ./openclaw-config.nix {
+        inherit (config.home) homeDirectory;
+      };
+
       sops = {
         memorySearchApiKey = "ai/gemini";
         elevenlabsApiKey = "ai/elevenlabs";
