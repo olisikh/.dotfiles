@@ -45,7 +45,7 @@ let
       };
     };
   };
-  typedConfig = recursiveUpdate cfg.config (recursiveUpdate secretConfig);
+  typedConfig = recursiveUpdate cfg.config secretConfig;
 in
 {
   options.${namespace}.openclaw = with types;
