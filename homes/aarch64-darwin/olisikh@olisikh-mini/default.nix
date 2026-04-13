@@ -36,11 +36,6 @@ in
     openclaw = {
       enable = true;
 
-      # NOTE: with sops module enabled, provide secret files:
-      # ~/.config/sops-nix/secrets/openclaw/gatewayToken
-      # ~/.config/sops-nix/secrets/openclaw/telegramBotToken
-      # ~/.config/sops-nix/secrets/ai/gemini
-      # ~/.config/sops-nix/secrets/ai/elevenlabs
       config = import ./openclaw-config.nix {
         inherit (config.home) homeDirectory;
 
