@@ -14,6 +14,10 @@
         provider = "opencode-go";
         mode = "api_key";
       };
+      "gemini:default" = {
+        provider = "gemini";
+        mode = "api_key";
+      };
     };
   };
 

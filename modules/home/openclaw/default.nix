@@ -12,6 +12,14 @@ let
 
   defaultStateDir = "${config.home.homeDirectory}/.openclaw";
   defaultWorkspaceDir = "${defaultStateDir}/workspace";
+  defaultQmdPackage = inputs.qmd.packages.${system}.qmd;
+
+  cfgMemory = cfg.config.memory or { };
+  cfgQmd = if (cfgMemory.qmd or null) == null then { } else cfgMemory.qmd;
+  qmdEnabled = (cfgMemory.backend or null) == "qmd";
+  qmdConfig = lib.optionalAttrs qmdEnabled {
+    memory.qmd.command = cfgQmd.command or (lib.getExe' cfg.qmdPackage "qmd");
+  };
 
   mkEnvSecretRef = provider: id: {
     source = "env";
@@ -45,7 +53,7 @@ let
       };
     };
   };
-  typedConfig = recursiveUpdate cfg.config secretConfig;
+  typedConfig = recursiveUpdate cfg.config (recursiveUpdate secretConfig qmdConfig);
 in
 {
   options.${namespace}.openclaw = with types;
@@ -54,6 +62,7 @@ in
 
       config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
       extraConfig = mkOpt attrs { } "Raw OpenClaw config merged after nix-openclaw's schema-typed config";
+      qmdPackage = mkOpt package defaultQmdPackage "qmd package used when OpenClaw memory.backend is qmd";
 
       documents = mkOpt (nullOr path) null "Optional directory with AGENTS.md/SOUL.md/TOOLS.md for OpenClaw workspace bootstrap";
       bundledPlugins = mkOpt attrs { } "Optional overrides for programs.openclaw.bundledPlugins";
@@ -101,6 +110,8 @@ in
         appDefaults.nixMode = lib.mkDefault true;
       };
     };
+
+    home.packages = lib.optionals qmdEnabled [ cfg.qmdPackage ];
 
     # NOTE: OpenClaw may rewrite this file at runtime. Keep Home Manager authoritative.
     home.file.".openclaw/openclaw.json".force = lib.mkDefault true;
