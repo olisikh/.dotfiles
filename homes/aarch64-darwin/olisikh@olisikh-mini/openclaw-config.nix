@@ -1,4 +1,4 @@
-{ homeDirectory }:
+{ homeDirectory, qmdPath }:
 {
   auth = {
     profiles = {
@@ -124,6 +124,9 @@
 
   memory = {
     backend = "qmd";
+    qmd = {
+      command = qmdPath;
+    };
   };
 
   hooks = {

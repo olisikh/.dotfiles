@@ -1,6 +1,8 @@
-{ lib, namespace, pkgs, config, ... }:
+{ lib, namespace, pkgs, config, inputs, system, ... }:
 let
   inherit (lib.${namespace}) enabled;
+
+  qmdPkg = inputs.qmd.packages.${system}.qmd;
 in
 {
   olisikh = {
@@ -41,6 +43,8 @@ in
       # ~/.config/sops-nix/secrets/ai/elevenlabs
       config = import ./openclaw-config.nix {
         inherit (config.home) homeDirectory;
+
+        qmdPath = (lib.getExe' qmdPkg "qmd");
       };
 
       # NOTE: nix-openclaw's generated schema currently only allows
@@ -76,6 +80,7 @@ in
           pulumi-nodejs
         ]))
         dotnet-sdk_10
+        qmdPkg
       ];
     };
     sops = {
