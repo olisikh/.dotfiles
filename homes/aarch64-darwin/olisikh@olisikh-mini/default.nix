@@ -46,6 +46,8 @@ in
       # messages.tts.providers.<name>.apiKey, while OpenClaw 2026.4.11 accepts
       # richer provider config. Keep schema drift isolated in this raw layer.
       extraConfig = {
+        agents.defaults.imageGenerationModel.primary = "google/gemini-3.1-flash-image-preview";
+
         messages.tts.providers.microsoft = {
           voice = "en-US-JennyNeural";
           lang = "en-US";

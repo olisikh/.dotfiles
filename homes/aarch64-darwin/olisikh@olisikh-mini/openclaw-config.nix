@@ -83,13 +83,7 @@
             "sessions_send"
             "sessions_history"
             "sessions_list"
-            "memory_get"
-            "memory_search"
-            "read"
             "browser"
-            "image"
-            "image_generate"
-            "canvas"
             "subagents"
           ];
         };
@@ -246,7 +240,7 @@
           enabled = true;
           agents = [ "main" ];
           allowedChatTypes = [ "direct" ];
-          model = "gemini/gemini-2.5-flash";
+          model = "google/gemini-2.5-flash";
           timeoutMs = 15000;
           logging = true;
         };
