@@ -57,9 +57,6 @@ in
           key = "ai/gemini";
         };
       };
-      sshKeyPaths = [
-        "${userCfg.home}/.ssh/id_rsa"
-      ];
     };
   };
 }

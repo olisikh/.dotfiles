@@ -2,7 +2,7 @@
 let
   inherit (lib.${namespace}) enabled;
 
-  username = "O.Lisikh";
+  username = "olisikh";
 in
 {
   nix.enable = false;
