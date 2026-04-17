@@ -67,8 +67,23 @@ in
       check_command darwin-rebuild
       sudo darwin-rebuild switch --flake ${dotDir} "$@"
 
+      # Only load yabai scripting addition if required SIP features are disabled
+      # yabai needs: Filesystem Protections, Debugging Restrictions (and NVRAM on Apple Silicon)
       if command -v "yabai" >/dev/null 2>&1; then
-          sudo yabai --load-sa
+          # Check if Filesystem Protections and Debugging Restrictions are disabled
+          local sip_status
+          sip_status=$(csrutil status 2>&1)
+          
+          # SIP status can be "disabled", "enabled", or "unknown" (when partially disabled)
+          # We need to check if the specific required protections are disabled
+          if echo "$sip_status" | grep -q "Filesystem Protections: disabled" && \
+             echo "$sip_status" | grep -q "Debugging Restrictions: disabled"; then
+              sudo yabai --load-sa
+          else
+              echo "Warning: yabai scripting addition not loaded."
+              echo "Required SIP features (Filesystem and Debugging protections) must be disabled."
+              echo "See: https://github.com/koekeishiya/yabai/wiki/Disabling-System-Integrity-Protection"
+          fi
       fi
   }
 
