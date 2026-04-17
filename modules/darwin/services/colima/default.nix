@@ -4,7 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.colima;
-  userCfg = config.${namespace}.user;
+  userCfg = config.${namespace}.core.user;
 
   colimaDir = "${userCfg.home}/.colima";
 

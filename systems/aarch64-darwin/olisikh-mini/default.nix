@@ -10,22 +10,28 @@ in
   nix.enable = false;
 
   olisikh = {
-    user = {
-      enable = true;
-      inherit username;
+    core = {
+      user = {
+        enable = true;
+        inherit username;
+      };
     };
-    homebrew = {
-      enable = true;
-      brews = [ ];
-      casks = [
-        "ollama-app"
-        "iina"
-        "claude-code"
-        "codex"
-        "chatgpt"
-      ];
-      taps = [ ];
+
+    terminal = {
+      homebrew = {
+        enable = true;
+        brews = [ ];
+        casks = [
+          "ollama-app"
+          "iina"
+          "claude-code"
+          "codex"
+          "chatgpt"
+        ];
+        taps = [ ];
+      };
     };
+
     services = {
       jankyborders = enabled;
       yabai = enabled;

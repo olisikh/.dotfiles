@@ -4,7 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.ollama;
-  userCfg = config.${namespace}.user;
+  userCfg = config.${namespace}.core.user;
 
   ollamaDir = "${userCfg.home}/.ollama";
 in

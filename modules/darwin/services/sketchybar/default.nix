@@ -4,7 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.services.sketchybar;
-  userCfg = config.${namespace}.user;
+  userCfg = config.${namespace}.core.user;
 in
 {
   options.${namespace}.services.sketchybar = {

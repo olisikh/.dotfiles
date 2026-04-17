@@ -8,16 +8,22 @@ in
   nix.enable = false;
 
   olisikh = {
-    user = {
-      enable = true;
-      inherit username;
+    core = {
+      user = {
+        enable = true;
+        inherit username;
+      };
     };
-    homebrew = {
-      enable = true;
-      brews = [ ];
-      casks = [ ];
-      taps = [ ];
+
+    terminal = {
+      homebrew = {
+        enable = true;
+        brews = [ ];
+        casks = [ ];
+        taps = [ ];
+      };
     };
+
     services = {
       jankyborders = enabled;
       yabai = enabled;
