@@ -1,6 +1,6 @@
-{ ... }:
 {
   imports = [
+    # Non-modular plugins (always enabled)
     ./plugins/blink-cmp.nix
     ./plugins/dap.nix
     ./plugins/gitsigns.nix
@@ -17,13 +17,10 @@
     ./plugins/treesitter.nix
     ./plugins/undotree.nix
     ./plugins/rustaceanvim.nix
-    ./plugins/nvim-java.nix
     ./plugins/which-key.nix
-    ./plugins/copilot.nix
     ./plugins/todo-comments.nix
     ./plugins/colorizer.nix
     ./plugins/opencode.nix
-    ./plugins/obsidian.nix
     ./plugins/luasnip.nix
     ./plugins/aerial.nix
     ./plugins/indent-blankline.nix
@@ -40,6 +37,11 @@
     ./plugins/guess-indent.nix
     ./plugins/neogen.nix
     ./plugins/99.nix
+
+    # Modular plugins
+    ./plugins/obsidian.nix
+    ./plugins/copilot.nix
+    ./plugins/nvim-java.nix
   ];
 
   plugins = {

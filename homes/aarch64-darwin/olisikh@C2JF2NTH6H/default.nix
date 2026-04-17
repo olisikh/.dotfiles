@@ -16,7 +16,11 @@ in
     starship = enabled;
     git = enabled;
     yazi = enabled;
-    nixvim = enabled;
+    nixvim = {
+      enable = true;
+      # Disable Java support on work laptop
+      plugins.nvim-java = disabled;
+    };
     sketchybar = enabled;
     intellij-idea = {
       enable = true;

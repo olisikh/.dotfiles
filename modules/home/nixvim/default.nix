@@ -12,6 +12,30 @@ in
   options.${namespace}.nixvim = {
     enable = mkBoolOpt false "Enable nixvim program";
     nightly = mkBoolOpt false "Use nightly neovim";
+
+    plugins.nvim-java = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether to enable nvim-java plugin";
+      };
+    };
+
+    plugins.obsidian = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether to enable Obsidian plugin";
+      };
+    };
+
+    plugins.copilot = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether to enable Copilot plugin";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -22,6 +46,9 @@ in
 
         # NOTE: use pkgs with applied snowfall overlays
         pkgs = lib.mkForce pkgs;
+
+        # NOTE: propagate home-manager config for modular plugins to access, fix circular dependency where plugins need config and config needs plugins
+        hmConfig = config;
       };
 
       enable = true;
