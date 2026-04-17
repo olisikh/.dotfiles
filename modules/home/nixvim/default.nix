@@ -13,28 +13,10 @@ in
     enable = mkBoolOpt false "Enable nixvim program";
     nightly = mkBoolOpt false "Use nightly neovim";
 
-    plugins.nvim-java = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Whether to enable nvim-java plugin";
-      };
-    };
-
-    plugins.obsidian = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Whether to enable Obsidian plugin";
-      };
-    };
-
-    plugins.copilot = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Whether to enable Copilot plugin";
-      };
+    plugins = {
+      nvim-java.enable = mkBoolOpt true "Enable nvim-java plugin";
+      obsidian.enable = mkBoolOpt true "Enable obsidian plugin";
+      copilot.enable = mkBoolOpt true "Enable copilot plugin";
     };
   };
 
