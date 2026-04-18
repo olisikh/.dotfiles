@@ -24,14 +24,15 @@ in
       };
     };
 
-    services = {
+    desktop = {
       jankyborders = enabled;
       yabai = enabled;
-      sketchybar = enabled;
       skhd = enabled;
-      colima = enabled;
-      ollama = enabled;
     };
+
+    gui.sketchybar = enabled;
+    containers.colima = enabled;
+    ai.ollama = enabled;
   };
 
   system = {

@@ -3,7 +3,7 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.services.colima;
+  cfg = config.${namespace}.containers.colima;
   userCfg = config.${namespace}.core.user;
 
   colimaDir = "${userCfg.home}/.colima";
@@ -12,7 +12,7 @@ let
   dockerPkg = pkgs.docker;
 in
 {
-  options.${namespace}.services.colima = {
+  options.${namespace}.containers.colima = {
     enable = mkBoolOpt false "Enable colima module";
   };
 

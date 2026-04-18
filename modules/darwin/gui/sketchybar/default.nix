@@ -3,11 +3,11 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.services.sketchybar;
+  cfg = config.${namespace}.gui.sketchybar;
   userCfg = config.${namespace}.core.user;
 in
 {
-  options.${namespace}.services.sketchybar = {
+  options.${namespace}.gui.sketchybar = {
     enable = mkBoolOpt false "Enable sketchybar module";
   };
 

@@ -3,13 +3,13 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.services.ollama;
+  cfg = config.${namespace}.ai.ollama;
   userCfg = config.${namespace}.core.user;
 
   ollamaDir = "${userCfg.home}/.ollama";
 in
 {
-  options.${namespace}.services.ollama = {
+  options.${namespace}.ai.ollama = {
     enable = mkBoolOpt false "Enable ollama module";
     port = lib.mkOption {
       type = lib.types.port;

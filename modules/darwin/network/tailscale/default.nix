@@ -3,10 +3,10 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.services.tailscale;
+  cfg = config.${namespace}.network.tailscale;
 in
 {
-  options.${namespace}.services.tailscale = {
+  options.${namespace}.network.tailscale = {
     enable = mkBoolOpt false "Enable tailscale module";
   };
 

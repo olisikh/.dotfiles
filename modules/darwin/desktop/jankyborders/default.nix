@@ -3,10 +3,10 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.services.jankyborders;
+  cfg = config.${namespace}.desktop.jankyborders;
 in
 {
-  options.${namespace}.services.jankyborders = {
+  options.${namespace}.desktop.jankyborders = {
     enable = mkBoolOpt false "Enable jankyborders module";
   };
 

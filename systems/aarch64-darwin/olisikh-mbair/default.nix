@@ -32,15 +32,16 @@ in
       };
     };
 
-    services = {
+    desktop = {
       jankyborders = enabled;
       yabai = enabled;
-      sketchybar = enabled;
       skhd = enabled;
-      colima = enabled;
-      ollama = enabled;
-      tailscale = enabled;
     };
+
+    gui.sketchybar = enabled;
+    containers.colima = enabled;
+    ai.ollama = enabled;
+    network.tailscale = enabled;
   };
 
   networking = {
