@@ -2,29 +2,28 @@
 let
   cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.nvim-java;
 
-  nvimJavaPackageRoots = {
+  nvim-java = pkgs.vimUtils.buildVimPlugin {
+    name = "nvim-java";
+    src = pkgs.fetchFromGitHub {
+      owner = "olisikh";
+      repo = "nvim-java";
+      rev = "4dd43374a5488775e68f0d3548cd9fdea6718307";
+      hash = "sha256-5wkHJCFYB7pkDKU6EJ3UvTCKvCZiKkdWt7ypne1Yx04=";
+    };
+    dependencies = with pkgs.vimPlugins; [
+      # mason-nvim
+      nui-nvim
+      nvim-dap
+      nvim-lspconfig
+    ];
+  };
+
+  nvimJavaToolPaths = {
     jdtls = "${pkgs.jdt-language-server}/share/java/jdtls";
-
-    java-test = pkgs.runCommand "nvim-java-java-test" { } ''
-      mkdir -p "$out"
-      ln -s ${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test "$out/extension"
-    '';
-
-    java-debug = pkgs.runCommand "nvim-java-java-debug" { } ''
-      mkdir -p "$out"
-      ln -s ${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug "$out/extension"
-    '';
-
-    lombok = pkgs.runCommand "nvim-java-lombok-${pkgs.lombok.version}" { } ''
-      mkdir -p "$out"
-      ln -s ${pkgs.lombok}/share/java/lombok.jar "$out/lombok.jar"
-    '';
-
-    openjdk = pkgs.runCommand "nvim-java-openjdk-25" { } ''
-      mkdir -p "$out/jdk-nix/Contents"
-      ln -s ${pkgs.jdk25} "$out/jdk-nix/Contents/Home"
-      ln -s ${pkgs.jdk25}/bin "$out/jdk-nix/bin"
-    '';
+    java-test = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test";
+    java-debug = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug";
+    lombok = "${pkgs.lombok}/share/java/lombok.jar";
+    jdk = "${pkgs.jdk25}";
   };
 
   spring-boot = pkgs.vimUtils.buildVimPlugin {
@@ -39,45 +38,31 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    extraPlugins = with pkgs.vimPlugins; [ nvim-java spring-boot ];
+    extraPlugins = [ nvim-java spring-boot ];
 
     extraConfigLua = ''
-      local nvim_java_package_roots = {
-        jdtls = "${nvimJavaPackageRoots.jdtls}",
-        ['java-test'] = "${nvimJavaPackageRoots.java-test}",
-        ['java-debug'] = "${nvimJavaPackageRoots.java-debug}",
-        lombok = "${nvimJavaPackageRoots.lombok}",
-        openjdk = "${nvimJavaPackageRoots.openjdk}",
-      }
-
-      do
-        local Manager = require("pkgm.manager")
-        local original_get_install_dir = Manager.get_install_dir
-
-        function Manager:install(name, version)
-          local package_root = nvim_java_package_roots[name]
-          if package_root ~= nil then
-            return package_root
-          end
-
-          error(("nvim-java tried to install unmanaged package %q version %q"):format(name, version))
-        end
-
-        function Manager:get_install_dir(name, version)
-          local package_root = nvim_java_package_roots[name]
-          if package_root ~= nil then
-            return package_root
-          end
-
-          return original_get_install_dir(self, name, version)
-        end
-      end
-
       require("java").setup({
+        jdtls = {
+          path = "${nvimJavaToolPaths.jdtls}",
+          auto_install = false
+        },
+        lombok = {
+          path = "${nvimJavaToolPaths.lombok}",
+          auto_install = false
+        },
+        java_test = {
+          path = "${nvimJavaToolPaths.java-test}",
+          auto_install = false
+        },
+        java_debug_adapter = {
+          path = "${nvimJavaToolPaths.java-debug}",
+          auto_install = false
+        },
         spring_boot_tools = {
           enable = false
         },
         jdk = {
+          path = "${nvimJavaToolPaths.jdk}",
           auto_install = false,
           version = "25"
         }
