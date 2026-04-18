@@ -1,6 +1,6 @@
 { inputs, system, lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf recursiveUpdate types;
+  inherit (lib) mkIf recursiveUpdate types optional;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.ai.openclaw;
@@ -46,11 +46,27 @@ let
     };
   };
   typedConfig = recursiveUpdate cfg.config secretConfig;
+
+  # Active-memory plugin config for extraConfig (schemaless, bypasses nix-openclaw validation)
+  activeMemoryExtraConfig = lib.optionalAttrs (cfg.enableActiveMemory && cfg.qmdPackage != null) {
+    memory = {
+      backend = "qmd";
+      qmd = {
+        command = lib.getExe' cfg.qmdPackage "qmd";
+      };
+    };
+  };
+
+  # Merge user's extraConfig with activeMemoryExtraConfig
+  finalExtraConfig = recursiveUpdate cfg.extraConfig activeMemoryExtraConfig;
 in
 {
   options.${namespace}.ai.openclaw = with types;
     {
       enable = mkBoolOpt false "Enable OpenClaw via nix-openclaw Home Manager module";
+
+      qmdPackage = mkOpt (nullOr package) null "Qmd package for active-memory plugin (required if enableActiveMemory is true)";
+      enableActiveMemory = mkBoolOpt true "Enable active-memory plugin (requires qmdPackage)";
 
       config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
       extraConfig = mkOpt attrs { } "Raw OpenClaw config merged after nix-openclaw's schema-typed config";
@@ -85,10 +101,19 @@ in
     };
 
   config = mkIf cfg.enable {
+    assertions = [{
+      assertion = !cfg.enableActiveMemory || cfg.qmdPackage != null;
+      message = "OpenClaw enableActiveMemory requires qmdPackage to be set";
+    }];
+
+    # Install qmd package if provided
+    home.packages = optional (cfg.qmdPackage != null) cfg.qmdPackage;
+
     # NOTE: Upstream currently merges instance config over global config, and the
     # default instance config expands to many null fields, which can erase the
     # global config after stripNulls. Put our full config on the default instance.
     # Keep top-level config empty to avoid being overwritten.
+    # typedConfig goes through schema, finalExtraConfig bypasses schema (schemaless)
     programs.openclaw = {
       enable = true;
       package = inputs.nix-openclaw.packages.${system}.openclaw-gateway;
@@ -105,17 +130,17 @@ in
     # NOTE: OpenClaw may rewrite this file at runtime. Keep Home Manager authoritative.
     home.file.".openclaw/openclaw.json".force = lib.mkDefault true;
 
-    home.activation.openclawExtraConfig = mkIf (cfg.extraConfig != { }) (
+    home.activation.openclawExtraConfig = mkIf (finalExtraConfig != { }) (
       let
-        finalConfig = recursiveUpdate
+        mergedConfig = recursiveUpdate
           (recursiveUpdate
             {
               gateway.mode = "local";
               agents.defaults.workspace = defaultWorkspaceDir;
             }
             typedConfig)
-          cfg.extraConfig;
-        finalConfigFile = pkgs.writeText "openclaw-default-extra-config.json" (builtins.toJSON finalConfig);
+          finalExtraConfig;
+        finalConfigFile = pkgs.writeText "openclaw-default-extra-config.json" (builtins.toJSON mergedConfig);
       in
       config.lib.dag.entryAfter [ "openclawConfigFiles" ] ''
         run --quiet ${lib.getExe' pkgs.coreutils "mkdir"} -p ${lib.escapeShellArg defaultStateDir}

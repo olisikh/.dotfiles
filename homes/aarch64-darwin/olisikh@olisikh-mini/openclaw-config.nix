@@ -1,4 +1,4 @@
-{ homeDirectory, qmdPath }:
+{ homeDirectory }:
 {
   auth = {
     profiles = {
@@ -114,13 +114,6 @@
 
   session = {
     dmScope = "per-channel-peer";
-  };
-
-  memory = {
-    backend = "qmd";
-    qmd = {
-      command = qmdPath;
-    };
   };
 
   hooks = {

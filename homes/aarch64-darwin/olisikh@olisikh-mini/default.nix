@@ -1,18 +1,11 @@
 { lib, namespace, pkgs, config, inputs, system, ... }:
 let
   inherit (lib.${namespace}) enabled;
-
-  qmdPkg = inputs.qmd.packages.${system}.qmd;
 in
 {
   olisikh = {
     core = {
-      user = {
-        enable = true;
-        packages = with pkgs; [
-          qmdPkg
-        ];
-      };
+      user.enabled = true;
       sops = {
         enable = true;
         secrets = {
@@ -99,11 +92,11 @@ in
       opencode = enabled;
       openclaw = {
         enable = true;
+        qmdPackage = inputs.qmd.packages.${system}.qmd;
+        enableActiveMemory = true;
 
         config = import ./openclaw-config.nix {
           inherit (config.home) homeDirectory;
-
-          qmdPath = (lib.getExe' qmdPkg "qmd");
         };
 
         # NOTE: nix-openclaw's generated schema currently only allows
