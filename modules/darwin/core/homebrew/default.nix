@@ -51,21 +51,12 @@ in
 
   config = mkIf cfg.enable {
     homebrew = {
+      inherit (cfg) brews casks taps;
       enable = true;
       enableZshIntegration = true;
       onActivation = {
         inherit (cfg) autoUpdate upgrade cleanup;
       };
-
-      brews = [
-        "ffmpeg"
-        "tccutil"
-        "JetBrains/utils/kotlin-lsp"
-      ] ++ cfg.brews;
-
-      casks = cfg.casks;
-
-      taps = cfg.taps;
     };
 
     environment.systemPath = [ "/opt/homebrew/bin" ];

@@ -12,16 +12,14 @@ in
   olisikh = {
     core = {
       user = {
-        enable = true;
         inherit username;
+        enable = true;
       };
-    };
 
-    core.homebrew = {
-      enable = true;
-      brews = [ ];
-      casks = [ ];
-      taps = [ ];
+      homebrew = {
+        enable = true;
+        brews = [ "JetBrains/utils/kotlin-lsp" ];
+      };
     };
 
     desktop = {
@@ -35,17 +33,22 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
-      iina = enabled;
+      spotify = enabled;
     };
 
     containers.colima = enabled;
+
     ai = {
       ollama = enabled;
       claude-code = enabled;
       codex = enabled;
       chatgpt = enabled;
     };
-    network.tailscale = enabled;
+
+    network = {
+      tailscale = enabled;
+      clearvpn = enabled;
+    };
   };
 
   networking = {

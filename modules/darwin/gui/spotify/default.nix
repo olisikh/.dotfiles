@@ -3,20 +3,20 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.gui.iina;
+  cfg = config.${namespace}.gui.spotify;
   homebrewCfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.gui.iina = {
-    enable = mkBoolOpt false "Enable iina (media player)";
+  options.${namespace}.gui.spotify = {
+    enable = mkBoolOpt false "Enable spotify";
   };
 
   config = mkIf cfg.enable {
     assertions = [{
       assertion = homebrewCfg.enable;
-      message = "iina requires homebrew to be enabled (core.homebrew.enable = true)";
+      message = "spotify requires darwin homebrew to be enabled (core.homebrew.enable = true)";
     }];
 
-    homebrew.casks = [ "iina" ];
+    homebrew.casks = [ "spotify" ];
   };
 }

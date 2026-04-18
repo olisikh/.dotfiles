@@ -82,6 +82,11 @@ in
       };
     };
 
+    media = {
+      iina = enabled;
+      transmission = enabled;
+    };
+
     ai = {
       opencode = enabled;
     };

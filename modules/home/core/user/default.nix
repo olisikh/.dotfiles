@@ -69,6 +69,7 @@ in
 
         htop
         pngpaste
+        ffmpeg
 
         scala
         (sbt.override { jre = jdk; })
@@ -110,7 +111,7 @@ in
 
         (writeShellScriptBin "home" (import ./script.nix {
           inherit config namespace lib;
-          home = cfg.home;
+          inherit (cfg) home;
         }))
       ] ++ cfg.packages;
 

@@ -12,17 +12,12 @@ in
   olisikh = {
     core = {
       user = {
-        enable = true;
         inherit username;
+        enable = true;
       };
+      homebrew = enabled;
     };
 
-    core.homebrew = {
-      enable = true;
-      brews = [ ];
-      casks = [ ];
-      taps = [ ];
-    };
 
     desktop = {
       jankyborders = enabled;
@@ -35,17 +30,21 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
-      iina = enabled;
     };
 
     containers.colima = enabled;
+
     ai = {
       ollama = enabled;
       claude-code = enabled;
       codex = enabled;
       chatgpt = enabled;
     };
-    network.tailscale = enabled;
+
+    network = {
+      tailscale = enabled;
+      clearvpn = enabled;
+    };
   };
 
   networking = {
