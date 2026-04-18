@@ -11,7 +11,6 @@ let
       hash = "sha256-5wkHJCFYB7pkDKU6EJ3UvTCKvCZiKkdWt7ypne1Yx04=";
     };
     dependencies = with pkgs.vimPlugins; [
-      # mason-nvim
       nui-nvim
       nvim-dap
       nvim-lspconfig
@@ -19,11 +18,11 @@ let
   };
 
   nvimJavaToolPaths = {
+    jdk = "${pkgs.jdk25}";
     jdtls = "${pkgs.jdt-language-server}/share/java/jdtls";
     java-test = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test";
     java-debug = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug";
     lombok = "${pkgs.lombok}/share/java/lombok.jar";
-    jdk = "${pkgs.jdk25}";
   };
 
   spring-boot = pkgs.vimUtils.buildVimPlugin {
