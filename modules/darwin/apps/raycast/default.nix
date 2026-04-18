@@ -3,11 +3,11 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.gui.raycast;
+  cfg = config.${namespace}.apps.raycast;
   homebrewCfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.gui.raycast = {
+  options.${namespace}.apps.raycast = {
     enable = mkBoolOpt false "Enable raycast (launcher)";
   };
 

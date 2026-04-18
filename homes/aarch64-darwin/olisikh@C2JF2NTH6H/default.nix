@@ -52,6 +52,10 @@ in
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
+    };
+
+    editor = {
+      vscode = enabled;
       intellij-idea = {
         enable = true;
         plugins = [

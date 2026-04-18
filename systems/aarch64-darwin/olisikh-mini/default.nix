@@ -25,7 +25,7 @@ in
       skhd = enabled;
     };
 
-    gui = {
+    apps = {
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;

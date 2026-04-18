@@ -1,7 +1,7 @@
 { config, lib, pkgs, namespace, inputs, ... }:
 
 let
-  cfg = config.${namespace}.apps.intellij-idea;
+  cfg = config.${namespace}.editor.intellij-idea;
 
   inherit (inputs.nix-jetbrains-plugins.lib) buildIdeWithPlugins;
 
@@ -10,7 +10,7 @@ let
     else pkgs.jetbrains.idea;
 in
 {
-  options.${namespace}.apps.intellij-idea = {
+  options.${namespace}.editor.intellij-idea = {
     enable = lib.mkEnableOption "IntelliJ IDEA (JetBrains) with plugins baked in";
 
     edition = lib.mkOption {

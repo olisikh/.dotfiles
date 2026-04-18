@@ -8,16 +8,6 @@ in
       user = {
         enable = true;
         packages = with pkgs; [
-
-          podman
-          brave
-          bitwarden-desktop
-
-          openai-whisper
-          antigravity
-          gemini-cli
-          obsidian
-          vscode
           cmatrix
           (pulumi.withPackages (ps: with ps; [
             pulumi-nodejs
@@ -52,6 +42,10 @@ in
       };
     };
 
+    containers.podman = enabled;
+    browser.brave = enabled;
+    apps.bitwarden = enabled;
+
     terminal = {
       direnv = enabled;
       zsh = enabled;
@@ -68,6 +62,11 @@ in
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
+    };
+
+    editor = {
+      obsidian = enabled;
+      vscode = enabled;
       intellij-idea = {
         enable = true;
         plugins = [
@@ -90,6 +89,9 @@ in
     };
 
     ai = {
+      whisper = enabled;
+      antigravity = enabled;
+      gemini-cli = enabled;
       opencode = enabled;
     };
   };

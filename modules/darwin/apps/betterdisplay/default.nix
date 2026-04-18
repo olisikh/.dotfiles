@@ -3,11 +3,11 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.gui.betterdisplay;
+  cfg = config.${namespace}.apps.betterdisplay;
   homebrewCfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.gui.betterdisplay = {
+  options.${namespace}.apps.betterdisplay = {
     enable = mkBoolOpt false "Enable betterdisplay (display management)";
   };
 

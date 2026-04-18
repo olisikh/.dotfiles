@@ -10,14 +10,6 @@ in
       user = {
         enable = true;
         packages = with pkgs; [
-          podman
-          brave
-          bitwarden-desktop
-          openai-whisper
-          antigravity
-          gemini-cli
-          obsidian
-          vscode
           cmatrix
           (pulumi.withPackages (ps: with ps; [
             pulumi-nodejs
@@ -60,22 +52,16 @@ in
       };
     };
 
-    terminal = {
-      direnv = enabled;
-      zsh = enabled;
-      fzf = enabled;
-      zoxide = enabled;
-      bat = enabled;
-      ripgrep = enabled;
-      starship = enabled;
-      git = enabled;
-      yazi = enabled;
-      nixvim = enabled;
-    };
-
+    browser.brave = enabled;
+    apps.bitwarden = enabled;
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
+    };
+
+    editor = {
+      obsidian = enabled;
+      vscode = enabled;
       intellij-idea = {
         enable = true;
         plugins = [
@@ -93,6 +79,9 @@ in
     };
 
     ai = {
+      whisper = enabled;
+      antigravity = enabled;
+      gemini-cli = enabled;
       opencode = enabled;
       openclaw = {
         enable = true;
@@ -122,6 +111,19 @@ in
           telegramBotToken = "openclaw/telegramBotToken";
         };
       };
+    };
+
+    terminal = {
+      direnv = enabled;
+      zsh = enabled;
+      fzf = enabled;
+      zoxide = enabled;
+      bat = enabled;
+      ripgrep = enabled;
+      starship = enabled;
+      git = enabled;
+      yazi = enabled;
+      nixvim = enabled;
     };
   };
 }

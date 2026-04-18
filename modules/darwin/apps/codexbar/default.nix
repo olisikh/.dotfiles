@@ -3,11 +3,11 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.gui.codexbar;
+  cfg = config.${namespace}.apps.codexbar;
   homebrewCfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.gui.codexbar = {
+  options.${namespace}.apps.codexbar = {
     enable = mkBoolOpt false "Enable codexbar (OpenAI Codex in menu bar)";
   };
 
