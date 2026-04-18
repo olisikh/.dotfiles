@@ -5,7 +5,7 @@ in
 {
   olisikh = {
     core = {
-      user.enabled = true;
+      user = enabled;
       sops = {
         enable = true;
         secrets = {
