@@ -3,11 +3,11 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.ai.gemini-cli;
+  cfg = config.${namespace}.ai.gemini;
 in
 {
-  options.${namespace}.ai.gemini-cli = {
-    enable = mkBoolOpt false "Enable gemini-cli (AI harness)";
+  options.${namespace}.ai.gemini = {
+    enable = mkBoolOpt false "Enable gemini (AI harness)";
   };
 
   config = mkIf cfg.enable {

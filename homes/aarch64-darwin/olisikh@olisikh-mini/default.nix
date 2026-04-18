@@ -10,11 +10,6 @@ in
       user = {
         enable = true;
         packages = with pkgs; [
-          cmatrix
-          (pulumi.withPackages (ps: with ps; [
-            pulumi-nodejs
-          ]))
-          dotnet-sdk_10
           qmdPkg
         ];
       };
@@ -70,8 +65,9 @@ in
     };
 
     browser.brave = enabled;
-    apps.bitwarden = enabled;
+
     apps = {
+      bitwarden = enabled;
       wezterm = enabled;
       sketchybar = enabled;
     };
@@ -98,8 +94,8 @@ in
     ai = {
       whisper = enabled;
       antigravity = enabled;
-      gemini-cli = enabled;
-      github-copilot-cli = enabled;
+      gemini = enabled;
+      gh-copilot = enabled;
       opencode = enabled;
       openclaw = {
         enable = true;

@@ -3,10 +3,10 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.ai.github-copilot-cli;
+  cfg = config.${namespace}.ai.gh-copilot;
 in
 {
-  options.${namespace}.ai.github-copilot-cli = {
+  options.${namespace}.ai.gh-copilot = {
     enable = mkBoolOpt false "Enable GitHub Copilot CLI";
   };
 

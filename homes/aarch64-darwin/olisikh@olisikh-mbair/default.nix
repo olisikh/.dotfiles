@@ -5,16 +5,7 @@ in
 {
   olisikh = {
     core = {
-      user = {
-        enable = true;
-        packages = with pkgs; [
-          cmatrix
-          (pulumi.withPackages (ps: with ps; [
-            pulumi-nodejs
-          ]))
-          dotnet-sdk_10
-        ];
-      };
+      user = enabled;
       sops = {
         enable = true;
         secrets = {
@@ -75,6 +66,7 @@ in
     cloud = {
       aws = enabled;
       terraform = enabled;
+      pulumi = enabled;
     };
 
     browser.brave = enabled;
@@ -113,8 +105,8 @@ in
     ai = {
       whisper = enabled;
       antigravity = enabled;
-      gemini-cli = enabled;
-      github-copilot-cli = enabled;
+      gemini = enabled;
+      gh-copilot = enabled;
       opencode = enabled;
     };
 

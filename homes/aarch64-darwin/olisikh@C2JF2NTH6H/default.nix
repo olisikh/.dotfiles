@@ -5,10 +5,7 @@ in
 {
   olisikh = {
     core = {
-      user = {
-        enable = true;
-        packages = with pkgs; [ ];
-      };
+      user = enabled;
       sops = {
         enable = true;
         secrets = {
@@ -85,7 +82,7 @@ in
     };
 
     ai = {
-      github-copilot-cli = enabled;
+      gh-copilot = enabled;
       opencode = enabled;
     };
 
