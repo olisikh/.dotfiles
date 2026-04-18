@@ -52,6 +52,23 @@ in
       };
     };
 
+    fonts = enabled;
+
+    dev = {
+      k8s = enabled;
+      kafka = enabled;
+      node = enabled;
+      jvm = enabled;
+      docker = enabled;
+      python = enabled;
+      git = enabled;
+    };
+
+    cloud = {
+      aws = enabled;
+      terraform = enabled;
+    };
+
     browser.brave = enabled;
     apps.bitwarden = enabled;
     apps = {
@@ -82,6 +99,7 @@ in
       whisper = enabled;
       antigravity = enabled;
       gemini-cli = enabled;
+      github-copilot-cli = enabled;
       opencode = enabled;
       openclaw = {
         enable = true;
@@ -113,17 +131,25 @@ in
       };
     };
 
-    terminal = {
-      direnv = enabled;
+    security.crypto = enabled;
+    media.tools = enabled;
+    utils = enabled;
+
+    dev.shell = {
       zsh = enabled;
+      direnv = enabled;
       fzf = enabled;
-      zoxide = enabled;
-      bat = enabled;
       ripgrep = enabled;
       starship = enabled;
-      git = enabled;
       yazi = enabled;
       nixvim = enabled;
+      fd = enabled;
+      eza = enabled;
+      jq = enabled;
+      yq = enabled;
+      bat = enabled;
+      pay-respects = enabled;
+      zoxide = enabled;
     };
   };
 }

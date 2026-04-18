@@ -32,20 +32,32 @@ in
       };
     };
 
-    terminal = {
-      direnv = enabled;
-      zsh = enabled;
-      fzf = enabled;
-      zoxide = enabled;
-      bat = enabled;
-      ripgrep = enabled;
-      starship = enabled;
+    fonts = enabled;
+
+    dev = {
+      node = enabled;
+      jvm = enabled;
+      python = enabled;
       git = enabled;
-      yazi = enabled;
-      nixvim = {
-        enable = true;
-        # Disable Java support on work laptop
-        plugins.nvim-java = disabled;
+      shell = {
+        zsh = enabled;
+        direnv = enabled;
+        fzf = enabled;
+        ripgrep = enabled;
+        starship = enabled;
+        yazi = enabled;
+        nixvim = {
+          enable = true;
+          # Disable Java support on work laptop
+          plugins.nvim-java = disabled;
+        };
+        fd = enabled;
+        eza = enabled;
+        jq = enabled;
+        yq = enabled;
+        bat = enabled;
+        pay-respects = enabled;
+        zoxide = enabled;
       };
     };
 
@@ -73,7 +85,11 @@ in
     };
 
     ai = {
+      github-copilot-cli = enabled;
       opencode = enabled;
     };
+
+    security.crypto = enabled;
+    utils = enabled;
   };
 }

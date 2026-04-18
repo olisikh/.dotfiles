@@ -7,9 +7,6 @@ let
 
   defaultUsername = config.snowfallorg.user.name;
   defaultHomeDir = config.snowfallorg.user.home.directory;
-
-  jdk = pkgs.jdk25;
-  scala = pkgs.scala-next;
 in
 {
   options.${namespace}.core.user = with types; {
@@ -36,90 +33,11 @@ in
       packages = with pkgs; [
         nix-prefetch
         nix-search-cli
-        bash
-        wget
-        nerd-fonts.jetbrains-mono
-        fd
-        eza
-        jq
-        yq
-        stress
-        zoxide
-        bat
-        pay-respects # thefuck alternative
-        minikube
-        k9s
-        kubectl
-        kubectx
-        kubernetes-helm
-        kustomize
-        etcd
-        terraform
-
-        nodejs
-        (pnpm.override { inherit nodejs; })
-        (yarn.override { inherit nodejs; })
-        bun
-
-        jdk
-        kafkactl
-        awscli2
-        # kcat
-        stern # kubectl pod log scraping tool
-
-        htop
-        pngpaste
-        ffmpeg
-
-        scala
-        (sbt.override { jre = jdk; })
-        (metals.override { jre = jdk; })
-        (bloop.override { jre = jdk; })
-
-        kotlin
-        gradle
-
-        xdg-utils # open apps from console/neovim
-        wezterm
-
-
-        docker
-        docker-compose
-        docker-buildx
-
-        lazygit
-        lazydocker
-        gh
-        github-copilot-cli
-        watch
-        (python3.withPackages (ps: with ps; [
-          pytest
-          debugpy
-        ]))
-        mkalias
-        pre-commit
-
-        age
-        gnupg # tool for generating gpg keys
-        sops
-
-        tflint
-        esbuild
-
-        bchunk
-        dos2unix
-
         (writeShellScriptBin "home" (import ./script.nix {
           inherit config namespace lib;
           inherit (cfg) home;
         }))
       ] ++ cfg.packages;
-
-      sessionVariables = {
-        SCALA_HOME = scala;
-        SCALA_CLI_POWER = "true";
-        JAVA_HOME = jdk;
-      };
     };
 
     # Ensure HM GUI apps are linked to ~/Applications on macOS.

@@ -42,22 +42,43 @@ in
       };
     };
 
+    fonts = enabled;
+
     containers.podman = enabled;
+
+    dev = {
+      k8s = enabled;
+      kafka = enabled;
+      node = enabled;
+      jvm = enabled;
+      docker = enabled;
+      python = enabled;
+      git = enabled;
+      shell = {
+        zsh = enabled;
+        direnv = enabled;
+        fzf = enabled;
+        ripgrep = enabled;
+        starship = enabled;
+        yazi = enabled;
+        nixvim = enabled;
+        fd = enabled;
+        eza = enabled;
+        jq = enabled;
+        yq = enabled;
+        bat = enabled;
+        pay-respects = enabled;
+        zoxide = enabled;
+      };
+    };
+
+    cloud = {
+      aws = enabled;
+      terraform = enabled;
+    };
+
     browser.brave = enabled;
     apps.bitwarden = enabled;
-
-    terminal = {
-      direnv = enabled;
-      zsh = enabled;
-      fzf = enabled;
-      zoxide = enabled;
-      bat = enabled;
-      ripgrep = enabled;
-      starship = enabled;
-      git = enabled;
-      yazi = enabled;
-      nixvim = enabled;
-    };
 
     apps = {
       wezterm = enabled;
@@ -86,13 +107,18 @@ in
     media = {
       iina = enabled;
       transmission = enabled;
+      tools = enabled;
     };
 
     ai = {
       whisper = enabled;
       antigravity = enabled;
       gemini-cli = enabled;
+      github-copilot-cli = enabled;
       opencode = enabled;
     };
+
+    security.crypto = enabled;
+    utils = enabled;
   };
 }
