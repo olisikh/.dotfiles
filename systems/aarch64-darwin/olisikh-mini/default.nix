@@ -17,19 +17,17 @@ in
       };
     };
 
-    terminal = {
-      homebrew = {
-        enable = true;
-        brews = [ ];
-        casks = [
-          "ollama-app"
-          "iina"
-          "claude-code"
-          "codex"
-          "chatgpt"
-        ];
-        taps = [ ];
-      };
+    core.homebrew = {
+      enable = true;
+      brews = [ ];
+      casks = [
+        "ollama-app"
+        "iina"
+        "claude-code"
+        "codex"
+        "chatgpt"
+      ];
+      taps = [ ];
     };
 
     desktop = {

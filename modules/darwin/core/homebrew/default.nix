@@ -3,10 +3,10 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.terminal.homebrew;
+  cfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.terminal.homebrew = {
+  options.${namespace}.core.homebrew = {
     enable = mkBoolOpt false "Enable common homebrew darwin module";
 
     brews = lib.mkOption {

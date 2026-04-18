@@ -15,13 +15,11 @@ in
       };
     };
 
-    terminal = {
-      homebrew = {
-        enable = true;
-        brews = [ ];
-        casks = [ ];
-        taps = [ ];
-      };
+    core.homebrew = {
+      enable = true;
+      brews = [ ];
+      casks = [ ];
+      taps = [ ];
     };
 
     desktop = {
