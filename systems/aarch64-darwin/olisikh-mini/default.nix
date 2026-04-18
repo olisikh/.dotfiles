@@ -20,13 +20,7 @@ in
     core.homebrew = {
       enable = true;
       brews = [ ];
-      casks = [
-        "ollama-app"
-        "iina"
-        "claude-code"
-        "codex"
-        "chatgpt"
-      ];
+      casks = [ ];
       taps = [ ];
     };
 
@@ -36,9 +30,21 @@ in
       skhd = enabled;
     };
 
-    gui.sketchybar = enabled;
+    gui = {
+      sketchybar = enabled;
+      raycast = enabled;
+      betterdisplay = enabled;
+      codexbar = enabled;
+      iina = enabled;
+    };
+
     containers.colima = enabled;
-    ai.ollama = enabled;
+    ai = {
+      ollama = enabled;
+      claude-code = enabled;
+      codex = enabled;
+      chatgpt = enabled;
+    };
     network.tailscale = enabled;
   };
 

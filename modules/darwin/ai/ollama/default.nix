@@ -19,9 +19,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment = {
-      systemPath = [ "/opt/homebrew/bin" ];
-    };
+    homebrew.casks = [ "ollama-app" ];
 
     launchd.user.agents.ollama = {
       path = [ config.environment.systemPath ];

@@ -28,9 +28,21 @@ in
       skhd = enabled;
     };
 
-    gui.sketchybar = enabled;
+    gui = {
+      sketchybar = enabled;
+      raycast = enabled;
+      betterdisplay = enabled;
+      codexbar = enabled;
+      iina = enabled;
+    };
+
     containers.colima = enabled;
-    ai.ollama = enabled;
+    ai = {
+      ollama = enabled;
+      claude-code = enabled;
+      codex = enabled;
+      chatgpt = enabled;
+    };
   };
 
   system = {
