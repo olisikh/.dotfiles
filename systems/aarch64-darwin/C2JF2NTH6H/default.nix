@@ -30,7 +30,6 @@ in
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;
-      codexbar = enabled;
     };
 
     media.spotify = enabled;
@@ -39,9 +38,6 @@ in
 
     ai = {
       ollama = enabled;
-      claude-code = enabled;
-      codex = enabled;
-      chatgpt = enabled;
     };
   };
 
