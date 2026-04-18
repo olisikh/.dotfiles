@@ -8,9 +8,11 @@ in
       user = {
         enable = true;
         packages = with pkgs; [
+
           podman
           brave
           bitwarden-desktop
+
           openai-whisper
           antigravity
           gemini-cli

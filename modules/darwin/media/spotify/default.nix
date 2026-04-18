@@ -3,11 +3,11 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.gui.spotify;
+  cfg = config.${namespace}.media.spotify;
   homebrewCfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.gui.spotify = {
+  options.${namespace}.media.spotify = {
     enable = mkBoolOpt false "Enable spotify";
   };
 

@@ -31,8 +31,9 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
-      spotify = enabled;
     };
+
+    media.spotify = enabled;
 
     containers.colima = enabled;
 
