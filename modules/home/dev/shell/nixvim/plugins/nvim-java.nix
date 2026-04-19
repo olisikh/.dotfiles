@@ -17,12 +17,35 @@ let
     ];
   };
 
+  # Download and extract vscode-spring-boot extension from Open VSX
+  vscode-spring-boot = pkgs.stdenv.mkDerivation rec {
+    pname = "vscode-spring-boot";
+    version = "1.55.1";
+
+    src = pkgs.fetchurl {
+      url = "https://open-vsx.org/api/VMware/vscode-spring-boot/${version}/file/VMware.vscode-spring-boot-${version}.vsix";
+      hash = "sha256-wA+VBjEJxXwhptuXBHidbpnCr3KnbtZ1JxJC0FonGHY=";
+    };
+
+    nativeBuildInputs = [ pkgs.unzip ];
+
+    unpackPhase = ''
+      unzip $src -d vsix-contents
+    '';
+
+    installPhase = ''
+      mkdir -p $out/share/vscode/extensions/vmware.vscode-spring-boot
+      cp -r vsix-contents/extension/* $out/share/vscode/extensions/vmware.vscode-spring-boot/
+    '';
+  };
+
   nvimJavaToolPaths = {
     jdk = "${pkgs.jdk25}";
     jdtls = "${pkgs.jdt-language-server}/share/java/jdtls";
     java-test = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test";
     java-debug = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug";
     lombok = "${pkgs.lombok}/share/java/lombok.jar";
+    spring-boot-tools = "${vscode-spring-boot}/share/vscode/extensions/vmware.vscode-spring-boot";
   };
 
   spring-boot = pkgs.vimUtils.buildVimPlugin {
@@ -58,7 +81,8 @@ in
           auto_install = false
         },
         spring_boot_tools = {
-          enable = false
+          path = "${nvimJavaToolPaths.spring-boot-tools}",
+          auto_install = false
         },
         jdk = {
           path = "${nvimJavaToolPaths.jdk}",
