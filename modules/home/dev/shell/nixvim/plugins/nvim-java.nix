@@ -7,8 +7,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "olisikh";
       repo = "nvim-java";
-      rev = "4dd43374a5488775e68f0d3548cd9fdea6718307";
-      hash = "sha256-5wkHJCFYB7pkDKU6EJ3UvTCKvCZiKkdWt7ypne1Yx04=";
+      rev = "602a5f7fa92f9c1d425a2159133ff9de86842f0a";
+      hash = "sha256-XdkKm3gE2S2yF8AgZPWO97BE/4yZt0M7pWdTjNKpeM4=";
     };
     dependencies = with pkgs.vimPlugins; [
       nui-nvim
