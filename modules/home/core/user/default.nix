@@ -33,6 +33,8 @@ in
       packages = with pkgs; [
         nix-prefetch
         nix-search-cli
+        nix-update
+
         (writeShellScriptBin "home" (import ./script.nix {
           inherit config namespace lib;
           inherit (cfg) home;
