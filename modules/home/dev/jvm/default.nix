@@ -10,7 +10,7 @@ let
 in
 {
   options.${namespace}.dev.jvm = {
-    enable = mkBoolOpt false "Enable JVM toolchain (jdk, scala, kotlin, gradle, sbt, metals, bloop)";
+    enable = mkBoolOpt false "Enable JVM toolchain (jdk, scala, kotlin, gradle, sbt, metals, bloop, maven)";
   };
 
   config = mkIf cfg.enable {
@@ -22,6 +22,7 @@ in
       (bloop.override { jre = jdk; })
       kotlin
       gradle
+      maven
     ];
 
     home.sessionVariables = {

@@ -36,6 +36,7 @@ in
       jvm = enabled;
       python = enabled;
       git = enabled;
+      kafka = enabled;
       shell = {
         zsh = enabled;
         direnv = enabled;

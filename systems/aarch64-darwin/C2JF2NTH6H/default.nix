@@ -36,6 +36,10 @@ in
 
     containers.colima = enabled;
 
+    network = {
+      proxyman = enabled;
+    };
+
     ai = {
       ollama = enabled;
     };

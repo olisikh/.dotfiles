@@ -7,69 +7,35 @@
 Nix help:
 https://github.com/agilesteel/.dotfiles/blob/master/nix/home-manager/home.nix
 
-## When it stops working again after OSX update
+## Self-signed company cert issues: make sure nix uses proper CA during nix build
 
-Edit the file /etc/zshrc adding the following lines in the end:
-
+1. Configure Determinate Nix daemon to know about cert whereabouts:
 ```bash
-# Nix
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
-# End Nix
+sudo vim /Library/LaunchDaemons/systems.determinate.nix-daemon.plist
 ```
 
-## Importing ZScaler certificates and pointing Nix to use them
-
-1. Import certificates:
-```bash
-security export -t certs -f pemseq -k /Library/Keychains/System.keychain -o /tmp/certs-system.pem
-security export -t certs -f pemseq -k /System/Library/Keychains/SystemRootCertificates.keychain -o /tmp/certs-root.pem
-cat /tmp/certs-root.pem /tmp/certs-system.pem > /tmp/ca_cert.pem
-```
-
-2. Move the certificate:
-```bash
-sudo mv /tmp/ca_cert.pem /etc/nix/
-```
-
-3. Configure Nix daemon to know about cert whereabouts:
-```bash
-sudo vim /Library/LaunchDaemons/<depends_on_nix_installer>.nix-daemon.plist
-```
-add the following:
+add the following environment configuration:
 ```xml
 <key>EnvironmentVariables</key>
 <dict>
   <key>NIX_SSL_CERT_FILE</key>
-  <string>/etc/nix/ca_cert.pem</string>
+  <string>/etc/nix/macos-keychain.crt</string>
   <key>SSL_CERT_FILE</key>
-  <string>/etc/nix/ca_cert.pem</string>
-  <key>REQUEST_CA_BUNDLE</key>
-  <string>/etc/nix/ca_cert.pem</string>
+  <string>/etc/nix/macos-keychain.crt</string>
+  <key>CURL_CA_BUNDLE</key>
+  <string>/etc/nix/macos-keychain.crt</string>
+  <key>GIT_SSL_CAINFO</key>
+  <string>/etc/nix/macos-keychain.crt</string>
+  <key>REQUESTS_CA_BUNDLE</key>
+  <string>/etc/nix/macos-keychain.crt</string>
 </dict>
 ```
 
-4. Restart nix daemon:
+2. Restart nix daemon:
 ```
-sudo launchctl unload /Library/LaunchDaemons/<depends_on_nix_installer>.nix-daemon.plist
-sudo launchctl load /Library/LaunchDaemons/<depends_on_nix_installer>.nix-daemon.plist
-```
-
-5. You may also need to make your current shell aware of the certificate, and add it to your nix config:
-Run in current shell:
-```bash
-export NIX_SSL_CERT_FILE=/etc/nix/ca_cert.pem
-export SSL_CERT_FILE=/etc/nix/ca_cert.pem
-```
-
-Add to nix:
-```nix
-environment.variables = {
-    NIX_SSL_CERT_FILE = "/etc/nix/ca_cert.pem";
-    SSL_CERT_FILE = "/etc/nix/ca_cert.pem";
-    REQUEST_CA_BUNDLE = "/etc/nix/ca_cert.pem";
-};
+sudo launchctl bootout system /Library/LaunchDaemons/systems.determinate.nix-daemon.plist
+sudo launchctl bootstrap system /Library/LaunchDaemons/systems.determinate.nix-daemon.plist
+sudo launchctl kickstart -k system/systems.determinate.nix-daemon
 ```
 
 ## Nix and Github
@@ -78,7 +44,7 @@ Nix downloads packages from Github and you may quickly get rate limited by Githu
 For that not to happen, generate a token in Github and add it to nix.conf file as:
 
 ```
-access-tokens = github.com=<your_access_token>
+access-tokens = github.com=<access_token>
 ```
 
 ## Nix fetchFromGithub: how to figure out SHA256 hash of a revision
@@ -106,13 +72,15 @@ Most of the packages have home-manager support, for example \
 wezterm has this page that tells what options you have to configure it: \
 https://home-manager-options.extranix.com/?query=wezterm&release=master
 
-## If skhd and yabai not showing up in Accessibility (Tahoe shenanigans)
-```bash
-realpath "$(which yabai)"
-realpath "$(which skhd)"
-open /path/to/yabai # and then drag-and-drop binary onto Accessibility table, confirm with Touch ID if needed
+## Quick nix-darwin help
 
+Feeling lost with nix-darwin config options?
+
+```bash
+darwin-help
 ```
+
+This command opens a browser window with documentation about nix-darwin settings
 
 ## Available Nix templates:
 
