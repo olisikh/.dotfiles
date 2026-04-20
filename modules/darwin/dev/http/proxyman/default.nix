@@ -3,12 +3,12 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.network.proxyman;
+  cfg = config.${namespace}.dev.http.proxyman;
   homebrewCfg = config.${namespace}.core.homebrew;
 in
 {
-  options.${namespace}.network.proxyman = {
-    enable = mkBoolOpt false "Enable proxyman";
+  options.${namespace}.dev.http.proxyman = {
+    enable = mkBoolOpt false "Enable proxyman (http debugging proxy tool for macOS)";
   };
 
   config = mkIf cfg.enable {

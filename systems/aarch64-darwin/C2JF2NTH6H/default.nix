@@ -36,7 +36,7 @@ in
 
     containers.colima = enabled;
 
-    network = {
+    dev.http = {
       proxyman = enabled;
     };
 
