@@ -53,6 +53,9 @@ in
         pay-respects = enabled;
         zoxide = enabled;
       };
+      http = {
+        postman = enabled;
+      };
     };
 
     cloud = {
