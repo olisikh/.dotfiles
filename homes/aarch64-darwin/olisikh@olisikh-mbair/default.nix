@@ -9,14 +9,6 @@ in
       sops = {
         enable = true;
         secrets = {
-          userEmail = {
-            key = "git/userEmail";
-            name = "git/userEmail";
-          };
-          signingKey = {
-            key = "git/signingKey";
-            name = "git/signingKey";
-          };
           opencode = {
             key = "ai/opencode";
             name = "ai/opencode";

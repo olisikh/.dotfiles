@@ -16,7 +16,7 @@ in
 
       homebrew = {
         enable = true;
-        brews = [ "JetBrains/utils/kotlin-lsp" ];
+        brews = [ "pinentry-mac" "JetBrains/utils/kotlin-lsp" ];
       };
     };
 
