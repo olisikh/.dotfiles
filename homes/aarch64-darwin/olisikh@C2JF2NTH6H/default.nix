@@ -49,6 +49,7 @@ in
         pay-respects = enabled;
         zoxide = enabled;
       };
+      http.bruno = enabled;
     };
 
     apps = {

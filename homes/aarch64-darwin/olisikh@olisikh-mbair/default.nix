@@ -55,6 +55,7 @@ in
       };
       http = {
         postman = enabled;
+        bruno = enabled;
       };
     };
 
