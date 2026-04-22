@@ -30,6 +30,7 @@ in
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;
+      codexbar = enabled;
     };
 
     media.spotify = enabled;
