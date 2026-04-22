@@ -77,7 +77,14 @@ in
 
     ai = {
       gh-copilot = enabled;
-      opencode = enabled;
+      opencode = {
+        enable = true;
+        config = {
+          enabled_providers = [ "github-copilot" ];
+          model = "github-copilot/gpt-5.4";
+          small_model = "github-copilot/gpt-5.4-mini";
+        };
+      };
     };
 
     security.crypto = enabled;

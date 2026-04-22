@@ -25,13 +25,13 @@
     defaults = {
       model = {
         primary = "openai-codex/gpt-5.4";
-        fallbacks = [ "opencode-go/kimi-k2.5" ];
+        fallbacks = [ "opencode-go/kimi-k2.6" ];
       };
       models = {
         "openai-codex/gpt-5.3-codex" = {
           alias = "Codex";
         };
-        "opencode-go/kimi-k2.5" = {
+        "opencode-go/kimi-k2.6" = {
           alias = "Kimi";
         };
         "opencode-go/glm-5" = {

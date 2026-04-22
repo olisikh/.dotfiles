@@ -82,7 +82,13 @@ in
       antigravity = enabled;
       gemini = enabled;
       gh-copilot = enabled;
-      opencode = enabled;
+      opencode = {
+        enable = true;
+        config = {
+          model = "opencode-go/kimi-k2.6";
+          small_model = "opencode-go/kimi-k2.6";
+        };
+      };
       openclaw = {
         enable = true;
         qmdPackage = inputs.qmd.packages.${system}.qmd;
