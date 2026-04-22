@@ -67,6 +67,7 @@ in
 
       qmdPackage = mkOpt (nullOr package) null "Qmd package for active-memory plugin (required if enableActiveMemory is true)";
       enableActiveMemory = mkBoolOpt true "Enable active-memory plugin (requires qmdPackage)";
+      package = mkOpt (nullOr package) null "OpenClaw gateway package override";
 
       config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
       extraConfig = mkOpt attrs { } "Raw OpenClaw config merged after nix-openclaw's schema-typed config";
@@ -116,7 +117,10 @@ in
     # typedConfig goes through schema, finalExtraConfig bypasses schema (schemaless)
     programs.openclaw = {
       enable = true;
-      package = inputs.nix-openclaw.packages.${system}.openclaw-gateway;
+      package =
+        if cfg.package != null
+        then cfg.package
+        else pkgs.openclawPackages.openclaw-gateway;
 
       inherit (cfg) documents bundledPlugins customPlugins excludeTools toolNames;
 

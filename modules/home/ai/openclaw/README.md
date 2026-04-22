@@ -30,6 +30,21 @@ Current host file:
 The module defaults `olisikh.openclaw.excludeTools = [ "nodejs_22" "python3" ]` to avoid Home Manager `buildEnv`
 conflicts with user-provided Node/Python packages. Override per host if you want OpenClaw-provided runtimes instead.
 
+## Overlay Override
+
+The default package path now goes through `pkgs.openclawPackages.openclaw-gateway`.
+
+That means a local Snowfall overlay can override the upstream `nix-openclaw` package in-place, while keeping the
+Home Manager module/service wiring untouched.
+
+Current local override point:
+
+- `overlays/openclaw-local/default.nix`
+- `overlays/openclaw-local/source.nix`
+
+To track a newer OpenClaw release than `nix-openclaw` ships, bump `rev`, `hash`, and `pnpmDepsHash` in
+`overlays/openclaw-local/source.nix`.
+
 ## Secrets Injection
 
 The module injects:
