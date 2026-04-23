@@ -8,7 +8,8 @@ in
       user = {
         enable = true;
         sessionVariables = {
-          METALS_OPTS = "-Djavax.net.ssl.trustStore=/path/to/truststore.jks";
+          METALS_OPTS = "-Djavax.net.ssl.trustStore=/opt/jdk17/lib/security/cacerts";
+          JAVA_OPTS = "-Djavax.net.ssl.trustStore=/opt/jdk17/lib/security/cacerts";
         };
       };
       sops = {
