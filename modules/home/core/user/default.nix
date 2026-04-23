@@ -5,15 +5,16 @@ let
 
   cfg = config.${namespace}.core.user;
 
-  defaultUsername = config.snowfallorg.user.name;
-  defaultHomeDir = config.snowfallorg.user.home.directory;
+  username = config.snowfallorg.user.name;
+  homeDirectory = config.snowfallorg.user.home.directory;
 in
 {
   options.${namespace}.core.user = with types; {
     enable = mkBoolOpt false "Enable user programs";
-    username = mkOpt str defaultUsername "Username of the user";
     name = mkOpt str "Oleksii Lisikh" "Name of the user";
-    home = mkOpt str defaultHomeDir "The user's home directory";
+    homeDirectory = mkOpt str defaultHomeDir "The user's home directory";
+
+    sessionVariables = mkOpt types.attrs { } "Extra home-manager session variables for the user";
 
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
@@ -24,8 +25,8 @@ in
 
   config = mkIf cfg.enable {
     home = {
-      username = cfg.username;
-      homeDirectory = cfg.home;
+      inherit username homeDirectory;
+      inherit (cfg) sessionVariables;
 
       # don't ever change the stateversion value, it will break the state
       stateVersion = "25.05";
@@ -36,8 +37,7 @@ in
         nix-update
 
         (writeShellScriptBin "home" (import ./script.nix {
-          inherit config namespace lib;
-          inherit (cfg) home;
+          inherit config namespace lib homeDirectory;
         }))
       ] ++ cfg.packages;
     };

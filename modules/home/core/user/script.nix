@@ -1,10 +1,10 @@
-{ config, namespace, home, lib }:
+{ config, namespace, homeDirectory, lib }:
 let
   inherit (config.${namespace}.core) sops;
   inherit (lib) optionals;
   inherit (lib.${namespace}) pad color;
 
-  dotDir = "${home}/.dotfiles";
+  dotDir = "${homeDirectory}/.dotfiles";
 
   allCommands = [
     { name = "make"; desc = "Rebuild dotfiles"; action = "home_make \"$@\""; }
@@ -124,7 +124,7 @@ in
 
   home_secrets() {
       check_command sops
-      local secrets_file="${home}/.config/sops/secrets.yaml"
+      local secrets_file="${homeDirectory}/.config/sops/secrets.yaml"
 
       mkdir -p "$(dirname "$secrets_file")"
 

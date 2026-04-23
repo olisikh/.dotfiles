@@ -19,7 +19,7 @@ set clipboard+=unnamedplus
 " IdeaVim mapping timeout behavior:
 " notimeout can make multi-key mappings awkward; use timeoutlen instead.
 set timeout
-set timeoutlen=500
+set timeoutlen=1000
 
 " line numbers (ignored if unsupported; harmless)
 set number

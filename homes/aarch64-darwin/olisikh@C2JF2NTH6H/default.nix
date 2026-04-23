@@ -5,7 +5,12 @@ in
 {
   olisikh = {
     core = {
-      user = enabled;
+      user = {
+        enable = true;
+        sessionVariables = {
+          METALS_OPTS = "-Djavax.net.ssl.trustStore=/path/to/truststore.jks";
+        };
+      };
       sops = {
         enable = true;
         secrets = {

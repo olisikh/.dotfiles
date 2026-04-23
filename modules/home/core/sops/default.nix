@@ -4,15 +4,17 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.core.sops;
-  home = config.${namespace}.core.user.home;
+  home = config.home.homeDirectory;
 
-  normalizedSecrets = lib.mapAttrs (
-    _secretName: secret:
-    secret
-    // (lib.optionalAttrs (!(secret ? path) && (secret ? name)) {
-      path = "${home}/.config/sops-nix/secrets/${secret.name}";
-    })
-  ) cfg.secrets;
+  normalizedSecrets = lib.mapAttrs
+    (
+      _secretName: secret:
+        secret
+        // (lib.optionalAttrs (!(secret ? path) && (secret ? name)) {
+          path = "${home}/.config/sops-nix/secrets/${secret.name}";
+        })
+    )
+    cfg.secrets;
 in
 {
   options.${namespace}.core.sops = with lib.types; {

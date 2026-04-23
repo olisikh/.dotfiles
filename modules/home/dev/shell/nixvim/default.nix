@@ -4,7 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.nixvim;
-  userCfg = config.${namespace}.core.user;
+  username = config.home.username;
 
   neovimNightlyPkg = inputs.nightly-neovim-overlay.packages.${system}.default;
 in
@@ -91,7 +91,7 @@ in
 
       # NOTE: auto-load all plugins from ~/Develop/nvim-plugins folder (my own convention)
       extraConfigLuaPre = ''
-        local username = "${userCfg.username}"
+        local username = "${username}"
         local root = "/Users/" .. username .. "/Develop/nvim-plugins"
 
         -- If you have nested dirs or want only some, adjust the pattern.
