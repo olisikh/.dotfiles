@@ -103,13 +103,7 @@ in
       antigravity = enabled;
       gemini = enabled;
       gh-copilot = enabled;
-      opencode = {
-        enable = true;
-        config = {
-          model = "opencode-go/kimi-k2.5";
-          small_model = "opencode-go/kimi-k2.5";
-        };
-      };
+      opencode = enabled;
     };
 
     security.crypto = enabled;

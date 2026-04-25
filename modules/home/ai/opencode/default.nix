@@ -9,6 +9,8 @@ let
     theme = "catppuccin";
     autoupdate = false;
     autoshare = false;
+    model = "opencode-go/kimi-k2.6";
+    small_model = "opencode-go/kimi-k2.6";
   };
 
   finalConfig = recursiveUpdate basicConfig cfg.config;

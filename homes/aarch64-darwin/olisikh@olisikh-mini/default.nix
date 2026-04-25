@@ -1,4 +1,4 @@
-{ lib, namespace, pkgs, config, inputs, system, ... }:
+{ lib, namespace, config, inputs, system, ... }:
 let
   inherit (lib.${namespace}) enabled;
 in
@@ -82,17 +82,11 @@ in
       antigravity = enabled;
       gemini = enabled;
       gh-copilot = enabled;
-      opencode = {
-        enable = true;
-        config = {
-          model = "opencode-go/kimi-k2.5";
-          small_model = "opencode-go/kimi-k2.5";
-        };
-      };
+      opencode = enabled;
       openclaw = {
         enable = true;
+
         qmdPackage = inputs.qmd.packages.${system}.qmd;
-        enableActiveMemory = true;
 
         config = import ./openclaw-config.nix {
           inherit (config.home) homeDirectory;

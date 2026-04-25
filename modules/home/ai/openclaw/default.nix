@@ -1,4 +1,4 @@
-{ inputs, system, lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types optional;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
@@ -48,7 +48,7 @@ let
   typedConfig = recursiveUpdate cfg.config secretConfig;
 
   # Active-memory plugin config for extraConfig (schemaless, bypasses nix-openclaw validation)
-  activeMemoryExtraConfig = lib.optionalAttrs (cfg.enableActiveMemory && cfg.qmdPackage != null) {
+  activeMemoryExtraConfig = lib.optionalAttrs (cfg.qmdPackage != null) {
     memory = {
       backend = "qmd";
       qmd = {
@@ -65,9 +65,8 @@ in
     {
       enable = mkBoolOpt false "Enable OpenClaw via nix-openclaw Home Manager module";
 
-      qmdPackage = mkOpt (nullOr package) null "Qmd package for active-memory plugin (required if enableActiveMemory is true)";
-      enableActiveMemory = mkBoolOpt true "Enable active-memory plugin (requires qmdPackage)";
       package = mkOpt (nullOr package) null "OpenClaw gateway package override";
+      qmdPackage = mkOpt (nullOr package) null "Qmd package for active-memory plugin";
 
       config = mkOpt attrs { } "OpenClaw config attrset (openclaw.json in Nix format), provided by each host";
       extraConfig = mkOpt attrs { } "Raw OpenClaw config merged after nix-openclaw's schema-typed config";
@@ -102,11 +101,6 @@ in
     };
 
   config = mkIf cfg.enable {
-    assertions = [{
-      assertion = !cfg.enableActiveMemory || cfg.qmdPackage != null;
-      message = "OpenClaw enableActiveMemory requires qmdPackage to be set";
-    }];
-
     # Install qmd package if provided
     home.packages = optional (cfg.qmdPackage != null) cfg.qmdPackage;
 
