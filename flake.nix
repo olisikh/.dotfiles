@@ -35,17 +35,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-openclaw = {
-      url = "github:openclaw/nix-openclaw";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
-
-    qmd = {
-      url = "github:tobi/qmd";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     snowfall-lib = {
       url = "github:snowfallorg/lib";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -85,9 +74,7 @@
       src = ./.;
 
       # NOTE: add external overlays here
-      overlays = with inputs; [
-        nix-openclaw.overlays.default
-      ];
+      overlays = [ ];
 
       channels-config.allowUnfree = true;
 
@@ -98,7 +85,6 @@
       homes.modules = with inputs; [
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
-        nix-openclaw.homeManagerModules.openclaw
       ];
 
       alias.templates.default = "empty";

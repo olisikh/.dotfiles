@@ -18,7 +18,6 @@ in
       homebrew = enabled;
     };
 
-
     desktop = {
       jankyborders = enabled;
       yabai = enabled;

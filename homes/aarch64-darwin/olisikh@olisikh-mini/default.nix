@@ -21,14 +21,6 @@ in
             key = "ai/elevenlabs";
             name = "ai/elevenlabs";
           };
-          openclawGatewayToken = {
-            key = "openclaw/gatewayToken";
-            name = "openclaw/gatewayToken";
-          };
-          openclawTelegramBotToken = {
-            key = "openclaw/telegramBotToken";
-            name = "openclaw/telegramBotToken";
-          };
         };
       };
     };
@@ -83,34 +75,7 @@ in
       gemini = enabled;
       gh-copilot = enabled;
       opencode = enabled;
-      openclaw = {
-        enable = true;
 
-        qmdPackage = inputs.qmd.packages.${system}.qmd;
-
-        config = import ./openclaw-config.nix {
-          inherit (config.home) homeDirectory;
-        };
-
-        # NOTE: nix-openclaw's generated schema currently only allows
-        # messages.tts.providers.<name>.apiKey, while OpenClaw 2026.4.11 accepts
-        # richer provider config. Keep schema drift isolated in this raw layer.
-        extraConfig = {
-          agents.defaults.imageGenerationModel.primary = "google/gemini-3.1-flash-image-preview";
-
-          messages.tts.providers.microsoft = {
-            voice = "en-US-JennyNeural";
-            lang = "en-US";
-          };
-        };
-
-        sops = {
-          memorySearchApiKey = "ai/gemini";
-          elevenlabsApiKey = "ai/elevenlabs";
-          gatewayToken = "openclaw/gatewayToken";
-          telegramBotToken = "openclaw/telegramBotToken";
-        };
-      };
     };
 
     security.crypto = enabled;
