@@ -106,8 +106,8 @@ in
       opencode = {
         enable = true;
         config = {
-          model = "opencode-go/kimi-k2.6";
-          small_model = "opencode-go/kimi-k2.6";
+          model = "opencode-go/kimi-k2.5";
+          small_model = "opencode-go/kimi-k2.5";
         };
       };
     };
