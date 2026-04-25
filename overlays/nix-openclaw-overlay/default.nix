@@ -6,10 +6,10 @@ let
       owner = "openclaw";
       repo = "openclaw";
 
-      # Release tag v2026.4.21 currently points at this commit.
-      rev = "f788c88b4c508c335336fb292afed8c900656d6d";
-      hash = "sha256-K1Pl9lXzGKfoq/fXWxYX5PoY3IBzJr0PPstUDGET/gs=";
-      pnpmDepsHash = "sha256-FDajXHs4s0+QDRPq4ZxQWWW9rqeSJVYACAl/5Mw2Agc=";
+      # Release tag v2026.4.23 currently points at this commit.
+      rev = "a9797214338ba31c52c796adbb75afb16e0684a9";
+      hash = "sha256-Mym3yAyOqr3g8oFEt6yBzMbSkyUOkm0ym/IRD2QfcBY=";
+      pnpmDepsHash = "sha256-xwLxNnr4PkQqWa2gJaGmWapKuO7qwSkTpIM6LwIbjLc=";
     };
   };
 in
