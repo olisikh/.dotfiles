@@ -21,14 +21,6 @@ in
             key = "ai/elevenlabs";
             name = "ai/elevenlabs";
           };
-          telegramBotToken = {
-            key = "openclaw/telegramBotToken";
-            name = "openclaw/telegramBotToken";
-          };
-          gatewayToken = {
-            key = "openclaw/gatewayToken";
-            name = "openclaw/gatewayToken";
-          };
         };
       };
     };
@@ -83,18 +75,7 @@ in
       gemini = enabled;
       gh-copilot = enabled;
       opencode = enabled;
-      openclaw = {
-        enable = true;
-        config = import ./openclaw-config.nix {
-          inherit (config.home) homeDirectory;
-        };
-        sops = {
-          memorySearchApiKey = "ai/gemini";
-          elevenlabsApiKey = "ai/elevenlabs";
-          gatewayToken = "openclaw/gatewayToken";
-          telegramBotToken = "openclaw/telegramBotToken";
-        };
-      };
+
     };
 
     security.crypto = enabled;
