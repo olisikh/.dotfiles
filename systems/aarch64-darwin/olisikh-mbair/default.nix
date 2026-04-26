@@ -37,6 +37,12 @@ in
       telegram = enabled;
     };
 
+    fonts = {
+      sf-symbols = enabled;
+      sf-pro = enabled;
+      sf-mono = enabled;
+    };
+
     media.spotify = enabled;
 
     containers.colima = enabled;
