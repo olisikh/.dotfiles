@@ -153,11 +153,9 @@ fi
 
 case "$SENDER" in
 "mouse.entered")
-	sketchybar --set "$NAME" background.color="$POMODORO_HIGHLIGHT_COLOR"
 	sketchybar --set timer popup.drawing=on
 	;;
 "mouse.exited" | "mouse.exited.global")
-	sketchybar --set "$NAME" background.color="$BAR_COLOR"
 	sketchybar --set timer popup.drawing=off
 	;;
 esac

@@ -37,7 +37,8 @@ sketchybar --add item wifi.up right \
 sketchybar --add item wifi right \
 	--set wifi \
 	update_freq=2 \
-	icon="󰤨 " \
+	icon="$(python3 -c 'print(chr(0x100647))')" \
+	icon.font="SF Pro:Regular:13.0" \
 	icon.color="$COLOR" \
 	icon.padding_right=5 \
 	label.drawing=off \

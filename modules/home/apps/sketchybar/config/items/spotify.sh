@@ -4,88 +4,76 @@ source "$HOME/.config/sketchybar/variables.sh"
 
 COLOR="$GREEN"
 
+# Spotify icon (leftmost)
+sketchybar --add item spotify.icon left \
+	--set spotify.icon \
+	icon=":spotify:" \
+	icon.font="$APP_ICON_FONT:15.0" \
+	icon.color="$COLOR" \
+	icon.padding_left=6 \
+	icon.padding_right=2 \
+	label.drawing=off \
+	background.drawing=off \
+	click_script="open -a Spotify"
+
+# Previous track
+sketchybar --add item spotify.prev left \
+	--set spotify.prev \
+	icon="󰒮" \
+	icon.color="$COLOR" \
+	icon.font="$FONT:Bold:16.0" \
+	label.drawing=off \
+	padding_left=1 \
+	padding_right=1 \
+	background.drawing=off \
+	script="$PLUGIN_DIR/spotify_controls.sh" \
+	--subscribe spotify.prev mouse.clicked
+
+# Play/Pause
+sketchybar --add item spotify.play left \
+	--set spotify.play \
+	icon="󰐊" \
+	icon.color="$COLOR" \
+	icon.font="$FONT:Bold:16.0" \
+	label.drawing=off \
+	padding_left=1 \
+	padding_right=1 \
+	background.drawing=off \
+	script="$PLUGIN_DIR/spotify_controls.sh" \
+	--subscribe spotify.play mouse.clicked
+
+# Next track
+sketchybar --add item spotify.next left \
+	--set spotify.next \
+	icon="󰒭" \
+	icon.color="$COLOR" \
+	icon.font="$FONT:Bold:16.0" \
+	label.drawing=off \
+	padding_left=1 \
+	padding_right=1 \
+	background.drawing=off \
+	script="$PLUGIN_DIR/spotify_controls.sh" \
+	--subscribe spotify.next mouse.clicked
+
+# Song name + artist
 sketchybar --add item spotify left \
 	--set spotify \
-	scroll_texts=on \
-	scroll_duration=99 \
-	icon=":spotify:" \
-	icon.font="$APP_ICON_FONT:13.0" \
-	icon.color="$COLOR" \
+	label.color="$WHITE" \
+	label.font="$FONT:Bold:13.0" \
+	label.padding_right=10 \
+	label.max_chars=43 \
+	icon.drawing=off \
+	background.drawing=off \
+	associated_display=active \
+	updates=on \
+	update_freq=5 \
+	script="$PLUGIN_DIR/spotify.sh"
+
+# Shared background bracket
+sketchybar --add bracket spotify_group spotify.icon spotify.prev spotify.play spotify.next spotify \
+	--set spotify_group \
 	background.color="$BAR_COLOR" \
 	background.height=26 \
 	background.corner_radius="$CORNER_RADIUS" \
 	background.border_width="$BORDER_WIDTH" \
-	background.drawing=on \
-	label.padding_right=10 \
-	label.max_chars=43 \
-	associated_display=active \
-	updates=on \
-	update_freq=5 \
-	script="$PLUGIN_DIR/spotify.sh" \
-	popup.horizontal=on \
-	popup.align=left \
-	popup.height=80 \
-	--subscribe spotify mouse.entered mouse.exited mouse.exited.global
-
-sketchybar --add item spotify.artwork popup.spotify \
-	--set spotify.artwork \
-	drawing=off \
-	background.drawing=on \
-	background.image.drawing=off \
-	background.image.scale=0.2 \
-	background.image.corner_radius="$CORNER_RADIUS,0,0,$CORNER_RADIUS" \
-	background.color=0x00000000 \
-	padding_right=30 \
-	updates=on \
-	width=100 \
-	script="$PLUGIN_DIR/spotify.sh" \
-	--subscribe spotify.artwork mouse.entered mouse.exited
-
-# Add popup controls
-sketchybar --add item spotify.prev popup.spotify \
-	--set spotify.prev icon="󰒮 " \
-	icon.color="$COLOR" \
-	icon.font.size=25 \
-	label.drawing=off \
-	padding_left=10 \
-	padding_right=10 \
-	width=50 \
-	align=center \
-	background.drawing=on \
-	background.color=0x00000000 \
-	background.height=50 \
-	background.corner_radius=25 \
-	script="$PLUGIN_DIR/spotify_controls.sh" \
-	--subscribe spotify.prev mouse.entered mouse.exited mouse.clicked
-
-sketchybar --add item spotify.play popup.spotify \
-	--set spotify.play icon="󰐊 " \
-	icon.color="$COLOR" \
-	icon.font.size=25 \
-	label.drawing=off \
-	padding_left=10 \
-	padding_right=10 \
-	width=50 \
-	align=center \
-	background.drawing=on \
-	background.color=0x00000000 \
-	background.height=50 \
-	background.corner_radius=25 \
-	script="$PLUGIN_DIR/spotify_controls.sh" \
-	--subscribe spotify.play mouse.entered mouse.exited mouse.clicked
-
-sketchybar --add item spotify.next popup.spotify \
-	--set spotify.next icon="󰒭 " \
-	icon.color="$COLOR" \
-	icon.font.size=25 \
-	label.drawing=off \
-	padding_left=10 \
-	padding_right=10 \
-	width=50 \
-	align=center \
-	background.drawing=on \
-	background.color=0x00000000 \
-	background.height=50 \
-	background.corner_radius=25 \
-	script="$PLUGIN_DIR/spotify_controls.sh" \
-	--subscribe spotify.next mouse.entered mouse.exited mouse.clicked
+	background.drawing=on
