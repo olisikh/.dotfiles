@@ -17,6 +17,8 @@ in
       xdg-utils
       watch
       mkalias
+      fastfetch
+      hyfetch
     ];
   };
 }

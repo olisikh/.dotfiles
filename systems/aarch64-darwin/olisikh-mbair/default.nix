@@ -33,6 +33,8 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
+      discord = enabled;
+      telegram = enabled;
     };
 
     media.spotify = enabled;
