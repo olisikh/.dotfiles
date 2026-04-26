@@ -29,7 +29,7 @@ PLUGIN_DIR="$HOME/.config/sketchybar/plugins"
 FONT="JetBrainsMono NF"
 APP_ICON_FONT="sketchybar-app-font:Regular"
 
-PADDINGS=3
+PADDINGS=5
 
 POPUP_BORDER_WIDTH=2
 POPUP_CORNER_RADIUS=5

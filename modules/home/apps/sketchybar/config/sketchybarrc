@@ -45,10 +45,10 @@ source "$ITEM_DIR/front_app.sh"
 source "$ITEM_DIR/spotify.sh"
 
 # Right
-source "$ITEM_DIR/clock.sh"
 source "$ITEM_DIR/calendar.sh"
 source "$ITEM_DIR/keyboard.sh"
 source "$ITEM_DIR/battery.sh"
+source "$ITEM_DIR/wifi.sh"
 source "$ITEM_DIR/volume.sh"
 source "$ITEM_DIR/pomodoro.sh"
 source "$ITEM_DIR/memory.sh"

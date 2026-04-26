@@ -11,12 +11,10 @@ sketchybar --add item spotify left \
 	icon=":spotify:" \
 	icon.font="$APP_ICON_FONT:13.0" \
 	icon.color="$COLOR" \
-	icon.padding_left=10 \
 	background.color="$BAR_COLOR" \
 	background.height=26 \
 	background.corner_radius="$CORNER_RADIUS" \
 	background.border_width="$BORDER_WIDTH" \
-	background.border_color="$COLOR" \
 	background.drawing=on \
 	label.padding_right=10 \
 	label.max_chars=43 \
