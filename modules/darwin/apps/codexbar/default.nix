@@ -8,7 +8,7 @@ let
 in
 {
   options.${namespace}.apps.codexbar = {
-    enable = mkBoolOpt false "Enable codexbar (OpenAI Codex in menu bar)";
+    enable = mkBoolOpt false "Enable codexbar (Menu bar plugin for tracking LLMs usage and costs)";
   };
 
   config = mkIf cfg.enable {
