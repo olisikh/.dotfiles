@@ -16,12 +16,10 @@ if has_battery; then
 		--set battery \
 		update_freq=60 \
 		icon.color="$COLOR" \
-		label.padding_right=10 \
 		label.color="$COLOR" \
-		label.width=45 \
+		label.width=40 \
 		background.height=26 \
 		background.corner_radius="$CORNER_RADIUS" \
-		background.padding_right=5 \
 		background.border_width="$BORDER_WIDTH" \
 		background.color="$BAR_COLOR" \
 		background.drawing=on \

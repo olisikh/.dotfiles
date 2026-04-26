@@ -12,8 +12,6 @@ sketchybar --add item timer right \
     label.drawing=off \
     icon=🍅 \
     icon.color="$COLOR" \
-    icon.padding_right=10 \
-    label.padding_right=10 \
     label.color="$COLOR" \
     background.height=26 \
     background.corner_radius="$CORNER_RADIUS" \

@@ -22,7 +22,6 @@ sketchybar --bar height=30 \
 	icon.font="$FONT:Bold:13.0" \
 	icon.color="$ICON_COLOR" \
 	icon.padding_left="$PADDINGS" \
-	icon.padding_right="$PADDINGS" \
 	label.font="$FONT:Bold:13.0" \
 	label.color="$LABEL_COLOR" \
 	label.padding_left="$PADDINGS" \

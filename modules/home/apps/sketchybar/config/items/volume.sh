@@ -7,8 +7,8 @@ sketchybar \
 	--set sound \
 	icon.color="$COLOR" \
 	label.color="$COLOR" \
-	label.padding_right=10 \
-	label.width=45 \
+	label.padding_right="$PADDINGS" \
+	label.width=40 \
 	background.height=26 \
 	background.corner_radius="$CORNER_RADIUS" \
 	background.padding_right=5 \

@@ -9,11 +9,9 @@ sketchybar --add item keyboard right \
 	icon=" " \
 	icon.color="$COLOR" \
 	label.color="$COLOR" \
-	label.padding_right=10 \
 	label.width=30 \
 	background.height=26 \
 	background.corner_radius="$CORNER_RADIUS" \
-	background.padding_right=5 \
 	background.border_width="$BORDER_WIDTH" \
 	background.drawing=on \
 	script="$PLUGIN_DIR/keyboard.sh" \

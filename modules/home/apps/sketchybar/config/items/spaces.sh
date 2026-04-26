@@ -44,8 +44,8 @@ sketchybar --add bracket spaces '/space\.[0-9]+/' \
 sketchybar --add item separator left \
 	--set separator icon= \
 	icon.font="$FONT:Regular:16.0" \
-	background.padding_left=26 \
-	background.padding_right=15 \
+	background.padding_left=10 \
+	background.padding_right=10 \
 	label.drawing=off \
 	associated_display=active \
 	icon.color="$YELLOW"
