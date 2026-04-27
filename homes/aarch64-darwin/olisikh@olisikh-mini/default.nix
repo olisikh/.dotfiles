@@ -29,6 +29,10 @@ in
             key = "openclaw/gatewayToken";
             name = "openclaw/gatewayToken";
           };
+          hermesGithubToken = {
+            key = "hermes/githubToken";
+            name = "hermes/githubToken";
+          };
         };
       };
     };
