@@ -21,6 +21,14 @@ in
             key = "ai/elevenlabs";
             name = "ai/elevenlabs";
           };
+          telegramBotToken = {
+            key = "openclaw/telegramBotToken";
+            name = "openclaw/telegramBotToken";
+          };
+          gatewayToken = {
+            key = "openclaw/gatewayToken";
+            name = "openclaw/gatewayToken";
+          };
         };
       };
     };
