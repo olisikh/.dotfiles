@@ -35,7 +35,10 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
+      telegram = enabled;
     };
+
+    media.spotify = enabled;
 
     containers.colima = enabled;
 
