@@ -42,6 +42,9 @@ BORDER_WIDTH=2
 POMODORO_COLOR=$RED
 POMODORO_COOLDOWN_COLOR=$GREEN
 
+# Space icons limit (max app icons shown per space)
+MAX_SPACE_ICONS=4
+
 CRON_COLOR=0xffc6a679
 
 SHADOW=on
