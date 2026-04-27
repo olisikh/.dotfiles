@@ -18,6 +18,12 @@ in
       homebrew = enabled;
     };
 
+    fonts = {
+      sf-symbols = enabled;
+      sf-pro = enabled;
+      sf-mono = enabled;
+    };
+
     desktop = {
       jankyborders = enabled;
       yabai = enabled;
