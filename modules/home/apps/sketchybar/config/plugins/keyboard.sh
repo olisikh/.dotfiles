@@ -54,19 +54,23 @@ short_layout_label() {
 	esac
 }
 
-LAYOUT=$(read_layout_from_defaults)
-if [ -z "$LAYOUT" ]; then
-	LAYOUT=$(osascript -e 'tell application "System Events" to get name of current input source' 2>/dev/null | tr -d '\r\n')
-fi
+update_label() {
+	LAYOUT=$(read_layout_from_defaults)
+	if [ -z "$LAYOUT" ]; then
+		LAYOUT=$(osascript -e 'tell application "System Events" to get name of current input source' 2>/dev/null | tr -d '\r\n')
+	fi
 
-if [ -z "$LAYOUT" ]; then
-	echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ') keyboard: no layout detected" >>"$LOG_FILE"
-	exit 0
-fi
+	if [ -z "$LAYOUT" ]; then
+		echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ') keyboard: no layout detected" >>"$LOG_FILE"
+		return
+	fi
 
-SHORT_LABEL=$(short_layout_label "$LAYOUT")
-echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ') keyboard: layout '$(printf '%s' "$LAYOUT")' -> '$SHORT_LABEL'" >>"$LOG_FILE"
+	SHORT_LABEL=$(short_layout_label "$LAYOUT")
+	echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ') keyboard: layout '$(printf '%s' "$LAYOUT")' -> '$SHORT_LABEL'" >>"$LOG_FILE"
 
-sketchybar -m \
-	--set "$NAME" \
-	label="$SHORT_LABEL"
+	sketchybar -m \
+		--set "$NAME" \
+		label="$SHORT_LABEL"
+}
+
+update_label
