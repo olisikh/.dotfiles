@@ -26,9 +26,12 @@ in
     ];
 
     home.sessionVariables = {
+      JAVA_HOME = jdk;
       SCALA_HOME = scala;
       SCALA_CLI_POWER = "true";
-      JAVA_HOME = jdk;
+      KOTLIN_HOME = pkgs.kotlin;
+      M2_HOME = pkgs.maven;
+      GRADLE_HOME = pkgs.gradle;
     };
   };
 }
