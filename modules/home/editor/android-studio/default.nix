@@ -20,12 +20,14 @@ let
     else
       pluginDrv;
 
-  pluginFiles = lib.mapAttrs' (
-    pluginId: pluginDrv:
-    lib.nameValuePair "${configDir}/plugins/nix-${pluginId}" {
-      source = normalizePlugin pluginId pluginDrv;
-    }
-  ) resolvedPlugins;
+  pluginFiles = lib.mapAttrs'
+    (
+      pluginId: pluginDrv:
+        lib.nameValuePair "${configDir}/plugins/nix-${pluginId}" {
+          source = normalizePlugin pluginId pluginDrv;
+        }
+    )
+    resolvedPlugins;
 in
 {
   options.${namespace}.editor.android-studio = {
@@ -48,8 +50,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.file = pluginFiles // {
-      ".ideavimrc".source = lib.mkDefault ../intellij-idea/ideavimrc;
-    };
+    home.file = pluginFiles;
   };
 }
