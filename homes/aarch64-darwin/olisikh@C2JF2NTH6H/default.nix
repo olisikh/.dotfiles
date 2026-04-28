@@ -65,6 +65,18 @@ in
 
     editor = {
       vscode = enabled;
+      android-studio = {
+        enable = true;
+        # Homebrew's Android Studio version can drift from nixpkgs, so pin the
+        # actual config directory version that the installed app uses.
+        configVersion = "2025.3.4";
+        plugins = [
+          "com.github.catppuccin.jetbrains"
+          "com.github.catppuccin.jetbrains_icons"
+          "IdeaVIM"
+          "youngstead.relative-line-numbers"
+        ];
+      };
       intellij-idea = {
         enable = true;
         plugins = [

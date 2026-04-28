@@ -74,6 +74,7 @@ in
           NSAutomaticSpellingCorrectionEnabled = false;
           NSAutomaticWindowAnimationsEnabled = false;
           NSWindowResizeTime = 0.0;
+          "com.apple.keyboard.fnState" = true;
           "com.apple.sound.beep.feedback" = 0;
           "com.apple.trackpad.scaling" = 2.0;
         };
