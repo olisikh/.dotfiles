@@ -19,6 +19,7 @@ in
       mkalias
       fastfetch
       hyfetch
+      git-lfs
     ];
   };
 }

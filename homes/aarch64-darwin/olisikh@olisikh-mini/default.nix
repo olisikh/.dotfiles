@@ -68,6 +68,7 @@ in
       intellij-idea = {
         enable = true;
         plugins = [
+          "com.apollographql.ijplugin"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
           "org.intellij.scala"

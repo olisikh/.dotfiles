@@ -71,6 +71,7 @@ in
         # actual config directory version that the installed app uses.
         configVersion = "2025.3.4";
         plugins = [
+          "com.apollographql.ijplugin"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
           "IdeaVIM"
@@ -80,6 +81,7 @@ in
       intellij-idea = {
         enable = true;
         plugins = [
+          "com.apollographql.ijplugin"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
           "org.intellij.scala"

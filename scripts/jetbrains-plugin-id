@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: jetbrains-plugin-id <plugin name>
+
+Searches the JetBrains Marketplace and prints the plugin ID (`xmlId`) for the
+best match. If the query matches multiple plugin names, matching results are
+printed as tab-separated `xmlId` and plugin name pairs.
+
+Examples:
+  jetbrains-plugin-id GraphQL
+  jetbrains-plugin-id "Apollo GraphQL"
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+  usage >&2
+  exit 1
+fi
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+  printf 'Error: curl is required.\n' >&2
+  exit 1
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+  printf 'Error: jq is required.\n' >&2
+  exit 1
+fi
+
+query="$*"
+encoded_query=$(jq -nr --arg q "$query" '$q|@uri')
+response=$(curl -fsSL "https://plugins.jetbrains.com/api/searchPlugins?search=${encoded_query}")
+
+matches=$(jq -r --arg q "$query" '
+  (.plugins // []) as $plugins
+  | [ $plugins[] | select((.name // "") == $q) ] as $exact
+  | [
+      $plugins[]
+      | select(((.name // "") | ascii_downcase | contains($q | ascii_downcase)))
+    ] as $contains
+  | if ($contains | length) > 1 then
+      $contains
+    elif ($exact | length) == 1 then
+      $exact
+    elif ($contains | length) == 1 then
+      $contains
+    else
+      $plugins
+    end
+  | .[]?
+  | [(.xmlId // ""), (.name // "")]
+  | @tsv
+' <<<"$response")
+
+if [[ -z "$matches" ]]; then
+  printf 'No plugin ID found for: %s\n' "$query" >&2
+  exit 1
+fi
+
+match_count=$(printf '%s\n' "$matches" | jq -Rsc 'split("\n") | map(select(length > 0)) | length')
+
+if [[ "$match_count" -eq 1 ]]; then
+  printf '%s\n' "$matches" | cut -f1
+else
+  printf '%s\n' "$matches"
+fi
