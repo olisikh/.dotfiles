@@ -21,6 +21,7 @@
         html.enable = true;
         cssls.enable = true;
         tailwindcss.enable = true;
+        graphql.enable = true;
         ts_ls = {
           enable = true;
           settings = {
