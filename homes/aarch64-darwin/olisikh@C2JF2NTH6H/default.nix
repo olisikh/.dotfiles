@@ -56,6 +56,9 @@ in
         zoxide = enabled;
       };
       http.bruno = enabled;
+      graphql = {
+        rover = enabled;
+      };
     };
 
     apps = {
