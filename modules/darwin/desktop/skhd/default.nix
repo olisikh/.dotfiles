@@ -5,6 +5,7 @@ let
 
   cfg = config.${namespace}.desktop.skhd;
   yabaiCfg = config.${namespace}.desktop.yabai;
+  # handyCfg = config.${namespace}.desktop.handy;
 
   # Yabai keymaps - only included when yabai is enabled
   yabaiKeymaps = optionalString yabaiCfg.enable ''
@@ -81,6 +82,11 @@ let
     shift + alt - s : yabai -m window --resize bottom:0:-20
     shift + alt - a : yabai -m window --resize top:0:20
   '';
+
+  # handyKeymaps = optionalString handyCfg.enable ''
+  #   # toggle transcription
+  #   ctrl - space : handy --toggle-transcription
+  # '';
 in
 {
   options.${namespace}.desktop.skhd = {
@@ -98,6 +104,7 @@ in
       enable = true;
       skhdConfig = lib.concatStringsSep "\n" [
         yabaiKeymaps
+        # handyKeymaps
         cfg.extraConfig
       ];
     };

@@ -20,6 +20,7 @@ in
       fastfetch
       hyfetch
       git-lfs
+      gh-dash
     ];
   };
 }

@@ -30,6 +30,7 @@ in
       jankyborders = enabled;
       yabai = enabled;
       skhd = enabled;
+      handy = enabled;
     };
 
     apps = {
