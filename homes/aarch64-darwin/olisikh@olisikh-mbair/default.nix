@@ -84,6 +84,7 @@ in
           "com.github.copilot"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
+          "nix-idea"
           "org.intellij.scala"
           "org.jetbrains.kotlin"
           "org.intellij.plugins.hcl"
