@@ -80,6 +80,8 @@ in
         enable = true;
         plugins = [
           "com.apollographql.ijplugin"
+          "com.anthropic.code.plugin"
+          "com.github.copilot"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
           "org.intellij.scala"

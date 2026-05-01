@@ -75,6 +75,8 @@ in
         configVersion = "2025.3.4";
         plugins = [
           "com.apollographql.ijplugin"
+          "com.anthropic.code.plugin"
+          "com.github.copilot"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
           "IdeaVIM"
@@ -85,6 +87,8 @@ in
         enable = true;
         plugins = [
           "com.apollographql.ijplugin"
+          "com.anthropic.code.plugin"
+          "com.github.copilot"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
           "org.intellij.scala"
