@@ -28,6 +28,7 @@ in
       skhd = enabled;
       handy = enabled;
       sketchybar = enabled;
+      raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
       discord = enabled;
@@ -46,9 +47,7 @@ in
 
     ai = {
       ollama = enabled;
-      claude-code = enabled;
       codex = enabled;
-      chatgpt = enabled;
     };
 
     network = {

@@ -62,7 +62,6 @@ in
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
-      raycast = enabled;
     };
 
     editor = {

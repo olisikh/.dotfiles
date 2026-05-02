@@ -60,7 +60,6 @@ in
       bitwarden = enabled;
       wezterm = enabled;
       sketchybar = enabled;
-      raycast = enabled;
     };
 
     editor = {
