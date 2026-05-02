@@ -8,6 +8,7 @@ let
   username = config.snowfallorg.user.name;
   homeDirectory = config.snowfallorg.user.home.directory;
   userScripts = [
+    "jetbrains-plugin-id"
     "lib.sh"
     "nix-build"
     "nix-dev"
