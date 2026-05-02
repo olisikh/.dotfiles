@@ -1,4 +1,4 @@
-{ lib, namespace, config, inputs, system, pkgs, ... }:
+{ lib, namespace, ... }:
 let
   inherit (lib.${namespace}) enabled;
 in
