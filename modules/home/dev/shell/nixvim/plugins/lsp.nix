@@ -68,7 +68,6 @@
             };
           };
         };
-        jdtls.enable = true;
         pylsp.enable = true;
         # pylyzer.enable = true;
         terraformls.enable = true;
