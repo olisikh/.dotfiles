@@ -1,6 +1,6 @@
 { lib, namespace, ... }:
 let
-  inherit (lib.${namespace}) enabled disabled;
+  inherit (lib.${namespace}) enabled;
 in
 {
   olisikh = {
@@ -44,8 +44,13 @@ in
         yazi = enabled;
         nixvim = {
           enable = true;
-          # Disable Java support on work laptop
-          plugins.nvim-java = disabled;
+          plugins.nvim-java = {
+            enable = true;
+            tools.jdk = {
+              path = "/opt/jdk17";
+              version = "17";
+            };
+          };
         };
         fd = enabled;
         eza = enabled;

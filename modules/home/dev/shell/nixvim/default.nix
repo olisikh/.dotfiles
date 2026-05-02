@@ -1,7 +1,7 @@
 { lib, config, namespace, pkgs, inputs, system, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.dev.shell.nixvim;
   username = config.home.username;
@@ -14,7 +14,21 @@ in
     nightly = mkBoolOpt false "Use nightly neovim";
 
     plugins = {
-      nvim-java.enable = mkBoolOpt true "Enable nvim-java plugin";
+      nvim-java = {
+        enable = mkBoolOpt true "Enable nvim-java plugin";
+
+        tools = {
+          jdk = {
+            path = mkOpt lib.types.str "${pkgs.jdk25}" "JDK home path used by nvim-java";
+            version = mkOpt lib.types.str "25" "JDK version used by nvim-java";
+          };
+          jdtls.path = mkOpt lib.types.str "${pkgs.jdt-language-server}/share/java/jdtls" "jdtls path used by nvim-java";
+          java-test.path = mkOpt lib.types.str "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test" "Java test extension path used by nvim-java";
+          java-debug.path = mkOpt lib.types.str "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug" "Java debug extension path used by nvim-java";
+          lombok.path = mkOpt lib.types.str "${pkgs.lombok}/share/java/lombok.jar" "Lombok jar path used by nvim-java";
+          spring-boot-tools.path = mkOpt (lib.types.nullOr lib.types.str) null "Spring Boot Tools extension path used by nvim-java";
+        };
+      };
       obsidian.enable = mkBoolOpt true "Enable obsidian plugin";
       copilot.enable = mkBoolOpt true "Enable copilot plugin";
     };
