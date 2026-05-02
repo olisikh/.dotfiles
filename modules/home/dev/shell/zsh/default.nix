@@ -8,8 +8,8 @@ let
   themes = pkgs.fetchFromGitHub {
     owner = "catppuccin";
     repo = "zsh-syntax-highlighting";
-    rev = "06d519c20798f0ebe275fc3a8101841faaeee8ea";
-    sha256 = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
+    rev = "7926c3d3e17d26b3779851a2255b95ee650bd928";
+    sha256 = "sha256-l6tztApzYpQ2/CiKuLBf8vI2imM6vPJuFdNDSEi7T/o=";
   };
 in
 {

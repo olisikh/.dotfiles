@@ -57,6 +57,19 @@ get_latest_hash() {
     fi
 }
 
+get_fetchurl_hash() {
+    local url="$1"
+
+    local raw_hash
+    raw_hash=$(nix-prefetch-url "$url" </dev/null 2>/dev/null)
+
+    if [[ -n "$raw_hash" && "$raw_hash" != "Failed" ]]; then
+        nix hash to-sri --type sha256 "$raw_hash" 2>/dev/null || echo "$raw_hash"
+    else
+        echo "Failed"
+    fi
+}
+
 get_latest_release_tag() {
     local owner="$1"
     local repo="$2"
@@ -82,6 +95,21 @@ resolve_sourceinfo_target() {
     fi
 
     printf '%s\t%s\n' "$latest_rev" "$latest_tag"
+}
+
+resolve_fetchurl_url() {
+    local file="$1"
+    local url="$2"
+
+    local resolved="$url"
+    local name=""
+    local value=""
+
+    while IFS=$'\t' read -r name value; do
+        resolved="${resolved//\$\{$name\}/$value}"
+    done < <(sed -nE 's/^[[:space:]]*([A-Za-z_][A-Za-z0-9_-]*)[[:space:]]*=[[:space:]]*"([^"]*)"[[:space:]]*;.*/\1\t\2/p' "$file")
+
+    printf '%s\n' "$resolved"
 }
 
 update_fetch_from_github_block() {
@@ -119,6 +147,31 @@ update_fetch_from_github_block() {
         $block =~ s|([^"]$hash_key\s*=\s*")($old_hash)(")|${1}$new_hash${3}|g;
         $block
         /gex' "$file"
+}
+
+update_fetchurl_block() {
+    local file="$1"
+    local url="$2"
+    local old_hash="$3"
+    local new_hash="$4"
+    local hash_key="$5"
+
+    export PERL_URL="$url"
+    export PERL_OLD_HASH="$old_hash"
+    export PERL_NEW_HASH="$new_hash"
+    export PERL_HASH_KEY="$hash_key"
+
+    perl -0777 -pi -e '
+        my $url = quotemeta($ENV{PERL_URL});
+        my $old_hash = quotemeta($ENV{PERL_OLD_HASH});
+        my $new_hash = $ENV{PERL_NEW_HASH};
+        my $hash_key = quotemeta($ENV{PERL_HASH_KEY});
+
+        s/((?:pkgs\.)?fetchurl\s*\{[^}]*?\burl\b\s*=\s*"$url"\s*;[^}]*?\})/
+        my $block = $1;
+        $block =~ s|(\b$hash_key\b\s*=\s*")($old_hash)(")|${1}$new_hash${3}|g;
+        $block
+        /gexs' "$file"
 }
 
 update_sourceinfo_block() {
@@ -267,6 +320,64 @@ get_sourceinfo_dep_hash() {
         echo "$dep_value"
         ;;
     esac
+}
+
+process_fetchurl_file() {
+    local file="$1"
+
+    local in_block=0
+    local url=""
+    local hash_val=""
+    local hash_key=""
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$line" =~ (^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{ ]]; then
+            in_block=1
+            url=""
+            hash_val=""
+            hash_key=""
+        fi
+
+        if [[ $in_block -eq 1 ]]; then
+            if [[ "$line" =~ url[[:space:]]*= ]]; then
+                url=$(echo "$line" | sed -E 's/.*url[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+            elif [[ "$line" =~ (hash|sha256)[[:space:]]*= ]]; then
+                hash_key=$(echo "$line" | sed -E 's/.*(hash|sha256)[[:space:]]*=.*/\1/')
+                hash_val=$(echo "$line" | sed -E 's/.*(hash|sha256)[[:space:]]*=[[:space:]]*"([^"]+)".*/\2/')
+            elif [[ "$line" == *"}"* ]]; then
+                if [[ -n "$url" && -n "$hash_val" && -n "$hash_key" ]]; then
+                    local resolved_url
+                    resolved_url=$(resolve_fetchurl_url "$file" "$url")
+
+                    if [[ "$resolved_url" == *'${'* ]]; then
+                        echo "Checking fetchurl $url..."
+                        echo "  Skipping: unresolved interpolation in URL: $resolved_url"
+                        in_block=0
+                        continue
+                    fi
+
+                    echo "Checking fetchurl $resolved_url..."
+                    echo "  Fetching hash..."
+
+                    local new_hash
+                    new_hash=$(get_fetchurl_hash "$resolved_url")
+
+                    if [[ "$new_hash" == "Failed" ]]; then
+                        echo "  Error: Failed to fetch hash."
+                    elif [[ "$hash_val" != "$new_hash" ]]; then
+                        echo "  Hash update available: $hash_val -> $new_hash"
+                        echo "  Updating file..."
+                        update_fetchurl_block "$file" "$url" "$hash_val" "$new_hash" "$hash_key"
+                        echo "  Done."
+                    else
+                        echo "  Up to date."
+                    fi
+                fi
+
+                in_block=0
+            fi
+        fi
+    done <"$file"
 }
 
 process_fetch_from_github_file() {
@@ -455,11 +566,15 @@ echo "Found ${#files[@]} Nix files"
 echo ""
 
 for file in "${files[@]}"; do
-    if grep -q "fetchFromGitHub" "$file" || grep -q "sourceInfo[[:space:]]*=" "$file"; then
+    if grep -q "fetchFromGitHub" "$file" || grep -q "sourceInfo[[:space:]]*=" "$file" || grep -Eq '(^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{' "$file"; then
         echo "--- File: $file ---"
 
         if grep -q "fetchFromGitHub" "$file"; then
             process_fetch_from_github_file "$file"
+        fi
+
+        if grep -Eq '(^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{' "$file"; then
+            process_fetchurl_file "$file"
         fi
 
         if grep -q "sourceInfo[[:space:]]*=" "$file"; then
