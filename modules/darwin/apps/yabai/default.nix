@@ -3,10 +3,10 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.desktop.yabai;
+  cfg = config.${namespace}.apps.yabai;
 in
 {
-  options.${namespace}.desktop.yabai = {
+  options.${namespace}.apps.yabai = {
     enable = mkBoolOpt false "Enable yabai module";
     package = lib.mkOption {
       type = lib.types.package;

@@ -24,14 +24,11 @@ in
       sf-mono = enabled;
     };
 
-    desktop = {
+    apps = {
       jankyborders = enabled;
       yabai = enabled;
       skhd = enabled;
       handy = enabled;
-    };
-
-    apps = {
       sketchybar = enabled;
       betterdisplay = enabled;
       codexbar = enabled;

@@ -1,4 +1,4 @@
-{ lib, namespace, pkgs, ... }:
+{ lib, namespace, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
 in
@@ -56,18 +56,13 @@ in
         zoxide = enabled;
       };
       http.bruno = enabled;
-      graphql = {
-        rover = enabled;
-      };
+      graphql.rover = enabled;
     };
 
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
-      raycast = {
-        enable = true;
-        extensions = [ "handy" "brew" "github" ];
-      };
+      raycast = enabled;
     };
 
     editor = {

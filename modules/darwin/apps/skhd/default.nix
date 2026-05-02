@@ -3,9 +3,9 @@ let
   inherit (lib) mkIf optionalString;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.desktop.skhd;
-  yabaiCfg = config.${namespace}.desktop.yabai;
-  # handyCfg = config.${namespace}.desktop.handy;
+  cfg = config.${namespace}.apps.skhd;
+  yabaiCfg = config.${namespace}.apps.yabai;
+  # handyCfg = config.${namespace}.apps.handy;
 
   # Yabai keymaps - only included when yabai is enabled
   yabaiKeymaps = optionalString yabaiCfg.enable ''
@@ -89,7 +89,7 @@ let
   # '';
 in
 {
-  options.${namespace}.desktop.skhd = {
+  options.${namespace}.apps.skhd = {
     enable = mkBoolOpt false "Enable skhd module";
 
     extraConfig = lib.mkOption {

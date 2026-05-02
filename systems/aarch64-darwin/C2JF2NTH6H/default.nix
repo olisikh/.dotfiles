@@ -26,14 +26,11 @@ in
       sf-mono = enabled;
     };
 
-    desktop = {
+    apps = {
       jankyborders = enabled;
       yabai = enabled;
       skhd = enabled;
       handy = enabled;
-    };
-
-    apps = {
       android-studio = enabled;
       sketchybar = enabled;
       betterdisplay = enabled;

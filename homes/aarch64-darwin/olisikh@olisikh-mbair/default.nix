@@ -66,15 +66,12 @@ in
     };
 
     browser.brave = enabled;
-    apps.bitwarden = enabled;
 
     apps = {
+      bitwarden = enabled;
       wezterm = enabled;
       sketchybar = enabled;
-      raycast = {
-        enable = true;
-        extensions = [ "handy" "brew" "github" ];
-      };
+      raycast = enabled;
     };
 
     editor = {
