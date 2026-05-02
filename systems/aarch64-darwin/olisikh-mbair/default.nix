@@ -31,7 +31,6 @@ in
 
     apps = {
       sketchybar = enabled;
-      raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
       discord = enabled;

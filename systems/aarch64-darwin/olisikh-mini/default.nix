@@ -33,7 +33,6 @@ in
 
     apps = {
       sketchybar = enabled;
-      raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
       telegram = enabled;

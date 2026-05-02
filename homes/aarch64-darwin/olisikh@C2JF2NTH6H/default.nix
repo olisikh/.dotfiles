@@ -1,4 +1,4 @@
-{ lib, namespace, ... }:
+{ lib, namespace, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
 in
@@ -64,6 +64,10 @@ in
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
+      raycast = {
+        enable = true;
+        extensions = [ "handy" "brew" "github" ];
+      };
     };
 
     editor = {

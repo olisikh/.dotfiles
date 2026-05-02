@@ -1,4 +1,4 @@
-{ lib, namespace, config, inputs, system, ... }:
+{ lib, namespace, config, inputs, system, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled;
 in
@@ -60,6 +60,10 @@ in
       bitwarden = enabled;
       wezterm = enabled;
       sketchybar = enabled;
+      raycast = {
+        enable = true;
+        extensions = [ "handy" "brew" "github" ];
+      };
     };
 
     editor = {

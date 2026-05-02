@@ -18,5 +18,7 @@ in
     }];
 
     homebrew.casks = [ "handy" ];
+
+    # symlink handy CLI tool to .local/bin
   };
 }

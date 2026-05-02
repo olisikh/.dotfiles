@@ -36,7 +36,6 @@ in
     apps = {
       android-studio = enabled;
       sketchybar = enabled;
-      raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
     };

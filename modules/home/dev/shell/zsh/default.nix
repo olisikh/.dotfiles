@@ -6,10 +6,10 @@ let
   cfg = config.${namespace}.dev.shell.zsh;
 
   themes = pkgs.fetchFromGitHub {
-    "owner" = "catppuccin";
-    "repo" = "zsh-syntax-highlighting";
-    "rev" = "06d519c20798f0ebe275fc3a8101841faaeee8ea";
-    "sha256" = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
+    owner = "catppuccin";
+    repo = "zsh-syntax-highlighting";
+    rev = "06d519c20798f0ebe275fc3a8101841faaeee8ea";
+    sha256 = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
   };
 in
 {
@@ -79,6 +79,9 @@ in
           alias h="history | fzf | awk '{$1=\"\"; print substr($0, 2)}' | sh"
           alias p="podman"
           alias ts="tailscale"
+
+          # keep user-installed binaries in PATH
+          export PATH="$HOME/.local/bin:$PATH"
 
           # overrides for work
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

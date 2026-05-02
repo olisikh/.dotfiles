@@ -71,6 +71,10 @@ in
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
+      raycast = {
+        enable = true;
+        extensions = [ "handy" "brew" "github" ];
+      };
     };
 
     editor = {
