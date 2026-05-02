@@ -3,11 +3,11 @@
 # Download and extract vscode-spring-boot extension from Open VSX
 pkgs.stdenv.mkDerivation rec {
   pname = "vscode-spring-boot";
-  version = "1.55.1";
+  version = "2.1.2";
 
   src = pkgs.fetchurl {
     url = "https://open-vsx.org/api/VMware/vscode-spring-boot/${version}/file/VMware.vscode-spring-boot-${version}.vsix";
-    hash = "sha256-wA+VBjEJxXwhptuXBHidbpnCr3KnbtZ1JxJC0FonGHY=";
+    hash = "sha256-zkMDRXBNERTVEPQz12nOtsFfBjNwk6ynYc/gy9iMxHg=";
   };
 
   nativeBuildInputs = [ pkgs.unzip ];

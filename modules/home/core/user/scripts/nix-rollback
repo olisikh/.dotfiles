@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0")
+
+Rollback nix-darwin to a selected previous generation.
+EOF
+}
+
+main() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    check_command darwin-rebuild
+    check_command fzf
+
+    local gen_id
+    gen_id="$(sudo darwin-rebuild --list-generations | fzf --tac | awk '{print $1}')"
+
+    if [[ -z "$gen_id" ]]; then
+        echo "No generation selected, rollback aborted."
+    else
+        sudo darwin-rebuild --switch-generation "$gen_id"
+    fi
+}
+
+main "$@"

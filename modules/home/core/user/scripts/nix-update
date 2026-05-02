@@ -2,18 +2,77 @@
 
 set -euo pipefail
 
-SEARCH_DIR="${1:-.}"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+SEARCH_DIR="."
+UPDATE_HASHES=1
+UPDATE_FLAKE=1
+FLAKE_UPDATE_ARGS=()
 FAKE_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 CURRENT_SYSTEM="${NIX_UPDATE_SYSTEM:-$(nix eval --impure --raw --expr 'builtins.currentSystem' 2>/dev/null || echo "aarch64-darwin")}"
 
-if ! command -v gh &>/dev/null; then
-    echo "Error: gh (GitHub CLI) is not installed."
-    exit 1
-fi
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [flags] [search-dir] [nix flake update args...]
+
+Flags:
+  --hashes-only, --no-flake   Update pinned source hashes only
+  --flake-only, --no-hashes   Run nix flake update only
+  -h, --help                  Show this help
+EOF
+}
+
+parse_args() {
+    local search_dir_set=0
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --hashes-only | --no-flake)
+            UPDATE_HASHES=1
+            UPDATE_FLAKE=0
+            shift
+            ;;
+        --flake-only | --no-hashes)
+            UPDATE_HASHES=0
+            UPDATE_FLAKE=1
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            FLAKE_UPDATE_ARGS+=("$@")
+            break
+            ;;
+        -*)
+            if [[ $search_dir_set -eq 0 ]]; then
+                FLAKE_UPDATE_ARGS+=("$@")
+                break
+            else
+                FLAKE_UPDATE_ARGS+=("$1")
+                shift
+            fi
+            ;;
+        *)
+            if [[ $search_dir_set -eq 0 ]]; then
+                SEARCH_DIR="$1"
+                search_dir_set=1
+            else
+                FLAKE_UPDATE_ARGS+=("$1")
+            fi
+            shift
+            ;;
+        esac
+    done
+}
 
 gh_api_jq() {
     local endpoint="$1"
     local jq_filter="$2"
+
+    check_command gh
 
     local attempt
     for attempt in 1 2 3; do
@@ -553,34 +612,60 @@ process_sourceinfo_file() {
     done <"$file"
 }
 
-echo "Scanning Nix files in $SEARCH_DIR..."
+update_hashes() {
+    check_command nix
+    check_command nix-prefetch-url
 
-mapfile -t files < <(find "$SEARCH_DIR" -name "*.nix" -type f 2>/dev/null | sort)
+    echo "Scanning Nix files in $SEARCH_DIR..."
 
-if [ ${#files[@]} -eq 0 ]; then
-    echo "No Nix files found in $SEARCH_DIR"
-    exit 1
-fi
+    mapfile -t files < <(find "$SEARCH_DIR" -name "*.nix" -type f 2>/dev/null | sort)
 
-echo "Found ${#files[@]} Nix files"
-echo ""
-
-for file in "${files[@]}"; do
-    if grep -q "fetchFromGitHub" "$file" || grep -q "sourceInfo[[:space:]]*=" "$file" || grep -Eq '(^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{' "$file"; then
-        echo "--- File: $file ---"
-
-        if grep -q "fetchFromGitHub" "$file"; then
-            process_fetch_from_github_file "$file"
-        fi
-
-        if grep -Eq '(^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{' "$file"; then
-            process_fetchurl_file "$file"
-        fi
-
-        if grep -q "sourceInfo[[:space:]]*=" "$file"; then
-            process_sourceinfo_file "$file"
-        fi
-
-        echo ""
+    if [ ${#files[@]} -eq 0 ]; then
+        echo "No Nix files found in $SEARCH_DIR"
+        exit 1
     fi
-done
+
+    echo "Found ${#files[@]} Nix files"
+    echo ""
+
+    for file in "${files[@]}"; do
+        if grep -q "fetchFromGitHub" "$file" || grep -q "sourceInfo[[:space:]]*=" "$file" || grep -Eq '(^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{' "$file"; then
+            echo "--- File: $file ---"
+
+            if grep -q "fetchFromGitHub" "$file"; then
+                process_fetch_from_github_file "$file"
+            fi
+
+            if grep -Eq '(^|[^A-Za-z0-9_-])((pkgs\.)?fetchurl)[[:space:]]*\{' "$file"; then
+                process_fetchurl_file "$file"
+            fi
+
+            if grep -q "sourceInfo[[:space:]]*=" "$file"; then
+                process_sourceinfo_file "$file"
+            fi
+
+            echo ""
+        fi
+    done
+}
+
+update_flake() {
+    check_command nix
+
+    echo "Updating flake lock in $SEARCH_DIR..."
+    nix flake update --flake "$SEARCH_DIR" "${FLAKE_UPDATE_ARGS[@]}"
+}
+
+main() {
+    parse_args "$@"
+
+    if [[ $UPDATE_HASHES -eq 1 ]]; then
+        update_hashes
+    fi
+
+    if [[ $UPDATE_FLAKE -eq 1 ]]; then
+        update_flake
+    fi
+}
+
+main "$@"

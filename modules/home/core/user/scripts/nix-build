@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [system] [darwin-rebuild args...]
+
+Build and switch a nix-darwin system from this flake.
+
+Examples:
+  $(basename "$0")
+  $(basename "$0") C2JF2NTH6H
+  $(basename "$0") olisikh-mini --show-trace
+EOF
+}
+
+default_system() {
+    if command -v scutil >/dev/null 2>&1; then
+        local local_hostname
+        local_hostname="$(scutil --get LocalHostName 2>/dev/null || true)"
+
+        if [[ -n "$local_hostname" ]]; then
+            echo "$local_hostname"
+            return
+        fi
+    fi
+
+    hostname -s
+}
+
+load_yabai_scripting_addition() {
+    if ! command -v yabai >/dev/null 2>&1; then
+        return
+    fi
+
+    local sip_status
+    sip_status="$(csrutil status 2>&1 || true)"
+
+    if echo "$sip_status" | grep -q "Filesystem Protections: disabled" &&
+        echo "$sip_status" | grep -q "Debugging Restrictions: disabled"; then
+        sudo yabai --load-sa
+    else
+        echo "Warning: yabai scripting addition not loaded."
+        echo "Required SIP features (Filesystem and Debugging protections) must be disabled."
+        echo "See: https://github.com/koekeishiya/yabai/wiki/Disabling-System-Integrity-Protection"
+    fi
+}
+
+main() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    check_command darwin-rebuild
+
+    local system=""
+    if [[ $# -gt 0 && "$1" != -* ]]; then
+        system="$1"
+        shift
+    else
+        system="$(default_system)"
+    fi
+
+    sudo darwin-rebuild switch --flake "$NIX_DOTFILES_ROOT#$system" "$@"
+    load_yabai_scripting_addition
+}
+
+main "$@"

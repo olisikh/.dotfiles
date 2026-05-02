@@ -7,6 +7,17 @@ let
 
   username = config.snowfallorg.user.name;
   homeDirectory = config.snowfallorg.user.home.directory;
+  userScripts = [
+    "lib.sh"
+    "nix-build"
+    "nix-dev"
+    "nix-gc"
+    "nix-gens"
+    "nix-rollback"
+    "nix-secrets"
+    "nix-tpl"
+    "nix-update"
+  ];
 in
 {
   options.${namespace}.core.user = with types; {
@@ -31,10 +42,21 @@ in
       # don't ever change the stateversion value, it will break the state
       stateVersion = "25.05";
 
+      sessionPath = [ "$HOME/.local/bin" ];
+
+      file = lib.listToAttrs (map
+        (script: {
+          name = ".local/bin/${script}";
+          value = {
+            source = ./scripts/${script};
+            executable = script != "lib.sh";
+          };
+        })
+        userScripts);
+
       packages = with pkgs; [
         nix-prefetch
         nix-search-cli
-        nix-update
 
         (writeShellScriptBin "home" (import ./script.nix {
           inherit config namespace lib homeDirectory;

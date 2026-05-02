@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [devshell]
+
+Run a dev shell from this dotfiles flake.
+EOF
+}
+
+main() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    local target="$NIX_DOTFILES_ROOT"
+    if [[ $# -gt 0 ]]; then
+        target="$NIX_DOTFILES_ROOT#$1"
+    fi
+
+    check_command nix
+    check_command zsh
+    nix develop "$target" --command zsh
+}
+
+main "$@"

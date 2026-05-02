@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0")
+
+Run Nix garbage collection.
+EOF
+}
+
+main() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    check_command nix-store
+    check_command nix-collect-garbage
+    nix-store --gc
+    nix-collect-garbage -d
+}
+
+main "$@"
