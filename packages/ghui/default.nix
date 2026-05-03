@@ -1,55 +1,88 @@
 { lib
-, buildNpmPackage
+, stdenvNoCC
 , fetchFromGitHub
-, fetchNpmDeps
 , makeWrapper
-, nodejs
 , bun
 , gh
 , git
+
 , ...
 }:
 
-buildNpmPackage (finalAttrs: {
-  pname = "ghui";
-  version = "0.3.3";
+let
+  repo = "ghui";
+  version = "0.4.6";
+  bunTarget = {
+    aarch64-darwin = "bun-darwin-arm64";
+    x86_64-darwin = "bun-darwin-x64";
+    aarch64-linux = "bun-linux-arm64";
+    x86_64-linux = "bun-linux-x64";
+  }.${stdenvNoCC.hostPlatform.system} or (throw "Unsupported ghui platform: ${stdenvNoCC.hostPlatform.system}");
 
   src = fetchFromGitHub {
     owner = "kitlangton";
-    repo = "ghui";
-    rev = "dea1d03a592904279b149aa1bfe0daa7778d0402";
-    hash = "sha256-pcKVNA3k8UZm7Nk7QLzYphiTtE3tXLgD/qcJbX/1vdY=";
+    repo = repo;
+    rev = "ccce54a27712bf0418c91df31ccc6534e4c1dd38";
+    hash = "sha256-jMi2Pc2VTpj0cZ2zXqtunG0FxcglCNEt9WzWnwxq+Js=";
   };
+
+  bunDeps = stdenvNoCC.mkDerivation {
+    inherit version src;
+    pname = repo;
+    name = "${repo}-${version}-bun-deps";
+
+    nativeBuildInputs = [ bun ];
+
+    buildPhase = ''
+      runHook preBuild
+
+      export HOME=$TMPDIR
+      bun install --frozen-lockfile --ignore-scripts --cache-dir $TMPDIR/bun-cache
+
+      runHook postBuild
+    '';
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out
+      cp -R node_modules $out/node_modules
+      cp -R packages $out/packages
+
+      runHook postInstall
+    '';
+
+    outputHashMode = "recursive";
+    outputHash = "sha256-OdHl09qiNOpjA3x4JLDi7+LGlWn5VuizdUc/ynizCq0=";
+  };
+in
+stdenvNoCC.mkDerivation {
+  inherit version src;
+
+  pname = repo;
 
   nativeBuildInputs = [
     bun
     makeWrapper
   ];
 
-  npmDeps = fetchNpmDeps {
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    inherit (finalAttrs) src;
-    hash = "sha256-kVXEz7g7Sad2D1byCXX1GsAyva7hZ+FFB5ziAYZbmQQ=";
-    nativeBuildInputs = [ nodejs ];
-    prePatch = ''
-      npm install --package-lock-only --ignore-scripts
-    '';
-  };
+  buildPhase = ''
+    runHook preBuild
 
-  prePatch = ''
-    cp ${finalAttrs.npmDeps}/package-lock.json package-lock.json
+    cp -R ${bunDeps}/node_modules node_modules
+    chmod -R u+w node_modules
+    bun build --compile --bytecode --format=esm --target=${bunTarget} --outfile=dist/ghui src/standalone.ts
+
+    runHook postBuild
   '';
-
-  npmBuildScript = "build:cli";
 
   installPhase = ''
     runHook preInstall
 
     mkdir -p $out/lib/ghui $out/bin
-    cp -r bin dist node_modules package.json packages README.md LICENSE .env.example $out/lib/ghui/
+    install -m755 dist/ghui $out/lib/ghui/ghui
 
-    makeWrapper ${lib.getExe bun} $out/bin/ghui \
-      --add-flags "$out/lib/ghui/bin/ghui.js" \
+    makeWrapper $out/lib/ghui/ghui $out/bin/ghui \
       --prefix PATH : ${lib.makeBinPath [ gh git ]}
 
     runHook postInstall
@@ -61,4 +94,4 @@ buildNpmPackage (finalAttrs: {
     license = lib.licenses.mit;
     mainProgram = "ghui";
   };
-})
+}
