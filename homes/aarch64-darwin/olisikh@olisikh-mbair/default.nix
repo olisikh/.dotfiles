@@ -21,6 +21,10 @@ in
             key = "ai/gemini";
             name = "ai/gemini";
           };
+          flakeHub = {
+            key = "nix/flake-hub";
+            name = "nix/flake-hub";
+          };
         };
       };
     };
