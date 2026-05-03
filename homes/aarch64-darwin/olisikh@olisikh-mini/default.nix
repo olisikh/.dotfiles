@@ -9,29 +9,39 @@ in
       sops = {
         enable = true;
         secrets = {
-          opencode = {
-            key = "ai/opencode";
-            name = "ai/opencode";
-          };
-          gemini = {
-            key = "ai/gemini";
-            name = "ai/gemini";
-          };
           elevenlabs = {
             key = "ai/elevenlabs";
             name = "ai/elevenlabs";
           };
+
           telegramBotToken = {
             key = "openclaw/telegramBotToken";
             name = "openclaw/telegramBotToken";
           };
-          gatewayToken = {
+          openclawGatewayToken = {
             key = "openclaw/gatewayToken";
             name = "openclaw/gatewayToken";
           };
-          hermesGithubToken = {
-            key = "hermes/githubToken";
-            name = "hermes/githubToken";
+          openclawOpencode = {
+            key = "openclaw/opencode";
+            name = "openclaw/opencode";
+          };
+          openclawGemini = {
+            key = "openclaw/gemini";
+            name = "openclaw/gemini";
+          };
+
+          hermesGithub = {
+            key = "hermes/github";
+            name = "hermes/github";
+          };
+          hermesGemini = {
+            key = "hermes/gemini";
+            name = "hermes/gemini";
+          };
+          hermesOpencode = {
+            key = "hermes/opencode";
+            name = "hermes/opencode";
           };
         };
       };
