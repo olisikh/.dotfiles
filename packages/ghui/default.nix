@@ -5,6 +5,7 @@
 , bun
 , gh
 , git
+, system
 
 , ...
 }:
@@ -12,12 +13,14 @@
 let
   repo = "ghui";
   version = "0.4.6";
-  bunTarget = {
+
+  targetPlatforms = {
     aarch64-darwin = "bun-darwin-arm64";
     x86_64-darwin = "bun-darwin-x64";
     aarch64-linux = "bun-linux-arm64";
     x86_64-linux = "bun-linux-x64";
-  }.${stdenvNoCC.hostPlatform.system} or (throw "Unsupported ghui platform: ${stdenvNoCC.hostPlatform.system}");
+  };
+  bunPlatform = targetPlatforms.${system};
 
   src = fetchFromGitHub {
     owner = "kitlangton";
@@ -71,7 +74,7 @@ stdenvNoCC.mkDerivation {
 
     cp -R ${bunDeps}/node_modules node_modules
     chmod -R u+w node_modules
-    bun build --compile --bytecode --format=esm --target=${bunTarget} --outfile=dist/ghui src/standalone.ts
+    bun build --compile --bytecode --format=esm --target=${bunPlatform} --outfile=dist/ghui src/standalone.ts
 
     runHook postBuild
   '';
@@ -93,5 +96,6 @@ stdenvNoCC.mkDerivation {
     homepage = "https://github.com/kitlangton/ghui";
     license = lib.licenses.mit;
     mainProgram = "ghui";
+    platforms = builtins.attrNames targetPlatforms;
   };
 }
