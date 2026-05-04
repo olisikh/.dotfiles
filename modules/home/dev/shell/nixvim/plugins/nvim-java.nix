@@ -1,13 +1,6 @@
 { pkgs, lib, namespace, hmConfig, ... }:
 let
   cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.nvim-java;
-
-  springBootTools = pkgs.${namespace}.vscode-spring-boot;
-
-  springBootToolsPath =
-    if cfg.tools.spring-boot-tools.path != null
-    then cfg.tools.spring-boot-tools.path
-    else "${springBootTools}/share/vscode/extensions/vmware.vscode-spring-boot";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -32,7 +25,7 @@ in
           auto_install = false
         },
         spring_boot_tools = {
-          path = "${springBootToolsPath}",
+          path = "${cfg.tools.spring-boot-tools.path}",
           auto_install = false
         },
         jdk = {
