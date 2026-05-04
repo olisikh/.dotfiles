@@ -1,7 +1,8 @@
 result
+.sisyphus/
+.claude/
+
 .sops.yaml
 secrets.yaml
 .DS_Store
-.sisyphus/
 
-TODO.md
