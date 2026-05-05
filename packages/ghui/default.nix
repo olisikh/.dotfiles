@@ -1,92 +1,119 @@
-{ lib
-, stdenvNoCC
-, fetchFromGitHub
-, makeWrapper
-, bun
-, gh
-, git
-, system
-
-, ...
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
+  fetchNpmDeps,
+  bun,
+  gh,
+  git,
+  nodejs,
+  runtimeShell,
+  versionCheckHook,
 }:
 
-let
-  repo = "ghui";
-  version = "0.4.6";
+buildNpmPackage (finalAttrs: {
+  pname = "ghui";
+  version = "0.6.0";
 
-  targetPlatforms = {
-    aarch64-darwin = "bun-darwin-arm64";
-    x86_64-darwin = "bun-darwin-x64";
-    aarch64-linux = "bun-linux-arm64";
-    x86_64-linux = "bun-linux-x64";
-  };
-  bunPlatform = targetPlatforms.${system};
+  __structuredAttrs = true;
 
   src = fetchFromGitHub {
     owner = "kitlangton";
-    repo = repo;
-    rev = "ccce54a27712bf0418c91df31ccc6534e4c1dd38";
-    hash = "sha256-jMi2Pc2VTpj0cZ2zXqtunG0FxcglCNEt9WzWnwxq+Js=";
+    repo = "ghui";
+    rev = "e9ac64c548af1c3a9ef434184fba222b40ff9d62";
+    hash = "sha256-WrhpSA29vcX6K101E2TiBPkEq72ZuBDFEImFGUMjE5c=";
   };
 
-  bunDeps = stdenvNoCC.mkDerivation {
-    inherit version src;
-    pname = repo;
-    name = "${repo}-${version}-bun-deps";
-
-    nativeBuildInputs = [ bun ];
-
-    buildPhase = ''
-      runHook preBuild
-
+  npmDeps = fetchNpmDeps {
+    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
+    inherit (finalAttrs) src;
+    fetcherVersion = finalAttrs.npmDepsFetcherVersion;
+    hash = lib.fakeHash;
+    nativeBuildInputs = [ nodejs ];
+    prePatch = ''
       export HOME=$TMPDIR
-      bun install --frozen-lockfile --ignore-scripts --cache-dir $TMPDIR/bun-cache
-
-      runHook postBuild
+      npm pkg set 'dependencies.@ghui/keymap=file:packages/keymap'
+      npm pkg delete 'devDependencies.@ghui/keymap'
+      npm install --package-lock-only --ignore-scripts --no-audit --no-fund
     '';
-
-    installPhase = ''
-      runHook preInstall
-
-      mkdir -p $out
-      cp -R node_modules $out/node_modules
-      cp -R packages $out/packages
-
-      runHook postInstall
-    '';
-
-    outputHashMode = "recursive";
-    outputHash = "sha256-OdHl09qiNOpjA3x4JLDi7+LGlWn5VuizdUc/ynizCq0=";
   };
-in
-stdenvNoCC.mkDerivation {
-  inherit version src;
 
-  pname = repo;
+  prePatch = ''
+    export HOME=$TMPDIR
+    export npmDeps
+    npm pkg set 'dependencies.@ghui/keymap=file:packages/keymap'
+    npm pkg delete 'devDependencies.@ghui/keymap'
+    cp ${finalAttrs.npmDeps}/package-lock.json package-lock.json
+  '';
 
-  nativeBuildInputs = [
-    bun
-    makeWrapper
+  nativeBuildInputs = [ bun ];
+
+  npmDepsFetcherVersion = 3;
+
+  npmFlags = [
+    "--no-audit"
+    "--no-fund"
   ];
 
-  buildPhase = ''
-    runHook preBuild
+  npmBuildScript = "build:cli";
 
-    cp -R ${bunDeps}/node_modules node_modules
-    chmod -R u+w node_modules
-    bun build --compile --bytecode --format=esm --target=${bunPlatform} --outfile=dist/ghui src/standalone.ts
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  doInstallCheck = true;
 
-    runHook postBuild
+  postInstallCheck = ''
+    cd $out/lib/ghui
+    ${lib.getExe bun} -e '
+      await import("@effect/atom-react")
+      await import("@ghui/keymap")
+      await import("@opentui/core")
+      await import("@opentui/react")
+      await import("effect")
+      await import("react")
+      await import("scheduler")
+    '
   '';
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/lib/ghui $out/bin
-    install -m755 dist/ghui $out/lib/ghui/ghui
+    npm prune --omit=dev --no-save --no-audit --no-fund
 
-    makeWrapper $out/lib/ghui/ghui $out/bin/ghui \
-      --prefix PATH : ${lib.makeBinPath [ gh git ]}
+    mkdir -p $out/lib/ghui $out/bin
+    cp -r dist node_modules packages package.json README.md LICENSE .env.example $out/lib/ghui/
+    rm -f $out/lib/ghui/node_modules/.bin/ghui
+
+    cat > $out/bin/ghui <<'EOF'
+    #!@runtimeShell@
+    case "''${1-}" in
+      -v|--version|version)
+        echo @version@
+        exit 0
+        ;;
+      -h|--help|help)
+        printf '%s\n' \
+          "ghui @version@" \
+          "" \
+          "Terminal UI for GitHub pull requests." \
+          "" \
+          "Usage:" \
+          "  ghui              Start the TUI" \
+          "  ghui -v, --version" \
+          "                    Print the installed version" \
+          "  ghui -h, --help   Show this help message"
+        exit 0
+        ;;
+    esac
+
+    export PATH=@path@:$PATH
+    exec @bun@ "@out@/lib/ghui/dist/index.js" "$@"
+    EOF
+    substituteInPlace $out/bin/ghui \
+      --replace-fail @runtimeShell@ ${runtimeShell} \
+      --replace-fail @version@ ${finalAttrs.version} \
+      --replace-fail @path@ ${lib.makeBinPath [ gh git ]} \
+      --replace-fail @bun@ ${lib.getExe bun} \
+      --replace-fail @out@ $out
+    chmod +x $out/bin/ghui
 
     runHook postInstall
   '';
@@ -94,8 +121,10 @@ stdenvNoCC.mkDerivation {
   meta = {
     description = "Terminal UI for GitHub pull requests";
     homepage = "https://github.com/kitlangton/ghui";
+    changelog = "https://github.com/kitlangton/ghui/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
     mainProgram = "ghui";
-    platforms = builtins.attrNames targetPlatforms;
+    platforms = bun.meta.platforms;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
   };
-}
+})
