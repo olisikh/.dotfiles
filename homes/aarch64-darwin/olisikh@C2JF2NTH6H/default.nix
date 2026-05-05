@@ -58,7 +58,6 @@ in
         yq = enabled;
         bat = enabled;
         pay-respects = enabled;
-        ghui = enabled;
         zoxide = enabled;
       };
       http.bruno = enabled;
