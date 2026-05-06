@@ -59,6 +59,7 @@ in
         bat = enabled;
         pay-respects = enabled;
         zoxide = enabled;
+        scrcpy = enabled;
       };
       http.bruno = enabled;
       graphql.rover = enabled;
