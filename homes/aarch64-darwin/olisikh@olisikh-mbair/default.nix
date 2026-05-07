@@ -56,6 +56,7 @@ in
         bat = enabled;
         pay-respects = enabled;
         zoxide = enabled;
+        ghui = disabled; # enable once 'ghui' package is available
       };
       http = {
         postman = enabled;
