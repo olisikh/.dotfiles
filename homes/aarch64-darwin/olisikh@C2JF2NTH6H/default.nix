@@ -93,9 +93,12 @@ in
         plugins = [
           "com.apollographql.ijplugin"
           "com.anthropic.code.plugin"
+          "com.intellij.reactivestreams"
+          "com.jetbrains.jax.ws"
           "com.github.copilot"
           "com.github.catppuccin.jetbrains"
           "com.github.catppuccin.jetbrains_icons"
+          "com.netflix.graphql.dgs.intellijplugin"
           "nix-idea"
           "org.intellij.scala"
           "org.jetbrains.kotlin"
