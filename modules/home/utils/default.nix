@@ -21,6 +21,7 @@ in
       hyfetch
       git-lfs
       gh-dash
+      terminal-notifier
     ];
   };
 }

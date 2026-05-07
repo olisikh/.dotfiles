@@ -47,8 +47,8 @@ in
           plugins.nvim-java = {
             enable = true;
             tools.jdk = {
-              path = "/opt/jdk17";
-              version = "17";
+              path = "/opt/jdk21";
+              version = "21";
             };
           };
         };
