@@ -62,6 +62,9 @@ in
                 path = "/opt/jdk21";
                 version = "21";
               };
+              spring-boot-tools = {
+                enable = false;
+              };
             };
           };
         };

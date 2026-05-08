@@ -13,13 +13,6 @@ in
     extraPlugins = with pkgs.${namespace}; [ nvim-java nvim-spring-boot ];
 
     extraConfigLua = ''
-      vim.print("JDK (${cfg.tools.jdk.version}): ${cfg.tools.jdk.path}")
-      vim.print("jdtls: ${cfg.tools.jdtls.path}")
-      vim.print("java-test: ${cfg.tools.java-test.path}")
-      vim.print("java-debug: ${cfg.tools.java-debug.path}")
-      vim.print("lombok: ${cfg.tools.lombok.path}")
-      vim.print("spring-boot-tools: ${cfg.tools.spring-boot-tools.path}")
-
       require("java").setup({
         jdtls = {
           path = "${cfg.tools.jdtls.path}",
@@ -39,6 +32,7 @@ in
           auto_install = false
         },
         spring_boot_tools = {
+          enable = ${builtins.toJSON cfg.tools.spring-boot-tools.enable},
           path = "${cfg.tools.spring-boot-tools.path}",
           auto_install = false
         },
