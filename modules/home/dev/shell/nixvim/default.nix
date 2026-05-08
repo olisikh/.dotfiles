@@ -17,12 +17,24 @@ in
       nvim-java = {
         enable = mkBoolOpt true "Enable nvim-java plugin";
 
+        runtimes = mkOpt
+          (lib.types.listOf (lib.types.submodule {
+            options = {
+              name = mkOpt lib.types.str "" "Runtime name exposed to jdtls";
+              path = mkOpt lib.types.str "" "Runtime path exposed to jdtls";
+              default = mkOpt lib.types.bool false "Whether this runtime is the default jdtls runtime";
+            };
+          })) [ ] "Additional Java runtimes exposed to jdtls";
+
         tools = {
           jdk = {
             path = mkOpt lib.types.str "${pkgs.jdk25}" "JDK home path used by nvim-java";
             version = mkOpt lib.types.str "25" "JDK version used by nvim-java";
           };
-          jdtls.path = mkOpt lib.types.str "${pkgs.jdt-language-server}/bin/jdtls" "jdtls path used by nvim-java";
+          jdtls = {
+            path = mkOpt lib.types.str "${pkgs.jdt-language-server}/bin/jdtls" "jdtls path used by nvim-java";
+            version = mkOpt lib.types.str "1.54.0" "jdtls version used by nvim-java, for informational purposes only";
+          };
           java-test.path = mkOpt lib.types.str "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test" "Java test extension path used by nvim-java";
           java-debug.path = mkOpt lib.types.str "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug" "Java debug extension path used by nvim-java";
           lombok.path = mkOpt lib.types.str "${pkgs.lombok}/share/java/lombok.jar" "Lombok jar path used by nvim-java";
@@ -105,8 +117,24 @@ in
 
       # NOTE: auto-load all plugins from ~/Develop/nvim-plugins folder (my own convention)
       extraConfigLuaPre = ''
-        local username = "${username}"
-        local root = "/Users/" .. username .. "/Develop/nvim-plugins"
+        vim.o.sessionoptions = vim.o.sessionoptions .. ",globals";
+
+        -- set backup directory to be a subdirectory of data to ensure that backups are not written to git repos
+        vim.o.backupdir = vim.fn.stdpath("data") .. "/backup"
+
+        -- set swap directory to ensure swap files are not written to git repos.
+        vim.o.directory = vim.fn.stdpath("data") .. "/swap"
+
+        -- set undodir to ensure that the undofiles are not saved to git repos.
+        vim.o.undodir = vim.fn.stdpath("data") .. "/undo"
+
+        -- make those directories if they don't exist
+        vim.fn.mkdir(vim.o.backupdir, "p")
+        vim.fn.mkdir(vim.o.directory, "p")
+        vim.fn.mkdir(vim.o.undodir, "p")
+
+        -- Auto-load all plugins from ~/Develop/nvim-plugins folder (my own convention).
+        local root = "/Users/${username}/Develop/nvim-plugins"
 
         -- If you have nested dirs or want only some, adjust the pattern.
         for name, t in vim.fs.dir(root) do
@@ -121,22 +149,6 @@ in
             end
           end
         end
-      '';
-
-      extraConfigLua = ''
-        vim.loop.fs_mkdir(vim.o.backupdir, 750)
-        vim.loop.fs_mkdir(vim.o.directory, 750)
-        vim.loop.fs_mkdir(vim.o.undodir, 750)
-
-        -- set backup directory to be a subdirectory of data to ensure that backups are not written to git repos
-        vim.o.backupdir = vim.fn.stdpath("data") .. "/backup"
-
-        -- Configure 'directory' to ensure that Neovim swap files are not written to repos.
-        vim.o.directory = vim.fn.stdpath("data") .. "/directory" 
-        vim.o.sessionoptions = vim.o.sessionoptions .. ",globals"
-
-        -- set undodir to ensure that the undofiles are not saved to git repos.
-        vim.o.undodir = vim.fn.stdpath("data") .. "/undo" 
       '';
 
       extraConfigLuaPost = ''

@@ -46,9 +46,22 @@ in
           enable = true;
           plugins.nvim-java = {
             enable = true;
-            tools.jdk = {
-              path = "/opt/jdk21";
-              version = "21";
+            runtimes = [
+              {
+                name = "jdk17";
+                path = "/opt/jdk17";
+                default = true;
+              }
+              {
+                name = "jdk21";
+                path = "/opt/jdk21";
+              }
+            ];
+            tools = {
+              jdk = {
+                path = "/opt/jdk21";
+                version = "21";
+              };
             };
           };
         };

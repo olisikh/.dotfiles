@@ -1,15 +1,29 @@
 { pkgs, lib, namespace, hmConfig, ... }:
 let
   cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.nvim-java;
+
+  runtimeToJdtls = runtime: {
+    inherit (runtime) name path;
+  } // lib.optionalAttrs runtime.default {
+    default = true;
+  };
 in
 {
   config = lib.mkIf cfg.enable {
     extraPlugins = with pkgs.${namespace}; [ nvim-java nvim-spring-boot ];
 
     extraConfigLua = ''
+      vim.print("JDK (${cfg.tools.jdk.version}): ${cfg.tools.jdk.path}")
+      vim.print("jdtls: ${cfg.tools.jdtls.path}")
+      vim.print("java-test: ${cfg.tools.java-test.path}")
+      vim.print("java-debug: ${cfg.tools.java-debug.path}")
+      vim.print("lombok: ${cfg.tools.lombok.path}")
+      vim.print("spring-boot-tools: ${cfg.tools.spring-boot-tools.path}")
+
       require("java").setup({
         jdtls = {
           path = "${cfg.tools.jdtls.path}",
+          version = "${cfg.tools.jdtls.version}",
           auto_install = false
         },
         lombok = {
@@ -36,6 +50,15 @@ in
       });
     '';
 
-    plugins.lsp.servers.jdtls.enable = true;
+    plugins.lsp.servers.jdtls = {
+      enable = true;
+      settings = {
+        java = {
+          configuration = {
+            runtimes = map runtimeToJdtls cfg.runtimes;
+          };
+        };
+      };
+    };
   };
 }

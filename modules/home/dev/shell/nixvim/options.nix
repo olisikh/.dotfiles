@@ -59,7 +59,7 @@
       space = "·";
       # multispace = "·";
       lead = "·";
-      trail = "·";   
+      trail = "·";
       nbsp = "␣";
       # eol = "↲";
     };
