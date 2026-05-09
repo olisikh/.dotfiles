@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <command> [args...]
+
+Commands:
+  build, make     Build and switch this nix-darwin system
+  update          Update flake inputs and pinned source hashes
+  upgrade         Update, then build and switch
+  tpl             Instantiate a template from this flake
+  dev             Run a dev shell from this flake
+  generations     List nix-darwin generations
+  rollback        Roll back to a previous generation
+  gc              Run Nix garbage collection
+  secrets         Edit the home sops secrets file
+  help            Show this help
+EOF
+}
+
+main() {
+    local command="${1:-help}"
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
+
+    case "$command" in
+    build | make)
+        nix-build "$@"
+        ;;
+    update)
+        nix-update "$NIX_DOTFILES_ROOT" "$@"
+        ;;
+    upgrade)
+        nix-update "$NIX_DOTFILES_ROOT" "$@"
+        nix-build
+        ;;
+    tpl)
+        nix-tpl "$@"
+        ;;
+    dev)
+        nix-dev "$@"
+        ;;
+    generations | gens)
+        nix-gens "$@"
+        ;;
+    rollback)
+        nix-rollback "$@"
+        ;;
+    gc)
+        nix-gc "$@"
+        ;;
+    secrets)
+        nix-secrets "$@"
+        ;;
+    help | -h | --help)
+        usage
+        ;;
+    *)
+        echo "Error: unknown command: $command" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+}
+
+main "$@"

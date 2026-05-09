@@ -8,6 +8,7 @@ let
   username = config.snowfallorg.user.name;
   homeDirectory = config.snowfallorg.user.home.directory;
   userScripts = [
+    "dots"
     "jetbrains-plugin-id"
     "lib.sh"
     "nix-build"
@@ -58,11 +59,6 @@ in
       packages = with pkgs; [
         nix-prefetch
         nix-search-cli
-
-        (writeShellScriptBin "dots" (import ./script.nix {
-          inherit config namespace lib homeDirectory;
-          name = "dots";
-        }))
       ] ++ cfg.packages;
     };
 
