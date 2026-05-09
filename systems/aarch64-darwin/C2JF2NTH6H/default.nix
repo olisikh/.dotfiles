@@ -36,6 +36,7 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
+      repobar = enabled;
     };
 
     media.spotify = enabled;

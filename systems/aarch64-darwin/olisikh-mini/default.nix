@@ -33,6 +33,7 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
+      repobar = enabled;
       telegram = enabled;
     };
 

@@ -31,6 +31,7 @@ in
       raycast = enabled;
       betterdisplay = enabled;
       codexbar = enabled;
+      repobar = enabled;
       discord = enabled;
       telegram = enabled;
     };
