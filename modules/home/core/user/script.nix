@@ -1,4 +1,4 @@
-{ config, namespace, homeDirectory, lib }:
+{ config, namespace, homeDirectory, lib, name }:
 let
   inherit (config.${namespace}.core) sops;
   inherit (lib) optionals;
@@ -26,7 +26,7 @@ let
     ]
   );
 
-  usage = (color.cyan "Usage: ") + "home <command>";
+  usage = (color.cyan "Usage: ") + "${name} <command>";
 
   commandsHeader = color.cyan "Commands:";
 

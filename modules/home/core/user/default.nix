@@ -59,8 +59,9 @@ in
         nix-prefetch
         nix-search-cli
 
-        (writeShellScriptBin "home" (import ./script.nix {
+        (writeShellScriptBin "dots" (import ./script.nix {
           inherit config namespace lib homeDirectory;
+          name = "dots";
         }))
       ] ++ cfg.packages;
     };
