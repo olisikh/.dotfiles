@@ -37,6 +37,7 @@ in
       betterdisplay = enabled;
       codexbar = enabled;
       repobar = enabled;
+      peekaboo = enabled;
     };
 
     media.spotify = enabled;

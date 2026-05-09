@@ -33,10 +33,16 @@ in
         # bash 
         ''
           source ${themes}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
-          eval "$(kafkactl completion zsh)"
-          eval "$(fzf --zsh)"
-          eval "$(pay-respects zsh)"
-          eval "$(opencode completion)"
+
+          function cmd {
+            command -v $1 >/dev/null 2>&1
+          }
+
+          cmd kafkactl && eval "$(kafkactl completion zsh)"
+          cmd fzf && eval "$(fzf --zsh)"
+          cmd pay-respects && eval "$(pay-respects zsh)"
+          cmd opencode && eval "$(opencode completion)"
+          cmd determinate-nixd && eval "$(determinate-nixd completion zsh)"
 
           # Preferred editor for local and remote sessions
           if [[ -n $SSH_CONNECTION ]]; then
