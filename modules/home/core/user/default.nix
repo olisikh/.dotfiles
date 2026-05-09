@@ -7,19 +7,13 @@ let
 
   username = config.snowfallorg.user.name;
   homeDirectory = config.snowfallorg.user.home.directory;
-  userScripts = [
-    "dots"
-    "jetbrains-plugin-id"
-    "lib.sh"
-    "nix-build"
-    "nix-dev"
-    "nix-gc"
-    "nix-gens"
-    "nix-rollback"
-    "nix-secrets"
-    "nix-tpl"
-    "nix-update"
-  ];
+
+  scriptsDir = ./scripts;
+  scripts = builtins.readDir scriptsDir;
+  excludedScripts = [ "lib.sh" ];
+  pathScripts = lib.filter
+    (name: scripts.${name} == "regular" && !(builtins.elem name excludedScripts))
+    (builtins.attrNames scripts);
 in
 {
   options.${namespace}.core.user = with types; {
@@ -46,15 +40,20 @@ in
 
       sessionPath = [ "$HOME/.local/bin" ];
 
-      file = lib.listToAttrs (map
+      file = {
+        ".local/bin/lib.sh" = {
+          source = "${scriptsDir}/lib.sh";
+          executable = false;
+        };
+      } // lib.listToAttrs (map
         (script: {
           name = ".local/bin/${script}";
           value = {
-            source = ./scripts/${script};
-            executable = script != "lib.sh";
+            source = "${scriptsDir}/${script}";
+            executable = true;
           };
         })
-        userScripts);
+        pathScripts);
 
       packages = with pkgs; [
         nix-prefetch
