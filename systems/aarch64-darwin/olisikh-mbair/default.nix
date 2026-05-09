@@ -32,7 +32,6 @@ in
       betterdisplay = enabled;
       codexbar = enabled;
       repobar = enabled;
-      peekaboo = enabled;
       discord = enabled;
       telegram = enabled;
     };
