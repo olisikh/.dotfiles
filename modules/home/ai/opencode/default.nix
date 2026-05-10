@@ -30,6 +30,11 @@ in
     home = {
       file = {
         ".config/opencode/config.json".source = configFile;
+        ".config/zsh/init.d/opencode.zsh".text =
+          # zsh
+          ''
+            eval "$(opencode completion)"
+          '';
       };
 
       sessionVariables = {

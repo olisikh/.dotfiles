@@ -38,11 +38,11 @@ in
             command -v $1 >/dev/null 2>&1
           }
 
-          cmd kafkactl && eval "$(kafkactl completion zsh)"
-          cmd fzf && eval "$(fzf --zsh)"
-          cmd pay-respects && eval "$(pay-respects zsh)"
-          cmd opencode && eval "$(opencode completion)"
           cmd determinate-nixd && eval "$(determinate-nixd completion zsh)"
+
+          for file in "$HOME/.config/zsh/init.d"/*.zsh(N); do
+            source "$file"
+          done
 
           # Preferred editor for local and remote sessions
           if [[ -n $SSH_CONNECTION ]]; then

@@ -11,6 +11,14 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.pay-respects ];
+    home = {
+      packages = [ pkgs.pay-respects ];
+
+      file.".config/zsh/init.d/pay-respects.zsh".text =
+        # zsh
+        ''
+          eval "$(pay-respects zsh)"
+        '';
+    };
   };
 }

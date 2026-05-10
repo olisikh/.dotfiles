@@ -11,6 +11,14 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.kafkactl ];
+    home = {
+      packages = [ pkgs.kafkactl ];
+
+      file.".config/zsh/init.d/kafkactl.zsh".text =
+        # zsh
+        ''
+          eval "$(kafkactl completion zsh)"
+        '';
+    };
   };
 }
