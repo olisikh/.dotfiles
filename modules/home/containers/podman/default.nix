@@ -11,6 +11,14 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.podman ];
+    home = {
+      packages = [ pkgs.podman ];
+
+      file.".config/zsh/init.d/podman.zsh".text =
+        # zsh
+        ''
+          alias p="podman"
+        '';
+    };
   };
 }

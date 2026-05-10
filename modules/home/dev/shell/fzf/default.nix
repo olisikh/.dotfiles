@@ -20,5 +20,11 @@ in
         "--color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
       ];
     };
+
+    home.file.".config/zsh/init.d/fzf.zsh".text =
+      # zsh
+      ''
+        alias h="history | fzf | awk '{$1=\"\"; print substr($0, 2)}' | sh"
+      '';
   };
 }

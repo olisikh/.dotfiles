@@ -11,6 +11,16 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.eza ];
+    home = {
+      packages = [ pkgs.eza ];
+
+      file.".config/zsh/init.d/eza.zsh".text =
+        # zsh
+        ''
+          alias ls="exa"
+          alias ll="exa -alh"
+          alias tree="exa --tree"
+        '';
+    };
   };
 }

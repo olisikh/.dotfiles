@@ -15,5 +15,11 @@ in
       enable = true;
       enableZshIntegration = true;
     };
+
+    home.file.".config/zsh/init.d/zoxide.zsh".text =
+      # zsh
+      ''
+        alias zz="z -"
+      '';
   };
 }

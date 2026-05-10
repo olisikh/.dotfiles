@@ -72,20 +72,6 @@ in
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
           zstyle ':completion:*' menu no
 
-          zstyle ':fzf-tab:*' use-fzf-default-opts yes
-          zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-
-          export LIBRARY_PATH="${pkgs.libiconv}/lib:$LIBRARY_PATH";
-
-          # aliases 
-          alias zz="z -"
-          alias ls="exa"
-          alias ll="exa -alh"
-          alias tree="exa --tree"
-          alias h="history | fzf | awk '{$1=\"\"; print substr($0, 2)}' | sh"
-          alias p="podman"
-          alias ts="tailscale"
-
           # keep user-installed binaries in PATH
           export PATH="$HOME/.local/bin:$PATH"
 
@@ -93,23 +79,6 @@ in
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
         '';
 
-      antidote = {
-        enable = true;
-        useFriendlyNames = true;
-
-        plugins = [
-          "zsh-users/zsh-completions"
-          "zsh-users/zsh-autosuggestions"
-          "zsh-users/zsh-syntax-highlighting"
-          "chisui/zsh-nix-shell"
-          "nix-community/nix-zsh-completions"
-          "ohmyzsh/ohmyzsh path:plugins/git"
-          "ohmyzsh/ohmyzsh path:plugins/aws"
-          "ohmyzsh/ohmyzsh path:plugins/kubectl"
-          "ohmyzsh/ohmyzsh path:plugins/terraform"
-          "Aloxaf/fzf-tab"
-        ];
-      };
     };
   };
 }

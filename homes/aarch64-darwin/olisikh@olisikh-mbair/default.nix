@@ -43,6 +43,7 @@ in
       git = enabled;
       shell = {
         zsh = enabled;
+        antidote = enabled;
         direnv = enabled;
         fzf = enabled;
         ripgrep = enabled;
