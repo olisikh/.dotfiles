@@ -72,10 +72,10 @@ in
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
           zstyle ':completion:*' menu no
 
-          # keep user-installed binaries in PATH
+          # add user-installed binaries in PATH
           export PATH="$HOME/.local/bin:$PATH"
 
-          # overrides for work
+          # source a local .zshrc.local file for extra customizations
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
         '';
 
