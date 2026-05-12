@@ -6,6 +6,14 @@
       fzf-native.enable = true;
       ui-select.enable = true;
     };
+    settings.defaults = {
+      layout_strategy = "vertical";
+      layout_config = {
+        prompt_position = "bottom";
+        mirror = false;
+        preview_height = 0.6;
+      };
+    };
   };
 
   keymaps = [

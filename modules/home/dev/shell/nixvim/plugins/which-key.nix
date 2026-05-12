@@ -1,7 +1,7 @@
 { ... }:
 {
   plugins = {
-    "which-key" = {
+    which-key = {
       enable = true;
       settings = {
         spelling = {

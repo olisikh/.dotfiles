@@ -1,8 +1,12 @@
 { ... }:
 {
-
   plugins.fff = {
     enable = true;
+    settings.layout = {
+      prompt_position = "bottom";
+      preview_position = "top";
+      preview_size = 0.6;
+    };
   };
 
   keymaps = [
