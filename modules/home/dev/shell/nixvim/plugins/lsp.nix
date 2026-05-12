@@ -1,4 +1,4 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins = {
     lsp = {
@@ -159,7 +159,7 @@
     })
   '';
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
     {
       key = "grx";

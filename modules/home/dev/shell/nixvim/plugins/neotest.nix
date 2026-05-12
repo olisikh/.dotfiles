@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, namespaceLib, ... }:
 let
   # TODO: override these plugins in vimPlugins?
   neotest-scala = (pkgs.vimUtils.buildVimPlugin {
@@ -105,8 +105,7 @@ in
     };
   };
 
-  keymaps =
-    [
+  keymaps = namespaceLib.nixvimKeymaps [
       # NOTE: NeoTest
       # nmap('<leader>tr', neotest.run.run, { desc = 'neotest: run nearest test' })
       {

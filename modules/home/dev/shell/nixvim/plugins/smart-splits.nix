@@ -1,15 +1,13 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins.smart-splits.enable = true;
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     {
       key = "<A-h>";
       action = ":lua require('smart-splits').resize_left()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: Resize split left";
       };
     }
@@ -18,8 +16,6 @@
       action = ":lua require('smart-splits').resize_down()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: Resize split down";
       };
     }
@@ -28,8 +24,6 @@
       action = ":lua require('smart-splits').resize_up()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: Resize split up";
       };
     }
@@ -38,8 +32,6 @@
       action = ":lua require('smart-splits').resize_right()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: Resize split right";
       };
     }
@@ -48,8 +40,6 @@
       action = ":lua require('smart-splits').move_cursor_left()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: jump left";
       };
     }
@@ -58,8 +48,6 @@
       action = ":lua require('smart-splits').move_cursor_down()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: jump down";
       };
     }
@@ -68,8 +56,6 @@
       action = ":lua require('smart-splits').move_cursor_up()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: jump up";
       };
     }
@@ -78,8 +64,6 @@
       action = ":lua require('smart-splits').move_cursor_right()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: jump right";
       };
     }
@@ -88,8 +72,6 @@
       action = ":lua require('smart-splits').swap_buf_left()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: swap buffer left";
       };
     }
@@ -98,8 +80,6 @@
       action = ":lua require('smart-splits').swap_buf_down()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: swap buffer down";
       };
     }
@@ -108,8 +88,6 @@
       action = ":lua require('smart-splits').swap_buf_up()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: swap buffer up";
       };
     }
@@ -118,8 +96,6 @@
       action = ":lua require('smart-splits').swap_buf_right()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "window: swap buffer right";
       };
     }

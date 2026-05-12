@@ -1,9 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, namespaceLib, ... }:
 {
 
   extraPlugins = [ pkgs.vimPlugins.nvim-jdtls ];
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # nmap('<leader>jv', function() jdtls.extract_variable() end, { desc = 'jdtls: extract [v]ariable' })
     {
       key = "<leader>cev";

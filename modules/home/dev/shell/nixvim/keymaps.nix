@@ -1,5 +1,5 @@
-{ ... }: {
-  keymaps = [
+{ namespaceLib, ... }: {
+  keymaps = namespaceLib.nixvimKeymaps [
     # -- Make sure Space is not mapped to anything, used as leader key
     # map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
     # map('n', '<esc>', '<nop>', { silent = true })
@@ -7,17 +7,11 @@
       key = "<Space>";
       action = "<nop>";
       mode = ["n" "v"];
-      options = {
-        silent = true;
-      };
     }
     {
       key = "<Esc>";
       action = "<nop>";
       mode = "n";
-      options = {
-        silent = true;
-      };
     }
 
     # -- Shift Q to do nothing, avoid weirdness
@@ -26,9 +20,6 @@
       key = "Q";
       action = ":lua vim.lsp.buf.signature_help()<cr>";
       mode = "n";
-      options = {
-        silent = true;
-      };
     }
 
     #
@@ -41,7 +32,6 @@
       mode = "n";
       options = {
         expr = true;
-        silent = true;
       };
     }
     {
@@ -50,7 +40,6 @@
       mode = "n";
       options = {
         expr = true;
-        silent = true;
       };
     }
 
@@ -191,37 +180,21 @@
       key = "<C-w>>";
       action = ":vertical resize +10<cr>";
       mode = "n";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<C-w><";
       action = ":vertical resize -10<cr>";
       mode = "n";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<C-w>+";
       action = ":horizontal resize +5<cr>";
       mode = "n";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<C-w>-";
       action = ":horizontal resize -5<cr>";
       mode = "n";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     #
     # -- Shift line or block right and left
@@ -233,37 +206,21 @@
       key = "<Tab>";
       action = ">>";
       mode = "n";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<S-Tab>";
       action = "<<";
       mode = "n";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<Tab>";
       action = ">gv";
       mode = "v";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<S-Tab>";
       action = "<gv";
       mode = "v";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
 
     #
@@ -274,53 +231,31 @@
       key = "<C-i>";
       action = "<C-i>";
       mode = "n";
-      options = {
-        noremap = true;
-      };
     }
     {
       key = "<C-o>";
       action = "<C-o>";
       mode = "n";
-      options = {
-        noremap = true;
-      };
     }
     {
       key = "<Up>";
       action = "<Nop>";
       mode = "i";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<Down>";
       action = "<Nop>";
       mode = "i";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<Left>";
       action = "<Nop>";
       mode = "i";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<Right>";
       action = "<Nop>";
       mode = "i";
-      options = {
-        noremap = true;
-        silent = true;
-      };
     }
     {
       key = "<leader>bd";

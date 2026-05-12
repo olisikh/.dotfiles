@@ -1,4 +1,4 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins."todo-comments" = {
     enable = true;
@@ -12,7 +12,7 @@
   };
 
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # nmap('<leader>st', ':TodoTelescope<cr>', { desc = 'todo: [s]earch [t]odos' })
     {
       key = "<leader>st";

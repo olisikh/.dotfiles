@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, namespaceLib, ... }:
 let
   jsConfigs = [
     {
@@ -166,7 +166,7 @@ in
     -- require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
   '';
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # NOTE: DAP
     #
     # nmap('<leader>db', dap.toggle_breakpoint, { desc = 'dap: set breakpoint' })

@@ -1,4 +1,4 @@
-{ pkgs, lib, namespace, config, hmConfig, ... }:
+{ pkgs, lib, namespace, namespaceLib, hmConfig, ... }:
 let
   cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.obsidian;
 in
@@ -22,7 +22,7 @@ in
       };
     };
 
-    keymaps = [
+    keymaps = namespaceLib.nixvimKeymaps [
       {
         key = "<leader>so";
         action = ":Obsidian search<cr>";

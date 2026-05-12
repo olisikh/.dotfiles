@@ -1,9 +1,9 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
 
   plugins.trouble.enable = true;
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # NOTE: Trouble
     # nmap('<leader>xx', '<cmd>Trouble diagnostics toggle filter.buf=0<cr>', { desc = 'trouble: document diagnostics' })
     {

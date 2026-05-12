@@ -11,6 +11,9 @@
 
     local dap = require("dap")
     local map = vim.keymap.set
+    local function map_opts(desc)
+      return { desc = desc, silent = true, remap = false }
+    end
 
     metals_config.tvp = {
       icons = {
@@ -48,28 +51,28 @@
       -- Metals specific mappings
       map("v", "<leader>ctr", function()
         metals.type_of_range()
-      end, { desc = "metals: see type of range" })
+      end, map_opts("metals: see type of range"))
       map("n", "<leader>chw", function()
         metals.hover_worksheet({ border = "single" })
-      end, { desc = "metals: hover worksheet" })
+      end, map_opts("metals: hover worksheet"))
       map("n", "<leader>ctv", function()
         metals_tvp.toggle_tree_view()
-      end, { desc = "metals: toggle tree view" })
+      end, map_opts("metals: toggle tree view"))
       map("n", "<leader>ctR", function()
         metals_tvp.reveal_in_tree()
-      end, { desc = "metals: tree reveal" })
+      end, map_opts("metals: tree reveal"))
       map("n", "<leader>cts", function()
         metals.toggle_setting("showImplicitArguments")
-      end, { desc = "metals: show implicit args" })
+      end, map_opts("metals: show implicit args"))
       map("n", "<leader>cmc", function()
         require("telescope").extensions.metals.commands()
-      end, { desc = "metals: open commands" })
+      end, map_opts("metals: open commands"))
       map("n", "<leader>csf", function()
         metals.run_scalafix()
-      end, { desc = "metals: scalafix" })
+      end, map_opts("metals: scalafix"))
       map("n", "<leader>co", function()
         metals.organize_imports()
-      end, { desc = "metals: [o]rganise imports" })
+      end, map_opts("metals: [o]rganise imports"))
 
       -- nvim-dap
       dap.configurations.scala = {

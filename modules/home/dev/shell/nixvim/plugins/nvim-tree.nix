@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, namespaceLib, ... }:
 {
   plugins = {
     # NOTE: :h nvim-tree for more settings,
@@ -33,7 +33,7 @@
     };
   };
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
     {
       key = "<leader>ft";
@@ -41,7 +41,6 @@
       mode = "n";
       options = {
         desc = "nvim-tree: toggle";
-        noremap = true;
       };
     }
     # nmap('<leader>O', ':NvimTreeFindFile<cr>', { desc = 'nvim-tree: locale file in a tree', noremap = true })
@@ -51,7 +50,6 @@
       mode = "n";
       options = {
         desc = "nvim-tree: navigate to file";
-        noremap = true;
       };
     }
   ];

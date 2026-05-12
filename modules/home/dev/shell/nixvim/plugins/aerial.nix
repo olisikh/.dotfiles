@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, namespaceLib, ... }:
 {
   plugins.aerial = {
     enable = true;
@@ -10,14 +10,15 @@
         # lua
         ''
           function(bufnr)
-            vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-            vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+            local opts = { buffer = bufnr, silent = true, remap = false }
+            vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", opts)
+            vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", opts)
           end
         '';
     };
   };
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     {
       mode = "n";
       key = "<leader>co";
@@ -28,4 +29,3 @@
     }
   ];
 }
-

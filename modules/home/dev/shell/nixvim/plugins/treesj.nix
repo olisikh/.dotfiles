@@ -1,4 +1,4 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins.treesj = {
     enable = true;
@@ -7,7 +7,7 @@
     };
   };
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     {
       key = "<leader>j";
       action = ":lua require('treesj').toggle()<cr>";

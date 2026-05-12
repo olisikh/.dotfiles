@@ -1,4 +1,4 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins.telescope = {
     enable = true;
@@ -11,14 +11,12 @@
     };
   };
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     {
       key = "<leader>?";
       action = ":lua require('telescope.builtin').oldfiles()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: recent files";
       };
     }
@@ -27,8 +25,6 @@
       action = ":lua require('telescope.builtin').buffers()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: buffers";
       };
     }
@@ -37,8 +33,6 @@
       action = ":lua require('telescope.builtin').git_files()<cr>";
       mode = "n";
       options = { 
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch git [f]iles";
       };
     }
@@ -47,8 +41,6 @@
       action = ":lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({ winblend = 10, previewer = false }))<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch [b]uffer";
       };
     }
@@ -57,8 +49,6 @@
       action = ":lua require('telescope.builtin').help_tags()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch [h]elp";
       };
     }
@@ -67,8 +57,6 @@
       action = ":lua require('telescope.builtin').grep_string()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch [w]ord";
       };
     }
@@ -77,8 +65,6 @@
       action = ":lua require('telescope.builtin').lsp_document_symbols()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch [s]ymbols";
       };
     }
@@ -87,8 +73,6 @@
       action = ":lua require('telescope.builtin').lsp_workspace_symbols()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch workspace [S]ymbols";
       };
     }
@@ -97,8 +81,6 @@
       action = ":lua require('telescope.builtin').diagnostics()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch [d]iagnostics";
       };
     }
@@ -107,8 +89,6 @@
       action = ":lua require('telescope.builtin').keymaps()<cr>";
       mode = "n";
       options = {
-        silent = true;
-        noremap = true;
         desc = "telescope: [s]earch [k]eymaps";
       };
     }

@@ -4,19 +4,20 @@
   ];
 
   extraConfigLua = ''
+    local opts = { silent = true, remap = false }
+
     vim.keymap.set(
       'n',
       '<leader>lr',
       '<cmd>CellularAutomaton make_it_rain<cr>',
-      { desc = 'cellular-automaton: Make it rain' }
+      vim.tbl_extend('force', opts, { desc = 'cellular-automaton: Make it rain' })
     );
 
     vim.keymap.set(
       'n',
       '<leader>lg',
       '<cmd>CellularAutomaton game_of_life<cr>',
-      { desc = 'cellular-automaton: Game of Life' }
+      vim.tbl_extend('force', opts, { desc = 'cellular-automaton: Game of Life' })
     );
   '';
 }
-

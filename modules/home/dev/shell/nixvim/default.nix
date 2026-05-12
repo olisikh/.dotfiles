@@ -54,6 +54,7 @@ in
       _module.args = {
         # NOTE: propagate inputs to each module imported within this scope
         inherit inputs lib namespace system;
+        namespaceLib = lib.${namespace};
 
         # NOTE: use pkgs with applied snowfall overlays
         pkgs = lib.mkForce pkgs;

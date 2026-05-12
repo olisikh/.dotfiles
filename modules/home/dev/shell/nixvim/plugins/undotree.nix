@@ -1,4 +1,4 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins = {
     undotree = {
@@ -10,7 +10,7 @@
     };
   };
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     # nmap('<leader>u', vim.cmd.UndotreeToggle, { desc = 'open undo tree' })
     {
       key = "<leader>u";

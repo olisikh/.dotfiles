@@ -1,4 +1,4 @@
-{ ... }:
+{ namespaceLib, ... }:
 {
   plugins.fff = {
     enable = true;
@@ -9,7 +9,7 @@
     };
   };
 
-  keymaps = [
+  keymaps = namespaceLib.nixvimKeymaps [
     {
       key = "<leader>sp";
       action = ":lua require('fff').find_files()<cr>";
