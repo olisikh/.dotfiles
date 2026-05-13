@@ -30,7 +30,7 @@
           typescript = [ "prettierd" ];
           typescriptreact = [ "prettierd" ];
           graphql = [ "prettierd" ];
-          java = [ "google-java-format" ];
+          java = [ "aosp-java-format" ];
           json = [ "jq" ];
           jsonc = [ "jq" ];
           yaml = [ "yq" ];

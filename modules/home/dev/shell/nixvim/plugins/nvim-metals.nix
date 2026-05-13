@@ -23,7 +23,6 @@
     metals_config.settings = {
       defaultBspToBuildTool = true, -- use BSP, bloop sucks
       useGlobalExecutable = true,
-      autoImportBuild = "on",
       showImplicitArguments = true,
       enableSemanticHighlighting = false, -- fix highlight issues
       showImplicitConversionsAndClasses = true,
