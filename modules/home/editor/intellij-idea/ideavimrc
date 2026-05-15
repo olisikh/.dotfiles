@@ -15,6 +15,8 @@ vnoremap <silent> <Space> <Nop>
 set scrolloff=5
 set incsearch
 set clipboard+=unnamedplus
+set visualbell
+set noerrorbells
 
 " IdeaVim mapping timeout behavior:
 " notimeout can make multi-key mappings awkward; use timeoutlen instead.
