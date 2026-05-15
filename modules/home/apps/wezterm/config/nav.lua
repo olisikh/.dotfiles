@@ -37,6 +37,14 @@ local function split_nav(resize_or_move, key)
 	}
 end
 
+-- Neovim writes an OSC 1337 SetUserVar sequence instead of spawning wezterm cli,
+-- which avoids the subprocess startup cost (often seconds on Nix-managed binaries).
+w.on('user-var-changed', function(window, pane, name, value)
+	if name == 'navigate_direction' then
+		window:perform_action(w.action.ActivatePaneDirection(value), pane)
+	end
+end)
+
 local M = {}
 
 function M.apply_to_config(c)

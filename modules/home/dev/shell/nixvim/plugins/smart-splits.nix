@@ -1,103 +1,45 @@
-{ namespaceLib, ... }:
+{ ... }:
 {
   plugins.smart-splits.enable = true;
 
-  keymaps = namespaceLib.nixvimKeymaps [
-    {
-      key = "<A-h>";
-      action = ":lua require('smart-splits').resize_left()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: Resize split left";
-      };
-    }
-    {
-      key = "<A-j>";
-      action = ":lua require('smart-splits').resize_down()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: Resize split down";
-      };
-    }
-    {
-      key = "<A-k>";
-      action = ":lua require('smart-splits').resize_up()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: Resize split up";
-      };
-    }
-    {
-      key = "<A-l>";
-      action = ":lua require('smart-splits').resize_right()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: Resize split right";
-      };
-    }
-    {
-      key = "<C-h>";
-      action = ":lua require('smart-splits').move_cursor_left()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: jump left";
-      };
-    }
-    {
-      key = "<C-j>";
-      action = ":lua require('smart-splits').move_cursor_down()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: jump down";
-      };
-    }
-    {
-      key = "<C-k>";
-      action = ":lua require('smart-splits').move_cursor_up()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: jump up";
-      };
-    }
-    {
-      key = "<C-l>";
-      action = ":lua require('smart-splits').move_cursor_right()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: jump right";
-      };
-    }
-    {
-      key = "<leader><leader>h";
-      action = ":lua require('smart-splits').swap_buf_left()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: swap buffer left";
-      };
-    }
-    {
-      key = "<leader><leader>j";
-      action = ":lua require('smart-splits').swap_buf_down()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: swap buffer down";
-      };
-    }
-    {
-      key = "<leader><leader>k";
-      action = ":lua require('smart-splits').swap_buf_up()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: swap buffer up";
-      };
-    }
-    {
-      key = "<leader><leader>l";
-      action = ":lua require('smart-splits').swap_buf_right()<cr>";
-      mode = "n";
-      options = {
-        desc = "window: swap buffer right";
-      };
-    }
-  ];
+  extraConfigLua = ''
+    ;(function()
+      local ss = require('smart-splits')
+
+      local function wezterm_navigate(wez_dir)
+        if not vim.env.WEZTERM_UNIX_SOCKET then return end
+        local b64 = vim.base64.encode(wez_dir)
+        io.write(('\027]1337;SetUserVar=%s=%s\007'):format('navigate_direction', b64))
+        io.flush()
+      end
+
+      local function smart_move(nvim_dir, wez_dir)
+        local before = vim.api.nvim_get_current_win()
+        vim.cmd('wincmd ' .. nvim_dir)
+        if vim.api.nvim_get_current_win() == before then
+          wezterm_navigate(wez_dir)
+        end
+      end
+
+      local map = vim.keymap.set
+
+      -- move
+      map('n', '<C-h>', function() smart_move('h', 'Left') end,  { silent = true, desc = 'window: jump left' })
+      map('n', '<C-j>', function() smart_move('j', 'Down') end,  { silent = true, desc = 'window: jump down' })
+      map('n', '<C-k>', function() smart_move('k', 'Up') end,    { silent = true, desc = 'window: jump up' })
+      map('n', '<C-l>', function() smart_move('l', 'Right') end, { silent = true, desc = 'window: jump right' })
+
+      -- resize
+      map('n', '<A-h>', ss.resize_left,  { silent = true, desc = 'window: resize split left' })
+      map('n', '<A-j>', ss.resize_down,  { silent = true, desc = 'window: resize split down' })
+      map('n', '<A-k>', ss.resize_up,    { silent = true, desc = 'window: resize split up' })
+      map('n', '<A-l>', ss.resize_right, { silent = true, desc = 'window: resize split right' })
+
+      -- swap buffers
+      map('n', '<leader><leader>h', ss.swap_buf_left,  { silent = true, desc = 'window: swap buffer left' })
+      map('n', '<leader><leader>j', ss.swap_buf_down,  { silent = true, desc = 'window: swap buffer down' })
+      map('n', '<leader><leader>k', ss.swap_buf_up,    { silent = true, desc = 'window: swap buffer up' })
+      map('n', '<leader><leader>l', ss.swap_buf_right, { silent = true, desc = 'window: swap buffer right' })
+    end)()
+  '';
 }
