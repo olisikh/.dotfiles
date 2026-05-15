@@ -35,6 +35,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    direnv-instant = {
+      url = "github:Mic92/direnv-instant";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     snowfall-lib = {
       url = "github:snowfallorg/lib";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -85,6 +90,7 @@
       homes.modules = with inputs; [
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
+        direnv-instant.homeModules.direnv-instant
       ];
 
       alias.templates.default = "empty";

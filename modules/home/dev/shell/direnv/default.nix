@@ -1,4 +1,4 @@
-{ lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, ... }:
 let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
@@ -11,10 +11,17 @@ in
   };
 
   config = mkIf cfg.enable {
-    programs.direnv = {
-      enable = true;
-      enableZshIntegration = true;
-      nix-direnv.enable = true;
+    programs = {
+      direnv = {
+        enable = true;
+        enableZshIntegration = true;
+        nix-direnv.enable = true;
+      };
+
+      direnv-instant = {
+        enable = true;
+        enableZshIntegration = true;
+      };
     };
   };
 }
