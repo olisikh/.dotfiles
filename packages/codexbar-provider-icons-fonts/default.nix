@@ -2,13 +2,13 @@
 
 pkgs.stdenvNoCC.mkDerivation rec {
   pname = "codexbar-provider-icons-fonts";
-  version = "0.24";
+  version = "0.0.1";
 
   src = pkgs.fetchFromGitHub {
     owner = "steipete";
     repo = "CodexBar";
-    rev = "a2d53233";
-    sha256 = "0b7z73vv1x227snaqjq6j2pfbqgzn8zvhnyzyj80s8b4rnl46gb5";
+    rev = "a2d532335d2da10114e5fb6e41d4587fc673fabf";
+    sha256 = "sha256-ZT1DqM1kIQ2Q9N9buD+y/+HlrpAGS6ysPkL0sPc4/yw=";
   };
 
   nativeBuildInputs = [ pkgs.fontforge ];
