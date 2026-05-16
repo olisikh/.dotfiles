@@ -15,6 +15,7 @@ in
     fonts.packages = with pkgs; [
       nerd-fonts.jetbrains-mono
       sketchybar-app-font
+      pkgs.${namespace}.codexbar-provider-icons-fonts
     ];
 
     services.sketchybar = {
