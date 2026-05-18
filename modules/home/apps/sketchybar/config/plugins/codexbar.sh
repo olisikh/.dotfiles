@@ -218,10 +218,8 @@ format_popup_usage() {
 remaining_color() {
 	local min_remaining="$1"
 
-	if (( min_remaining <= 10 )); then
+	if (( min_remaining <= 30 )); then
 		printf '%s\n' "$RED"
-	elif (( min_remaining <= 30 )); then
-		printf '%s\n' "$ORANGE"
 	elif (( min_remaining <= 60 )); then
 		printf '%s\n' "$YELLOW"
 	else
@@ -229,12 +227,21 @@ remaining_color() {
 	fi
 }
 
+openrouter_balance_color() {
+	awk -v balance="$1" -v red="$RED" -v yellow="$YELLOW" -v green="$GREEN" 'BEGIN {
+		balance += 0
+		if (balance <= 5) print red
+		else if (balance <= 10) print yellow
+		else print green
+	}'
+}
+
 set_error() {
 	sketchybar --set "$NAME" \
 		icon="!" \
 		icon.font="$FONT:Bold:13.0" \
 		icon.drawing=on \
-		icon.color="$RED" \
+		icon.color="$WHITE" \
 		label.color="$RED" \
 		label="$1" \
 		label.drawing=on
@@ -326,7 +333,6 @@ while IFS= read -r provider_json; do
 	usage="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage")"
 	label_line1="${usage%%|*}"
 	label_line2="${usage#*|}"
-	display_name="$(provider_display_name "$provider")"
 	icon="$(provider_icon "$provider")"
 	min_remaining="$(awk \
 		-v a="$(remaining_percent "${primary:-}")" \
@@ -342,7 +348,11 @@ while IFS= read -r provider_json; do
 		if (min == 101) min = 100
 		printf "%d", min
 	}')"
-	color="$(remaining_color "$min_remaining")"
+	if [[ "$provider" = "openrouter" && -n "$openrouter_balance" ]]; then
+		color="$(openrouter_balance_color "$openrouter_balance")"
+	else
+		color="$(remaining_color "$min_remaining")"
+	fi
 	item="codexbar.${provider}"
 	background_color="$POPUP_BACKGROUND_COLOR"
 
@@ -351,7 +361,7 @@ while IFS= read -r provider_json; do
 		sketchybar --set codexbar \
 			icon="$icon" \
 			icon.font="$CODEXBAR_ICON_FONT" \
-			icon.color="$color" \
+			icon.color="$WHITE" \
 			icon.drawing=on
 		if [[ -n "$label_line2" ]]; then
 			sketchybar --set codexbar \
@@ -381,14 +391,13 @@ while IFS= read -r provider_json; do
 	fi
 
 	popup_usage="$(format_popup_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$label_line1" "$label_line2")"
-	popup_label="${display_name} ${popup_usage}"
 	sketchybar --set "$item" \
 		drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)" \
 		icon="$icon" \
 		icon.font="$CODEXBAR_ICON_FONT" \
-		icon.color="$color" \
+		icon.color="$WHITE" \
 		icon.drawing=on \
-		label="$popup_label" \
+		label="$popup_usage" \
 		label.color="$color" \
 		background.color="$background_color"
 done < <(printf '%s\n' "$json" | jq -c '.[]')

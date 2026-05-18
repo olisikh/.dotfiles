@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-COLOR="$CYAN"
+COLOR="$WHITE"
 CODEXBAR_ICON_FONT="CodexBar Provider Icons:Regular:15.0"
 CODEXBAR_LABEL_WIDTH=70
 CODEXBAR_ICON_MAP="$HOME/.config/sketchybar/helpers/codexbar_icon_map.sh"
@@ -142,7 +142,7 @@ for provider in "${CODEXBAR_PROVIDERS[@]}"; do
 		label.color="$LABEL_COLOR" \
 		label.padding_left=0 \
 		label.padding_right=12 \
-		label.width=250 \
+		label.width=160 \
 		label.align=left \
 		label.font="$FONT:Bold:12.0" \
 		background.color="$POPUP_BACKGROUND_COLOR" \
