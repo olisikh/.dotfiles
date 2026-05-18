@@ -4,6 +4,7 @@ source "$HOME/.config/sketchybar/variables.sh"
 
 CODEXBAR_BIN="${CODEXBAR_BIN:-$(command -v codexbar || true)}"
 CODEXBAR_ICON_FONT="CodexBar Provider Icons:Regular:15.0"
+CODEXBAR_LABEL_WIDTH=70
 STATE_DIR="$HOME/.cache/sketchybar"
 STATE_FILE="$STATE_DIR/codexbar_provider"
 CACHE_FILE="$STATE_DIR/codexbar_usage.json"
@@ -138,7 +139,7 @@ format_usage() {
 	local openrouter_key_limit="${10}"
 	local openrouter_key_usage="${11}"
 	local parts=()
-	local balance key_remaining label percent
+	local balance key_remaining percent
 
 	if [[ "$provider" = "openrouter" && -n "$openrouter_percent" ]]; then
 		if [[ -n "$openrouter_key_limit" && -n "$openrouter_key_usage" ]]; then
@@ -157,27 +158,32 @@ format_usage() {
 			percent="$(remaining_percent "$openrouter_percent")"
 			parts+=("$(format_percent "$percent")/key")
 		fi
-		printf '%s\n' "${parts[*]}"
-		return
-	fi
-
-	if [[ -n "$primary_percent" ]]; then
-		parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
-	fi
-
-	if [[ -n "$secondary_percent" ]]; then
-		parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(window_label "$secondary_window" "S")")
-	fi
-
-	if [[ -n "$tertiary_percent" ]]; then
-		parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(window_label "$tertiary_window" "T")")
-	fi
-
-	label="${parts[*]}"
-	if [[ -n "$label" ]]; then
-		printf '%s\n' "$label"
+	elif [[ "$provider" = "copilot" ]]; then
+		if [[ -n "$primary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")")
+		fi
 	else
-		printf '%s\n' "n/a"
+		if [[ -n "$primary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
+		fi
+
+		if [[ -n "$secondary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(window_label "$secondary_window" "S")")
+		fi
+
+		if [[ -n "$tertiary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(window_label "$tertiary_window" "T")")
+		fi
+	fi
+
+	# Output line1 and line2 separated by |
+	if [[ "${#parts[@]}" -eq 0 ]]; then
+		printf 'n/a|\n'
+	elif [[ "${#parts[@]}" -eq 1 ]]; then
+		printf '%s|\n' "${parts[0]}"
+	else
+		local rest=("${parts[@]:1}")
+		printf '%s|%s\n' "${parts[0]}" "${rest[*]}"
 	fi
 }
 
@@ -197,12 +203,15 @@ remaining_color() {
 
 set_error() {
 	sketchybar --set "$NAME" \
-		label.color="$RED" \
 		icon="!" \
 		icon.font="$FONT:Bold:13.0" \
 		icon.drawing=on \
 		icon.color="$RED" \
-		label="$1"
+		label.color="$RED" \
+		label="$1" \
+		label.drawing=on
+	sketchybar --set codexbar.l1 drawing=off
+	sketchybar --set codexbar.l2 drawing=off
 }
 
 mkdir -p "$STATE_DIR"
@@ -286,7 +295,9 @@ while IFS= read -r provider_json; do
 	openrouter_balance="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.balance // empty')"
 	openrouter_key_limit="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.keyLimit // empty')"
 	openrouter_key_usage="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.keyUsage // empty')"
-	label="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage")"
+	usage="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage")"
+	label_line1="${usage%%|*}"
+	label_line2="${usage#*|}"
 	display_name="$(provider_display_name "$provider")"
 	icon="$(provider_icon "$provider")"
 	min_remaining="$(awk \
@@ -313,18 +324,39 @@ while IFS= read -r provider_json; do
 			icon="$icon" \
 			icon.font="$CODEXBAR_ICON_FONT" \
 			icon.color="$color" \
-			icon.drawing=on \
-			label.color="$color" \
-			label="$label"
+			icon.drawing=on
+		if [[ -n "$label_line2" ]]; then
+			sketchybar --set codexbar \
+				label.drawing=off
+			sketchybar --set codexbar.l1 \
+				label.color="$color" \
+				label="$label_line1" \
+				label.width="$CODEXBAR_LABEL_WIDTH" \
+				y_offset=6 \
+				padding_right=-$CODEXBAR_LABEL_WIDTH \
+				drawing=on
+			sketchybar --set codexbar.l2 \
+				label.color="$color" \
+				label="$label_line2" \
+				drawing=on
+		else
+			sketchybar --set codexbar \
+				label.color="$color" \
+				label="$label_line1" \
+				label.drawing=on
+			sketchybar --set codexbar.l1 drawing=off
+			sketchybar --set codexbar.l2 drawing=off
+		fi
 	fi
 
+	popup_label="${display_name} ${label_line1}$([[ -n "$label_line2" ]] && printf ' %s' "$label_line2")"
 	sketchybar --set "$item" \
 		drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)" \
 		icon="$icon" \
 		icon.font="$CODEXBAR_ICON_FONT" \
 		icon.color="$color" \
 		icon.drawing=on \
-		label="${display_name} ${label}" \
+		label="$popup_label" \
 		label.color="$color" \
 		background.color="$background_color"
 done < <(printf '%s\n' "$json" | jq -c '.[]')
