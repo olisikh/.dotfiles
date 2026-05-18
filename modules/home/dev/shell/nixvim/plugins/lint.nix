@@ -13,7 +13,8 @@
         dockerfile = [ "hadolint" ];
         terraform = [ "tflint" ];
         python = [ "pylint" ];
-        java = [ "checkstyle" ];
+        # NOTE: disable checkstyle, until figure out how to tweak it
+        # java = [ "checkstyle" ];
       };
     };
   };
