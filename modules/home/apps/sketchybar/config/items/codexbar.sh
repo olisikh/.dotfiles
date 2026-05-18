@@ -3,6 +3,7 @@
 COLOR="$CYAN"
 CODEXBAR_ICON_FONT="CodexBar Provider Icons:Regular:15.0"
 CODEXBAR_LABEL_WIDTH=70
+CODEXBAR_ICON_MAP="$HOME/.config/sketchybar/helpers/codexbar_provider_icon_map.sh"
 CODEXBAR_PROVIDERS=(
 	codex
 	claude
@@ -36,43 +37,27 @@ CODEXBAR_PROVIDERS=(
 	codebuff
 )
 
-provider_icon_hex() {
+if [[ -f "$CODEXBAR_ICON_MAP" ]]; then
+	source "$CODEXBAR_ICON_MAP"
+fi
+
+provider_icon_key() {
 	case "$1" in
-	codex) printf '%s\n' "E000" ;;
-	claude) printf '%s\n' "E001" ;;
-	cursor) printf '%s\n' "E002" ;;
-	opencode) printf '%s\n' "E003" ;;
-	opencodego) printf '%s\n' "E004" ;;
-	alibaba-coding-plan) printf '%s\n' "E005" ;;
-	factory) printf '%s\n' "E006" ;;
-	gemini) printf '%s\n' "E007" ;;
-	antigravity) printf '%s\n' "E008" ;;
-	copilot) printf '%s\n' "E009" ;;
-	zai) printf '%s\n' "E00A" ;;
-	minimax) printf '%s\n' "E00B" ;;
-	kimi | kimik2) printf '%s\n' "E00C" ;;
-	kilo) printf '%s\n' "E00D" ;;
-	kiro) printf '%s\n' "E00E" ;;
-	vertexai) printf '%s\n' "E00F" ;;
-	augment) printf '%s\n' "E010" ;;
-	jetbrains) printf '%s\n' "E011" ;;
-	amp) printf '%s\n' "E012" ;;
-	ollama) printf '%s\n' "E013" ;;
-	synthetic) printf '%s\n' "E014" ;;
-	warp) printf '%s\n' "E015" ;;
-	openrouter) printf '%s\n' "E016" ;;
-	windsurf) printf '%s\n' "E017" ;;
-	perplexity) printf '%s\n' "E018" ;;
-	abacusai) printf '%s\n' "E019" ;;
-	mistral) printf '%s\n' "E01A" ;;
-	deepseek) printf '%s\n' "E01B" ;;
-	codebuff) printf '%s\n' "E01C" ;;
-	*) printf '%s\n' "E000" ;;
+	abacusai) printf '%s\n' "abacus" ;;
+	alibaba-coding-plan) printf '%s\n' "alibaba" ;;
+	kimik2) printf '%s\n' "kimi" ;;
+	*) printf '%s\n' "$1" ;;
 	esac
 }
 
 provider_icon() {
-	printf '%b' "\\u$(provider_icon_hex "$1")"
+	local icon_result=""
+
+	if declare -F __codexbar_provider_icon_map >/dev/null; then
+		__codexbar_provider_icon_map "$(provider_icon_key "$1")"
+	fi
+
+	printf '%s\n' "$icon_result"
 }
 
 # Bottom label (line 2) — rightmost, placed first for right-side ordering

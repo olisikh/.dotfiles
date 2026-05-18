@@ -2,42 +2,26 @@
 
 import os
 import sys
+from glob import glob
 
 import fontforge
 import psMat
 
 
-PROVIDERS = [
-    ("codex", "ProviderIcon-codex.svg"),
-    ("claude", "ProviderIcon-claude.svg"),
-    ("cursor", "ProviderIcon-cursor.svg"),
-    ("opencode", "ProviderIcon-opencode.svg"),
-    ("opencodego", "ProviderIcon-opencodego.svg"),
-    ("alibaba", "ProviderIcon-alibaba.svg"),
-    ("factory", "ProviderIcon-factory.svg"),
-    ("gemini", "ProviderIcon-gemini.svg"),
-    ("antigravity", "ProviderIcon-antigravity.svg"),
-    ("copilot", "ProviderIcon-copilot.svg"),
-    ("zai", "ProviderIcon-zai.svg"),
-    ("minimax", "ProviderIcon-minimax.svg"),
-    ("kimi", "ProviderIcon-kimi.svg"),
-    ("kilo", "ProviderIcon-kilo.svg"),
-    ("kiro", "ProviderIcon-kiro.svg"),
-    ("vertexai", "ProviderIcon-vertexai.svg"),
-    ("augment", "ProviderIcon-augment.svg"),
-    ("jetbrains", "ProviderIcon-jetbrains.svg"),
-    ("amp", "ProviderIcon-amp.svg"),
-    ("ollama", "ProviderIcon-ollama.svg"),
-    ("synthetic", "ProviderIcon-synthetic.svg"),
-    ("warp", "ProviderIcon-warp.svg"),
-    ("openrouter", "ProviderIcon-openrouter.svg"),
-    ("windsurf", "ProviderIcon-windsurf.svg"),
-    ("perplexity", "ProviderIcon-perplexity.svg"),
-    ("abacus", "ProviderIcon-abacus.svg"),
-    ("mistral", "ProviderIcon-mistral.svg"),
-    ("deepseek", "ProviderIcon-deepseek.svg"),
-    ("codebuff", "ProviderIcon-codebuff.svg"),
-]
+HEADER = """#!/usr/bin/env bash
+
+### START-OF-CODEXBAR-PROVIDER-ICON-MAP
+function __codexbar_provider_icon_map() {
+\tcase "$1" in
+"""
+
+FOOTER = """\t*)
+\t\ticon_result="$(printf '%b' '\\uE000')"
+\t\t;;
+\tesac
+}
+### END-OF-CODEXBAR-PROVIDER-ICON-MAP
+"""
 
 
 def fit_glyph(glyph):
@@ -76,12 +60,10 @@ def main():
     font.em = 1000
 
     glyph_map = []
+    icon_paths = sorted(glob(os.path.join(resource_dir, "ProviderIcon-*.svg")))
 
-    for index, (provider, filename) in enumerate(PROVIDERS):
-        path = os.path.join(resource_dir, filename)
-        if not os.path.exists(path):
-            continue
-
+    for index, path in enumerate(icon_paths):
+        provider = os.path.basename(path).removeprefix("ProviderIcon-").removesuffix(".svg")
         codepoint = 0xE000 + index
         glyph = font.createChar(codepoint, f"codexbar-{provider}")
         glyph.importOutlines(path)
@@ -90,9 +72,13 @@ def main():
 
     font.generate(f"{output_prefix}.ttf")
 
-    with open(f"{output_prefix}.tsv", "w", encoding="utf-8") as output:
+    with open(f"{output_prefix}.sh", "w", encoding="utf-8") as output:
+        output.write(HEADER)
         for provider, codepoint in glyph_map:
-            output.write(f"{provider}\t{codepoint:04X}\n")
+            output.write(f'\t"{provider}")\n')
+            output.write(f"\t\ticon_result=\"$(printf '%b' '\\u{codepoint:04X}')\"\n")
+            output.write("\t\t;;\n")
+        output.write(FOOTER)
 
 
 if __name__ == "__main__":

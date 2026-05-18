@@ -16,6 +16,7 @@ in
       ".config/sketchybar/plugins".source = ./config/plugins;
       ".config/sketchybar/sketchybarrc".source = ./config/sketchybarrc;
       ".config/sketchybar/variables.sh".source = ./config/variables.sh;
+      ".config/sketchybar/helpers/codexbar_provider_icon_map.sh".source = "${pkgs.${namespace}.codexbar-provider-icons-fonts}/bin/icon_map.sh";
       ".config/sketchybar/helpers/icon_map.sh".source = "${pkgs.sketchybar-app-font}/bin/icon_map.sh";
     };
   };

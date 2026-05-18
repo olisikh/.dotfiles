@@ -7,8 +7,8 @@ pkgs.stdenvNoCC.mkDerivation rec {
   src = pkgs.fetchFromGitHub {
     owner = "steipete";
     repo = "CodexBar";
-    rev = "a2d532335d2da10114e5fb6e41d4587fc673fabf";
-    sha256 = "sha256-ZT1DqM1kIQ2Q9N9buD+y/+HlrpAGS6ysPkL0sPc4/yw=";
+    rev = "8c29b3b867215058db0e0cdbb332c0d3c89819da";
+    sha256 = "sha256-AtOe2ZFySGOLmZ9N4Eo9gH7khFwpTHQxkHwNOXJvJiQ=";
   };
 
   nativeBuildInputs = [ pkgs.fontforge ];
@@ -25,8 +25,8 @@ pkgs.stdenvNoCC.mkDerivation rec {
     runHook preInstall
     install -Dm644 codexbar-provider-icons-fonts.ttf \
       $out/share/fonts/truetype/CodexBarProviderIcons.ttf
-    install -Dm644 codexbar-provider-icons-fonts.tsv \
-      $out/share/codexbar-provider-icons-fonts/glyphs.tsv
+    install -Dm755 codexbar-provider-icons-fonts.sh \
+      $out/bin/icon_map.sh
     runHook postInstall
   '';
 }
