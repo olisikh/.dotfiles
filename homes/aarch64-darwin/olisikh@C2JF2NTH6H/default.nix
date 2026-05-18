@@ -45,26 +45,34 @@ in
         yazi = enabled;
         nixvim = {
           enable = true;
-          plugins.nvim-java = {
-            enable = true;
-            runtimes = [
+          plugins = {
+            obsidian.workspaces = [
               {
-                name = "jdk17";
-                path = "/opt/jdk17";
-                default = true;
-              }
-              {
-                name = "jdk21";
-                path = "/opt/jdk21";
+                name = "default";
+                path = "~/notes";
               }
             ];
-            tools = {
-              jdk = {
-                path = "/opt/jdk21";
-                version = "21";
-              };
-              spring-boot-tools = {
-                enable = false;
+            nvim-java = {
+              enable = true;
+              runtimes = [
+                {
+                  name = "jdk17";
+                  path = "/opt/jdk17";
+                  default = true;
+                }
+                {
+                  name = "jdk21";
+                  path = "/opt/jdk21";
+                }
+              ];
+              tools = {
+                jdk = {
+                  path = "/opt/jdk21";
+                  version = "21";
+                };
+                spring-boot-tools = {
+                  enable = false;
+                };
               };
             };
           };

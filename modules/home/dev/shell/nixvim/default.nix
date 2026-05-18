@@ -44,7 +44,16 @@ in
           };
         };
       };
-      obsidian.enable = mkBoolOpt true "Enable obsidian plugin";
+      obsidian = {
+        enable = mkBoolOpt true "Enable obsidian plugin";
+        workspaces = mkOpt
+          (lib.types.listOf (lib.types.submodule {
+            options = {
+              name = mkOpt lib.types.str "" "Obsidian workspace name";
+              path = mkOpt lib.types.str "" "Obsidian vault path";
+            };
+          })) [ ] "Obsidian.nvim workspaces";
+      };
       copilot.enable = mkBoolOpt true "Enable copilot plugin";
     };
   };

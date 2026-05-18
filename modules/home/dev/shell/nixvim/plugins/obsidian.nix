@@ -10,13 +10,17 @@ in
         package = pkgs.vimPlugins.obsidian-nvim;
         doCheck = false;
         settings = {
+          inherit (cfg) workspaces;
+
           legacy_commands = false;
-          workspaces = [
-            {
-              name = "default";
-              path = "~/notes";
-            }
-          ];
+
+          # Keep inserted wikilinks readable now that note IDs are UUIDs.
+          # Default id-based links would be:
+          #   [[7bce18a9-92eb-4a33-a22a-e8bdd91b8629|Raise of AI]]
+          # Path-based links stay human-friendly:
+          #   [[10 Work/Raise of AI|Raise of AI]]
+          wiki_link_func = lib.nixvim.mkRaw ''require("obsidian.builtin").wiki_link_path_prefix'';
+
           # Builds the file stem/path for new notes from the typed title.
           # Input -> output examples:
           #   "Buying a house in NL" -> "Buying a house in NL.md"
@@ -77,7 +81,7 @@ in
                     :gsub("^.*/", "")
                 end
 
-                local title = clean(metadata.title or note.title or basename(note.id))
+                local title = clean(metadata.title or note.title or basename(note.path or note.id))
                 local existing_id = clean(metadata.id or note.id)
                 local function should_preserve_id(value)
                   return value:match("^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$") ~= nil

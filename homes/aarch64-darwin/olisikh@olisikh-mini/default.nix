@@ -116,7 +116,15 @@ in
       ripgrep = enabled;
       starship = enabled;
       yazi = enabled;
-      nixvim = enabled;
+      nixvim = {
+        enable = true;
+        plugins.obsidian.workspaces = [
+          {
+            name = "default";
+            path = "~/notes";
+          }
+        ];
+      };
       fd = enabled;
       eza = enabled;
       jq = enabled;
