@@ -127,6 +127,10 @@ format_usage() {
 	local balance key_remaining percent
 
 	if [[ "$provider" = "openrouter" && -n "$openrouter_percent" ]]; then
+		if [[ -n "$openrouter_balance" ]]; then
+			balance="$(awk -v value="$openrouter_balance" 'BEGIN { printf "$%.2f", value }')"
+			parts+=("$balance")
+		fi
 		if [[ -n "$openrouter_key_limit" && -n "$openrouter_key_usage" ]]; then
 			key_remaining="$(awk -v limit="$openrouter_key_limit" -v usage="$openrouter_key_usage" 'BEGIN {
 				remaining = limit - usage
@@ -135,10 +139,6 @@ format_usage() {
 			}')"
 			parts+=("$key_remaining")
 		fi
-		if [[ -n "$openrouter_balance" ]]; then
-			balance="$(awk -v value="$openrouter_balance" 'BEGIN { printf "$%.2f", value }')"
-			parts+=("$balance")
-		fi
 		if [[ "${#parts[@]}" -eq 0 ]]; then
 			percent="$(remaining_percent "$openrouter_percent")"
 			parts+=("$(format_percent "$percent")/key")
@@ -146,6 +146,21 @@ format_usage() {
 	elif [[ "$provider" = "copilot" ]]; then
 		if [[ -n "$primary_percent" ]]; then
 			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")")
+		fi
+	elif [[ "$provider" = "opencodego" ]]; then
+		if [[ -n "$primary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
+		fi
+
+		local compact=()
+		if [[ -n "$secondary_percent" ]]; then
+			compact+=("$(format_percent "$(remaining_percent "$secondary_percent")")")
+		fi
+		if [[ -n "$tertiary_percent" ]]; then
+			compact+=("$(format_percent "$(remaining_percent "$tertiary_percent")")")
+		fi
+		if [[ "${#compact[@]}" -gt 0 ]]; then
+			parts+=("${compact[*]}")
 		fi
 	else
 		if [[ -n "$primary_percent" ]]; then
@@ -169,6 +184,34 @@ format_usage() {
 	else
 		local rest=("${parts[@]:1}")
 		printf '%s|%s\n' "${parts[0]}" "${rest[*]}"
+	fi
+}
+
+format_popup_usage() {
+	local provider="$1"
+	local primary_percent="$2"
+	local primary_window="$3"
+	local secondary_percent="$4"
+	local secondary_window="$5"
+	local tertiary_percent="$6"
+	local tertiary_window="$7"
+	local label_line1="$8"
+	local label_line2="$9"
+	local parts=()
+
+	if [[ "$provider" = "opencodego" ]]; then
+		if [[ -n "$primary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
+		fi
+		if [[ -n "$secondary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(window_label "$secondary_window" "S")")
+		fi
+		if [[ -n "$tertiary_percent" ]]; then
+			parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(window_label "$tertiary_window" "T")")
+		fi
+		printf '%s\n' "${parts[*]}"
+	else
+		printf '%s%s\n' "$label_line1" "$([[ -n "$label_line2" ]] && printf ' %s' "$label_line2")"
 	fi
 }
 
@@ -219,7 +262,7 @@ mouse.entered)
 	fi
 	exit 0
 	;;
-mouse.exited | mouse.exited.global)
+mouse.exited.global)
 	sketchybar --set codexbar popup.drawing=off
 	exit 0
 	;;
@@ -312,6 +355,7 @@ while IFS= read -r provider_json; do
 			icon.drawing=on
 		if [[ -n "$label_line2" ]]; then
 			sketchybar --set codexbar \
+				icon.padding_right=6 \
 				label.drawing=off
 			sketchybar --set codexbar.l1 \
 				label.color="$color" \
@@ -326,15 +370,18 @@ while IFS= read -r provider_json; do
 				drawing=on
 		else
 			sketchybar --set codexbar \
+				icon.padding_right=6 \
 				label.color="$color" \
 				label="$label_line1" \
+				label.padding_left=0 \
 				label.drawing=on
 			sketchybar --set codexbar.l1 drawing=off
 			sketchybar --set codexbar.l2 drawing=off
 		fi
 	fi
 
-	popup_label="${display_name} ${label_line1}$([[ -n "$label_line2" ]] && printf ' %s' "$label_line2")"
+	popup_usage="$(format_popup_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$label_line1" "$label_line2")"
+	popup_label="${display_name} ${popup_usage}"
 	sketchybar --set "$item" \
 		drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)" \
 		icon="$icon" \
