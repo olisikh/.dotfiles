@@ -11,7 +11,7 @@ import psMat
 HEADER = """#!/usr/bin/env bash
 
 ### START-OF-CODEXBAR-PROVIDER-ICON-MAP
-function __codexbar_provider_icon_map() {
+function __codexbar_icon_map() {
 \tcase "$1" in
 """
 

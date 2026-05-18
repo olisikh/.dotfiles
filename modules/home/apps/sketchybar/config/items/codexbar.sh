@@ -3,7 +3,7 @@
 COLOR="$CYAN"
 CODEXBAR_ICON_FONT="CodexBar Provider Icons:Regular:15.0"
 CODEXBAR_LABEL_WIDTH=70
-CODEXBAR_ICON_MAP="$HOME/.config/sketchybar/helpers/codexbar_provider_icon_map.sh"
+CODEXBAR_ICON_MAP="$HOME/.config/sketchybar/helpers/codexbar_icon_map.sh"
 CODEXBAR_PROVIDERS=(
 	codex
 	claude
@@ -53,8 +53,8 @@ provider_icon_key() {
 provider_icon() {
 	local icon_result=""
 
-	if declare -F __codexbar_provider_icon_map >/dev/null; then
-		__codexbar_provider_icon_map "$(provider_icon_key "$1")"
+	if declare -F __codexbar_icon_map >/dev/null; then
+		__codexbar_icon_map "$(provider_icon_key "$1")"
 	fi
 
 	printf '%s\n' "$icon_result"
