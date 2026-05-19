@@ -49,6 +49,7 @@ in
 
     ai = {
       ollama = enabled;
+      cursor = enabled;
     };
   };
 
