@@ -15,6 +15,7 @@ in
       (python3.withPackages (ps: with ps; [
         pytest
         debugpy
+        pyyaml
       ]))
     ];
   };
