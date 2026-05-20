@@ -5,8 +5,8 @@ pkgs.vimUtils.buildVimPlugin {
   src = pkgs.fetchFromGitHub {
     owner = "olisikh";
     repo = "nvim-java";
-    rev = "d5db275b7649f4377fb7527daa9002f7bf212a09";
-    hash = "sha256-5wkHJCFYB7pkDKU6EJ3UvTCKvCZiKkdWt7ypne1Yx04=";
+    rev = "6739851e2316a9fb1b9997986978b4a36c795462";
+    hash = "sha256-ImvffGAeUjKgmXFNMWyZHDI7bsWnXG3yFZJIDmUVBGw=";
   };
   dependencies = with pkgs.vimPlugins; [
     nui-nvim

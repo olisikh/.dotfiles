@@ -10,10 +10,16 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    extraPlugins = with pkgs.${namespace}; [ nvim-java nvim-spring-boot ];
+    extraPlugins = with pkgs.${namespace}; [
+      nvim-java
+      nvim-spring-boot
+    ];
 
     extraConfigLua = ''
       require("java").setup({
+        experimental = {
+          fix_generated_sources = true,
+        },
         jdtls = {
           path = "${cfg.tools.jdtls.path}",
           version = "${cfg.tools.jdtls.version}",
@@ -40,6 +46,14 @@ in
           path = "${cfg.tools.jdk.path}",
           auto_install = false,
           version = "${cfg.tools.jdk.version}"
+        },
+        log = {
+          use_console = true,
+          use_file = true,
+          level = 'info',
+          log_file = vim.fn.stdpath('state') .. '/nvim-java.log',
+          max_lines = 4000,
+          show_location = false
         }
       });
     '';
