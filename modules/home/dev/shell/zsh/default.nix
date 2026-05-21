@@ -72,13 +72,15 @@ in
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
           zstyle ':completion:*' menu no
 
+          # open home-manager options help (like darwin-help)
+          alias hm-help="open https://nix-community.github.io/home-manager/options.xhtml"
+
           # add user-installed binaries in PATH
           export PATH="$HOME/.local/bin:$PATH"
 
           # source a local .zshrc.local file for extra customizations
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
         '';
-
     };
   };
 }
