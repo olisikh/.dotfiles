@@ -62,6 +62,8 @@ in
       enable = true;
       settings = {
         java = {
+          referencesCodeLens.enabled = false;
+          implementationsCodeLens.enabled = false;
           configuration = {
             runtimes = map runtimeToJdtls cfg.runtimes;
           };
