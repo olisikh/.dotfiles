@@ -1,4 +1,4 @@
-{ lib, namespace, ... }:
+{ lib, namespace, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled disabled;
 in
@@ -51,12 +51,41 @@ in
         yazi = enabled;
         nixvim = {
           enable = true;
-          plugins.obsidian.workspaces = [
-            {
-              name = "default";
-              path = "~/notes";
-            }
-          ];
+          plugins = {
+            obsidian = {
+              workspaces = [
+                {
+                  name = "default";
+                  path = "~/notes";
+                }
+              ];
+            };
+
+            nvim-java = {
+              enable = true;
+              runtimes = [
+                {
+                  name = "jdk17";
+                  path = "${pkgs.jdk17}";
+                }
+                {
+                  name = "jdk21";
+                  path = "${pkgs.jdk21}";
+                }
+                {
+                  name = "jdk25";
+                  path = "${pkgs.jdk25}";
+                  default = true;
+                }
+              ];
+              tools = {
+                jdk = {
+                  path = "${pkgs.jdk25}";
+                  version = "25";
+                };
+              };
+            };
+          };
         };
         fd = enabled;
         eza = enabled;
