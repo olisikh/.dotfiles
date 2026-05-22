@@ -99,7 +99,7 @@ sketchybar --add item codexbar.l1 right \
 # Icon item — leftmost in the group
 sketchybar --add item codexbar right \
 	--set codexbar \
-	update_freq=300 \
+	update_freq=60 \
 	icon="$(provider_icon codex)" \
 	icon.font="$CODEXBAR_ICON_FONT" \
 	icon.color="$COLOR" \

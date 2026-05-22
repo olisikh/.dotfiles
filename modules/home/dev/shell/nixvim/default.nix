@@ -32,8 +32,8 @@ in
             version = mkOpt lib.types.str "25" "JDK version used by nvim-java";
           };
           jdtls = {
-            path = mkOpt lib.types.str "${pkgs.jdt-language-server}/share/java/jdtls" "jdtls path used by nvim-java";
-            version = mkOpt lib.types.str "1.58.0" "jdtls version used by nvim-java";
+            path = mkOpt lib.types.str "${pkgs.${namespace}.jdt-language-server}/share/java/jdtls" "jdtls path used by nvim-java";
+            version = mkOpt lib.types.str "1.59.0" "jdtls version used by nvim-java";
           };
           java-test.path = mkOpt lib.types.str "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test" "Java test extension path used by nvim-java";
           java-debug.path = mkOpt lib.types.str "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug" "Java debug extension path used by nvim-java";
@@ -95,7 +95,7 @@ in
       extraPackages = with pkgs; [
         gcc
         fzf
-        jdt-language-server
+        pkgs.${namespace}.jdt-language-server
         vscode-extensions.vscjava.vscode-java-debug
         vscode-extensions.vscjava.vscode-java-test
         vscode-extensions.ms-python.debugpy
