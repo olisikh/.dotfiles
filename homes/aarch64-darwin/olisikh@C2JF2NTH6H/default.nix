@@ -56,6 +56,10 @@ in
               enable = true;
               runtimes = [
                 {
+                  name = "jdk11";
+                  path = "/opt/jdk11";
+                }
+                {
                   name = "jdk17";
                   path = "/opt/jdk17";
                   default = true;
@@ -64,14 +68,15 @@ in
                   name = "jdk21";
                   path = "/opt/jdk21";
                 }
+                {
+                  name = "jdk25";
+                  path = "/opt/jdk25";
+                }
               ];
               tools = {
                 jdk = {
-                  path = "/opt/jdk21";
-                  version = "21";
-                };
-                spring-boot-tools = {
-                  enable = false;
+                  path = "/opt/jdk25";
+                  version = "25";
                 };
               };
             };
