@@ -70,11 +70,34 @@
           (lib.nixvim.mkRaw ''
             (function()
               local in_git = Snacks.git.get_root() ~= nil
+              local function is_gh_repo()
+                local remotes = vim.trim(vim.fn.system("git remote 2>/dev/null"))
+                local remote_list = vim.split(remotes, "\n", { plain = true })
+                if #remote_list == 0 or (#remote_list == 1 and remote_list[1] == "") then
+                  return false
+                end
+                if #remote_list == 1 then
+                  return true
+                end
+                -- multiple remotes: require gh repo set-default to have been run
+                vim.fn.system("git config --get gh-resolved.base-repo 2>/dev/null")
+                return vim.v.shell_error == 0
+              end
+              local in_github = in_git and is_gh_repo()
+              local function with_timeout(seconds, cmd)
+                return vim.list_extend({
+                  "perl",
+                  "-e",
+                  "alarm shift @ARGV; exec @ARGV;",
+                  tostring(seconds),
+                }, cmd)
+              end
+
               local cmds = {
                 {
                   icon = " ",
                   title = "Pull Requests",
-                  cmd = "gh pr list -L 5",
+                  cmd = with_timeout(1, { "gh", "pr", "list", "-L", "5" }),
                   key = "P",
                   action = function()
                     vim.fn.jobstart("gh pr list --web", { detach = true })
@@ -84,7 +107,7 @@
                 {
                   icon = " ",
                   title = "Open Issues",
-                  cmd = "gh issue list -L 5",
+                  cmd = with_timeout(1, { "gh", "issue", "list", "-L", "5" }),
                   key = "i",
                   action = function()
                     vim.fn.jobstart("gh issue list --web", { detach = true })
@@ -96,7 +119,7 @@
               return vim.tbl_map(function(cmd)
                 return vim.tbl_extend("force", {
                   section = "terminal",
-                  enabled = in_git,
+                  enabled = in_github,
                   padding = 1,
                   ttl = 5 * 60,
                   indent = 3,

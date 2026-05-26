@@ -92,5 +92,21 @@
         desc = "telescope: [s]earch [k]eymaps";
       };
     }
+    {
+      key = "<leader>sp";
+      action = ":lua require('telescope.builtin').find_files()<cr>";
+      mode = "n";
+      options = {
+        desc = "telescope: [s]earch [p]roject files";
+      };
+    }
+    {
+      key = "<leader>sg";
+      action = ":lua require('telescope.builtin').live_grep()<cr>";
+      mode = "n";
+      options = {
+        desc = "telescope: [s]earch [g]rep";
+      };
+    }
   ];
 }

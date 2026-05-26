@@ -26,8 +26,43 @@ let
     };
     dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
   });
+  neotest-maven = (pkgs.vimUtils.buildVimPlugin {
+    name = "neotest-maven";
+    src = pkgs.fetchFromGitHub {
+      owner = "lucas-garcia-rubio";
+      repo = "neotest-maven";
+      rev = "3fc7b6743c4d9c659653150926838376190230c7";
+      hash = "sha256-VSn7Ae0KaHkF5fWf+8l6QOVdqrm9lfAwDxdh05JiOfg=";
+    };
+    dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
+  });
 in
 {
+  extraPlugins = [ neotest-maven ];
+
+  extraConfigLuaPost = ''
+    do
+      local ok_config, neotest_config = pcall(require, "neotest.config")
+      local ok_maven, maven_adapter = pcall(require, "neotest-maven")
+
+      if ok_config and ok_maven then
+        neotest_config.adapters = neotest_config.adapters or {}
+
+        local has_maven = false
+        for _, adapter in ipairs(neotest_config.adapters) do
+          if type(adapter) == "table" and adapter.name == "neotest-maven" then
+            has_maven = true
+            break
+          end
+        end
+
+        if not has_maven then
+          table.insert(neotest_config.adapters, maven_adapter)
+        end
+      end
+    end
+  '';
+
   plugins = {
     neotest = {
       enable = true;

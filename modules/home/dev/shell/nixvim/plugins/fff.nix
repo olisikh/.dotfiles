@@ -1,7 +1,7 @@
 { namespaceLib, ... }:
 {
   plugins.fff = {
-    enable = true;
+    enable = false;
     settings.layout = {
       prompt_position = "bottom";
       preview_position = "top";
