@@ -16,23 +16,23 @@ let
       neotest
     ];
   });
-  neotest-gradle = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-gradle";
+  neotest-java = (pkgs.vimUtils.buildVimPlugin {
+    name = "neotest-java";
     src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-gradle";
-      rev = "cfb5d5d7d193631fc2a60244adc78313561c5d0d";
-      hash = "sha256-u+A9yQDSEYOGD9Bw6umoS1MnTkPE5DJSo/PtSI04Lt8=";
+      owner = "lucas-garcia-rubio";
+      repo = "neotest-java";
+      rev = "c8b824acd15f0f7350abf90ab4494e5beee6370c";
+      hash = "sha256-HE2IW520SGMh7sK3dOs7IMaV6HRsFXcohQDFyaHBJVw=";
     };
     dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
   });
   neotest-maven = (pkgs.vimUtils.buildVimPlugin {
     name = "neotest-maven";
     src = pkgs.fetchFromGitHub {
-      owner = "lucas-garcia-rubio";
+      owner = "olisikh";
       repo = "neotest-maven";
-      rev = "3fc7b6743c4d9c659653150926838376190230c7";
-      hash = "sha256-VSn7Ae0KaHkF5fWf+8l6QOVdqrm9lfAwDxdh05JiOfg=";
+      rev = "63c17048d895c943862adc2fc267b9beaa2ccb68";
+      hash = "sha256-5ErbUN3UAtebJPYXjQOKVe4/EFjWVGT79hJr760071Y=";
     };
     dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
   });
@@ -132,122 +132,122 @@ in
         rust.enable = true; # NOTE: rustacean's neotest integration is used instead
         vitest.enable = true;
         jest.enable = true;
-        gradle = {
-          enable = true;
-          package = neotest-gradle;
+        java = {
+          enable = false;
+          package = neotest-java;
         };
       };
     };
   };
 
   keymaps = namespaceLib.nixvimKeymaps [
-      # NOTE: NeoTest
-      # nmap('<leader>tr', neotest.run.run, { desc = 'neotest: run nearest test' })
-      {
-        key = "<leader>tr";
-        action = ":lua require('neotest').run.run()<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: run nearest test";
-        };
-      }
-      # nmap('<leader>td', function() neotest.run.run({ strategy = 'dap' }) end, { desc = 'neotest: debug nearest test' })
-      {
-        key = "<leader>td";
-        action = ":lua require('neotest').run.run({strategy = 'dap' })<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: debug nearest test";
-        };
-      }
-      # nmap('<leader>tR', function() neotest.run.run(vim.fn.expand('%')) end, { desc = 'neotest: run current file' })
-      {
-        key = "<leader>tR";
-        action = ":lua require('neotest').run.run(vim.fn.expand('%'))<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: run tests in buffer";
-        };
-      }
-      # nmap('<leader>tD', function() neotest.run.run({ vim.fn.expand('%'), strategy = 'dap' }) end, { desc = 'neotest: debug current file' })
-      {
-        key = "<leader>tD";
-        action = ":lua require('neotest').run.run({ vim.fn.expand('%'), strategy = 'dap' })<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: debug tests in buffer";
-        };
-      }
-      # nmap('<leader>ta', neotest.run.attach, { desc = 'neotest: attach to nearest test' })
-      {
-        key = "<leader>ta";
-        action = ":lua require('neotest').run.attach()<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: attach to nearest test";
-        };
-      }
-      # nmap('<leader>tS', neotest.summary.toggle, { desc = 'neotest: toggle test summary' })
-      {
-        key = "<leader>ti";
-        action = ":lua require('neotest').summary.toggle()<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: toggle test info";
-        };
-      }
-      # nmap('<leader>ts', neotest.run.stop, { desc = 'neotest: stop nearest test' })
-      {
-        key = "<leader>ts";
-        action = ":lua require('neotest').run.stop()<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: stop nearest test";
-        };
-      }
-      # nmap('<leader>to', neotest.output_panel.toggle, { desc = 'neotest: open output panel' })
-      {
-        key = "<leader>to";
-        action = ":lua require('neotest').output_panel.toggle()<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: toggle test output";
-        };
-      }
-      # nmap('<leader>tO', function() neotest.output.open({ enter = true }) end, { desc = 'neotest: open output floating window' })
-      {
-        key = "<leader>tO";
-        action = ":lua require('neotest').output.panel({ enter = true })<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: toggle test output (floating window)";
-        };
-      }
-      # nmap('[t', function() neotest.jump.prev({ status = 'failed' }) end, { desc = 'neotest: jump to prev failed test' })
-      {
-        key = "[t";
-        action = ":lua require('neotest').jump.prev({ status = 'failed' })<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: jump to prev failed test";
-        };
-      }
-      # nmap(']t', function() neotest.jump.next({ status = 'failed' }) end, { desc = 'neotest: jump to prev failed test' })
-      {
-        key = "]t";
-        action = ":lua require('neotest').jump.next({ stauts = 'failed' })<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: jump to next failed test";
-        };
-      }
-      {
-        key = "<leader>tS";
-        action = ":lua require('neotest').summary.toggle()<cr>";
-        mode = "n";
-        options = {
-          desc = "neotest: [t]est [S]ummary";
-        };
-      }
-    ];
+    # NOTE: NeoTest
+    # nmap('<leader>tr', neotest.run.run, { desc = 'neotest: run nearest test' })
+    {
+      key = "<leader>tr";
+      action = ":lua require('neotest').run.run()<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: run nearest test";
+      };
+    }
+    # nmap('<leader>td', function() neotest.run.run({ strategy = 'dap' }) end, { desc = 'neotest: debug nearest test' })
+    {
+      key = "<leader>td";
+      action = ":lua require('neotest').run.run({strategy = 'dap' })<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: debug nearest test";
+      };
+    }
+    # nmap('<leader>tR', function() neotest.run.run(vim.fn.expand('%')) end, { desc = 'neotest: run current file' })
+    {
+      key = "<leader>tR";
+      action = ":lua require('neotest').run.run(vim.fn.expand('%'))<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: run tests in buffer";
+      };
+    }
+    # nmap('<leader>tD', function() neotest.run.run({ vim.fn.expand('%'), strategy = 'dap' }) end, { desc = 'neotest: debug current file' })
+    {
+      key = "<leader>tD";
+      action = ":lua require('neotest').run.run({ vim.fn.expand('%'), strategy = 'dap' })<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: debug tests in buffer";
+      };
+    }
+    # nmap('<leader>ta', neotest.run.attach, { desc = 'neotest: attach to nearest test' })
+    {
+      key = "<leader>ta";
+      action = ":lua require('neotest').run.attach()<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: attach to nearest test";
+      };
+    }
+    # nmap('<leader>tS', neotest.summary.toggle, { desc = 'neotest: toggle test summary' })
+    {
+      key = "<leader>ti";
+      action = ":lua require('neotest').summary.toggle()<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: toggle test info";
+      };
+    }
+    # nmap('<leader>ts', neotest.run.stop, { desc = 'neotest: stop nearest test' })
+    {
+      key = "<leader>ts";
+      action = ":lua require('neotest').run.stop()<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: stop nearest test";
+      };
+    }
+    # nmap('<leader>to', neotest.output_panel.toggle, { desc = 'neotest: open output panel' })
+    {
+      key = "<leader>to";
+      action = ":lua require('neotest').output_panel.toggle()<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: toggle test output";
+      };
+    }
+    # nmap('<leader>tO', function() neotest.output.open({ enter = true }) end, { desc = 'neotest: open output floating window' })
+    {
+      key = "<leader>tO";
+      action = ":lua require('neotest').output.panel({ enter = true })<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: toggle test output (floating window)";
+      };
+    }
+    # nmap('[t', function() neotest.jump.prev({ status = 'failed' }) end, { desc = 'neotest: jump to prev failed test' })
+    {
+      key = "[t";
+      action = ":lua require('neotest').jump.prev({ status = 'failed' })<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: jump to prev failed test";
+      };
+    }
+    # nmap(']t', function() neotest.jump.next({ status = 'failed' }) end, { desc = 'neotest: jump to prev failed test' })
+    {
+      key = "]t";
+      action = ":lua require('neotest').jump.next({ stauts = 'failed' })<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: jump to next failed test";
+      };
+    }
+    {
+      key = "<leader>tS";
+      action = ":lua require('neotest').summary.toggle()<cr>";
+      mode = "n";
+      options = {
+        desc = "neotest: [t]est [S]ummary";
+      };
+    }
+  ];
 }

@@ -19,7 +19,7 @@ in
       };
 
       direnv-instant = {
-        enable = true;
+        enable = false; # NOTE: disabled because of race conditions (unpredictable PATH problem)
         enableZshIntegration = true;
       };
     };

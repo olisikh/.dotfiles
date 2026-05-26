@@ -4,7 +4,6 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.dev.shell.nixvim;
-  username = config.home.username;
 
   neovimNightlyPkg = inputs.nightly-neovim-overlay.packages.${system}.default;
 in
@@ -147,15 +146,15 @@ in
         vim.fn.mkdir(vim.o.undodir, "p")
 
         -- Auto-load all plugins from ~/Develop/nvim-plugins folder (my own convention).
-        local root = "/Users/${username}/Develop/nvim-plugins"
+        local root = vim.fn.expand("~/Develop/nvim-plugins")
 
         -- If you have nested dirs or want only some, adjust the pattern.
         for name, t in vim.fs.dir(root) do
           if t == "directory" then
             local p = root .. "/" .. name
 
-            -- Optional: ignore dot dirs
-            if name:sub(1, 1) ~= "." then
+            -- Optional: ignore dot dirs and __disabled plugins
+            if name:sub(1, 1) ~= "." and name:sub(1, 2) ~= "__" then
               -- Add plugin to runtimepath.
               -- Use prepend if you want local plugins to override Nix-provided ones.
               vim.opt.rtp:prepend(p)
