@@ -81,6 +81,8 @@ function M.apply_to_config(c)
 		{ mods = "LEADER", key = "7", action = w.action({ MoveTab = 6 }) },
 		{ mods = "LEADER", key = "8", action = w.action({ MoveTab = 7 }) },
 		{ mods = "LEADER", key = "9", action = w.action({ MoveTab = 8 }) },
+		{ mods = "LEADER", key = "LeftArrow", action = w.action.MoveTabRelative(-1) },
+		{ mods = "LEADER", key = "RightArrow", action = w.action.MoveTabRelative(1) },
 
 		-- map a tab
 		{ mods = "LEADER", key = "c", action = w.action({ SpawnTab = "CurrentPaneDomain" }) },
