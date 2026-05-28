@@ -64,6 +64,9 @@ in
         java = {
           referencesCodeLens.enabled = false;
           implementationsCodeLens.enabled = false;
+          settings = {
+            url = lib.nixvim.mkRaw ''"file://" .. vim.fn.stdpath("config") .. "/jdtls/org.eclipse.jdt.core.prefs"'';
+          };
           configuration = {
             runtimes = map runtimeToJdtls cfg.runtimes;
           };

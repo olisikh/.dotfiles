@@ -1,8 +1,13 @@
-{ ... }:
+{ lib, ... }:
 {
   plugins = {
     lint = {
       enable = true;
+      linters = {
+        checkstyle = {
+          config_file = lib.nixvim.mkRaw ''vim.fn.stdpath("config") .. "/checkstyle.xml"'';
+        };
+      };
       lintersByFt = {
         javascript = [ "eslint_d" ];
         typescript = [ "eslint_d" ];
@@ -13,8 +18,7 @@
         dockerfile = [ "hadolint" ];
         terraform = [ "tflint" ];
         python = [ "pylint" ];
-        # NOTE: disable checkstyle, until figure out how to tweak it
-        # java = [ "checkstyle" ];
+        java = [ "checkstyle" ];
       };
     };
   };

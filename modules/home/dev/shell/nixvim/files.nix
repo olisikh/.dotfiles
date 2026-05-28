@@ -2,6 +2,9 @@
 {
 
   extraFiles = {
+    "checkstyle.xml".source = ./checkstyle.xml;
+    "jdtls/org.eclipse.jdt.core.prefs".source = ./jdtls/org.eclipse.jdt.core.prefs;
+
     "ftplugin/terraform.lua".source = ./ftplugin/terraform.lua;
     "ftplugin/kotlin.lua".source = ./ftplugin/kotlin.lua;
     "ftplugin/graphql.lua".source = ./ftplugin/graphql.lua;
