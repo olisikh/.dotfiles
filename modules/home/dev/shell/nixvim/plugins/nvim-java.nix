@@ -64,8 +64,15 @@ in
         java = {
           referencesCodeLens.enabled = false;
           implementationsCodeLens.enabled = false;
+          format = {
+            enabled = true;
+            settings = {
+              url = lib.nixvim.mkRaw ''vim.fn.stdpath("config") .. "/jdtls/formatter.xml"'';
+              profile = "default";
+            };
+          };
           settings = {
-            url = lib.nixvim.mkRaw ''"file://" .. vim.fn.stdpath("config") .. "/jdtls/org.eclipse.jdt.core.prefs"'';
+            url = lib.nixvim.mkRaw ''vim.fn.stdpath("config") .. "/jdtls/org.eclipse.jdt.core.prefs"'';
           };
           configuration = {
             runtimes = map runtimeToJdtls cfg.runtimes;
