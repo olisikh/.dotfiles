@@ -18,7 +18,6 @@ in
       watch
       mkalias
       fastfetch
-      hyfetch
       git-lfs
       gh-dash
       terminal-notifier

@@ -32,7 +32,7 @@ let
       owner = "olisikh";
       repo = "neotest-maven";
       rev = "63c17048d895c943862adc2fc267b9beaa2ccb68";
-      hash = "sha256-5ErbUN3UAtebJPYXjQOKVe4/EFjWVGT79hJr760071Y=";
+      hash = "sha256-HE2IW520SGMh7sK3dOs7IMaV6HRsFXcohQDFyaHBJVw=";
     };
     dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
   });
