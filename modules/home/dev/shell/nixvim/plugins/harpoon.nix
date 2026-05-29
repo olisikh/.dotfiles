@@ -1,16 +1,4 @@
 { pkgs, ... }:
-let
-  harpoon-lualine = (pkgs.vimUtils.buildVimPlugin {
-    name = "harpoon-lualine";
-    src = pkgs.fetchFromGitHub {
-      owner = "letieu";
-      repo = "harpoon-lualine";
-      rev = "215c0847dfb787b19268f7b42eed83bdcf06b966";
-      hash = "sha256-HGbz/b2AVl8145BCy8I47dDrhBVMSQQIr+mWbOrmj5Q=";
-    };
-    dependencies = with pkgs.vimPlugins; [ lualine-nvim ];
-  });
-in
 {
 
   extraPlugins = with pkgs.vimPlugins; [ harpoon2 harpoon-lualine ];

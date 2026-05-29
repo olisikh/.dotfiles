@@ -1,44 +1,6 @@
 { pkgs, lib, namespaceLib, ... }:
-let
-  # TODO: override these plugins in vimPlugins?
-  neotest-scala = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-scala";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-scala";
-      rev = "a7ebaae13f889eac27db54d184a185ccf8a55fd9";
-      hash = "sha256-ErR/Anh1vofiI5KBIW1mRkGnEByg+4T75QQJX+csbzw=";
-    };
-    dependencies = with pkgs.vimPlugins; [
-      plenary-nvim
-      nvim-nio
-      nvim-treesitter-parsers.xml
-      neotest
-    ];
-  });
-  neotest-java = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-java";
-    src = pkgs.fetchFromGitHub {
-      owner = "lucas-garcia-rubio";
-      repo = "neotest-java";
-      rev = "c8b824acd15f0f7350abf90ab4494e5beee6370c";
-      hash = "sha256-HE2IW520SGMh7sK3dOs7IMaV6HRsFXcohQDFyaHBJVw=";
-    };
-    dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
-  });
-  neotest-maven = (pkgs.vimUtils.buildVimPlugin {
-    name = "neotest-maven";
-    src = pkgs.fetchFromGitHub {
-      owner = "olisikh";
-      repo = "neotest-maven";
-      rev = "63c17048d895c943862adc2fc267b9beaa2ccb68";
-      hash = "sha256-HE2IW520SGMh7sK3dOs7IMaV6HRsFXcohQDFyaHBJVw=";
-    };
-    dependencies = with pkgs.vimPlugins; [ plenary-nvim nvim-nio neotest ];
-  });
-in
 {
-  extraPlugins = [ neotest-maven ];
+  extraPlugins = with pkgs.vimPlugins; [ neotest-maven ];
 
   extraConfigLuaPost = ''
     do
@@ -122,7 +84,7 @@ in
         };
         scala = {
           enable = true;
-          package = neotest-scala; # NOTE: replace with my neotest-scala plugin
+          package = pkgs.vimPlugins.neotest-scala;
           settings = {
             log_run_spec = false;
             build_tool = "auto";
@@ -132,9 +94,13 @@ in
         rust.enable = true; # NOTE: rustacean's neotest integration is used instead
         vitest.enable = true;
         jest.enable = true;
+        gradle = {
+          enable = true;
+          package = pkgs.vimPlugins.neotest-gradle;
+        };
         java = {
           enable = false;
-          package = neotest-java;
+          package = pkgs.vimPlugins.neotest-java;
         };
       };
     };

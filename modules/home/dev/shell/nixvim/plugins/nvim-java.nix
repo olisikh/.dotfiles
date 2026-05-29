@@ -10,7 +10,7 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    extraPlugins = with pkgs.${namespace}; [
+    extraPlugins = with pkgs.vimPlugins; [
       nvim-java
       nvim-spring-boot
     ];

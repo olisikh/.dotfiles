@@ -1,19 +1,6 @@
 { pkgs, ... }:
-let
-  p99 = (pkgs.vimUtils.buildVimPlugin {
-    name = "99";
-    src = pkgs.fetchFromGitHub {
-      owner = "theprimeagen";
-      repo = "99";
-      rev = "4d229141546290746c82ac90f5afc2786865b5f3";
-      hash = "sha256-LQb5jqzTNWVyFNKlICjhnk25fTAmyC38s8/mrOKp//M=";
-    };
-    # TODO: uncomment if require check starts working again
-    doCheck = false;
-  });
-in
 {
-  extraPlugins = [ p99 ];
+  extraPlugins = [ pkgs.vimPlugins."99" ];
 
   extraConfigLua = ''
     local _99 = require("99")
@@ -71,7 +58,6 @@ in
     	--- /foo/AGENT.md
     	--- assuming that /foo is project root (based on cwd)
     	md_files = {
-            "AGENT.md",
             "AGENTS.md",
     	},
     })
@@ -80,10 +66,11 @@ in
       return { desc = desc, silent = true, remap = false }
     end
 
-    vim.keymap.set("n", "<leader>of", function() _99.fill_in_function() end, opts("99: fill in function"))
-    vim.keymap.set("n", "<leader>op", function() _99.fill_in_function_prompt() end, opts("99: fill in function (prompt)"))
-    vim.keymap.set("v", "<leader>ov", function() _99.visual() end, opts("99: visual (prompt)"))
-    vim.keymap.set("v", "<leader>ol", function() _99.view_logs() end, opts("99: view logs"))
-    vim.keymap.set("v", "<leader>os", function() _99.stop_all_requests() end, opts("99: stop all requests"))
+    vim.keymap.set("n", "<leader>9s", function() _99.search() end, opts("99: search"))
+    vim.keymap.set("n", "<leader>9o", function() _99.open() end, opts("99: open last result"))
+    vim.keymap.set("n", "<leader>9l", function() _99.view_logs() end, opts("99: view logs"))
+    vim.keymap.set("n", "<leader>9x", function() _99.stop_all_requests() end, opts("99: stop all requests"))
+    vim.keymap.set("n", "<leader>9c", function() _99.clear_previous_requests() end, opts("99: clear previous requests"))
+    vim.keymap.set("v", "<leader>9v", function() _99.visual() end, opts("99: visual"))
   '';
 }
