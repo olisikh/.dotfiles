@@ -34,6 +34,7 @@ in
       betterdisplay = enabled;
       codexbar = enabled;
       repobar = enabled;
+      bitwarden = enabled;
       peekaboo = enabled;
       telegram = enabled;
     };

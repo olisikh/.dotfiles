@@ -110,7 +110,6 @@ in
     browser.brave = enabled;
 
     apps = {
-      bitwarden = enabled;
       wezterm = enabled;
       sketchybar = enabled;
     };
