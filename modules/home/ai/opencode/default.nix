@@ -1,4 +1,4 @@
-{ lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
