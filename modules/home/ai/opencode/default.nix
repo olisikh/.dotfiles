@@ -25,7 +25,6 @@ let
   };
 
   finalConfig = recursiveUpdate basicConfig cfg.config;
-  configFile = pkgs.writeText "opencode-config.json" (builtins.toJSON finalConfig);
 in
 {
   options.${namespace}.ai.opencode = {
@@ -40,7 +39,7 @@ in
 
     home = {
       file = {
-        ".config/opencode/config.json".source = configFile;
+        ".config/opencode/config.json".text = builtins.toJSON finalConfig;
         ".config/opencode/CAVEMAN.md".text = builtins.readFile ./prompts/CAVEMAN.md;
         ".config/zsh/init.d/opencode.zsh".text =
           # zsh
