@@ -10,7 +10,7 @@ let
     autoupdate = false;
     autoshare = false;
     model = "opencode-go/kimi-k2.6";
-    small_model = "opencode-go/kimi-k2.6";
+    small_model = "opencode-go/deepseek-v4-flash";
     agent = {
       plan = {
         prompt = builtins.readFile ./prompts/PLAN.md;
