@@ -1,7 +1,6 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types;
-  inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.ai.opencode;
 
@@ -28,8 +27,8 @@ let
 in
 {
   options.${namespace}.ai.opencode = {
-    enable = mkBoolOpt false "Enable OpenCode program";
-    config = mkOpt types.attrs { } "OpenCode config attrset merged into the module's base config";
+    enable = lib.${namespace}.mkBoolOpt false "Enable OpenCode program";
+    config = lib.${namespace}.mkOpt types.attrs { } "OpenCode config attrset merged into the module's base config";
   };
 
   config = mkIf cfg.enable {
@@ -37,15 +36,16 @@ in
       enable = true;
     };
 
+    programs.zsh.initContent = lib.${namespace}.mkZshLate
+      # zsh
+      ''
+        eval "$(opencode completion)"
+      '';
+
     home = {
       file = {
         ".config/opencode/config.json".text = builtins.toJSON finalConfig;
         ".config/opencode/CAVEMAN.md".text = builtins.readFile ./prompts/CAVEMAN.md;
-        ".config/zsh/init.d/opencode.zsh".text =
-          # zsh
-          ''
-            eval "$(opencode completion)"
-          '';
       };
 
       sessionVariables = {

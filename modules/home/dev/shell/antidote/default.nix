@@ -1,14 +1,13 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.antidote;
   zshCfg = config.${namespace}.dev.shell.zsh;
 in
 {
   options.${namespace}.dev.shell.antidote = {
-    enable = mkBoolOpt false "Enable Antidote (zsh plugin manager)";
+    enable = lib.${namespace}.mkBoolOpt false "Enable Antidote (zsh plugin manager)";
   };
 
   config = mkIf cfg.enable {
@@ -35,7 +34,7 @@ in
       ];
     };
 
-    home.file.".config/zsh/init.d/fzf-tab.zsh".text =
+    programs.zsh.initContent = lib.${namespace}.mkZshEarly
       # zsh
       ''
         zstyle ':fzf-tab:*' use-fzf-default-opts yes

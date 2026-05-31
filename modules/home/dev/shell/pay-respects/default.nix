@@ -1,24 +1,21 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.pay-respects;
 in
 {
   options.${namespace}.dev.shell.pay-respects = {
-    enable = mkBoolOpt false "Enable pay-respects (command correction tool, thefuck alternative)";
+    enable = lib.${namespace}.mkBoolOpt false "Enable pay-respects (command correction tool, thefuck alternative)";
   };
 
   config = mkIf cfg.enable {
-    home = {
-      packages = [ pkgs.pay-respects ];
+    home.packages = [ pkgs.pay-respects ];
 
-      file.".config/zsh/init.d/pay-respects.zsh".text =
-        # zsh
-        ''
-          eval "$(pay-respects zsh)"
-        '';
-    };
+    programs.zsh.initContent = lib.${namespace}.mkZshLate
+      # zsh
+      ''
+        eval "$(pay-respects zsh)"
+      '';
   };
 }

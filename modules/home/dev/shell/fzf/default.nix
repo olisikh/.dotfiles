@@ -1,13 +1,12 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.fzf;
 in
 {
   options.${namespace}.dev.shell.fzf = {
-    enable = mkBoolOpt false "Enable fzf (fuzzy finder for files, history, and more)";
+    enable = lib.${namespace}.mkBoolOpt false "Enable fzf (fuzzy finder for files, history, and more)";
   };
 
   config = mkIf cfg.enable {
@@ -21,7 +20,7 @@ in
       ];
     };
 
-    home.file.".config/zsh/init.d/fzf.zsh".text =
+    programs.zsh.initContent = lib.${namespace}.mkZshLate
       # zsh
       ''
         alias h="history | fzf | awk '{$1=\"\"; print substr($0, 2)}' | sh"

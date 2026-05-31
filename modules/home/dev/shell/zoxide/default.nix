@@ -1,13 +1,12 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.zoxide;
 in
 {
   options.${namespace}.dev.shell.zoxide = {
-    enable = mkBoolOpt false "Enable zoxide (smarter cd command with learning)";
+    enable = lib.${namespace}.mkBoolOpt false "Enable zoxide (smarter cd command with learning)";
   };
 
   config = mkIf cfg.enable {
@@ -16,7 +15,7 @@ in
       enableZshIntegration = true;
     };
 
-    home.file.".config/zsh/init.d/zoxide.zsh".text =
+    programs.zsh.initContent = lib.${namespace}.mkZshLate
       # zsh
       ''
         alias zz="z -"

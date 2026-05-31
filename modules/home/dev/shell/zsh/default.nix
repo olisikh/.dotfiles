@@ -1,7 +1,6 @@
 { config, lib, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.zsh;
 
@@ -14,7 +13,7 @@ let
 in
 {
   options.${namespace}.dev.shell.zsh = {
-    enable = mkBoolOpt false "Enable zsh (Z shell with completions, autosuggestions, and syntax highlighting)";
+    enable = lib.${namespace}.mkBoolOpt false "Enable zsh (Z shell with completions, autosuggestions, and syntax highlighting)";
   };
 
   config = mkIf cfg.enable {
@@ -29,8 +28,8 @@ in
 
       dotDir = config.home.homeDirectory;
 
-      initContent =
-        # bash 
+      initContent = lib.${namespace}.mkZshMid
+        # bash
         ''
           source ${themes}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
@@ -39,10 +38,6 @@ in
           }
 
           cmd determinate-nixd && eval "$(determinate-nixd completion zsh)"
-
-          for file in "$HOME/.config/zsh/init.d"/*.zsh(N); do
-            source "$file"
-          done
 
           # Preferred editor for local and remote sessions
           if [[ -n $SSH_CONNECTION ]]; then

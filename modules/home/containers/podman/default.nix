@@ -1,24 +1,21 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.containers.podman;
 in
 {
   options.${namespace}.containers.podman = {
-    enable = mkBoolOpt false "Enable podman (container runtime)";
+    enable = lib.${namespace}.mkBoolOpt false "Enable podman (container runtime)";
   };
 
   config = mkIf cfg.enable {
-    home = {
-      packages = [ pkgs.podman ];
+    home.packages = [ pkgs.podman ];
 
-      file.".config/zsh/init.d/podman.zsh".text =
-        # zsh
-        ''
-          alias p="podman"
-        '';
-    };
+    programs.zsh.initContent = lib.${namespace}.mkZshLate
+      # zsh
+      ''
+        alias p="podman"
+      '';
   };
 }
