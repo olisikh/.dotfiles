@@ -1,8 +1,10 @@
-{ pkgs, lib, namespaceLib, ... }:
+{ lib, nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins.aerial = {
     enable = true;
-    package = pkgs.vimPlugins.aerial-nvim;
     doCheck = false;
 
     settings = {
@@ -18,7 +20,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     {
       mode = "n";
       key = "<leader>co";

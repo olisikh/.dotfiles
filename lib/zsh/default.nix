@@ -1,9 +1,12 @@
 { lib, ... }:
 with lib; {
 
-  # NOTE: zsh initContent ordering helpers
-  # lower number = earlier in .zshrc
-  mkZshEarly = content: mkOrder 500 content;
-  mkZshMid = content: mkOrder 1000 content;
-  mkZshLate = content: mkOrder 2000 content;
+  zsh = {
+
+    # NOTE: zsh initContent ordering helpers
+    # lower number = earlier in .zshrc
+    mkEarly = content: mkOrder 500 content;
+    mkMid = content: mkOrder 1000 content;
+    mkLate = content: mkOrder 2000 content;
+  };
 }

@@ -1,6 +1,7 @@
-{ lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, ... }:
 let
   inherit (lib) mkIf;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.dev.shell.fzf;
 in
@@ -20,7 +21,7 @@ in
       ];
     };
 
-    programs.zsh.initContent = lib.${namespace}.mkZshLate
+    programs.zsh.initContent = mkLate
       # zsh
       ''
         alias h="history | fzf | awk '{$1=\"\"; print substr($0, 2)}' | sh"

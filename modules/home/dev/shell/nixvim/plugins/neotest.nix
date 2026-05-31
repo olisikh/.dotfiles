@@ -1,4 +1,7 @@
-{ pkgs, lib, namespaceLib, ... }:
+{ pkgs, lib, nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   extraPlugins = with pkgs.vimPlugins; [ neotest-maven ];
 
@@ -106,7 +109,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     # NOTE: NeoTest
     # nmap('<leader>tr', neotest.run.run, { desc = 'neotest: run nearest test' })
     {

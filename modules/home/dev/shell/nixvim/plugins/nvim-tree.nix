@@ -1,4 +1,7 @@
-{ lib, namespaceLib, ... }:
+{ lib, nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins = {
     # NOTE: :h nvim-tree for more settings,
@@ -33,7 +36,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     # nmap('<leader>o', api.tree.toggle, { desc = 'nvim-tree: toggle', noremap = true })
     {
       key = "<leader>ft";

@@ -1,4 +1,7 @@
-{ namespaceLib, ... }:
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins.treesj = {
     enable = true;
@@ -7,7 +10,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     {
       key = "<leader>j";
       action = ":lua require('treesj').toggle()<cr>";

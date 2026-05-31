@@ -1,9 +1,12 @@
-{ namespaceLib, ... }:
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
 
   plugins.trouble.enable = true;
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     # NOTE: Trouble
     # nmap('<leader>xx', '<cmd>Trouble diagnostics toggle filter.buf=0<cr>', { desc = 'trouble: document diagnostics' })
     {

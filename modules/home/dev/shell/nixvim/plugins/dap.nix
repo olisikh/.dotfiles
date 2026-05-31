@@ -1,5 +1,6 @@
-{ pkgs, lib, namespaceLib, ... }:
+{ pkgs, lib, nsLib, ... }:
 let
+  inherit (nsLib.nixvim) mkKeymaps;
   jsConfigs = [
     {
       type = "pwa-node";
@@ -166,7 +167,7 @@ in
     -- require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
   '';
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     # NOTE: DAP
     #
     # nmap('<leader>db', dap.toggle_breakpoint, { desc = 'dap: set breakpoint' })

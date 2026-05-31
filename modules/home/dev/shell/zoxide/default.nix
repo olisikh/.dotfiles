@@ -1,6 +1,7 @@
-{ lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, ... }:
 let
   inherit (lib) mkIf;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.dev.shell.zoxide;
 in
@@ -15,7 +16,7 @@ in
       enableZshIntegration = true;
     };
 
-    programs.zsh.initContent = lib.${namespace}.mkZshLate
+    programs.zsh.initContent = mkLate
       # zsh
       ''
         alias zz="z -"

@@ -1,6 +1,7 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.ai.opencode;
 
@@ -36,7 +37,7 @@ in
       enable = true;
     };
 
-    programs.zsh.initContent = lib.${namespace}.mkZshLate
+    programs.zsh.initContent = mkLate
       # zsh
       ''
         eval "$(opencode completion)"

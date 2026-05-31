@@ -1,4 +1,7 @@
-{ namespaceLib, ... }:
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins.fff = {
     enable = false;
@@ -9,7 +12,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     {
       key = "<leader>sp";
       action = ":lua require('fff').find_files()<cr>";

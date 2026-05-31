@@ -1,4 +1,7 @@
-{ lib, namespaceLib, ... }:
+{ lib, nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   extraConfigLuaPre = ''
     local function format_duration_ms(ms)
@@ -132,7 +135,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     {
       key = "<leader>gg";
       action = '':lua require("snacks").lazygit.open()<cr>'';

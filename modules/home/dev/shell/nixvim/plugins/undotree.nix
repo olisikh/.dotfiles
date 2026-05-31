@@ -1,4 +1,7 @@
-{ namespaceLib, ... }:
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins = {
     undotree = {
@@ -10,7 +13,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     # nmap('<leader>u', vim.cmd.UndotreeToggle, { desc = 'open undo tree' })
     {
       key = "<leader>u";

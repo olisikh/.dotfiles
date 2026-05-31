@@ -1,4 +1,7 @@
-{ namespaceLib, ... }:
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins.telescope = {
     enable = true;
@@ -11,7 +14,7 @@
     };
   };
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     {
       key = "<leader>?";
       action = ":lua require('telescope.builtin').oldfiles()<cr>";

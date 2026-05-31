@@ -1,6 +1,6 @@
-{ pkgs, lib, namespace, hmConfig, ... }:
+{ pkgs, lib, nsConfig, ... }:
 let
-  cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.nvim-java;
+  cfg = nsConfig.dev.shell.nixvim.plugins.nvim-java;
 
   runtimeToJdtls = runtime: {
     inherit (runtime) name path;

@@ -1,13 +1,13 @@
-{ pkgs, lib, namespace, namespaceLib, hmConfig, ... }:
+{ lib, nsLib, nsConfig, ... }:
 let
-  cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.obsidian;
+  inherit (nsLib.nixvim) mkKeymaps;
+  cfg = nsConfig.dev.shell.nixvim.plugins.obsidian;
 in
 {
   config = lib.mkIf cfg.enable {
     plugins = {
       obsidian = {
         enable = true;
-        package = pkgs.vimPlugins.obsidian-nvim;
         doCheck = false;
         settings = {
           inherit (cfg) workspaces;
@@ -162,7 +162,7 @@ in
       };
     };
 
-    keymaps = namespaceLib.nixvimKeymaps [
+    keymaps = mkKeymaps [
       {
         key = "<leader>so";
         action = ":Obsidian search<cr>";

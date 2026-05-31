@@ -1,6 +1,7 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf;
+  inherit (lib.${namespace}.zsh) mkEarly;
 
   cfg = config.${namespace}.dev.shell.antidote;
   zshCfg = config.${namespace}.dev.shell.zsh;
@@ -34,7 +35,7 @@ in
       ];
     };
 
-    programs.zsh.initContent = lib.${namespace}.mkZshEarly
+    programs.zsh.initContent = mkEarly
       # zsh
       ''
         zstyle ':fzf-tab:*' use-fzf-default-opts yes

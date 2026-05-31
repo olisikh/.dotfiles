@@ -1,6 +1,7 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.dev.shell.eza;
 in
@@ -12,7 +13,7 @@ in
   config = mkIf cfg.enable {
     home.packages = [ pkgs.eza ];
 
-    programs.zsh.initContent = lib.${namespace}.mkZshLate
+    programs.zsh.initContent = mkLate
       # zsh
       ''
         alias ls="exa"

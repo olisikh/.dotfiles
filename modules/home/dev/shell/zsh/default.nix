@@ -1,6 +1,7 @@
 { config, lib, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
+  inherit (lib.${namespace}.zsh) mkMid;
 
   cfg = config.${namespace}.dev.shell.zsh;
 
@@ -28,7 +29,7 @@ in
 
       dotDir = config.home.homeDirectory;
 
-      initContent = lib.${namespace}.mkZshMid
+      initContent = mkMid
         # bash
         ''
           source ${themes}/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh

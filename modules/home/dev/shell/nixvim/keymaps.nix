@@ -1,12 +1,16 @@
-{ namespaceLib, ... }: {
-  keymaps = namespaceLib.nixvimKeymaps [
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
+{
+  keymaps = mkKeymaps [
     # -- Make sure Space is not mapped to anything, used as leader key
     # map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })
     # map('n', '<esc>', '<nop>', { silent = true })
     {
       key = "<Space>";
       action = "<nop>";
-      mode = ["n" "v"];
+      mode = [ "n" "v" ];
     }
     {
       key = "<Esc>";

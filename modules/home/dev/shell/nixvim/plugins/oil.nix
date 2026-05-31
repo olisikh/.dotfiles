@@ -1,8 +1,11 @@
-{ namespaceLib, ... }:
+{ nsLib, ... }:
+let
+  inherit (nsLib.nixvim) mkKeymaps;
+in
 {
   plugins.oil.enable = true;
 
-  keymaps = namespaceLib.nixvimKeymaps [
+  keymaps = mkKeymaps [
     # nmap('-', oil.open, { desc = 'oil: open parent directory' })
     {
       key = "-";

@@ -1,6 +1,7 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.dev.shell.pay-respects;
 in
@@ -12,7 +13,7 @@ in
   config = mkIf cfg.enable {
     home.packages = [ pkgs.pay-respects ];
 
-    programs.zsh.initContent = lib.${namespace}.mkZshLate
+    programs.zsh.initContent = mkLate
       # zsh
       ''
         eval "$(pay-respects zsh)"

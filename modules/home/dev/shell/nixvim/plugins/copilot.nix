@@ -1,6 +1,6 @@
-{ pkgs, lib, namespace, config, hmConfig, ... }:
+{ pkgs, lib, nsConfig, ... }:
 let
-  cfg = hmConfig.${namespace}.dev.shell.nixvim.plugins.copilot;
+  cfg = nsConfig.dev.shell.nixvim.plugins.copilot;
 in
 {
   config = lib.mkIf cfg.enable {

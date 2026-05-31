@@ -61,14 +61,12 @@ in
     programs.nixvim = {
       _module.args = {
         # NOTE: propagate inputs to each module imported within this scope
-        inherit inputs lib namespace system;
-        namespaceLib = lib.${namespace};
+        inherit inputs namespace system;
+        nsLib = lib.${namespace};
+        nsConfig = config.${namespace};
 
         # NOTE: use pkgs with applied snowfall overlays
         pkgs = lib.mkForce pkgs;
-
-        # NOTE: propagate home-manager config for modular plugins to access, fix circular dependency where plugins need config and config needs plugins
-        hmConfig = config;
       };
 
       enable = true;
