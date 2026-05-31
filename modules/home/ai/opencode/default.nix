@@ -5,6 +5,8 @@ let
 
   cfg = config.${namespace}.ai.opencode;
 
+  homeDir = config.home.homeDirectory;
+
   basicConfig = {
     theme = "catppuccin";
     autoupdate = false;
@@ -12,7 +14,7 @@ let
     model = "opencode-go/kimi-k2.6";
     small_model = "opencode-go/deepseek-v4-flash";
     instructions = [
-      "${config.home.homeDirectory}/.config/opencode/INSTRUCTIONS.md"
+      "${homeDir}/.config/opencode/CAVEMAN.md"
     ];
     agent = {
       plan.prompt = builtins.readFile ./prompts/PLAN.md;
@@ -39,7 +41,7 @@ in
     home = {
       file = {
         ".config/opencode/config.json".source = configFile;
-        ".config/opencode/INSTRUCTIONS.md".text = builtins.readFile ./prompts/INSTRUCTIONS.md;
+        ".config/opencode/CAVEMAN.md".text = builtins.readFile ./prompts/CAVEMAN.md;
         ".config/zsh/init.d/opencode.zsh".text =
           # zsh
           ''
@@ -48,7 +50,7 @@ in
       };
 
       sessionVariables = {
-        OPENCODE_CONFIG = "${config.home.homeDirectory}/.config/opencode/config.json";
+        OPENCODE_CONFIG = "${homeDir}/.config/opencode/config.json";
       };
     };
   };
