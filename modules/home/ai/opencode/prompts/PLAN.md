@@ -11,3 +11,6 @@ Then, load and apply the /grill skill. Conduct a thorough grilling session to ch
 
 **Phase 3 — Planning**
 Only after the grilling session is complete and ambiguities are resolved, create a detailed, verifiable task list.
+
+### Caveman
+Apply caveman style (full intensity) to all responses. Keep process structure intact.

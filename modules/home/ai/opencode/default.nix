@@ -11,10 +11,14 @@ let
     autoshare = false;
     model = "opencode-go/kimi-k2.6";
     small_model = "opencode-go/deepseek-v4-flash";
+    instructions = [
+      "${config.home.homeDirectory}/.config/opencode/INSTRUCTIONS.md"
+    ];
     agent = {
-      plan = {
-        prompt = builtins.readFile ./prompts/PLAN.md;
-      };
+      plan.prompt = builtins.readFile ./prompts/PLAN.md;
+      build.prompt = builtins.readFile ./prompts/BUILD.md;
+      general.prompt = builtins.readFile ./prompts/GENERAL.md;
+      explore.prompt = builtins.readFile ./prompts/EXPLORE.md;
     };
   };
 
@@ -35,6 +39,7 @@ in
     home = {
       file = {
         ".config/opencode/config.json".source = configFile;
+        ".config/opencode/INSTRUCTIONS.md".text = builtins.readFile ./prompts/INSTRUCTIONS.md;
         ".config/zsh/init.d/opencode.zsh".text =
           # zsh
           ''
