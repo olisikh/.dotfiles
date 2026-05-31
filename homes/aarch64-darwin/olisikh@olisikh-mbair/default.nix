@@ -107,7 +107,9 @@ in
       pulumi = enabled;
     };
 
-    browser.brave = enabled;
+    browser = {
+      brave = enabled;
+    };
 
     apps = {
       wezterm = enabled;

@@ -62,6 +62,7 @@ in
 
         # apps to ignore
         yabai -m rule --add app="^System (Preferences|Settings)$" manage=off
+        yabai -m rule --add app="^Finder$" manage=off
         yabai -m rule --add app="^Activity Monitor$" manage=off
         yabai -m rule --add app="^Archive Utility$" manage=off
         yabai -m rule --add app="^Creative Cloud$" manage=off
