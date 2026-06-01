@@ -96,5 +96,70 @@ final: prev: {
         hash = "sha256-JkOWlqyVLcwW7hxOGj5jb8BpUge3bUHbSV0o5qOYW1c=";
       };
     };
+
+    nvim-dap-ui = final.vimUtils.buildVimPlugin {
+      pname = "nvim-dap-ui";
+      version = "4.0.0-unstable-2026-04-05";
+      src = final.fetchFromGitHub {
+        owner = "rcarriga";
+        repo = "nvim-dap-ui";
+        rev = "1a66cabaa4a4da0be107d5eda6d57242f0fe7e49";
+        hash = "sha256-J/gUD4X//JtC2HB3HBeONivCQdMnXDnZJWd6jFF9+nk=";
+      };
+      dependencies = with final.vimPlugins; [ nvim-dap nvim-nio ];
+      doCheck = false;
+    };
+
+
+    # HACK: prevert SSL errors as nix fails to fetch these plugins from codeberg.org git repos.
+    nvim-dap-virtual-text = final.vimUtils.buildVimPlugin {
+      pname = "nvim-dap-virtual-text";
+      version = "0-unstable-2025-05-25";
+      src = final.fetchFromGitHub {
+        owner = "theHamsta";
+        repo = "nvim-dap-virtual-text";
+        rev = "fbdb48c2ed45f4a8293d0d483f7730d24467ccb6";
+        hash = "sha256-8hsk+EwnvoHCNhb0dcL9e4hQg9I+t/5Cy9ZoZgcz4fU=";
+      };
+      dependencies = with final.vimPlugins; [ nvim-dap nvim-treesitter ];
+      doCheck = false;
+    };
+
+    nvim-dap = final.vimUtils.buildVimPlugin {
+      pname = "nvim-dap";
+      version = "0.10.0-unstable-2026-05-20";
+      src = final.fetchFromGitHub {
+        owner = "mfussenegger";
+        repo = "nvim-dap";
+        rev = "531771530d4f82ad2d21e436e3cc052d68d7aebb";
+        hash = "sha256-pgD51NWFyjK1FrXZ8MFFIM9DX2OBxL7cd7JlST2Twvc=";
+      };
+      doCheck = false;
+    };
+
+    nvim-dap-python = final.vimUtils.buildVimPlugin {
+      pname = "nvim-dap-python";
+      version = "0-unstable-2025-12-20";
+      src = final.fetchFromGitHub {
+        owner = "mfussenegger";
+        repo = "nvim-dap-python";
+        rev = "1808458eba2b18f178f990e01376941a42c7f93b";
+        hash = "sha256-qqPoYmMPjK74Nyyl7TfsHnJCsIvOYFuQnKWn3Rh8FLU=";
+      };
+      doCheck = false;
+    };
+
+    nvim-lint = final.vimUtils.buildVimPlugin {
+      pname = "nvim-lint";
+      version = "05-unstable-2026-05-19";
+      src = final.fetchFromGitHub {
+        owner = "mfussenegger";
+        repo = "nvim-lint";
+        rev = "d48f3a76189d03b2239f6df1b2f7e3fa8353743b";
+        hash = "sha256-5mlNCE0KFGfJTocV5NMlczZMmZKGzxqVdUO23KVZ4O8=";
+      };
+      doCheck = false;
+    };
+
   };
 }
