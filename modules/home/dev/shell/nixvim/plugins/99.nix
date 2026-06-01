@@ -67,6 +67,7 @@
     end
 
     vim.keymap.set("n", "<leader>9s", function() _99.search() end, opts("99: search"))
+    vim.keymap.set("n", "<leader>9v", function() _99.vibe() end, opts("99: vibe"))
     vim.keymap.set("n", "<leader>9o", function() _99.open() end, opts("99: open last result"))
     vim.keymap.set("n", "<leader>9l", function() _99.view_logs() end, opts("99: view logs"))
     vim.keymap.set("n", "<leader>9x", function() _99.stop_all_requests() end, opts("99: stop all requests"))
