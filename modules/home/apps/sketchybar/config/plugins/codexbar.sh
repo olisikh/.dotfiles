@@ -111,6 +111,118 @@ window_label() {
 	esac
 }
 
+time_until_reset() {
+	local resets_at="$1"
+	local now_epoch resets_at_epoch remaining_minutes
+
+	if [[ -z "$resets_at" ]]; then
+		return 1
+	fi
+
+	now_epoch=$(date +%s)
+
+	if [[ "$resets_at" =~ Z$ ]]; then
+		resets_at_epoch=$(date -j -u -f "%Y-%m-%dT%H:%M:%SZ" "$resets_at" "+%s" 2>/dev/null)
+	else
+		resets_at_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S" "${resets_at:0:19}" "+%s" 2>/dev/null)
+	fi
+
+	if [[ -z "$resets_at_epoch" ]]; then
+		return 1
+	fi
+
+	remaining_minutes=$(( (resets_at_epoch - now_epoch) / 60 ))
+
+	if (( remaining_minutes < 0 )); then
+		remaining_minutes=0
+	fi
+
+	printf '%d\n' "$remaining_minutes"
+}
+
+parse_reset_description() {
+	local desc="$1"
+	local now_epoch result_epoch
+
+	if [[ -z "$desc" ]]; then
+		return 1
+	fi
+
+	now_epoch=$(date +%s)
+
+	# Pattern: "Resets in N minutes/hours/seconds"
+	if [[ "$desc" =~ Resets[[:space:]]+in[[:space:]]+([0-9]+)[[:space:]]*(minute|minutes|hour|hours|second|seconds) ]]; then
+		local amount="${BASH_REMATCH[1]}"
+		local unit="${BASH_REMATCH[2]}"
+		local add_seconds=0
+
+		case "$unit" in
+		minute | minutes) add_seconds=$((amount * 60)) ;;
+		hour | hours) add_seconds=$((amount * 3600)) ;;
+		second | seconds) add_seconds=$amount ;;
+		esac
+
+		result_epoch=$((now_epoch + add_seconds))
+		date -u -j -f "%s" "$result_epoch" "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null
+		return 0
+	fi
+
+	# Pattern: "Resets HH:MM AM/PM" (daily reset, no date)
+	if [[ "$desc" =~ Resets[[:space:]]+([0-9]{1,2}):([0-9]{2})[[:space:]]*(AM|PM) ]]; then
+		local hour="${BASH_REMATCH[1]}"
+		local minute="${BASH_REMATCH[2]}"
+		local ampm="${BASH_REMATCH[3]}"
+		local today_str
+
+		today_str="$(date +%Y-%m-%d)"
+		result_epoch=$(date -j -f "%Y-%m-%d %I:%M %p" "$today_str $hour:$minute $ampm" "+%s" 2>/dev/null)
+
+		if [[ -n "$result_epoch" && "$result_epoch" -le "$now_epoch" ]]; then
+			# Already passed today, use tomorrow
+			result_epoch=$(date -j -v+1d -f "%Y-%m-%d %I:%M %p" "$today_str $hour:$minute $ampm" "+%s" 2>/dev/null)
+		fi
+
+		if [[ -n "$result_epoch" ]]; then
+			date -u -j -f "%s" "$result_epoch" "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null
+			return 0
+		fi
+	fi
+
+	# Pattern: "Resets Month DD, YYYY HH:MM AM/PM"
+	if [[ "$desc" =~ Resets[[:space:]]+([A-Za-z]+)[[:space:]]+([0-9]{1,2}),?[[:space:]]+([0-9]{4})[[:space:]]+([0-9]{1,2}):([0-9]{2})[[:space:]]*(AM|PM) ]]; then
+		local month="${BASH_REMATCH[1]}"
+		local day="${BASH_REMATCH[2]}"
+		local year="${BASH_REMATCH[3]}"
+		local hour="${BASH_REMATCH[4]}"
+		local minute="${BASH_REMATCH[5]}"
+		local ampm="${BASH_REMATCH[6]}"
+
+		result_epoch=$(date -j -f "%b %d %Y %I:%M %p" "$month $day $year $hour:$minute $ampm" "+%s" 2>/dev/null)
+
+		if [[ -n "$result_epoch" ]]; then
+			date -u -j -f "%s" "$result_epoch" "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null
+			return 0
+		fi
+	fi
+
+	return 1
+}
+
+reset_window_label() {
+	local resets_at="$1"
+	local window_minutes="$2"
+	local fallback="$3"
+	local remaining_minutes
+
+	remaining_minutes=$(time_until_reset "$resets_at" 2>/dev/null)
+
+	if [[ -n "$remaining_minutes" ]]; then
+		window_label "$remaining_minutes" ""
+	else
+		window_label "$window_minutes" "$fallback"
+	fi
+}
+
 format_usage() {
 	local provider="$1"
 	local primary_percent="$2"
@@ -123,19 +235,22 @@ format_usage() {
 	local openrouter_balance="$9"
 	local openrouter_key_limit="${10}"
 	local openrouter_key_usage="${11}"
+	local primary_resets_at="${12}"
+	local secondary_resets_at="${13}"
+	local tertiary_resets_at="${14}"
 	local parts=()
 	local balance key_remaining percent
 
 	if [[ "$provider" = "openrouter" && -n "$openrouter_percent" ]]; then
 		if [[ -n "$openrouter_balance" ]]; then
-			balance="$(awk -v value="$openrouter_balance" 'BEGIN { printf "$%.2f", value }')"
+			balance="$(awk -v value="$openrouter_balance" 'BEGIN { printf "$.2f", value }')"
 			parts+=("$balance")
 		fi
 		if [[ -n "$openrouter_key_limit" && -n "$openrouter_key_usage" ]]; then
 			key_remaining="$(awk -v limit="$openrouter_key_limit" -v usage="$openrouter_key_usage" 'BEGIN {
 				remaining = limit - usage
 				if (remaining < 0) remaining = 0
-				printf "$%.2f/key", remaining
+				printf "$.2f/key", remaining
 			}')"
 			parts+=("$key_remaining")
 		fi
@@ -149,7 +264,7 @@ format_usage() {
 		fi
 	elif [[ "$provider" = "opencodego" ]]; then
 		if [[ -n "$primary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(reset_window_label "$primary_resets_at" "$primary_window" "P")")
 		fi
 
 		local compact=()
@@ -164,15 +279,15 @@ format_usage() {
 		fi
 	else
 		if [[ -n "$primary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(reset_window_label "$primary_resets_at" "$primary_window" "P")")
 		fi
 
 		if [[ -n "$secondary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(window_label "$secondary_window" "S")")
+			parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(reset_window_label "$secondary_resets_at" "$secondary_window" "S")")
 		fi
 
 		if [[ -n "$tertiary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(window_label "$tertiary_window" "T")")
+			parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(reset_window_label "$tertiary_resets_at" "$tertiary_window" "T")")
 		fi
 	fi
 
@@ -197,17 +312,20 @@ format_popup_usage() {
 	local tertiary_window="$7"
 	local label_line1="$8"
 	local label_line2="$9"
+	local primary_resets_at="${10}"
+	local secondary_resets_at="${11}"
+	local tertiary_resets_at="${12}"
 	local parts=()
 
 	if [[ "$provider" = "opencodego" ]]; then
 		if [[ -n "$primary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(window_label "$primary_window" "P")")
+			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(reset_window_label "$primary_resets_at" "$primary_window" "P")")
 		fi
 		if [[ -n "$secondary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(window_label "$secondary_window" "S")")
+			parts+=("$(format_percent "$(remaining_percent "$secondary_percent")")/$(reset_window_label "$secondary_resets_at" "$secondary_window" "S")")
 		fi
 		if [[ -n "$tertiary_percent" ]]; then
-			parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(window_label "$tertiary_window" "T")")
+			parts+=("$(format_percent "$(remaining_percent "$tertiary_percent")")/$(reset_window_label "$tertiary_resets_at" "$tertiary_window" "T")")
 		fi
 		printf '%s\n' "${parts[*]}"
 	else
@@ -322,15 +440,30 @@ while IFS= read -r provider_json; do
 	provider="$(printf '%s\n' "$provider_json" | jq -r '.provider')"
 	primary="$(printf '%s\n' "$provider_json" | jq -r '.usage.primary.usedPercent // empty')"
 	primary_window="$(printf '%s\n' "$provider_json" | jq -r '.usage.primary.windowMinutes // empty')"
+	primary_resets_at="$(printf '%s\n' "$provider_json" | jq -r '.usage.primary.resetsAt // empty')"
+	primary_reset_desc="$(printf '%s\n' "$provider_json" | jq -r '.usage.primary.resetDescription // empty')"
+	if [[ -z "$primary_resets_at" && -n "$primary_reset_desc" ]]; then
+		primary_resets_at="$(parse_reset_description "$primary_reset_desc")"
+	fi
 	secondary="$(printf '%s\n' "$provider_json" | jq -r '.usage.secondary.usedPercent // empty')"
 	secondary_window="$(printf '%s\n' "$provider_json" | jq -r '.usage.secondary.windowMinutes // empty')"
+	secondary_resets_at="$(printf '%s\n' "$provider_json" | jq -r '.usage.secondary.resetsAt // empty')"
+	secondary_reset_desc="$(printf '%s\n' "$provider_json" | jq -r '.usage.secondary.resetDescription // empty')"
+	if [[ -z "$secondary_resets_at" && -n "$secondary_reset_desc" ]]; then
+		secondary_resets_at="$(parse_reset_description "$secondary_reset_desc")"
+	fi
 	tertiary="$(printf '%s\n' "$provider_json" | jq -r '.usage.tertiary.usedPercent // empty')"
 	tertiary_window="$(printf '%s\n' "$provider_json" | jq -r '.usage.tertiary.windowMinutes // empty')"
+	tertiary_resets_at="$(printf '%s\n' "$provider_json" | jq -r '.usage.tertiary.resetsAt // empty')"
+	tertiary_reset_desc="$(printf '%s\n' "$provider_json" | jq -r '.usage.tertiary.resetDescription // empty')"
+	if [[ -z "$tertiary_resets_at" && -n "$tertiary_reset_desc" ]]; then
+		tertiary_resets_at="$(parse_reset_description "$tertiary_reset_desc")"
+	fi
 	openrouter_percent="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.usedPercent // empty')"
 	openrouter_balance="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.balance // empty')"
 	openrouter_key_limit="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.keyLimit // empty')"
 	openrouter_key_usage="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.keyUsage // empty')"
-	usage="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage")"
+	usage="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage" "$primary_resets_at" "$secondary_resets_at" "$tertiary_resets_at")"
 	label_line1="${usage%%|*}"
 	label_line2="${usage#*|}"
 	icon="$(provider_icon "$provider")"
@@ -390,7 +523,7 @@ while IFS= read -r provider_json; do
 		fi
 	fi
 
-	popup_usage="$(format_popup_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$label_line1" "$label_line2")"
+	popup_usage="$(format_popup_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$label_line1" "$label_line2" "$primary_resets_at" "$secondary_resets_at" "$tertiary_resets_at")"
 	sketchybar --set "$item" \
 		drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)" \
 		icon="$icon" \
