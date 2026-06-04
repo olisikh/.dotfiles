@@ -1,9 +1,8 @@
+local w = require("wezterm")
+
 local bar = require("bar")
 local nav = require("nav")
 
-local theme_style = "Mocha"
-
-local w = require("wezterm")
 local config = w.config_builder()
 
 local bg_opacity = 1
@@ -19,7 +18,7 @@ config.macos_window_background_blur = 10
 config.audible_bell = "Disabled" -- or "SystemBeep"
 config.unzoom_on_switch_pane = true
 
-config.color_scheme = "Catppuccin " .. theme_style
+config.color_scheme = "Catppuccin Mocha"
 config.colors = {
 	tab_bar = {
 		-- TODO: how to access catppuccin palette, take the color and apply opacity?
