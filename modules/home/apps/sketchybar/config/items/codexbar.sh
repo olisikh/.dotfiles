@@ -142,7 +142,7 @@ for provider in "${CODEXBAR_PROVIDERS[@]}"; do
 		label.color="$LABEL_COLOR" \
 		label.padding_left=0 \
 		label.padding_right=12 \
-		label.width=160 \
+		label.width=170 \
 		label.align=left \
 		label.font="$FONT:Bold:12.0" \
 		background.color="$POPUP_BACKGROUND_COLOR" \

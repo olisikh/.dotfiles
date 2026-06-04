@@ -22,7 +22,7 @@ in
 
     cleanup = lib.mkOption {
       type = lib.types.enum [ "none" "check" "uninstall" "zap" ];
-      default = "zap";
+      default = "none"; # NOTE: revert back to 'zap' once it works again.
       description = ''Set the cleanup strategy to use after installing Homebrew packages.
       - 'none': packages not present in the generated Brewfile are left installed
       - 'zap': uninstalls all packages not listed in the generated Brewfile, and if the package is a cask, removes all files associated with that cask
