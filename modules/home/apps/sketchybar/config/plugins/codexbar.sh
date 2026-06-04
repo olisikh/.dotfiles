@@ -243,14 +243,14 @@ format_usage() {
 
 	if [[ "$provider" = "openrouter" && -n "$openrouter_percent" ]]; then
 		if [[ -n "$openrouter_balance" ]]; then
-			balance="$(awk -v value="$openrouter_balance" 'BEGIN { printf "$.2f", value }')"
+			balance="$(awk -v value="$openrouter_balance" 'BEGIN { printf "$%.2f", value }')"
 			parts+=("$balance")
 		fi
 		if [[ -n "$openrouter_key_limit" && -n "$openrouter_key_usage" ]]; then
 			key_remaining="$(awk -v limit="$openrouter_key_limit" -v usage="$openrouter_key_usage" 'BEGIN {
 				remaining = limit - usage
 				if (remaining < 0) remaining = 0
-				printf "$.2f/key", remaining
+				printf "$%.2f/key", remaining
 			}')"
 			parts+=("$key_remaining")
 		fi
