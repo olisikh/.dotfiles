@@ -9,7 +9,10 @@ local config = w.config_builder()
 local bg_opacity = 1
 
 config.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
-config.font_size = 13.0
+
+config.font = w.font("JetBrains Mono", { weight = "Medium" })
+config.font_size = 15.0
+
 config.hide_tab_bar_if_only_one_tab = false
 config.window_background_opacity = bg_opacity
 config.macos_window_background_blur = 10
