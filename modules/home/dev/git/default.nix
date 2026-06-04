@@ -16,5 +16,13 @@ in
       gh
       pre-commit
     ];
+
+    programs.git = {
+      enable = true;
+      extraConfig = {
+        submodule.recurse = true;
+        fetch.recurseSubmodules = "on-demand";
+      };
+    };
   };
 }
