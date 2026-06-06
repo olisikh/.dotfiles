@@ -4,10 +4,6 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.virtualization.qemu;
-
-  arch = if pkgs.stdenv.hostPlatform.isAarch64 then "aarch64"
-    else if pkgs.stdenv.hostPlatform.isx86_64 then "x86_64"
-    else throw "Unsupported architecture: ${pkgs.stdenv.hostPlatform.system}";
 in
 {
   options.${namespace}.dev.virtualization.qemu = {
@@ -17,9 +13,15 @@ in
   config = mkIf cfg.enable {
     home.packages = [ pkgs.qemu ];
 
-    home.file.".local/bin/qemu" = {
-      source = "${pkgs.qemu}/bin/qemu-system-${arch}";
-      executable = true;
+    # Symlink specific qemu binaries for Vagrantfile compatibility
+    # without replacing the entire ~/.local/bin directory
+    home.file.".local/bin/qemu-system-x86_64".source = "${pkgs.qemu}/bin/qemu-system-x86_64";
+    home.file.".local/bin/qemu-system-aarch64".source = "${pkgs.qemu}/bin/qemu-system-aarch64";
+
+    # Symlink qemu firmware/share directory for Vagrantfile compatibility
+    home.file.".local/share/qemu" = {
+      source = "${pkgs.qemu}/share/qemu";
+      recursive = true;
     };
   };
 }

@@ -50,6 +50,7 @@ in
     dev = {
       virtualization = {
         virtualbox = enabled;
+        multipass = enabled;
       };
     };
 
