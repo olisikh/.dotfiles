@@ -2,6 +2,7 @@
 let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.dev.k8s;
 in
@@ -20,6 +21,13 @@ in
       kustomize
       etcd
       stern
+      kops
     ];
+
+    programs.zsh.initContent = mkLate
+      # zsh
+      ''
+        eval "$(kops completion zsh)"
+      '';
   };
 }
