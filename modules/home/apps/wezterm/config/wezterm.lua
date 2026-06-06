@@ -92,6 +92,11 @@ config.keys = {
 	},
 }
 
+-- HACK: peak terminal customization
+w.on("bell", function(window, pane)
+	w.run_child_process({ "afplay", w.config_dir .. "/faaah.mp3" })
+end)
+
 nav.apply_to_config(config)
 bar.apply_to_config(config, {
 	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
