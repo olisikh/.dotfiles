@@ -1,4 +1,4 @@
-{ lib, config, namespace, pkgs, ... }:
+{ lib, config, namespace, ... }:
 with lib;
 let
   inherit (lib.${namespace}) mkBoolOpt;
@@ -18,22 +18,5 @@ in
     }];
 
     homebrew.casks = [ "multipass" ];
-
-    launchd.user.agents.multipassd = {
-      path = [ config.environment.systemPath ];
-
-      serviceConfig = {
-        Label = "com.canonical.multipass.multipassd";
-        ProgramArguments = [
-          "/Applications/Multipass.app/Contents/Library/LoginItems/multipassd.app/Contents/MacOS/multipassd"
-        ];
-
-        RunAtLoad = true;
-        KeepAlive = true;
-
-        StandardOutPath = "/tmp/multipassd.stdout.log";
-        StandardErrorPath = "/tmp/multipassd.stderr.log";
-      };
-    };
   };
 }
