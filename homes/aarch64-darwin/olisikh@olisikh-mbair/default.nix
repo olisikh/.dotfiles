@@ -111,7 +111,6 @@ in
       pulumi = enabled;
     };
 
-
     browser = {
       brave = enabled;
     };
@@ -148,6 +147,7 @@ in
       iina = enabled;
       transmission = enabled;
       tools = enabled;
+      blackhole = enabled;
     };
 
     ai = {

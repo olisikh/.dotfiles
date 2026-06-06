@@ -3,10 +3,10 @@ with lib;
 let
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.apps.obs;
+  cfg = config.${namespace}.media.obs;
 in
 {
-  options.${namespace}.apps.obs = {
+  options.${namespace}.media.obs = {
     enable = mkBoolOpt false "Enable obs module";
   };
 

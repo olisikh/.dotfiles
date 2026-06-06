@@ -35,7 +35,6 @@ in
       bitwarden = enabled;
       discord = enabled;
       telegram = enabled;
-      obs = enabled;
     };
 
     fonts = {
@@ -44,7 +43,10 @@ in
       sf-mono = enabled;
     };
 
-    media.spotify = enabled;
+    media = {
+      spotify = enabled;
+      obs = enabled;
+    };
 
     containers.colima = enabled;
 
