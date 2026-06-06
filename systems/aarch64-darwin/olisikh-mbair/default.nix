@@ -35,6 +35,7 @@ in
       bitwarden = enabled;
       discord = enabled;
       telegram = enabled;
+      obs = enabled;
     };
 
     fonts = {

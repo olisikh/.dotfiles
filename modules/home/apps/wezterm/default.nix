@@ -2,6 +2,7 @@
 let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.apps.wezterm;
 in
@@ -18,5 +19,12 @@ in
     programs.wezterm = {
       enable = true;
     };
+
+    programs.zsh.initContent = mkLate
+      # zsh
+      ''
+        # play faaah sound
+        alias faaah="echo -e '\a'"
+      '';
   };
 }
