@@ -47,6 +47,12 @@ in
 
     containers.colima = enabled;
 
+    dev = {
+      virtualization = {
+        virtualbox = enabled;
+      };
+    };
+
     ai = {
       ollama = enabled;
       codex = enabled;

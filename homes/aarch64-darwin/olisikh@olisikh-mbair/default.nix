@@ -99,6 +99,9 @@ in
         postman = enabled;
         bruno = enabled;
       };
+      virtualization = {
+        vagrant = enabled;
+      };
     };
 
     cloud = {
@@ -106,6 +109,7 @@ in
       terraform = enabled;
       pulumi = enabled;
     };
+
 
     browser = {
       brave = enabled;
