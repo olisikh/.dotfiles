@@ -1,13 +1,13 @@
 { lib, config, namespace, pkgs, ... }:
 with lib;
 let
-  inherit (lib.${namespace}) mkOpt mkBoolOpt;
+  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.shell.scrcpy;
 in
 {
-  options.${namespace}.dev.shell.scrcpy = with types; {
-    enable = mkBoolOpt false "Enable dev.scrcpy module";
+  options.${namespace}.dev.shell.scrcpy = {
+    enable = mkBoolOpt false "Enable scrcpy module";
   };
 
   config = mkIf cfg.enable {
