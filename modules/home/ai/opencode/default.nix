@@ -1,6 +1,7 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types;
+  inherit (lib.${namespace}) mkBoolOpt mkOpt;
   inherit (lib.${namespace}.zsh) mkLate;
 
   cfg = config.${namespace}.ai.opencode;
@@ -28,8 +29,8 @@ let
 in
 {
   options.${namespace}.ai.opencode = {
-    enable = lib.${namespace}.mkBoolOpt false "Enable OpenCode program";
-    config = lib.${namespace}.mkOpt types.attrs { } "OpenCode config attrset merged into the module's base config";
+    enable = mkBoolOpt false "Enable OpenCode program";
+    config = mkOpt types.attrs { } "OpenCode config attrset merged into the module's base config";
   };
 
   config = mkIf cfg.enable {
