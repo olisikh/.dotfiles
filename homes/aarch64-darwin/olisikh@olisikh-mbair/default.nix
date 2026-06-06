@@ -100,6 +100,7 @@ in
         bruno = enabled;
       };
       virtualization = {
+        qemu = enabled;
         vagrant = enabled;
       };
     };
