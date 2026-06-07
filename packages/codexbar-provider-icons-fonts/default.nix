@@ -7,8 +7,8 @@ pkgs.stdenvNoCC.mkDerivation rec {
   src = pkgs.fetchFromGitHub {
     owner = "steipete";
     repo = "CodexBar";
-    rev = "65e39f4dcb3a0c0f33e93111ebd8fcda97798485";
-    hash = "sha256-sZgYMSFKrHsaFXN5QK+hOOMjOjlP8vXlIX0zKpeN5ug=";
+    rev = "ae63897f3ee5375607d0a4e057dafa01edd6e330";
+    hash = "sha256-NK7+G4k8CFCmTlJ8oX3L/9XmtnyMHwuPW1RalIDTEHk=";
   };
 
   nativeBuildInputs = [ pkgs.fontforge ];

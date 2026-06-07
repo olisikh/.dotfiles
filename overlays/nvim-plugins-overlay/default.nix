@@ -155,8 +155,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-lint";
-        rev = "d48f3a76189d03b2239f6df1b2f7e3fa8353743b";
-        hash = "sha256-5mlNCE0KFGfJTocV5NMlczZMmZKGzxqVdUO23KVZ4O8=";
+        rev = "99cbc3ca8a76845fca50e496be7212bebf907dd3";
+        hash = "sha256-c0LEEbbWHZAKk+dpLGOjKvS1miuYLsxUM3AUf/t9ti8=";
       };
       doCheck = false;
     };

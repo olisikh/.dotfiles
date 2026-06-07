@@ -38,6 +38,7 @@
     ./plugins/neogen.nix
     ./plugins/99.nix
     ./plugins/fff.nix
+    ./plugins/faaah.nix
 
     # Modular plugins
     ./plugins/obsidian.nix
