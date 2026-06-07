@@ -1,15 +1,9 @@
 { pkgs, nsLib, ... }:
 let
   inherit (nsLib.nixvim) mkKeymaps;
-  faaahPlugin = pkgs.fetchFromGitHub {
-    owner = "olisikh";
-    repo = "faaah.nvim";
-    rev = "fbd8b2550e8c616228455e8a2a8f28d2d5de40d4";
-    sha256 = "sha256-30dVOHA0bPiPZdJryXvMNOLH+QkMVbI1LcsYFkrnFV0=";
-  };
 in
 {
-  extraPlugins = [ faaahPlugin ];
+  extraPlugins = [ pkgs.vimPlugins.faaah ];
 
   extraConfigLua = ''
     require("faaah").setup({

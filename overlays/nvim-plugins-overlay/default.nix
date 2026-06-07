@@ -98,8 +98,7 @@ final: prev: {
     };
 
     nvim-dap-ui = final.vimUtils.buildVimPlugin {
-      pname = "nvim-dap-ui";
-      version = "4.0.0-unstable-2026-04-05";
+      name = "nvim-dap-ui";
       src = final.fetchFromGitHub {
         owner = "rcarriga";
         repo = "nvim-dap-ui";
@@ -113,8 +112,7 @@ final: prev: {
 
     # HACK: prevert SSL errors as nix fails to fetch these plugins from codeberg.org git repos.
     nvim-dap-virtual-text = final.vimUtils.buildVimPlugin {
-      pname = "nvim-dap-virtual-text";
-      version = "0-unstable-2025-05-25";
+      name = "nvim-dap-virtual-text";
       src = final.fetchFromGitHub {
         owner = "theHamsta";
         repo = "nvim-dap-virtual-text";
@@ -126,8 +124,7 @@ final: prev: {
     };
 
     nvim-dap = final.vimUtils.buildVimPlugin {
-      pname = "nvim-dap";
-      version = "0.10.0-unstable-2026-05-20";
+      name = "nvim-dap";
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-dap";
@@ -138,8 +135,7 @@ final: prev: {
     };
 
     nvim-dap-python = final.vimUtils.buildVimPlugin {
-      pname = "nvim-dap-python";
-      version = "0-unstable-2025-12-20";
+      name = "nvim-dap-python";
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-dap-python";
@@ -150,8 +146,7 @@ final: prev: {
     };
 
     nvim-lint = final.vimUtils.buildVimPlugin {
-      pname = "nvim-lint";
-      version = "05-unstable-2026-05-19";
+      name = "nvim-lint";
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-lint";
@@ -159,6 +154,16 @@ final: prev: {
         hash = "sha256-c0LEEbbWHZAKk+dpLGOjKvS1miuYLsxUM3AUf/t9ti8=";
       };
       doCheck = false;
+    };
+
+    faaah = final.vimUtils.buildVimPlugin {
+      name = "faaah";
+      src = final.fetchFromGitHub {
+        owner = "olisikh";
+        repo = "faaah.nvim";
+        rev = "fbd8b2550e8c616228455e8a2a8f28d2d5de40d4";
+        hash = "sha256-30dVOHA0bPiPZdJryXvMNOLH+QkMVbI1LcsYFkrnFV0=";
+      };
     };
 
   };
