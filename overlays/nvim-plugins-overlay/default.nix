@@ -55,7 +55,7 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "olisikh";
         repo = "neotest-maven";
-        rev = "f33a61240c08888f1c1d48d7672402a728f9140d";
+        rev = "e5a76f39a02c9dfab24ae9b11a158e36c6284f0a";
         hash = "sha256-40UnjYsPoNjo2MKXcMUTD4a2Z9jlTer3qThawq9E3Wc=";
       };
       dependencies = with final.vimPlugins; [ plenary-nvim nvim-nio neotest ];
@@ -77,8 +77,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "olisikh";
         repo = "nvim-java";
-        rev = "6739851e2316a9fb1b9997986978b4a36c795462";
-        hash = "sha256-ImvffGAeUjKgmXFNMWyZHDI7bsWnXG3yFZJIDmUVBGw=";
+        rev = "5441bab6e445a657cb55c84d225a12a9f98e1b48";
+        hash = "sha256-8c/v879mqbJypPsVcaM3mXXx+vewQbErWQW9tB9Zkc4=";
       };
       dependencies = with final.vimPlugins; [
         nui-nvim
@@ -161,8 +161,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "olisikh";
         repo = "faaah.nvim";
-        rev = "fbd8b2550e8c616228455e8a2a8f28d2d5de40d4";
-        hash = "sha256-30dVOHA0bPiPZdJryXvMNOLH+QkMVbI1LcsYFkrnFV0=";
+        rev = "2f52d2f68339a6681b51c193ab93084f24e01960";
+        hash = "sha256-qMi6YQd5bOcmHl2n8kjnEFIGx4yFhT/mehpN+OT9x/k=";
       };
     };
 
