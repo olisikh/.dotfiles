@@ -9,16 +9,16 @@ usage() {
 Usage: $(basename "$0") <command> [args...]
 
 Commands:
-  build, make     Build and switch this nix-darwin system
-  update          Update flake inputs and pinned source hashes
-  upgrade         Update, then build and switch
-  tpl             Instantiate a template from this flake
-  dev             Run a dev shell from this flake
-  generations     List nix-darwin generations
-  rollback        Roll back to a previous generation
-  gc              Run Nix garbage collection
-  secrets         Edit the home sops secrets file
-  help            Show this help
+  build, make           Build and switch this nix-darwin system
+  update                Update flake inputs and pinned source hashes
+  upgrade               Update, then build and switch
+  template, tpl         Instantiate a template from this flake
+  dev                   Run a dev shell from this flake
+  generations, gens     List nix-darwin generations
+  rb, rollback          Roll back to a previous generation
+  gc                    Run Nix garbage collection
+  secrets               Edit the home sops secrets file
+  help                  Show this help
 EOF
 }
 
@@ -39,7 +39,7 @@ main() {
         nix-update "$NIX_DOTFILES_ROOT" "$@"
         nix-build
         ;;
-    tpl)
+    template | tpl)
         nix-tpl "$@"
         ;;
     dev)
@@ -48,7 +48,7 @@ main() {
     generations | gens)
         nix-gens "$@"
         ;;
-    rollback)
+    rollback | rb)
         nix-rollback "$@"
         ;;
     gc)

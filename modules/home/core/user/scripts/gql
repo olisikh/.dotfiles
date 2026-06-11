@@ -1,0 +1,343 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: gql [--shrink|-s|--pretty|-p] [file|string]
+
+Shrinkify GraphQL query by removing non-semantic whitespace/comments while
+preserving required token boundaries and string/block-string contents.
+
+Modes:
+  --shrink, -s   Output compact query (default)
+  --pretty, -p   Output formatted query
+
+Examples:
+  gql query.graphql                  # rewrite file in place
+  gql --pretty query.graphql         # prettyify file in place
+  gql < query.graphql                # read stdin, write stdout
+  gql 'query Foo { me { id } }'      # read string arg, write stdout
+  gql --pretty 'query Foo { me { id } }'
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+python3 - "$@" <<'PY'
+import sys
+from pathlib import Path
+
+TOKENISH = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+PUNCT = set("!$&():=@[]{}|,")
+
+
+def tokenize(src: str):
+    tokens = []
+    i = 0
+    n = len(src)
+
+    while i < n:
+        ch = src[i]
+
+        if ch.isspace() or ch == ',':
+            i += 1
+            continue
+
+        if ch == '#':
+            start = i
+            i += 1
+            while i < n and src[i] not in "\r\n":
+                i += 1
+            tokens.append(("COMMENT", src[start:i]))
+            continue
+
+        if src.startswith('"""', i):
+            start = i
+            i += 3
+            while i < n:
+                if src.startswith('\\"""', i):
+                    i += 4
+                elif src.startswith('"""', i):
+                    i += 3
+                    break
+                else:
+                    i += 1
+            tokens.append(("BLOCK_STRING", src[start:i]))
+            continue
+
+        if ch == '"':
+            start = i
+            i += 1
+            while i < n:
+                if src[i] == '\\':
+                    i += 2
+                    continue
+                if src[i] == '"':
+                    i += 1
+                    break
+                i += 1
+            tokens.append(("STRING", src[start:i]))
+            continue
+
+        if src.startswith('...', i):
+            tokens.append(("SPREAD", '...'))
+            i += 3
+            continue
+
+        if ch in PUNCT:
+            tokens.append(("PUNCT", ch))
+            i += 1
+            continue
+
+        start = i
+        while i < n and (not src[i].isspace()) and src[i] != '#' and (not src.startswith('...', i)) and src[i] not in PUNCT:
+            i += 1
+        tokens.append(("ATOM", src[start:i]))
+
+    return tokens
+
+
+def token_starts_word(token):
+    return token[0] in {"ATOM", "STRING", "BLOCK_STRING"}
+
+
+def needs_space(prev, curr):
+    if prev is None:
+        return False
+
+    prev_type, prev_val = prev
+    curr_type, curr_val = curr
+
+    if prev_type == "PUNCT" and prev_val in "([":
+        return False
+    if curr_type == "PUNCT" and curr_val in ")]}":
+        return False
+    if curr_type == "PUNCT" and curr_val in ":!":
+        return False
+    if prev_type == "PUNCT" and prev_val == ':':
+        return True
+    if prev_type == "PUNCT" and prev_val == '@' and curr_type == "ATOM":
+        return False
+    if curr_type == "PUNCT" and curr_val == '@':
+        return True
+    if curr_type == "PUNCT" and curr_val == '(' and prev_type == "ATOM":
+        return False
+    if prev_type == "SPREAD" and curr_type == "ATOM":
+        return True
+    if token_starts_word(prev) and token_starts_word(curr):
+        return True
+    if prev_type == "PUNCT" and prev_val == ')' and token_starts_word(curr):
+        return True
+    if token_starts_word(prev) and curr_type == "PUNCT" and curr_val == '{':
+        return True
+    if prev_type == "PUNCT" and prev_val == ')' and curr_type == "PUNCT" and curr_val == '{':
+        return True
+    return False
+
+
+def shrinkify(src: str) -> str:
+    tokens = [token for token in tokenize(src) if token[0] != "COMMENT"]
+    out = []
+    prev = None
+    for token in tokens:
+        if needs_space(prev, token):
+            out.append(" ")
+        out.append(token[1])
+        prev = token
+    return ''.join(out).strip()
+
+
+def prettyify(src: str) -> str:
+    tokens = tokenize(src)
+    lines = []
+    current = []
+    indent = 0
+    paren_depth = 0
+    bracket_depth = 0
+    brace_depth = 0
+    prev = None
+    line_prev = None
+
+    def needs_line_space(prev_token, curr_token):
+        if prev_token is None:
+            return False
+
+        prev_type, prev_val = prev_token
+        curr_type, curr_val = curr_token
+
+        if prev_type == "PUNCT" and prev_val in "([":
+            return False
+        if curr_type == "PUNCT" and curr_val in ")]}":
+            return False
+        if curr_type == "PUNCT" and curr_val in ":!":
+            return False
+        if prev_type == "PUNCT" and prev_val == '@' and curr_type == "ATOM":
+            return False
+        if curr_type == "PUNCT" and curr_val == '@':
+            return True
+        if curr_type == "PUNCT" and curr_val == '(' and prev_type == "ATOM":
+            return False
+        if prev_type == "SPREAD" and curr_type == "ATOM":
+            return True
+        if token_starts_word(prev_token) and token_starts_word(curr_token):
+            return True
+        if prev_type == "PUNCT" and prev_val == ')' and token_starts_word(curr_token):
+            return True
+        if token_starts_word(prev_token) and curr_type == "PUNCT" and curr_val == '{':
+            return True
+        if prev_type == "PUNCT" and prev_val == ')' and curr_type == "PUNCT" and curr_val == '{':
+            return True
+        if prev_type == "PUNCT" and prev_val == '|' and token_starts_word(curr_token):
+            return True
+        return False
+
+    def flush():
+        nonlocal current, line_prev
+        text = ''.join(current).rstrip()
+        if text:
+            lines.append('  ' * indent + text)
+        current = []
+        line_prev = None
+
+    for idx, token in enumerate(tokens):
+        token_type, token_value = token
+        next_token = tokens[idx + 1] if idx + 1 < len(tokens) else None
+
+        if token_type == "COMMENT":
+            flush()
+            lines.append('  ' * indent + token_value)
+            prev = token
+            continue
+
+        if token_type == "PUNCT" and token_value == '{':
+            if current and current[-1] != ' ':
+                current.append(' ')
+            current.append('{')
+            flush()
+            indent += 1
+            brace_depth += 1
+            prev = token
+            continue
+
+        if token_type == "PUNCT" and token_value == '}':
+            flush()
+            indent = max(indent - 1, 0)
+            brace_depth = max(brace_depth - 1, 0)
+            lines.append('  ' * indent + '}')
+            prev = token
+            line_prev = None
+            continue
+
+        if token_type == "PUNCT" and token_value == '(':
+            if needs_line_space(line_prev, token):
+                current.append(' ')
+            current.append('(')
+            paren_depth += 1
+            prev = token
+            line_prev = token
+            continue
+
+        if token_type == "PUNCT" and token_value == ')':
+            current.append(')')
+            paren_depth = max(paren_depth - 1, 0)
+            prev = token
+            line_prev = token
+            continue
+
+        if token_type == "PUNCT" and token_value == '[':
+            if needs_line_space(line_prev, token):
+                current.append(' ')
+            current.append('[')
+            bracket_depth += 1
+            prev = token
+            line_prev = token
+            continue
+
+        if token_type == "PUNCT" and token_value == ']':
+            current.append(']')
+            bracket_depth = max(bracket_depth - 1, 0)
+            prev = token
+            line_prev = token
+            continue
+
+        if (
+            brace_depth > 0
+            and paren_depth == 0
+            and bracket_depth == 0
+            and token_type in {"ATOM", "SPREAD"}
+            and current
+            and prev is not None
+            and not (prev[0] == "PUNCT" and prev[1] in {"(", "[", ":", "@", "|", "{"})
+        ):
+            flush()
+
+        if needs_line_space(line_prev, token):
+            current.append(' ')
+        current.append(token_value)
+        prev = token
+        line_prev = token
+
+        if token_type == "PUNCT" and token_value == ':':
+            if not current or current[-1] != ' ':
+                current.append(' ')
+
+        if token_type == "COMMENT" or (next_token and next_token[0] == "COMMENT"):
+            flush()
+
+    flush()
+    return '\n'.join(lines).strip() + '\n'
+
+
+def main() -> None:
+    args = sys.argv[1:]
+    mode = "shrink"
+    string_input = None
+
+    while args and args[0].startswith('-'):
+        flag = args.pop(0)
+        if flag in {"--shrink", "-s"}:
+            mode = "shrink"
+        elif flag in {"--pretty", "-p"}:
+            mode = "pretty"
+        elif flag == "--string":
+            if not args:
+                raise SystemExit('--string requires a value')
+            string_input = args.pop(0)
+        elif flag in {"-h", "--help"}:
+            raise SystemExit(0)
+        else:
+            raise SystemExit(f'unknown flag: {flag}')
+
+    formatter = prettyify if mode == "pretty" else shrinkify
+
+    if string_input is not None:
+        if args:
+            raise SystemExit('gql accepts either --string or one file/string arg')
+        sys.stdout.write(formatter(string_input))
+        return
+
+    if not args:
+        src = sys.stdin.read()
+        sys.stdout.write(formatter(src))
+        return
+
+    if len(args) > 1:
+        raise SystemExit('gql accepts at most one file path or one string arg')
+
+    input_arg = args[0]
+    file_path = Path(input_arg)
+
+    if file_path.exists() and file_path.is_file():
+        src = file_path.read_text()
+        file_path.write_text(formatter(src))
+        return
+
+    sys.stdout.write(formatter(input_arg))
+
+
+main()
+PY
