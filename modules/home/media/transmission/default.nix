@@ -11,6 +11,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.transmission_4 ];
+    home.packages = [ pkgs.transmission_4-mac ];
   };
 }
