@@ -18,7 +18,7 @@ in
           enabled = true,
         },
         notifications = { 
-          enabled = true,
+          enabled = false,
         },
       },
     })
