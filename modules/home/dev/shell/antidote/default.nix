@@ -41,5 +41,9 @@ in
         zstyle ':fzf-tab:*' use-fzf-default-opts yes
         zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
       '';
+
+    home.sessionVariables = {
+      ANTIDOTE_HOME = "${config.home.homeDirectory}/.cache/antidote";
+    };
   };
 }
