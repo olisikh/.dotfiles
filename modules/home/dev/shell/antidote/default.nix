@@ -1,7 +1,7 @@
 { lib, config, namespace, ... }:
 let
   inherit (lib) mkIf;
-  inherit (lib.${namespace}.zsh) mkEarly;
+  inherit (lib.${namespace}.zsh) mkMid;
 
   cfg = config.${namespace}.dev.shell.antidote;
   zshCfg = config.${namespace}.dev.shell.zsh;
@@ -22,20 +22,25 @@ in
       useFriendlyNames = true;
 
       plugins = [
+        # fpath additions must come before compinit
         "zsh-users/zsh-completions"
-        "zsh-users/zsh-autosuggestions"
-        "zsh-users/zsh-syntax-highlighting"
-        "chisui/zsh-nix-shell"
         "nix-community/nix-zsh-completions"
+        "chisui/zsh-nix-shell"
         "ohmyzsh/ohmyzsh path:plugins/git"
         "ohmyzsh/ohmyzsh path:plugins/aws"
         "ohmyzsh/ohmyzsh path:plugins/kubectl"
         "ohmyzsh/ohmyzsh path:plugins/terraform"
+        # ez-compinit calls compinit at the right point
+        "mattmc3/ez-compinit"
+        # fzf-tab must come after compinit, before widget wrappers
         "Aloxaf/fzf-tab"
+        # widget wrappers must come after fzf-tab
+        "zsh-users/zsh-autosuggestions"
+        "zsh-users/zsh-syntax-highlighting"
       ];
     };
 
-    programs.zsh.initContent = mkEarly
+    programs.zsh.initContent = mkMid
       # zsh
       ''
         zstyle ':fzf-tab:*' use-fzf-default-opts yes

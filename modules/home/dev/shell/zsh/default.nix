@@ -24,8 +24,6 @@ in
 
     programs.zsh = {
       enable = true;
-      enableCompletion = true;
-      autosuggestion.enable = true;
 
       dotDir = config.home.homeDirectory;
 
