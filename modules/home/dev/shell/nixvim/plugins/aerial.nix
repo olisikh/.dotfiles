@@ -5,7 +5,6 @@ in
 {
   plugins.aerial = {
     enable = true;
-    doCheck = false;
 
     settings = {
       on_attach = lib.nixvim.mkRaw

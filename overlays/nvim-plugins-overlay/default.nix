@@ -6,8 +6,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "theprimeagen";
         repo = "99";
-        rev = "4d229141546290746c82ac90f5afc2786865b5f3";
-        hash = "sha256-LQb5jqzTNWVyFNKlICjhnk25fTAmyC38s8/mrOKp//M=";
+        rev = "c17422457027c913c76c75a921fca1e623d2678e";
+        hash = "sha256-iilpiG81kHIv7Y0qvPzZOanNA0lsPotlB18cvtmTy0o=";
       };
       doCheck = false;
     };
@@ -150,8 +150,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-lint";
-        rev = "99cbc3ca8a76845fca50e496be7212bebf907dd3";
-        hash = "sha256-c0LEEbbWHZAKk+dpLGOjKvS1miuYLsxUM3AUf/t9ti8=";
+        rev = "1ba49820a3c29ba6ab1b2dd441a63b3822c4e39b";
+        hash = "sha256-lUxd4cv5U8DB7LjbhHesjSJHR4IvBNQ4yPI+xY8B2vg=";
       };
       doCheck = false;
     };
@@ -161,8 +161,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "olisikh";
         repo = "faaah.nvim";
-        rev = "2f52d2f68339a6681b51c193ab93084f24e01960";
-        hash = "sha256-qMi6YQd5bOcmHl2n8kjnEFIGx4yFhT/mehpN+OT9x/k=";
+        rev = "16d682b17f95faeedb6f9146361e4a7161ddf40a";
+        hash = "sha256-u2BjIjzoSgQ2rr7ejK9bwB3jouRsG+pOCyacM/ObE64=";
       };
     };
 

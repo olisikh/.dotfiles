@@ -8,7 +8,6 @@ in
     plugins = {
       obsidian = {
         enable = true;
-        doCheck = false;
         settings = {
           inherit (cfg) workspaces;
 
