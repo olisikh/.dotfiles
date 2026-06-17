@@ -6,6 +6,7 @@ local nav = require("nav")
 local config = w.config_builder()
 
 local bg_opacity = 1
+local bell_enabled = true
 
 config.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 
@@ -84,6 +85,17 @@ config.keys = {
 		}),
 	},
 
+	-- Toggle bell sound (mute)
+	{
+		key = "m",
+		mods = "LEADER",
+		action = w.action_callback(function(window, pane)
+			bell_enabled = not bell_enabled
+			local msg = bell_enabled and "Bell: ON" or "Bell: OFF"
+			window:toast_notification("wezterm", msg, nil, 2000)
+		end),
+	},
+
 	-- Disable M+Enter hotkey to use it in Neovim
 	{
 		key = "Enter",
@@ -94,6 +106,9 @@ config.keys = {
 
 -- HACK: peak terminal customization
 w.on("bell", function(window, pane)
+	if not bell_enabled then
+		return
+	end
 	w.run_child_process({ "afplay", w.config_dir .. "/faaah.mp3" })
 end)
 
@@ -107,5 +122,15 @@ bar.apply_to_config(config, {
 		enabled = false,
 	},
 })
+
+-- Persistent bell mute indicator in right status (overrides bar's empty string)
+w.on("update-status", function(window)
+	if not bell_enabled then
+		window:set_right_status(w.format({
+			{ Foreground = { Color = "#f38ba8" } },
+			{ Text = " 🔇 " },
+		}))
+	end
+end)
 
 return config
