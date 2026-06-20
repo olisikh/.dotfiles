@@ -128,8 +128,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-dap";
-        rev = "531771530d4f82ad2d21e436e3cc052d68d7aebb";
-        hash = "sha256-pgD51NWFyjK1FrXZ8MFFIM9DX2OBxL7cd7JlST2Twvc=";
+        rev = "9e848e09a697ee95302a3ef2dd43fd6eb709e570";
+        hash = "sha256-IHm3CwO7qUTtOZqhljDjSzz4WbaAJ4kPY384MyZZ9ac=";
       };
       doCheck = false;
     };
@@ -150,8 +150,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-lint";
-        rev = "1ba49820a3c29ba6ab1b2dd441a63b3822c4e39b";
-        hash = "sha256-lUxd4cv5U8DB7LjbhHesjSJHR4IvBNQ4yPI+xY8B2vg=";
+        rev = "01c9842c089069ab497430159312b2c8868a4590";
+        hash = "sha256-rKPjNRm37VE25vNLvccWbHkTaCjh0T3fomcmQ3bWBik=";
       };
       doCheck = false;
     };
