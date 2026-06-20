@@ -12,7 +12,7 @@ let
     theme = "catppuccin";
     autoupdate = false;
     autoshare = false;
-    model = "opencode-go/deepseek-v4-pro";
+    model = "opencode-go/kimi-k2.7-code";
     small_model = "opencode-go/deepseek-v4-flash";
     instructions = [
       "${homeDir}/.config/opencode/CAVEMAN.md"

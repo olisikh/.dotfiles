@@ -4,7 +4,6 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.dev.node;
-  nodejs = pkgs.nodejs;
 in
 {
   options.${namespace}.dev.node = {
@@ -14,8 +13,8 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       nodejs
-      (pnpm.override { inherit nodejs; })
-      (yarn.override { inherit nodejs; })
+      pnpm
+      yarn
       bun
       esbuild
     ];
