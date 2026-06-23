@@ -434,8 +434,6 @@ if [[ -z "$selected_provider" ]] || ! printf '%s\n' "$json" | jq -e --arg provid
 	printf '%s\n' "$selected_provider" >"$STATE_FILE"
 fi
 
-sketchybar --set '/codexbar\..*/' drawing=off
-
 while IFS= read -r provider_json; do
 	provider="$(printf '%s\n' "$provider_json" | jq -r '.provider')"
 	primary="$(printf '%s\n' "$provider_json" | jq -r '.usage.primary.usedPercent // empty')"
