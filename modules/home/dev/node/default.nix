@@ -14,6 +14,7 @@ in
     home.packages = with pkgs; [
       nodejs
       pnpm
+      deno
       yarn
       bun
       esbuild
