@@ -30,6 +30,10 @@ in
             key = "openclaw/gemini";
             name = "openclaw/gemini";
           };
+          openclawOllama = {
+            key = "openclaw/ollama";
+            name = "openclaw/ollama";
+          };
 
           hermesGithub = {
             key = "hermes/github";
@@ -42,6 +46,10 @@ in
           hermesOpencode = {
             key = "hermes/opencode";
             name = "hermes/opencode";
+          };
+          hermesOllama = {
+            key = "hermes/ollama";
+            name = "hermes/ollama";
           };
         };
       };
