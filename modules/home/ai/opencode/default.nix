@@ -9,19 +9,116 @@ let
   homeDir = config.home.homeDirectory;
 
   basicConfig = {
-    theme = "catppuccin";
-    autoupdate = false;
-    autoshare = false;
+    "$schema" = "https://opencode.ai/config.json";
     model = "opencode-go/kimi-k2.7-code";
     small_model = "opencode-go/deepseek-v4-flash";
+    autoupdate = false;
+    share = "manual";
+    formatter = true;
+    snapshot = true;
+    compaction = {
+      auto = true;
+      prune = false;
+      reserved = 8000;
+    };
     instructions = [
       "${homeDir}/.config/opencode/CAVEMAN.md"
+      "${homeDir}/.agents/AGENTS.md"
     ];
+    permission = {
+      "*" = "ask";
+      read = "allow";
+      glob = "allow";
+      grep = "allow";
+      list = "allow";
+      skill = "allow";
+      webfetch = "allow";
+      websearch = "allow";
+      lsp = "allow";
+      todowrite = "allow";
+      bash = {
+        "*" = "ask";
+        "git status*" = "allow";
+        "git log*" = "allow";
+        "git diff*" = "allow";
+        "git branch*" = "allow";
+        "git remote*" = "allow";
+        "git show*" = "allow";
+        "git push*" = "ask";
+        "git commit*" = "ask";
+        "grep *" = "allow";
+        "rg *" = "allow";
+        "nixfmt*" = "allow";
+        "shfmt*" = "allow";
+        "nix-build*" = "ask";
+      };
+      edit = "ask";
+      external_directory = {
+        "~/.agents/**" = "allow";
+        "~/.config/opencode/**" = "allow";
+      };
+      task = "ask";
+      question = "allow";
+      doom_loop = "ask";
+    };
     agent = {
-      plan.prompt = builtins.readFile ./prompts/PLAN.md;
+      plan = {
+        prompt = builtins.readFile ./prompts/PLAN.md;
+        temperature = 0.1;
+        permission = {
+          edit = "deny";
+          bash = {
+            "*" = "ask";
+            "git status*" = "allow";
+            "git log*" = "allow";
+            "git diff*" = "allow";
+            "git branch*" = "allow";
+            "git remote*" = "allow";
+            "git show*" = "allow";
+          };
+          task = "allow";
+          webfetch = "allow";
+          websearch = "allow";
+        };
+      };
       build.prompt = builtins.readFile ./prompts/BUILD.md;
-      general.prompt = builtins.readFile ./prompts/GENERAL.md;
-      explore.prompt = builtins.readFile ./prompts/EXPLORE.md;
+      general = {
+        prompt = builtins.readFile ./prompts/GENERAL.md;
+        temperature = 0.2;
+      };
+      explore = {
+        prompt = builtins.readFile ./prompts/EXPLORE.md;
+        temperature = 0.1;
+        permission = {
+          edit = "deny";
+          bash = "ask";
+        };
+      };
+    };
+    mcp = {
+      context7 = {
+        type = "remote";
+        url = "https://mcp.context7.com/mcp";
+        enabled = true;
+      };
+      gh_grep = {
+        type = "remote";
+        url = "https://mcp.grep.app";
+        enabled = true;
+      };
+    };
+    watcher = {
+      ignore = [
+        "node_modules/**"
+        "dist/**"
+        "build/**"
+        ".git/**"
+        ".direnv/**"
+        ".devenv/**"
+        "result/**"
+        "result-*/**"
+        "*.lock"
+      ];
     };
   };
 
@@ -46,12 +143,14 @@ in
 
     home = {
       file = {
-        ".config/opencode/config.json".text = builtins.toJSON finalConfig;
+        ".config/opencode/opencode.json".text = builtins.toJSON finalConfig;
         ".config/opencode/CAVEMAN.md".text = builtins.readFile ./prompts/CAVEMAN.md;
-      };
-
-      sessionVariables = {
-        OPENCODE_CONFIG = "${homeDir}/.config/opencode/config.json";
+        ".config/opencode/tui.json".text = builtins.toJSON {
+          "$schema" = "https://opencode.ai/tui.json";
+          theme = "catppuccin";
+          mouse = true;
+          diff_style = "auto";
+        };
       };
     };
   };
