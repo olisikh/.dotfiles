@@ -95,6 +95,13 @@ let
         };
       };
     };
+    command = {
+      commit = {
+        description = "Generate a conventional commit message";
+        agent = "plan";
+        template = "Look at the staged git diff. Write a commit message in Conventional Commits format.\n\nRules:\n- Subject: '<type>(<scope>): <imperative summary>' where type is one of feat, fix, refactor, perf, docs, test, chore, build, ci, style, revert.\n- Subject ≤50 chars when possible, hard cap 72, no trailing period, imperative mood.\n- Scope optional; use it when it clarifies which module changed.\n- Body only if the change's purpose is not obvious. Explain why, not what.\n- Wrap body at 72 chars.\n- Reference issues at the end if any: 'Closes #42'.\n- No AI attribution, no emoji, no 'This commit does...', no first-person.\n\nOutput only the final commit message, nothing else. If no changes are staged, say so.";
+      };
+    };
     mcp = {
       context7 = {
         type = "remote";
