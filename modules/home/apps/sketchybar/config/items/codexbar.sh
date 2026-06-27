@@ -103,8 +103,8 @@ sketchybar --add item codexbar right \
 	icon="$(provider_icon codex)" \
 	icon.font="$CODEXBAR_ICON_FONT" \
 	icon.color="$COLOR" \
-	icon.padding_left=8 \
-	icon.padding_right=6 \
+	icon.padding_left="$PADDINGS" \
+	icon.padding_right="$PADDINGS" \
 	label.padding_right="$PADDINGS" \
 	label.drawing=off \
 	background.drawing=off \
