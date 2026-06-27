@@ -15,6 +15,7 @@ let
     autoupdate = false;
     share = "manual";
     formatter = true;
+    lsp = true;
     snapshot = true;
     compaction = {
       auto = true;
