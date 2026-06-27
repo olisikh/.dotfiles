@@ -14,11 +14,14 @@ in
   };
 
   config = mkIf cfg.enable {
+    home.packages = [ pkgs.macmon ];
+
     home.file = {
       ".config/sketchybar/items".source = ./config/items;
       ".config/sketchybar/plugins".source = ./config/plugins;
       ".config/sketchybar/sketchybarrc".source = ./config/sketchybarrc;
       ".config/sketchybar/variables.sh".source = ./config/variables.sh;
+      ".config/sketchybar/helpers/macmon".source = "${pkgs.macmon}/bin/macmon";
       ".config/sketchybar/helpers/codexbar_icon_map.sh".source = "${codexBarProviderIconsFonts}/bin/icon_map.sh";
       ".config/sketchybar/helpers/icon_map.sh".source = "${sketchybarAppFont}/bin/icon_map.sh";
     };
