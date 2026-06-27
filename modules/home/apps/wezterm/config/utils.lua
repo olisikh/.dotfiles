@@ -96,7 +96,7 @@ function M.build_tab_title(tab, zoom_icon)
 		if type(zoom_icon) == "string" then
 			icon = zoom_icon
 		else
-			icon = "🔍"
+			icon = " "
 		end
 
 		tab_title = icon .. tab_title
