@@ -15,7 +15,12 @@
           lualine_x = [
             "harpoon2"
             {
-              __unkeyed-1 = lib.nixvim.mkRaw ''require("opencode").statusline'';
+              __unkeyed-1 = lib.nixvim.mkRaw ''
+                function()
+                  local opencode_status = require("opencode").statusline()
+                  return opencode_status:gsub("localhost", "")
+                end
+              '';
             }
             "copilot"
             "encoding"

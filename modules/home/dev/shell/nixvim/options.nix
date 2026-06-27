@@ -53,6 +53,8 @@
     completeopt = "menu,menuone,noinsert";
     termguicolors = true;
 
+    autoread = true; # automatically read files updated outside of nvim
+
     list = false; # show whitespaces, tabs, etc as virtual text
     listchars = {
       tab = "↦↦";

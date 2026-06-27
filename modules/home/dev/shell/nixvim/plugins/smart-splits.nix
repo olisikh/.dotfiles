@@ -23,17 +23,34 @@
 
       local map = vim.keymap.set
 
+      local function tmap(key, rhs, desc)
+        map('t', key, function()
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true), 'n', true)
+          rhs()
+        end, { silent = true, desc = desc })
+      end
+
       -- move
       map('n', '<C-h>', function() smart_move('h', 'Left') end,  { silent = true, desc = 'window: jump left' })
       map('n', '<C-j>', function() smart_move('j', 'Down') end,  { silent = true, desc = 'window: jump down' })
       map('n', '<C-k>', function() smart_move('k', 'Up') end,    { silent = true, desc = 'window: jump up' })
       map('n', '<C-l>', function() smart_move('l', 'Right') end, { silent = true, desc = 'window: jump right' })
 
+      tmap('<C-h>', function() smart_move('h', 'Left') end,  'window: jump left (term)')
+      tmap('<C-j>', function() smart_move('j', 'Down') end,  'window: jump down (term)')
+      tmap('<C-k>', function() smart_move('k', 'Up') end,    'window: jump up (term)')
+      tmap('<C-l>', function() smart_move('l', 'Right') end, 'window: jump right (term)')
+
       -- resize
       map('n', '<A-h>', ss.resize_left,  { silent = true, desc = 'window: resize split left' })
       map('n', '<A-j>', ss.resize_down,  { silent = true, desc = 'window: resize split down' })
       map('n', '<A-k>', ss.resize_up,    { silent = true, desc = 'window: resize split up' })
       map('n', '<A-l>', ss.resize_right, { silent = true, desc = 'window: resize split right' })
+
+      tmap('<A-h>', ss.resize_left,  'window: resize split left (term)')
+      tmap('<A-j>', ss.resize_down,  'window: resize split down (term)')
+      tmap('<A-k>', ss.resize_up,    'window: resize split up (term)')
+      tmap('<A-l>', ss.resize_right, 'window: resize split right (term)')
 
       -- swap buffers
       map('n', '<leader><leader>h', ss.swap_buf_left,  { silent = true, desc = 'window: swap buffer left' })
