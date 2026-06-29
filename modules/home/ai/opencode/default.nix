@@ -1,4 +1,4 @@
-{ lib, config, namespace, ... }:
+{ lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf recursiveUpdate types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
@@ -7,6 +7,15 @@ let
   cfg = config.${namespace}.ai.opencode;
 
   homeDir = config.home.homeDirectory;
+
+  llmWikiRepo = pkgs.fetchFromGitHub {
+    owner = "nvk";
+    repo = "llm-wiki";
+    rev = "75623c681a1a799883478d5755999091060189ae";
+    hash = "sha256-9Vah3jJTpnmtghfbP9mNb7rEHcPBvAYIlJUPgyHubdQ=";
+  };
+
+  llmWikiSkillPath = "${homeDir}/.llm-wiki/vendor/llm-wiki/plugins/llm-wiki-opencode/skills/wiki-manager/SKILL.md";
 
   basicConfig = {
     "$schema" = "https://opencode.ai/config.json";
@@ -25,6 +34,7 @@ let
     instructions = [
       "${homeDir}/.config/opencode/CAVEMAN.md"
       "${homeDir}/.agents/AGENTS.md"
+      llmWikiSkillPath
     ];
     permission = {
       "*" = "ask";
@@ -56,7 +66,9 @@ let
       edit = "ask";
       external_directory = {
         "~/.agents/**" = "allow";
+        "~/.config/llm-wiki/**" = "allow";
         "~/.config/opencode/**" = "allow";
+        "~/.llm-wiki/**" = "allow";
       };
       task = "ask";
       question = "allow";
@@ -151,6 +163,11 @@ in
 
     home = {
       file = {
+        ".config/llm-wiki/config.json".text = builtins.toJSON {
+          hub_path = "~/.llm-wiki/hub";
+        };
+        ".llm-wiki/vendor/llm-wiki".source = llmWikiRepo;
+
         ".config/opencode/opencode.json".text = builtins.toJSON finalConfig;
         ".config/opencode/CAVEMAN.md".text = builtins.readFile ./prompts/CAVEMAN.md;
         ".config/opencode/tui.json".text = builtins.toJSON {
