@@ -15,8 +15,6 @@ let
     hash = "sha256-9Vah3jJTpnmtghfbP9mNb7rEHcPBvAYIlJUPgyHubdQ=";
   };
 
-  llmWikiSkillPath = "${homeDir}/.llm-wiki/vendor/llm-wiki/plugins/llm-wiki-opencode/skills/wiki-manager/SKILL.md";
-
   basicConfig = {
     "$schema" = "https://opencode.ai/config.json";
     model = "opencode-go/kimi-k2.7-code";
@@ -32,9 +30,9 @@ let
       reserved = 8000;
     };
     instructions = [
-      "${homeDir}/.config/opencode/CAVEMAN.md"
+      "${homeDir}/.agents/skills/caveman/SKILL.md"
+      "${homeDir}/.config/opencode/skills/wiki-manager/SKILL.md"
       "${homeDir}/.agents/AGENTS.md"
-      llmWikiSkillPath
     ];
     permission = {
       "*" = "ask";
@@ -169,7 +167,6 @@ in
         ".llm-wiki/vendor/llm-wiki".source = llmWikiRepo;
 
         ".config/opencode/opencode.json".text = builtins.toJSON finalConfig;
-        ".config/opencode/CAVEMAN.md".text = builtins.readFile ./prompts/CAVEMAN.md;
         ".config/opencode/tui.json".text = builtins.toJSON {
           "$schema" = "https://opencode.ai/tui.json";
           theme = "catppuccin";
