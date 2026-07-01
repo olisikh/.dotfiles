@@ -195,7 +195,7 @@
     <module name="FallThrough"/>
     <module name="UpperEll"/>
     <module name="ModifierOrder"/>
-    <module name="TextBlockGoogleStyleFormatting"/>
+    <!-- <module name="TextBlockGoogleStyleFormatting"/> -->
     <module name="EmptyLineSeparator">
       <property name="tokens"
                value="PACKAGE_DEF, IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
@@ -319,6 +319,7 @@
       <property name="arrayInitIndent" value="4"/>
     </module>
 
+    <!--
     <module name="AbbreviationAsWordInName">
       <property name="ignoreFinal" value="false"/>
       <property name="allowedAbbreviationLength" value="0"/>
@@ -327,6 +328,7 @@
                     PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF,
                     RECORD_COMPONENT_DEF"/>
     </module>
+    -->
     <module name="NoWhitespaceBeforeCaseDefaultColon"/>
     <module name="OverloadMethodsDeclarationOrder"/>
     <module name="ConstructorsDeclarationGrouping"/>
