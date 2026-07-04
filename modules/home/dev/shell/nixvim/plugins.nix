@@ -44,6 +44,9 @@
     ./plugins/obsidian.nix
     ./plugins/copilot.nix
     ./plugins/nvim-java.nix
+
+    # not really plugins
+    ./plugins/inline-lenses.nix
   ];
 
   plugins = {

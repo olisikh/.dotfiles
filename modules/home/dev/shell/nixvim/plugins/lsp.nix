@@ -154,8 +154,8 @@ in
 
   extraConfigLua = ''
     -- Configure kotlin-lsp
-    vim.lsp.config('kotlin-lsp', {
-      cmd = { 'kotlin-lsp', '--stdio' },
+    vim.lsp.config("kotlin-lsp", {
+      cmd = { "kotlin-lsp", "--stdio" },
       settings = {
         kotlin_lsp = { }
       }

@@ -3,6 +3,7 @@ vim.opt_local.shiftwidth = 4
 vim.opt_local.softtabstop = 4
 vim.opt_local.expandtab = true
 
+
 local function java_action(kind, desc)
 	return function()
 		vim.lsp.buf.code_action({

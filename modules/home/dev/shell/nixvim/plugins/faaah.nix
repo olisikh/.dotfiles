@@ -8,6 +8,7 @@ in
   extraConfigLua = ''
     require("faaah").setup({
       defaults = {
+        sound = "ahh.mp3",
         throttle_ms = 2000,
       },
       sources = {
