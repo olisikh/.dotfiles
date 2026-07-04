@@ -7,8 +7,8 @@
 }:
 
 let
-  version = "1.59.0";
-  timestamp = "202605111959";
+  version = "1.60.0";
+  timestamp = "202606262232";
 
   # The application ships with different config directories for each platform.
   configDir = if stdenv.hostPlatform.isDarwin then
@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://download.eclipse.org/jdtls/snapshots/jdt-language-server-${version}-${timestamp}.tar.gz";
-    hash = "sha256-tCS4Ho2Y61fQqTqY7SsPJ85v7msQ7yYZW5a1nq8EBdg=";
+    hash = "sha256-6UwwPYGY+XeTCANYJzh3H9GMUsVJKHhBC/IisaqB7x0=";
   };
 
   sourceRoot = ".";
