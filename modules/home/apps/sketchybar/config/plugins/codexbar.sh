@@ -336,9 +336,9 @@ format_popup_usage() {
 remaining_color() {
 	local min_remaining="$1"
 
-	if (( min_remaining <= 30 )); then
+	if (( min_remaining <= 10 )); then
 		printf '%s\n' "$RED"
-	elif (( min_remaining <= 60 )); then
+	elif (( min_remaining <= 30 )); then
 		printf '%s\n' "$YELLOW"
 	else
 		printf '%s\n' "$GREEN"

@@ -75,10 +75,10 @@ final: prev: {
     nvim-java = final.vimUtils.buildVimPlugin {
       name = "nvim-java";
       src = final.fetchFromGitHub {
-        owner = "olisikh";
+        owner = "nvim-java";
         repo = "nvim-java";
-        rev = "5441bab6e445a657cb55c84d225a12a9f98e1b48";
-        hash = "sha256-8c/v879mqbJypPsVcaM3mXXx+vewQbErWQW9tB9Zkc4=";
+        rev = "9e8b842ea9eff3ebf25fb7360908ed4d4f87c56a";
+        hash = "sha256-IPeuAlXiBZhAHlac/e/2oPpSnptovZ7kxIuzF+AAeQs=";
       };
       dependencies = with final.vimPlugins; [
         nui-nvim
