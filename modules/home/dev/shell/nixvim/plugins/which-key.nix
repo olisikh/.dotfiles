@@ -125,6 +125,42 @@
               color = "blue";
             };
           }
+          {
+            __unkeyed-1 = "gr";
+            group = "[g]oto / [r]ename";
+            icon = {
+              icon = "󰞂";
+              color = "azure";
+            };
+          }
+          {
+            __unkeyed-1 = "grn";
+            desc = "lsp: re[n]ame";
+          }
+          {
+            __unkeyed-1 = "gra";
+            desc = "lsp: code [a]ction";
+          }
+          {
+            __unkeyed-1 = "grr";
+            desc = "lsp: [r]eferences";
+          }
+          {
+            __unkeyed-1 = "gri";
+            desc = "lsp: [i]mplementation";
+          }
+          {
+            __unkeyed-1 = "grt";
+            desc = "lsp: [t]ype definition";
+          }
+          {
+            __unkeyed-1 = "grD";
+            desc = "lsp: [D]eclaration";
+          }
+          {
+            __unkeyed-1 = "gO";
+            desc = "lsp: d[O]cument symbols";
+          }
         ];
         spelling = {
           enabled = false;
