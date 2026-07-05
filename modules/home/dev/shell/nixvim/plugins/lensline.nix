@@ -10,7 +10,7 @@
             {
               name = "usages";
               enabled = true;
-              include = [ "refs" "impls" ];
+              include = [ "refs" ];
               breakdown = true;
               show_zero = false;
               labels = {
@@ -21,6 +21,11 @@
               };
               icon_for_single = "󰌹 ";
               inner_separator = ", ";
+            }
+            {
+              name = "complexity";
+              enabled = true;
+              min_level = "L";
             }
             {
               name = "last_author";
