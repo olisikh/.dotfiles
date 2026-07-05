@@ -166,5 +166,15 @@ final: prev: {
       };
     };
 
+    smart-paste = final.vimUtils.buildVimPlugin {
+      name = "smart-paste";
+      src = final.fetchFromGitHub {
+        owner = "nemanjamalesija";
+        repo = "smart-paste.nvim";
+        rev = "24da69b42ba7bbfd93dd6dc314c79223cc34c389";
+        hash = "sha256-hM7wPqzuJXYRHd5oGVCMUWloWNsO6ZHKMeB0Da6sBBY=";
+      };
+    };
+
   };
 }

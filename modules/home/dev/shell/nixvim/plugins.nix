@@ -25,6 +25,7 @@
     ./plugins/aerial.nix
     ./plugins/indent-blankline.nix
     ./plugins/lensline.nix
+    ./plugins/smart-paste.nix
     ./plugins/visual-whitespace.nix
     ./plugins/snacks.nix
     ./plugins/smart-splits.nix
