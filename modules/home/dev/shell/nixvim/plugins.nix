@@ -24,6 +24,7 @@
     ./plugins/luasnip.nix
     ./plugins/aerial.nix
     ./plugins/indent-blankline.nix
+    ./plugins/lensline.nix
     ./plugins/visual-whitespace.nix
     ./plugins/snacks.nix
     ./plugins/smart-splits.nix

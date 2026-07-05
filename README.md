@@ -72,6 +72,14 @@ Most of the packages have home-manager support, for example \
 wezterm has this page that tells what options you have to configure it: \
 https://home-manager-options.extranix.com/?query=wezterm&release=master
 
+## Nixvim plugin docs
+
+Nixvim plugin options are documented at:
+https://nix-community.github.io/nixvim/plugins/
+
+For example, `lensline` options:
+https://nix-community.github.io/nixvim/plugins/lensline/index.html
+
 ## Quick nix-darwin help
 
 Feeling lost with nix-darwin config options?

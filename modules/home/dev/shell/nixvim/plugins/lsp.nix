@@ -235,12 +235,6 @@ in
       command = "LspRestart";
     }
     {
-      event = [ "BufEnter" ];
-      pattern = "*";
-      group = "user_lsp";
-      command = "silent! lua vim.lsp.codelens.enable(true)";
-    }
-    {
       event = [ "CursorHold" "CursorHoldI" ];
       pattern = "*";
       group = "user_lsp";
