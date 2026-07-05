@@ -6,6 +6,29 @@
       profiles = [
         {
           name = "default";
+          providers = [
+            {
+              name = "usages";
+              enabled = true;
+              include = [ "refs" "impls" ];
+              breakdown = true;
+              show_zero = false;
+              labels = {
+                refs = "refs";
+                impls = "impls";
+                defs = "defs";
+                usages = "usages";
+              };
+              icon_for_single = "󰌹 ";
+              inner_separator = ", ";
+            }
+            {
+              name = "last_author";
+              enabled = true;
+              cache_max_files = 50;
+            }
+          ];
+
           style = {
             placement = "inline";
             prefix = "";

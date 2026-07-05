@@ -11,8 +11,30 @@
       virtual_text = {
         current_line = true;
       };
+      update_in_insert = false;
     };
   };
+
+
+  extraConfigLua = ''
+    -- Hide diagnostic virtual text while typing in insert mode;
+    -- restore it when leaving insert mode.
+    local diagnostics_group = vim.api.nvim_create_augroup("DiagnosticInsertToggle", { clear = true })
+
+    vim.api.nvim_create_autocmd("InsertEnter", {
+      group = diagnostics_group,
+      callback = function()
+        vim.diagnostic.config({ virtual_text = false })
+      end,
+    })
+
+    vim.api.nvim_create_autocmd("InsertLeave", {
+      group = diagnostics_group,
+      callback = function()
+        vim.diagnostic.config({ virtual_text = { current_line = true } })
+      end,
+    })
+  '';
 
   opts = {
     cursorline = false;
