@@ -111,7 +111,7 @@
           }
           {
             __unkeyed-1 = "<leader>sg";
-            desc = "fff: [s]earch [g]rep";
+            desc = "telescope: [s]earch [g]rep";
             icon = {
               icon = "";
               color = "blue";
@@ -119,7 +119,7 @@
           }
           {
             __unkeyed-1 = "<leader>sp";
-            desc = "fff: [s]earch [p]roject files";
+            desc = "telescope: [s]earch [p]roject files";
             icon = {
               icon = "";
               color = "blue";
@@ -139,7 +139,7 @@
           }
           {
             __unkeyed-1 = "gra";
-            desc = "lsp: code [a]ction";
+            desc = "lsp: [a]ctions";
           }
           {
             __unkeyed-1 = "grr";

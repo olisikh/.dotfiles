@@ -38,7 +38,6 @@
     ./plugins/guess-indent.nix
     ./plugins/neogen.nix
     ./plugins/99.nix
-    ./plugins/fff.nix
     ./plugins/faaah.nix
 
     # Modular plugins

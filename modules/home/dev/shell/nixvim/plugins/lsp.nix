@@ -1,6 +1,6 @@
 { nsLib, ... }:
 let
-  inherit (nsLib.nixvim) mkKeymaps;
+  inherit (nsLib.nixvim) mkKeymaps mkRaw;
 in
 {
   plugins = {
@@ -163,23 +163,30 @@ in
   '';
 
   keymaps = mkKeymaps [
-    # nmap('<leader>cd', vim.diagnostic.open_float, { desc = 'diagnostic: show [c]ode [d]iagnostic' })
     {
       key = "grx";
       action = ":lua vim.diagnostic.open_float()<cr>";
       mode = "n";
       options = {
-        desc = "lsp: [c]ode [d]iagnostic";
+        desc = "lsp: code diagnostic";
       };
     }
-
-    # nmap('<leader>cf', function() vim.lsp.buf.format() end, { desc = 'lsp: [c]ode [f]ormat' })
-    # map('v', '<leader>cf', function()
-    #   local vstart = vim.fn.getpos("'<")
-    #   local vend = vim.fn.getpos("'>")
-    #
-    #   vim.lsp.buf.format({ range = { vstart, vend } })
-    # end, { desc = 'lsp: [c]ode [f]ormat' })
+    {
+      key = "grX";
+      action.__raw = ''
+        function()
+          local current = vim.diagnostic.config().virtual_text
+          local use_current_line = current == true or current == nil
+          vim.diagnostic.config({
+            virtual_text = use_current_line and { current_line = true } or true,
+          })
+        end
+      '';
+      mode = "n";
+      options = {
+        desc = "lsp: toggle diagnostic view";
+      };
+    }
     {
       key = "grf";
       action = ":lua require('conform').format()<cr>";
@@ -188,19 +195,14 @@ in
         desc = "lsp: [c]ode [f]ormat";
       };
     }
-
-    # nmap('<leader>ci', function()
-    #   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-    # end, { desc = 'lsp: toggle inlay hints (buffer)' })
     {
       key = "grh";
       action = ":lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<cr>";
       mode = "n";
       options = {
-        desc = "lsp: [c]ode [i]nlay hints";
+        desc = "lsp: code inlay [h]ints";
       };
     }
-    # map("n", "<leader>cl", vim.lsp.codelens.run)
     {
       key = "grl";
       action = ":lua vim.lsp.codelens.run()<cr>";
@@ -209,7 +211,6 @@ in
         desc = "lsp: [g]oto [l]ens";
       };
     }
-    # nmap('gd', telescope_builtin.lsp_definitions, { desc = 'lsp: [g]oto [d]efinition' })
     {
       key = "grd";
       action = ":lua require('telescope.builtin').lsp_definitions()<cr>";
