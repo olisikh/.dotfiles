@@ -27,11 +27,6 @@
               enabled = true;
               min_level = "L";
             }
-            {
-              name = "last_author";
-              enabled = true;
-              cache_max_files = 50;
-            }
           ];
 
           style = {
