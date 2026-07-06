@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if ! command -v macmon >/dev/null 2>&1; then
+	exit 0
+fi
+
 TEMP_COLOR="$YELLOW"
 STAT_WIDTH=58
 
@@ -15,7 +19,7 @@ sketchybar --add item temperature right \
 	label.padding_left="$PADDINGS" \
 	label.padding_right="$PADDINGS" \
 	padding_left=0 \
-	padding_right=0 \
+	padding_right="$PADDINGS" \
 	background.drawing=off \
 	script="$PLUGIN_DIR/temperature.sh"
 

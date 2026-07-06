@@ -27,6 +27,7 @@ in
     };
 
     apps = {
+      macmon = enabled;
       jankyborders = enabled;
       yabai = enabled;
       skhd = enabled;

@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-MACMON="$HOME/.config/sketchybar/helpers/macmon"
+MACMON=$(command -v macmon)
 LAST_FILE="/tmp/sketchybar_temperature_last"
-
-if [ ! -x "$MACMON" ]; then
-	MACMON=$(command -v macmon)
-fi
 
 if [ -z "$MACMON" ]; then
 	sketchybar --set temperature label=" --"
