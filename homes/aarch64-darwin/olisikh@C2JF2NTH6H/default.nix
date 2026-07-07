@@ -92,7 +92,10 @@ in
         zoxide = enabled;
         scrcpy = enabled;
       };
-      http.bruno = enabled;
+      http = {
+        bruno = enabled;
+        postman = enabled;
+      };
       graphql.rover = enabled;
     };
 

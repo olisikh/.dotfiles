@@ -42,7 +42,10 @@ in
 
     media.spotify = enabled;
 
-    containers.colima = enabled;
+    containers.colima = {
+      enable = true;
+      dir = "/opt/colima";
+    };
 
     dev.http = {
       proxyman = enabled;

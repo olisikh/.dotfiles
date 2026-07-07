@@ -100,7 +100,7 @@ sketchybar --add item codexbar.l1 right \
 sketchybar --add item codexbar right \
 	--set codexbar \
 	update_freq=60 \
-	icon="$(provider_icon codex)" \
+	icon.drawing="off" \
 	icon.font="$CODEXBAR_ICON_FONT" \
 	icon.color="$COLOR" \
 	icon.padding_left="$PADDINGS" \

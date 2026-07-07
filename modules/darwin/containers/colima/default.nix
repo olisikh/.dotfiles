@@ -1,12 +1,12 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib) mkIf types;
+  inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.containers.colima;
   userCfg = config.${namespace}.core.user;
 
-  colimaDir = "${userCfg.home}/.colima";
+  colimaDir = cfg.dir;
 
   colimaPkg = pkgs.colima;
   dockerPkg = pkgs.docker;
@@ -14,6 +14,7 @@ in
 {
   options.${namespace}.containers.colima = {
     enable = mkBoolOpt false "Enable colima module";
+    dir = mkOpt types.str "${userCfg.home}/.colima" "Directory used as COLIMA_HOME";
   };
 
   config = mkIf cfg.enable {
@@ -21,6 +22,7 @@ in
       systemPackages = with pkgs; [ lima colima ];
 
       variables = {
+        COLIMA_HOME = colimaDir;
         DOCKER_HOST = "unix://${colimaDir}/docker.sock";
         TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/var/run/docker.sock";
       };
@@ -48,6 +50,7 @@ in
 
         EnvironmentVariables = {
           HOME = userCfg.home;
+          COLIMA_HOME = colimaDir;
         };
       };
     };

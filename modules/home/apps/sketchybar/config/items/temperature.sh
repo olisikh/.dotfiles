@@ -5,19 +5,19 @@ if ! command -v macmon >/dev/null 2>&1; then
 fi
 
 TEMP_COLOR="$YELLOW"
-STAT_WIDTH=58
+STAT_WIDTH=56
 
 sketchybar --add item temperature right \
 	--set temperature \
 	update_freq=5 \
 	icon.drawing=off \
 	label.drawing=on \
-	label.font="$FONT:Bold:13.0" \
+	label.font="$FONT:Regular:13.0" \
 	label.color="$TEMP_COLOR" \
 	label.width="$STAT_WIDTH" \
 	label.align=left \
-	label.padding_left="$PADDINGS" \
-	label.padding_right="$PADDINGS" \
+	label.padding_left=0 \
+	label.padding_right=0 \
 	padding_left=0 \
 	padding_right="$PADDINGS" \
 	background.drawing=off \
