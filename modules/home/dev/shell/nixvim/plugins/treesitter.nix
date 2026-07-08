@@ -1,8 +1,12 @@
 { pkgs, ... }:
 let
-  grammars = pkgs.vimPlugins.nvim-treesitter.allGrammars;
+  grammars = pkgs.vimPlugins.nvim-treesitter.allGrammars ++ [
+    pkgs.vimPlugins.nvim-treesitter-parsers.bruno
+  ];
 in
 {
+  extraPlugins = with pkgs.vimPlugins; [ nvim-treesitter-parsers.bruno ];
+
   plugins = {
     treesitter = {
       enable = true;
@@ -10,6 +14,7 @@ in
       indent.enable = false;
       folding.enable = false;
       grammarPackages = grammars;
+      languageRegister.bruno = [ "bru" "bruno" ];
 
       settings = {
         highlight = { enable = true; };

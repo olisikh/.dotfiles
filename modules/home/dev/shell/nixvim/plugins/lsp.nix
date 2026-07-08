@@ -153,6 +153,23 @@ in
   };
 
   extraConfigLua = ''
+    vim.filetype.add({
+      extension = {
+        bru = "bru",
+      },
+    })
+
+    vim.lsp.config("bruno_ls", {
+      cmd = { "bruno-language-server", "--stdio" },
+      filetypes = { "bru", "bruno" },
+      root_dir = function(bufnr, on_dir)
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        local root = vim.fs.root(name, { "bruno.json", ".git" })
+        on_dir(root or vim.fs.dirname(name))
+      end,
+    })
+    vim.lsp.enable("bruno_ls")
+
     -- Configure kotlin-lsp
     vim.lsp.config("kotlin-lsp", {
       cmd = { "kotlin-lsp", "--stdio" },

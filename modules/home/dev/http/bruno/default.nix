@@ -13,6 +13,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       bruno
+      pkgs.${namespace}.bruno-language-server
     ];
   };
 }

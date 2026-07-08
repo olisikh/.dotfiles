@@ -37,7 +37,7 @@ sketchybar --add item wifi.up right \
 sketchybar --add item wifi right \
 	--set wifi \
 	update_freq=2 \
-	icon="$(python3 -c 'print(chr(0x100647))')" \
+	icon=" " \
 	icon.font="SF Pro:Regular:13.0" \
 	icon.color="$COLOR" \
 	icon.padding_right=5 \
@@ -52,7 +52,7 @@ sketchybar --add bracket wifi_bracket wifi wifi.up wifi.down \
 	--set wifi_bracket \
 	background.height=26 \
 	background.corner_radius="$CORNER_RADIUS" \
-	background.padding_right=5 \
+	background.padding_right=0 \
 	background.border_width="$BORDER_WIDTH" \
 	background.color="$BAR_COLOR" \
 	background.drawing=on
