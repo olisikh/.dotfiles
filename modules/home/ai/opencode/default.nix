@@ -11,8 +11,8 @@ let
   llmWikiRepo = pkgs.fetchFromGitHub {
     owner = "nvk";
     repo = "llm-wiki";
-    rev = "868a210da0626e825aed9445ad4fb820e8227ef0";
-    hash = "sha256-kozZSTKIbITXZaTcqq9MYoF2B8X5tjxIlTy+3/+UmoE=";
+    rev = "a2979238481ea15ae90006e6e38f0371642ce668";
+    hash = "sha256-LymOEgpi0M7M1rjva0siUDwPfFChWBZPi1yscusuuYU=";
   };
 
   basicConfig = {

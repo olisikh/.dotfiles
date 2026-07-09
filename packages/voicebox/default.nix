@@ -9,7 +9,7 @@ stdenvNoCC.mkDerivation rec {
   version = "0.5.0";
 
   src = fetchurl {
-    url = "https://github.com/jamiepine/voicebox/releases/download/v${version}/Voicebox_aarch64.app.tar.gz";
+    url = "https://github.com/jamiepine/voicebox/releases/latest/download/Voicebox_aarch64.app.tar.gz";
     hash = "sha256-ifjh4qd2gxAsQNQ5Vi3BRGOqnYfPLfWo1RUw5kWb6gk=";
   };
 
