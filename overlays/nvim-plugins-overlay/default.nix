@@ -177,8 +177,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "olisikh";
         repo = "faaah.nvim";
-        rev = "2baf9183f8c5095faeeb81c34c8d1fedc7a4ab61";
-        hash = "sha256-cbbVNWMXIn7UxXBrR4sM/zbmAftf3AVWAcgq44uWibM=";
+        rev = "d31a3e6472d09ded9c958a490ad62c7a35040f93";
+        hash = "sha256-6eG76iZF1T4k1JdPLLC6mENKFeIl2dmOHJ2lUvScTl0=";
       };
     };
 
@@ -187,8 +187,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "nemanjamalesija";
         repo = "smart-paste.nvim";
-        rev = "24da69b42ba7bbfd93dd6dc314c79223cc34c389";
-        hash = "sha256-hM7wPqzuJXYRHd5oGVCMUWloWNsO6ZHKMeB0Da6sBBY=";
+        rev = "7eef31499d910959fe94bb1a99dcdae6eb30f90b";
+        hash = "sha256-N5R3E2aOm8Fz7OIqah05pZYn+MT3tnPxRN6KA/7Y+bM=";
       };
     };
 
