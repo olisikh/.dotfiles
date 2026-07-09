@@ -357,7 +357,7 @@ openrouter_balance_color() {
 set_error() {
 	sketchybar --set "$NAME" \
 		icon="!" \
-		icon.font="$FONT:Bold:13.0" \
+		icon.font="$FONT:Bold:$FONT_SIZE" \
 		icon.drawing=on \
 		icon.color="$WHITE" \
 		label.color="$RED" \

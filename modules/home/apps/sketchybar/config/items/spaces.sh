@@ -13,7 +13,7 @@ for i in {0..9}; do
 	sketchybar --add space space.$sid left \
 		--set space.$sid associated_space=$sid \
 		icon="${SPACE_ICONS[$i]}" \
-		icon.font="$FONT:Bold:13.0" \
+		icon.font="$FONT:Bold:$FONT_SIZE" \
 		icon.color="$COMMENT" \
 		icon.padding_left=10 \
 		icon.padding_right=4 \

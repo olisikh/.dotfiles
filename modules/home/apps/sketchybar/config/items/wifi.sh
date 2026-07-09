@@ -38,7 +38,7 @@ sketchybar --add item wifi right \
 	--set wifi \
 	update_freq=2 \
 	icon=" " \
-	icon.font="SF Pro:Regular:13.0" \
+	icon.font="$SF_ICON_FONT:$FONT_SIZE" \
 	icon.color="$COLOR" \
 	icon.padding_right=5 \
 	label.drawing=off \

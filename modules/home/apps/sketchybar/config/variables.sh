@@ -27,7 +27,9 @@ ITEM_DIR="$HOME/.config/sketchybar/items"
 PLUGIN_DIR="$HOME/.config/sketchybar/plugins"
 
 FONT="JetBrainsMono NF"
+FONT_SIZE="13.0"
 APP_ICON_FONT="sketchybar-app-font:Regular"
+SF_ICON_FONT="SF Pro:Regular"
 
 PADDINGS=5
 

@@ -6,7 +6,7 @@ sketchybar \
 	--add item front_app left \
 	--set front_app script="$PLUGIN_DIR/front_app.sh" \
 	icon.color="$COLOR" \
-	icon.font="$APP_ICON_FONT:13.0" \
+	icon.font="$APP_ICON_FONT:$FONT_SIZE" \
 	label.color="$COLOR" \
 	label.padding_right=10 \
 	background.padding_right=10 \

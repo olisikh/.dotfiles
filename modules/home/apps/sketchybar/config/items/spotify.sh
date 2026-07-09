@@ -59,7 +59,7 @@ sketchybar --add item spotify.next left \
 sketchybar --add item spotify left \
 	--set spotify \
 	label.color="$WHITE" \
-	label.font="$FONT:Bold:13.0" \
+	label.font="$FONT:Bold:$FONT_SIZE" \
 	label.padding_right=10 \
 	label.max_chars=43 \
 	icon.drawing=off \
