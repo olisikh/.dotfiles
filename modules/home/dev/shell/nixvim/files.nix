@@ -14,9 +14,6 @@
 
     "queries/lua/injections.scm".source = ./queries/lua/injections.scm;
     "queries/scala/injections.scm".source = ./queries/scala/injections.scm;
-    "queries/bruno/highlights.scm".source = ./queries/bruno/highlights.scm;
-    "queries/bruno/locals.scm".source = ./queries/bruno/locals.scm;
-    "queries/bruno/textobjects.scm".source = ./queries/bruno/textobjects.scm;
 
     # custom snippets
     "snippets".source = ./snippets;
