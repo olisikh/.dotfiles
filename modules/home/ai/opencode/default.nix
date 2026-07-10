@@ -24,7 +24,6 @@ let
     };
     instructions = [
       "${homeDir}/.agents/skills/caveman/SKILL.md"
-      "${homeDir}/.config/opencode/skills/wiki-manager/SKILL.md"
       "${homeDir}/.agents/AGENTS.md"
     ];
     permission = {
