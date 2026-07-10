@@ -8,13 +8,6 @@ let
 
   homeDir = config.home.homeDirectory;
 
-  llmWikiRepo = pkgs.fetchFromGitHub {
-    owner = "nvk";
-    repo = "llm-wiki";
-    rev = "a2979238481ea15ae90006e6e38f0371642ce668";
-    hash = "sha256-LymOEgpi0M7M1rjva0siUDwPfFChWBZPi1yscusuuYU=";
-  };
-
   basicConfig = {
     "$schema" = "https://opencode.ai/config.json";
     model = "opencode-go/kimi-k2.7-code";
@@ -164,7 +157,6 @@ in
         ".config/llm-wiki/config.json".text = builtins.toJSON {
           hub_path = "~/.llm-wiki/hub";
         };
-        ".llm-wiki/vendor/llm-wiki".source = llmWikiRepo;
 
         ".config/opencode/opencode.json".text = builtins.toJSON finalConfig;
         ".config/opencode/tui.json".text = builtins.toJSON {
