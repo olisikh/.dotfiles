@@ -29,6 +29,10 @@ config.colors = {
 }
 
 config.keys = {
+	-- Hermes recognizes Option-Enter as a multiline key. Map Shift-Enter to its
+	-- exact escape sequence because WezTerm otherwise sends it as plain Enter.
+	{ mods = "SHIFT", key = "Enter", action = w.action({ SendString = "\x1b\r" }) },
+
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
 	{ mods = "OPT", key = "LeftArrow", action = w.action({ SendString = "\x1bb" }) },
 	-- Make Option-Right equivalent to Alt-f; forward-word
