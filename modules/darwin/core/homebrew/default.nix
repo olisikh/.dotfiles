@@ -10,14 +10,14 @@ in
     enable = mkBoolOpt false "Enable common homebrew darwin module";
     autoUpdate = lib.mkOption {
       type = lib.types.bool;
-      default = false;
-      description = "Set to true to automatically update Homebrew before installing packages.";
+      default = true;
+      description = "Run `brew update` during activation to refresh package metadata.";
     };
 
     upgrade = lib.mkOption {
       type = lib.types.bool;
-      default = false;
-      description = "Set to true to automatically upgrade Homebrew packages after installation.";
+      default = true;
+      description = "Run `brew upgrade` during activation to keep installed packages current.";
     };
 
     cleanup = lib.mkOption {
