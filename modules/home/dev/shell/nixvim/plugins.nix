@@ -40,6 +40,7 @@
     ./plugins/neogen.nix
     ./plugins/99.nix
     ./plugins/faaah.nix
+    ./plugins/scrollview.nix
 
     # Modular plugins
     ./plugins/obsidian.nix
