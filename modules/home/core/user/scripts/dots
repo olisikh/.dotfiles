@@ -12,14 +12,50 @@ Commands:
   build, make           Build and switch this nix-darwin system
   update                Update flake inputs and pinned source hashes
   upgrade               Update, then build and switch
-  template, tpl         Instantiate a template from this flake
+  tpl                   Instantiate a template from this flake
   dev                   Run a dev shell from this flake
-  generations, gens     List nix-darwin generations
-  rb, rollback          Roll back to a previous generation
+  gens                  List nix-darwin generations
+  rb                    Roll back to a previous generation
   gc                    Run Nix garbage collection
   secrets               Edit the home sops secrets file
+  sync                  Pull latest main for ~/.dotfiles, ~/.llm-harness, ~/.llm-wiki
   help                  Show this help
 EOF
+}
+
+sync_repo() {
+    local repo_path="$1"
+    local name
+    name="$(basename "$repo_path")"
+
+    echo "==> $name"
+
+    if [[ ! -d "$repo_path/.git" ]]; then
+        echo "Error: $name is not a git repository at $repo_path" >&2
+        return 1
+    fi
+
+    if ! git -C "$repo_path" pull --rebase --autostash origin main; then
+        echo "Error: failed to sync $name" >&2
+        return 1
+    fi
+}
+
+cmd_sync() {
+    local repos=(
+        "$HOME/.dotfiles"
+        "$HOME/.llm-harness"
+        "$HOME/.llm-wiki"
+    )
+
+    for repo in "${repos[@]}"; do
+        if ! sync_repo "$repo"; then
+            echo "Sync cancelled." >&2
+            exit 1
+        fi
+    done
+
+    echo "All repositories synced."
 }
 
 main() {
@@ -39,16 +75,16 @@ main() {
         nix-update "$NIX_DOTFILES_ROOT" "$@"
         nix-build
         ;;
-    template | tpl)
+    tpl)
         nix-tpl "$@"
         ;;
     dev)
         nix-dev "$@"
         ;;
-    generations | gens)
+    gens)
         nix-gens "$@"
         ;;
-    rollback | rb)
+    rb)
         nix-rollback "$@"
         ;;
     gc)
@@ -56,6 +92,9 @@ main() {
         ;;
     secrets)
         nix-secrets "$@"
+        ;;
+    sync)
+        cmd_sync
         ;;
     help | -h | --help)
         usage
