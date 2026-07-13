@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Keep a bounded rollback window without touching the current /nix/.../system link.
+# The numbered system-N-link entries are the GC roots created by nix-darwin.
+readonly DEFAULT_KEEP=10
+readonly SYSTEM_PROFILE_DIR="/nix/var/nix/profiles"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [--keep N] [--dry-run]
+
+Retain only the newest N nix-darwin system generations (default: $DEFAULT_KEEP).
+
+Options:
+  --keep N    Number of newest system generations to retain; N must be at least 1.
+  --dry-run   Print generations that would be removed without changing anything.
+  -h, --help  Show this help.
+
+The default can also be overridden with NIX_DARWIN_GENERATIONS_TO_KEEP.
+EOF
+}
+
+main() {
+    local keep="${NIX_DARWIN_GENERATIONS_TO_KEEP:-$DEFAULT_KEEP}"
+    local dry_run=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --keep)
+            [[ $# -ge 2 ]] || { echo "Error: --keep requires a value." >&2; exit 2; }
+            keep="$2"
+            shift 2
+            ;;
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Error: unknown option: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+        esac
+    done
+
+    [[ "$keep" =~ ^[1-9][0-9]*$ ]] || {
+        echo "Error: --keep must be a positive integer." >&2
+        exit 2
+    }
+
+    shopt -s nullglob
+    local links=("$SYSTEM_PROFILE_DIR"/system-[0-9]*-link)
+    local entries=()
+    local link generation
+    for link in "${links[@]}"; do
+        generation="${link##*/system-}"
+        generation="${generation%-link}"
+        [[ "$generation" =~ ^[0-9]+$ ]] || continue
+        entries+=("$generation:$link")
+    done
+
+    local total="${#entries[@]}"
+    if (( total <= keep )); then
+        printf 'Keeping all %s system generation(s); limit is %s.\n' "$total" "$keep"
+        return
+    fi
+
+    local sorted=()
+    while IFS= read -r entry; do
+        sorted+=("$entry")
+    done < <(printf '%s\n' "${entries[@]}" | sort -t: -k1,1n)
+
+    local remove_count=$((total - keep))
+    local removal_entries=("${sorted[@]:0:remove_count}")
+    local removal_paths=()
+    printf 'System generations: %s. Keeping newest %s; pruning %s old generation(s):\n' \
+        "$total" "$keep" "$remove_count"
+    for entry in "${removal_entries[@]}"; do
+        generation="${entry%%:*}"
+        link="${entry#*:}"
+        printf '  system-%s\n' "$generation"
+        removal_paths+=("$link")
+    done
+
+    if [[ "$dry_run" == true ]]; then
+        printf 'Dry run: no system generations were removed.\n'
+        return
+    fi
+
+    # The system profile belongs to root. Remove only explicitly enumerated, old
+    # numbered generation links; never remove the active `system` profile link.
+    sudo rm -- "${removal_paths[@]}"
+
+    # Once their roots are gone, reclaim unreachable store paths as root too.
+    sudo nix-store --gc
+    sudo nix-collect-garbage -d
+    printf 'Pruning complete. Retained %s newest system generations.\n' "$keep"
+}
+
+main "$@"

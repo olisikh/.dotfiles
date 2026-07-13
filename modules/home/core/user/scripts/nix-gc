@@ -6,9 +6,10 @@ set -euo pipefail
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0")
+Usage: $(basename "$0") [--keep N] [--dry-run]
 
-Run Nix garbage collection.
+Prune nix-darwin system generations, retaining the newest 10 by default, then
+run garbage collection. Pass --keep N to retain a different number.
 EOF
 }
 
@@ -18,10 +19,8 @@ main() {
         exit 0
     fi
 
-    check_command nix-store
-    check_command nix-collect-garbage
-    nix-store --gc
-    nix-collect-garbage -d
+    check_command nix-prune-system-generations
+    nix-prune-system-generations "$@"
 }
 
 main "$@"

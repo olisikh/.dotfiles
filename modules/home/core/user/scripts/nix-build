@@ -66,6 +66,7 @@ main() {
     fi
 
     sudo darwin-rebuild switch --flake "$NIX_DOTFILES_ROOT#$system" "$@"
+    nix-prune-system-generations
     load_yabai_scripting_addition
 }
 
