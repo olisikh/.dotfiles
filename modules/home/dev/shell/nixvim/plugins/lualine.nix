@@ -18,7 +18,7 @@
               __unkeyed-1 = lib.nixvim.mkRaw ''
                 function()
                   local opencode_status = require("opencode").statusline()
-                  return opencode_status:gsub("localhost", "")
+                  return opencode_status:gsub("localhost", "") .. " "
                 end
               '';
             }
