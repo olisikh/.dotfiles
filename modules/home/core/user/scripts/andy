@@ -1,0 +1,846 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+
+EMULATOR_BIN=""
+ADB_BIN=""
+AVDS=()
+PARSED_DEVICE_ID=""
+PARSED_ARGS=()
+
+usage() {
+    cat <<'EOF'
+Usage: andy <command> [args]
+
+Commands:
+  devices
+      Show Android emulators on this system and their ids.
+
+  run [-s id]
+      Open and run emulator by id. If only one emulator exists, id is optional.
+
+  restart [-s id]
+      Restart emulator by id. If emulator is not running, start it first.
+
+  install <apk> [-s id]
+      Install APK on emulator by id. If emulator is not running, start it first.
+
+  uninstall <package> [-s id]
+      Uninstall app package (for example com.ebay.mobile) from emulator by id.
+      If emulator is not running, start it first.
+
+  shell [-s id]
+      Open adb shell in emulator by id. If emulator is not running, start it first.
+
+  run-app <package> [-s id]
+      Launch app package.
+
+  reset-app <package> [-s id]
+      Delete all local app data after confirmation.
+
+  restart-app <package> [-s id]
+      Force-stop app package and launch it again.
+
+  screenshot [path] [-s id]
+      Save emulator screenshot. Defaults to ~/Desktop/andy-YYYY-MM-DD-HHMMSS.png.
+
+  logcat [-s id] [--app package] [--tag tag] [--verbose|--debug|--info|--warn|--error|--fatal] [--grep expr] [--dump|--clear]
+      Stream or dump logcat with common filters.
+
+Examples:
+  andy devices                      # list emulators
+  andy run                          # run emulator if only one exists
+  andy run -s 2                     # run emulator with id 2
+  andy restart                      # restart emulator
+  andy install app-debug.apk        # install APK on emulator
+  andy uninstall com.ebay.mobile    # uninstall app
+  andy shell                        # open adb shell in emulator
+  andy run-app com.ebay.mobile      # launch app
+  andy reset-app com.ebay.mobile    # delete app data after confirmation
+  andy restart-app com.ebay.mobile  # restart app
+  andy screenshot                   # save screenshot to Desktop
+  andy logcat --app com.ebay.mobile --info
+  andy logcat --error
+EOF
+}
+
+parse_device_args() {
+    local arg=""
+
+    PARSED_DEVICE_ID=""
+    PARSED_ARGS=()
+
+    while [[ $# -gt 0 ]]; do
+        arg="$1"
+        shift
+
+        case "$arg" in
+        -s)
+            if [[ $# -eq 0 ]]; then
+                echo "Error: $arg requires device id." >&2
+                exit 1
+            fi
+
+            if [[ -n "$PARSED_DEVICE_ID" ]]; then
+                echo "Error: device id specified more than once." >&2
+                exit 1
+            fi
+
+            PARSED_DEVICE_ID="$1"
+            shift
+            ;;
+        --)
+            PARSED_ARGS+=("$@")
+            break
+            ;;
+        *)
+            PARSED_ARGS+=("$arg")
+            ;;
+        esac
+    done
+}
+
+android_sdk_roots() {
+    local candidates=()
+    local candidate
+    local seen=":"
+
+    if [[ -n "${ANDROID_SDK_ROOT:-}" ]]; then
+        candidates+=("$ANDROID_SDK_ROOT")
+    fi
+
+    if [[ -n "${ANDROID_HOME:-}" ]]; then
+        candidates+=("$ANDROID_HOME")
+    fi
+
+    candidates+=("$HOME/Library/Android/sdk")
+
+    for candidate in "${candidates[@]}"; do
+        [[ -d "$candidate" ]] || continue
+
+        case "$seen" in
+        *":$candidate:"*)
+            continue
+            ;;
+        esac
+
+        seen="${seen}${candidate}:"
+        printf '%s\n' "$candidate"
+    done
+}
+
+resolve_android_tool() {
+    local tool="$1"
+    local candidate=""
+    local sdk_root=""
+
+    if command -v "$tool" >/dev/null 2>&1; then
+        command -v "$tool"
+        return 0
+    fi
+
+    while IFS= read -r sdk_root; do
+        case "$tool" in
+        adb)
+            candidate="$sdk_root/platform-tools/adb"
+            ;;
+        emulator)
+            candidate="$sdk_root/emulator/emulator"
+            ;;
+        *)
+            echo "Error: unsupported Android tool: $tool" >&2
+            exit 1
+            ;;
+        esac
+
+        if [[ -x "$candidate" ]]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done < <(android_sdk_roots)
+
+    echo "Error: $tool not found. Set ANDROID_SDK_ROOT/ANDROID_HOME or install Android SDK tools." >&2
+    exit 1
+}
+
+init_tools() {
+    EMULATOR_BIN="$(resolve_android_tool emulator)"
+    ADB_BIN="$(resolve_android_tool adb)"
+}
+
+load_avds() {
+    local avd=""
+
+    AVDS=()
+    while IFS= read -r avd; do
+        [[ -n "$avd" ]] || continue
+        AVDS+=("$avd")
+    done < <("$EMULATOR_BIN" -list-avds)
+
+    if [[ ${#AVDS[@]} -eq 0 ]]; then
+        echo "Error: no Android emulators found on this system." >&2
+        exit 1
+    fi
+}
+
+avd_name_for_serial() {
+    local serial="$1"
+    local avd_name=""
+
+    avd_name="$($ADB_BIN -s "$serial" emu avd name 2>/dev/null || true)"
+    avd_name="${avd_name%%$'\n'*}"
+    avd_name="${avd_name%$'\r'}"
+    printf '%s' "$avd_name"
+}
+
+running_emulator_serials() {
+    local serial=""
+    local state=""
+    local extra=""
+
+    while IFS=$' \t' read -r serial state extra; do
+        [[ "$serial" == emulator-* ]] || continue
+        [[ -n "$state" ]] || continue
+        printf '%s\n' "$serial"
+    done < <("$ADB_BIN" devices)
+}
+
+find_running_serial_for_avd() {
+    local target_avd="$1"
+    local serial=""
+    local avd_name=""
+
+    while IFS= read -r serial; do
+        [[ -n "$serial" ]] || continue
+        avd_name="$(avd_name_for_serial "$serial")"
+
+        if [[ "$avd_name" == "$target_avd" ]]; then
+            printf '%s\n' "$serial"
+            return 0
+        fi
+    done < <(running_emulator_serials)
+
+    return 1
+}
+
+print_devices() {
+    local idx=0
+    local avd=""
+    local serial=""
+
+    load_avds
+
+    printf '%-4s %-40s %-10s %s\n' "ID" "NAME" "STATE" "SERIAL"
+    for idx in "${!AVDS[@]}"; do
+        avd="${AVDS[$idx]}"
+
+        if serial="$(find_running_serial_for_avd "$avd")"; then
+            printf '%-4s %-40s %-10s %s\n' "$((idx + 1))" "$avd" "running" "$serial"
+        else
+            printf '%-4s %-40s %-10s %s\n' "$((idx + 1))" "$avd" "stopped" "-"
+        fi
+    done
+}
+
+resolve_target_avd() {
+    local id="${1:-}"
+    local max_id=0
+
+    load_avds
+    max_id="${#AVDS[@]}"
+
+    if [[ -z "$id" ]]; then
+        if [[ $max_id -eq 1 ]]; then
+            printf '%s\n' "${AVDS[0]}"
+            return 0
+        fi
+
+        echo "Error: multiple emulators found. Pick id from 'andy devices'." >&2
+        print_devices >&2
+        exit 1
+    fi
+
+    if [[ ! "$id" =~ ^[0-9]+$ ]]; then
+        echo "Error: id must be a number." >&2
+        exit 1
+    fi
+
+    if (( id < 1 || id > max_id )); then
+        echo "Error: id must be between 1 and $max_id." >&2
+        exit 1
+    fi
+
+    printf '%s\n' "${AVDS[$((id - 1))]}"
+}
+
+start_emulator() {
+    local avd="$1"
+
+    nohup "$EMULATOR_BIN" "@$avd" >/dev/null 2>&1 &
+}
+
+wait_for_emulator_serial() {
+    local avd="$1"
+    local attempt=0
+    local serial=""
+
+    for attempt in $(seq 1 90); do
+        if serial="$(find_running_serial_for_avd "$avd" 2>/dev/null)" && [[ -n "$serial" ]]; then
+            printf '%s\n' "$serial"
+            return 0
+        fi
+
+        sleep 2
+    done
+
+    echo "Error: timed out waiting for emulator '$avd' to appear." >&2
+    exit 1
+}
+
+wait_for_emulator_stop() {
+    local avd="$1"
+    local attempt=0
+
+    for attempt in $(seq 1 30); do
+        if ! find_running_serial_for_avd "$avd" >/dev/null 2>&1; then
+            return 0
+        fi
+
+        sleep 1
+    done
+
+    echo "Error: timed out waiting for emulator '$avd' to stop." >&2
+    exit 1
+}
+
+wait_for_boot() {
+    local serial="$1"
+    local boot_completed=""
+    local attempt=0
+
+    "$ADB_BIN" -s "$serial" wait-for-device >/dev/null 2>&1
+
+    for attempt in $(seq 1 120); do
+        boot_completed="$("$ADB_BIN" -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')"
+
+        if [[ "$boot_completed" == "1" ]]; then
+            return 0
+        fi
+
+        sleep 2
+    done
+
+    echo "Error: timed out waiting for emulator '$serial' to finish booting." >&2
+    exit 1
+}
+
+ensure_running_emulator() {
+    local avd="$1"
+    local serial=""
+
+    if serial="$(find_running_serial_for_avd "$avd" 2>/dev/null)" && [[ -n "$serial" ]]; then
+        wait_for_boot "$serial"
+        printf '%s\n' "$serial"
+        return 0
+    fi
+
+    start_emulator "$avd"
+    serial="$(wait_for_emulator_serial "$avd")"
+    wait_for_boot "$serial"
+    printf '%s\n' "$serial"
+}
+
+default_screenshot_path() {
+    printf '%s/Desktop/andy-%s.png\n' "$HOME" "$(date +%Y-%m-%d-%H%M%S)"
+}
+
+resolve_package_pid() {
+    local serial="$1"
+    local package_name="$2"
+    local pid=""
+
+    pid="$($ADB_BIN -s "$serial" shell pidof -s "$package_name" 2>/dev/null | tr -d '\r')"
+
+    if [[ -z "$pid" ]]; then
+        echo "Error: app not running: $package_name" >&2
+        exit 1
+    fi
+
+    printf '%s\n' "$pid"
+}
+
+resolve_launchable_activity() {
+    local serial="$1"
+    local package_name="$2"
+    local output=""
+    local line=""
+    local component=""
+
+    output="$($ADB_BIN -s "$serial" shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.LAUNCHER "$package_name" 2>/dev/null | tr -d '\r')"
+
+    while IFS= read -r line; do
+        [[ -n "$line" ]] || continue
+        component="$line"
+    done <<< "$output"
+
+    if [[ -z "$component" || "$component" == "No activity found" ]]; then
+        echo "Error: no launchable activity found for app: $package_name" >&2
+        exit 1
+    fi
+
+    printf '%s\n' "$component"
+}
+
+launch_app() {
+    local serial="$1"
+    local package_name="$2"
+    local component=""
+
+    component="$(resolve_launchable_activity "$serial" "$package_name")"
+
+    "$ADB_BIN" -s "$serial" shell am start -n "$component" >/dev/null
+}
+
+confirm_reset_app() {
+    local package_name="$1"
+    local answer=""
+
+    printf 'Warning: This will delete all local app data for %s and cannot be undone. Continue? [y/N] ' "$package_name" >&2
+
+    if ! read -r answer; then
+        echo >&2
+        echo "Reset cancelled." >&2
+        return 1
+    fi
+
+    case "$answer" in
+    y | Y | yes | YES)
+        return 0
+        ;;
+    *)
+        echo "Reset cancelled." >&2
+        return 1
+        ;;
+    esac
+}
+
+cmd_run() {
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -gt 0 ]]; then
+        echo "Error: run does not accept positional arguments. Use -s <id>." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+
+    if serial="$(find_running_serial_for_avd "$avd" 2>/dev/null)" && [[ -n "$serial" ]]; then
+        echo "Already running: $avd ($serial)"
+        return 0
+    fi
+
+    start_emulator "$avd"
+    echo "Opening: $avd"
+}
+
+cmd_restart() {
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -gt 0 ]]; then
+        echo "Error: restart does not accept positional arguments. Use -s <id>." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+
+    if serial="$(find_running_serial_for_avd "$avd" 2>/dev/null)" && [[ -n "$serial" ]]; then
+        "$ADB_BIN" -s "$serial" emu kill >/dev/null
+        wait_for_emulator_stop "$avd"
+    fi
+
+    start_emulator "$avd"
+    serial="$(wait_for_emulator_serial "$avd")"
+    wait_for_boot "$serial"
+    echo "Restarted: $avd ($serial)"
+}
+
+cmd_install() {
+    local apk_path=""
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -ne 1 ]]; then
+        echo "Error: install requires apk path only. Use -s <id> for device." >&2
+        usage >&2
+        exit 1
+    fi
+
+    apk_path="${PARSED_ARGS[0]}"
+
+    if [[ -z "$apk_path" ]]; then
+        echo "Error: apk path is required." >&2
+        usage >&2
+        exit 1
+    fi
+
+    if [[ ! -f "$apk_path" ]]; then
+        echo "Error: apk not found: $apk_path" >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    "$ADB_BIN" -s "$serial" install -r "$apk_path"
+}
+
+cmd_uninstall() {
+    local package_name=""
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -ne 1 ]]; then
+        echo "Error: uninstall requires package name only. Use -s <id> for device." >&2
+        usage >&2
+        exit 1
+    fi
+
+    package_name="${PARSED_ARGS[0]}"
+
+    if [[ -z "$package_name" ]]; then
+        echo "Error: package name is required." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    "$ADB_BIN" -s "$serial" uninstall "$package_name"
+}
+
+cmd_shell() {
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -gt 0 ]]; then
+        echo "Error: shell does not accept positional arguments. Use -s <id>." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    "$ADB_BIN" -s "$serial" shell
+}
+
+cmd_run_app() {
+    local package_name=""
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -ne 1 ]]; then
+        echo "Error: run-app requires package name only. Use -s <id> for device." >&2
+        usage >&2
+        exit 1
+    fi
+
+    package_name="${PARSED_ARGS[0]}"
+
+    if [[ -z "$package_name" ]]; then
+        echo "Error: package name is required." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    launch_app "$serial" "$package_name"
+    echo "Started app: $package_name"
+}
+
+cmd_reset_app() {
+    local package_name=""
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -ne 1 ]]; then
+        echo "Error: reset-app requires package name only. Use -s <id> for device." >&2
+        usage >&2
+        exit 1
+    fi
+
+    package_name="${PARSED_ARGS[0]}"
+
+    if [[ -z "$package_name" ]]; then
+        echo "Error: package name is required." >&2
+        usage >&2
+        exit 1
+    fi
+
+    if ! confirm_reset_app "$package_name"; then
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    "$ADB_BIN" -s "$serial" shell pm clear "$package_name"
+    echo "Reset app data: $package_name"
+}
+
+cmd_restart_app() {
+    local package_name=""
+    local avd=""
+    local serial=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -ne 1 ]]; then
+        echo "Error: restart-app requires package name only. Use -s <id> for device." >&2
+        usage >&2
+        exit 1
+    fi
+
+    package_name="${PARSED_ARGS[0]}"
+
+    if [[ -z "$package_name" ]]; then
+        echo "Error: package name is required." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    "$ADB_BIN" -s "$serial" shell am force-stop "$package_name"
+
+    launch_app "$serial" "$package_name"
+
+    echo "Restarted app: $package_name"
+}
+
+cmd_screenshot() {
+    local avd=""
+    local serial=""
+    local output_path=""
+    local output_dir=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -gt 1 ]]; then
+        echo "Error: screenshot accepts at most one path argument." >&2
+        usage >&2
+        exit 1
+    fi
+
+    if [[ ${#PARSED_ARGS[@]} -eq 1 ]]; then
+        output_path="${PARSED_ARGS[0]}"
+    else
+        output_path="$(default_screenshot_path)"
+    fi
+
+    output_dir="$(dirname "$output_path")"
+    mkdir -p "$output_dir"
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    "$ADB_BIN" -s "$serial" exec-out screencap -p > "$output_path"
+    echo "Saved screenshot: $output_path"
+}
+
+cmd_logcat() {
+    local avd=""
+    local serial=""
+    local arg=""
+    local app_package=""
+    local tag=""
+    local grep_expr=""
+    local priority="V"
+    local dump_mode=0
+    local clear_mode=0
+    local pid=""
+    local -a logcat_args=("logcat" "-v" "threadtime")
+    local -a filter_specs=()
+
+    parse_device_args "$@"
+
+    while [[ ${#PARSED_ARGS[@]} -gt 0 ]]; do
+        arg="${PARSED_ARGS[0]}"
+        PARSED_ARGS=("${PARSED_ARGS[@]:1}")
+
+        case "$arg" in
+        --app)
+            if [[ ${#PARSED_ARGS[@]} -eq 0 ]]; then
+                echo "Error: --app requires package name." >&2
+                exit 1
+            fi
+            app_package="${PARSED_ARGS[0]}"
+            PARSED_ARGS=("${PARSED_ARGS[@]:1}")
+            ;;
+        --tag)
+            if [[ ${#PARSED_ARGS[@]} -eq 0 ]]; then
+                echo "Error: --tag requires tag name." >&2
+                exit 1
+            fi
+            tag="${PARSED_ARGS[0]}"
+            PARSED_ARGS=("${PARSED_ARGS[@]:1}")
+            ;;
+        --grep)
+            if [[ ${#PARSED_ARGS[@]} -eq 0 ]]; then
+                echo "Error: --grep requires expression." >&2
+                exit 1
+            fi
+            grep_expr="${PARSED_ARGS[0]}"
+            PARSED_ARGS=("${PARSED_ARGS[@]:1}")
+            ;;
+        --verbose)
+            priority="V"
+            ;;
+        --debug)
+            priority="D"
+            ;;
+        --info)
+            priority="I"
+            ;;
+        --warn)
+            priority="W"
+            ;;
+        --error)
+            priority="E"
+            ;;
+        --fatal)
+            priority="F"
+            ;;
+        --dump)
+            dump_mode=1
+            ;;
+        --clear)
+            clear_mode=1
+            ;;
+        *)
+            echo "Error: unknown logcat option: $arg" >&2
+            usage >&2
+            exit 1
+            ;;
+        esac
+    done
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+
+    if (( clear_mode )); then
+        "$ADB_BIN" -s "$serial" logcat -c
+        echo "Cleared logcat on $avd"
+        return 0
+    fi
+
+    if (( dump_mode )); then
+        logcat_args+=("-d")
+    fi
+
+    if [[ -n "$app_package" ]]; then
+        pid="$(resolve_package_pid "$serial" "$app_package")"
+        logcat_args+=("--pid=$pid")
+    fi
+
+    if [[ -n "$grep_expr" ]]; then
+        logcat_args+=("-e" "$grep_expr")
+    fi
+
+    if [[ -n "$tag" ]]; then
+        filter_specs+=("$tag:$priority" "*:S")
+    else
+        filter_specs+=("*:$priority")
+    fi
+
+    "$ADB_BIN" -s "$serial" "${logcat_args[@]}" "${filter_specs[@]}"
+}
+
+main() {
+    local command="${1:-help}"
+
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
+
+    case "$command" in
+    help | -h | --help)
+        usage
+        ;;
+    devices)
+        init_tools
+        print_devices
+        ;;
+    run)
+        init_tools
+        cmd_run "$@"
+        ;;
+    restart)
+        init_tools
+        cmd_restart "$@"
+        ;;
+    install)
+        init_tools
+        cmd_install "$@"
+        ;;
+    uninstall)
+        init_tools
+        cmd_uninstall "$@"
+        ;;
+    shell)
+        init_tools
+        cmd_shell "$@"
+        ;;
+    run-app)
+        init_tools
+        cmd_run_app "$@"
+        ;;
+    reset-app)
+        init_tools
+        cmd_reset_app "$@"
+        ;;
+    restart-app)
+        init_tools
+        cmd_restart_app "$@"
+        ;;
+    screenshot)
+        init_tools
+        cmd_screenshot "$@"
+        ;;
+    logcat)
+        init_tools
+        cmd_logcat "$@"
+        ;;
+    *)
+        echo "Error: unknown command: $command" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+}
+
+main "$@"
