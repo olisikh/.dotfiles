@@ -61,7 +61,7 @@ in
 
     ai = {
       ollama = enabled;
-      codex = enabled;
+      chatgpt = enabled;
     };
 
     network = {
