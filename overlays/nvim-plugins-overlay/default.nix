@@ -118,8 +118,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "rcarriga";
         repo = "nvim-dap-ui";
-        rev = "1a66cabaa4a4da0be107d5eda6d57242f0fe7e49";
-        hash = "sha256-J/gUD4X//JtC2HB3HBeONivCQdMnXDnZJWd6jFF9+nk=";
+        rev = "cc9dd33aade7f20bae414d0cba163bc60d4d4b43";
+        hash = "sha256-za3/6W1J6aMvNZQq8ANCq+TGHKHJtSxR/C5t3/oL3DI=";
       };
       dependencies = with final.vimPlugins; [ nvim-dap nvim-nio ];
       doCheck = false;
