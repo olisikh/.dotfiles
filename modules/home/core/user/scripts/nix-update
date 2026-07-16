@@ -16,9 +16,9 @@ usage() {
 Usage: $(basename "$0") [flags] [search-dir] [nix flake update args...]
 
 Flags:
-  --hashes-only, --no-flake   Update pinned source hashes only
-  --flake-only, --no-hashes   Run nix flake update only
-  -h, --help                  Show this help
+  --hashes      Update pinned source hashes only
+  --flake       Run nix flake update only
+  -h, --help    Show this help
 EOF
 }
 
@@ -27,12 +27,12 @@ parse_args() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-        --hashes-only | --no-flake)
+        --hashes)
             UPDATE_HASHES=1
             UPDATE_FLAKE=0
             shift
             ;;
-        --flake-only | --no-hashes)
+        --flake)
             UPDATE_HASHES=0
             UPDATE_FLAKE=1
             shift
