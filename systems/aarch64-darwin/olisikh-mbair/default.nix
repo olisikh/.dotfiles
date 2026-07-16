@@ -47,6 +47,7 @@ in
     media = {
       spotify = enabled;
       obs = enabled;
+      transmission = enabled;
     };
 
     containers.colima = enabled;
