@@ -17,9 +17,9 @@ in
       message = "Codexbar requires homebrew to be enabled (core.homebrew.enable = true)";
     }];
 
-    homebrew = {
-      taps = [ "steipete/tap" ];
-      casks = [ "codexbar" ];
-    };
+    homebrew.casks = [ {
+      name = "steipete/tap/codexbar";
+      trusted = true;
+    } ];
   };
 }

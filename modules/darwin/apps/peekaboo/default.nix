@@ -17,9 +17,9 @@ in
       message = "Peekaboo requires homebrew to be enabled (core.homebrew.enable = true)";
     }];
 
-    homebrew = {
-      taps = [ "steipete/tap" ];
-      brews = [ "peekaboo" ];
-    };
+    homebrew.brews = [ {
+      name = "steipete/tap/peekaboo";
+      trusted = true;
+    } ];
   };
 }

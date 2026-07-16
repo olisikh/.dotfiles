@@ -17,9 +17,9 @@ in
       message = "RepoBar requires homebrew to be enabled (core.homebrew.enable = true)";
     }];
 
-    homebrew = {
-      taps = [ "steipete/tap" ];
-      casks = [ "repobar" ];
-    };
+    homebrew.casks = [ {
+      name = "steipete/tap/repobar";
+      trusted = true;
+    } ];
   };
 }
