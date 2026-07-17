@@ -131,9 +131,8 @@ in
 
     ai = {
       whisper = enabled;
-      antigravity = enabled;
       gemini = enabled;
-      gh-copilot = enabled;
+      copilot = enabled;
       opencode = enabled;
     };
 

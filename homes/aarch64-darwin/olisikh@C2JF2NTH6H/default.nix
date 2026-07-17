@@ -136,7 +136,7 @@ in
     };
 
     ai = {
-      gh-copilot = enabled;
+      copilot = enabled;
       opencode = {
         enable = true;
         config = {

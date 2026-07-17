@@ -7,7 +7,7 @@ let
 in
 {
   options.${namespace}.ai.gemini = {
-    enable = mkBoolOpt false "Enable gemini (AI harness)";
+    enable = mkBoolOpt false "Enable Gemini CLI";
   };
 
   config = mkIf cfg.enable {
