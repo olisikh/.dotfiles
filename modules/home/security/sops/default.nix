@@ -3,7 +3,7 @@ let
   inherit (lib) mkIf;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
-  cfg = config.${namespace}.core.sops;
+  cfg = config.${namespace}.security.sops;
   home = config.home.homeDirectory;
 
   normalizedSecrets = lib.mapAttrs
@@ -17,7 +17,7 @@ let
     cfg.secrets;
 in
 {
-  options.${namespace}.core.sops = with lib.types; {
+  options.${namespace}.security.sops = with lib.types; {
     enable = mkBoolOpt false "Enable sops program";
     keyFile = mkOpt str "${home}/.config/sops/age/keys.txt" "Path to the sops age keys file";
     secretsFile = mkOpt str "${home}/.config/sops/secrets.yaml" "Path to the sops secrets file";

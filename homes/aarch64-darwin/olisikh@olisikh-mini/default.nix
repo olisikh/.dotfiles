@@ -6,53 +6,6 @@ in
   olisikh = {
     core = {
       user = enabled;
-      sops = {
-        enable = true;
-        secrets = {
-          elevenlabs = {
-            key = "ai/elevenlabs";
-            name = "ai/elevenlabs";
-          };
-
-          telegramBotToken = {
-            key = "openclaw/telegramBotToken";
-            name = "openclaw/telegramBotToken";
-          };
-          openclawGatewayToken = {
-            key = "openclaw/gatewayToken";
-            name = "openclaw/gatewayToken";
-          };
-          openclawOpencode = {
-            key = "openclaw/opencode";
-            name = "openclaw/opencode";
-          };
-          openclawGemini = {
-            key = "openclaw/gemini";
-            name = "openclaw/gemini";
-          };
-          openclawOllama = {
-            key = "openclaw/ollama";
-            name = "openclaw/ollama";
-          };
-
-          hermesGithub = {
-            key = "hermes/github";
-            name = "hermes/github";
-          };
-          hermesGemini = {
-            key = "hermes/gemini";
-            name = "hermes/gemini";
-          };
-          hermesOpencode = {
-            key = "hermes/opencode";
-            name = "hermes/opencode";
-          };
-          hermesOllama = {
-            key = "hermes/ollama";
-            name = "hermes/ollama";
-          };
-        };
-      };
     };
 
     fonts = enabled;
@@ -111,7 +64,57 @@ in
 
     };
 
-    security.crypto = enabled;
+    security = {
+      crypto = enabled;
+      sops = {
+        enable = true;
+        secrets = {
+          elevenlabs = {
+            key = "ai/elevenlabs";
+            name = "ai/elevenlabs";
+          };
+
+          telegramBotToken = {
+            key = "openclaw/telegramBotToken";
+            name = "openclaw/telegramBotToken";
+          };
+          openclawGatewayToken = {
+            key = "openclaw/gatewayToken";
+            name = "openclaw/gatewayToken";
+          };
+          openclawOpencode = {
+            key = "openclaw/opencode";
+            name = "openclaw/opencode";
+          };
+          openclawGemini = {
+            key = "openclaw/gemini";
+            name = "openclaw/gemini";
+          };
+          openclawOllama = {
+            key = "openclaw/ollama";
+            name = "openclaw/ollama";
+          };
+
+          hermesGithub = {
+            key = "hermes/github";
+            name = "hermes/github";
+          };
+          hermesGemini = {
+            key = "hermes/gemini";
+            name = "hermes/gemini";
+          };
+          hermesOpencode = {
+            key = "hermes/opencode";
+            name = "hermes/opencode";
+          };
+          hermesOllama = {
+            key = "hermes/ollama";
+            name = "hermes/ollama";
+          };
+        };
+      };
+    };
+
     media.tools = enabled;
     utils = enabled;
 

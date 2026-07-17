@@ -12,19 +12,6 @@ in
           JAVA_OPTS = "-Djavax.net.ssl.trustStore=/opt/jdk17/lib/security/cacerts";
         };
       };
-      sops = {
-        enable = true;
-        secrets = {
-          opencode = {
-            path = "ai/opencode";
-            key = "ai/opencode";
-          };
-          gemini = {
-            path = "ai/gemini";
-            key = "ai/gemini";
-          };
-        };
-      };
     };
 
     fonts = enabled;
@@ -160,7 +147,23 @@ in
       };
     };
 
-    security.crypto = enabled;
+    security = {
+      crypto = enabled;
+
+      sops = {
+        enable = true;
+        secrets = {
+          opencode = {
+            path = "ai/opencode";
+            key = "ai/opencode";
+          };
+          gemini = {
+            path = "ai/gemini";
+            key = "ai/gemini";
+          };
+        };
+      };
+    };
     utils = enabled;
   };
 }

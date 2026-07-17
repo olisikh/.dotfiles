@@ -6,27 +6,6 @@ in
   olisikh = {
     core = {
       user = enabled;
-      sops = {
-        enable = true;
-        secrets = {
-          opencode = {
-            key = "ai/opencode";
-            name = "ai/opencode";
-          };
-          openrouter = {
-            key = "ai/openrouter";
-            name = "ai/openrouter";
-          };
-          gemini = {
-            key = "ai/gemini";
-            name = "ai/gemini";
-          };
-          flakeHub = {
-            key = "nix/flake-hub";
-            name = "nix/flake-hub";
-          };
-        };
-      };
     };
 
     fonts = enabled;
@@ -158,7 +137,31 @@ in
       opencode = enabled;
     };
 
-    security.crypto = enabled;
+    security = {
+      crypto = enabled;
+
+      sops = {
+        enable = true;
+        secrets = {
+          opencode = {
+            key = "ai/opencode";
+            name = "ai/opencode";
+          };
+          openrouter = {
+            key = "ai/openrouter";
+            name = "ai/openrouter";
+          };
+          gemini = {
+            key = "ai/gemini";
+            name = "ai/gemini";
+          };
+          flakeHub = {
+            key = "nix/flake-hub";
+            name = "nix/flake-hub";
+          };
+        };
+      };
+    };
     utils = enabled;
   };
 }
