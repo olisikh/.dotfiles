@@ -141,6 +141,10 @@ in
             key = "plane/hermes-webhook-secret";
             name = "plane/hermes-webhook-secret";
           };
+          planeAdminPassword = {
+            key = "plane/admin-password";
+            name = "plane/admin-password";
+          };
 
           tailscaleGolinkAuthKey = {
             key = "tailscale/golinkAuthKey";
