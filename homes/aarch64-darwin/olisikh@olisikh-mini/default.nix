@@ -4,9 +4,7 @@ let
 in
 {
   olisikh = {
-    core = {
-      user = enabled;
-    };
+    core.user = enabled;
 
     fonts = enabled;
 
@@ -109,6 +107,11 @@ in
           hermesOllama = {
             key = "hermes/ollama";
             name = "hermes/ollama";
+          };
+
+          tailscaleGolinkAuthKey = {
+            key = "tailscale/golinkAuthKey";
+            name = "tailscale/golink-auth-key";
           };
         };
       };

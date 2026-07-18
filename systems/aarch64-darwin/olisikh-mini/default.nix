@@ -52,7 +52,11 @@ in
     };
 
     network = {
-      tailscale = enabled;
+      tailscale = {
+        enable = true;
+        caddy = enabled;
+        golink = enabled;
+      };
       clearvpn = enabled;
     };
   };
