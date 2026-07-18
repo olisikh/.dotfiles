@@ -47,9 +47,11 @@ let
 
       ${lib.optionalString caddyCfg.openclaw.enable ''
       # OpenClaw owns its configured basePath, so preserve the prefix upstream.
-      @openclaw_bare path ${caddyCfg.openclaw.prefix}
-      redir @openclaw_bare ${caddyCfg.openclaw.prefix}/ permanent
-      handle ${caddyCfg.openclaw.prefix}/* {
+      # Its WebSocket endpoint is the exact base path (without a trailing slash),
+      # which must be proxied rather than redirected because WebSocket clients do
+      # not follow HTTP redirects during the handshake.
+      @openclaw path ${caddyCfg.openclaw.prefix} ${caddyCfg.openclaw.prefix}/*
+      handle @openclaw {
         reverse_proxy ${caddyCfg.openclaw.upstream} {
           header_up X-Forwarded-Proto "https"
         }
