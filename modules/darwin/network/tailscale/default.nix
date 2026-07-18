@@ -46,18 +46,11 @@ let
       ''}
 
       ${lib.optionalString caddyCfg.plane.enable ''
-      # Plane is reached through the public /plane prefix, while the upstream
-      # Compose proxy remains root-routed and loopback-only. Plane's WEB_URL
-      # and the browser compatibility suite must prove this arrangement.
-      @plane_bare path ${caddyCfg.plane.prefix}
-      redir @plane_bare ${caddyCfg.plane.prefix}/ permanent
-      handle_path ${caddyCfg.plane.prefix}/* {
-        reverse_proxy ${caddyCfg.plane.upstream} {
-          header_up Host "{http.request.host}"
-          header_up X-Forwarded-Proto "https"
-          header_up X-Forwarded-Prefix "${caddyCfg.plane.prefix}"
-        }
-      }
+      # Plane emits root-relative browser assets and does not accept a path in
+      # CORS_ALLOWED_ORIGINS. Preserve this legacy path as a safe redirect;
+      # Plane itself owns the Tailnet host root below.
+      @plane_legacy path ${caddyCfg.plane.prefix} ${caddyCfg.plane.prefix}/*
+      redir @plane_legacy / permanent
 
       # Plane must be able to send a signed work-item webhook to a narrow
       # dispatcher without exposing Hermes' privileged webhook server.
@@ -84,10 +77,24 @@ let
       }
       ''}
 
+      ${lib.optionalString caddyCfg.plane.enable ''
+      # This catch-all is intentionally after every explicit application route.
+      # It makes the root-relative Plane shell, assets, API and live endpoints
+      # resolve on the Tailnet hostname without exposing the Compose proxy.
+      handle {
+        reverse_proxy ${caddyCfg.plane.upstream} {
+          header_up Host "{http.request.host}"
+          header_up X-Forwarded-Proto "https"
+        }
+      }
+      ''}
+
       # Do not let an unmatched path fall through to a privileged application.
+      ${lib.optionalString (!caddyCfg.plane.enable) ''
       @root path /
       redir @root ${caddyCfg.rootRedirect} permanent
       respond "Not Found" 404
+      ''}
     }
   '';
 
