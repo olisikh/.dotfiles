@@ -15,15 +15,51 @@ let
     }
 
     # Tailscale Serve is the only remote-facing layer. Keep Caddy strictly
-    # loopback-only and rewrite the Host header required by Hermes' guard.
+    # loopback-only. Each application owns an explicit public prefix so that
+    # their root-relative SPA/API paths never collide.
     :${toString caddyCfg.port} {
       bind 127.0.0.1
 
-      reverse_proxy ${caddyCfg.upstream} {
-        header_up Host "${caddyCfg.upstream}"
-        header_up Origin "${caddyCfg.upstream}" 
-        header_up X-Forwarded-Proto "https"
+      # Hermes Dashboard supports a forwarded prefix, but its host/origin
+      # guard still requires the loopback authority upstream.
+      @dashboard_bare path ${caddyCfg.dashboardPrefix}
+      redir @dashboard_bare ${caddyCfg.dashboardPrefix}/ permanent
+      handle_path ${caddyCfg.dashboardPrefix}/* {
+        reverse_proxy ${caddyCfg.upstream} {
+          header_up Host "${caddyCfg.upstream}"
+          header_up Origin "http://${caddyCfg.upstream}"
+          header_up X-Forwarded-Prefix "${caddyCfg.dashboardPrefix}"
+          header_up X-Forwarded-Proto "https"
+        }
       }
+
+      ${lib.optionalString caddyCfg.webui.enable ''
+      # Hermes WebUI resolves normal UI/API/SSE paths from document.baseURI.
+      # Strip the public prefix because its Python server is root-routed.
+      @webui_bare path ${caddyCfg.webui.prefix}
+      redir @webui_bare ${caddyCfg.webui.prefix}/ permanent
+      handle_path ${caddyCfg.webui.prefix}/* {
+        reverse_proxy ${caddyCfg.webui.upstream} {
+          header_up X-Forwarded-Proto "https"
+        }
+      }
+      ''}
+
+      ${lib.optionalString caddyCfg.openclaw.enable ''
+      # OpenClaw owns its configured basePath, so preserve the prefix upstream.
+      @openclaw_bare path ${caddyCfg.openclaw.prefix}
+      redir @openclaw_bare ${caddyCfg.openclaw.prefix}/ permanent
+      handle ${caddyCfg.openclaw.prefix}/* {
+        reverse_proxy ${caddyCfg.openclaw.upstream} {
+          header_up X-Forwarded-Proto "https"
+        }
+      }
+      ''}
+
+      # Do not let an unmatched path fall through to a privileged application.
+      @root path /
+      redir @root ${caddyCfg.rootRedirect} permanent
+      respond "Not Found" 404
     }
   '';
 
@@ -79,7 +115,51 @@ in
       upstream = mkOption {
         type = types.str;
         default = "127.0.0.1:9119";
-        description = "Loopback upstream to proxy while rewriting the Host header.";
+        description = "Hermes Dashboard loopback upstream to proxy while rewriting the Host header.";
+      };
+
+      dashboardPrefix = mkOption {
+        type = types.str;
+        default = "/hermes";
+        description = "Public path prefix for the Hermes Dashboard.";
+      };
+
+      rootRedirect = mkOption {
+        type = types.str;
+        default = "/hermes/";
+        description = "Public path used when a browser requests the bare Tailnet HTTPS root.";
+      };
+
+      webui = {
+        enable = mkBoolOpt false "Expose Hermes WebUI below the shared Tailnet HTTPS proxy";
+
+        prefix = mkOption {
+          type = types.str;
+          default = "/hermes-webui";
+          description = "Public path prefix for Hermes WebUI.";
+        };
+
+        upstream = mkOption {
+          type = types.str;
+          default = "127.0.0.1:8787";
+          description = "Hermes WebUI loopback upstream.";
+        };
+      };
+
+      openclaw = {
+        enable = mkBoolOpt false "Expose OpenClaw Control UI below the shared Tailnet HTTPS proxy";
+
+        prefix = mkOption {
+          type = types.str;
+          default = "/openclaw";
+          description = "Public path prefix for OpenClaw Control UI.";
+        };
+
+        upstream = mkOption {
+          type = types.str;
+          default = "127.0.0.1:18789";
+          description = "OpenClaw Control UI loopback upstream.";
+        };
       };
 
       logsDir = mkOption {

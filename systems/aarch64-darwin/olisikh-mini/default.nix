@@ -54,7 +54,12 @@ in
     network = {
       tailscale = {
         enable = true;
-        caddy = enabled;
+        caddy = {
+          enable = true;
+          rootRedirect = "/hermes-webui/";
+          webui.enable = true;
+          openclaw.enable = true;
+        };
         golink = enabled;
       };
       clearvpn = enabled;
