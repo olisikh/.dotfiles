@@ -21,6 +21,7 @@ let
 
       reverse_proxy ${caddyCfg.upstream} {
         header_up Host "${caddyCfg.upstream}"
+        header_up Origin "${caddyCfg.upstream}" 
         header_up X-Forwarded-Proto "https"
       }
     }
