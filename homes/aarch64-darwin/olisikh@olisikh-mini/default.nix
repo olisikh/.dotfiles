@@ -109,6 +109,39 @@ in
             name = "hermes/ollama";
           };
 
+          planeSecretKey = {
+            key = "plane/secret-key";
+            name = "plane/secret-key";
+          };
+          planePostgresPassword = {
+            key = "plane/postgres-password";
+            name = "plane/postgres-password";
+          };
+          planeRabbitmqPassword = {
+            key = "plane/rabbitmq-password";
+            name = "plane/rabbitmq-password";
+          };
+          planeMinioAccessKey = {
+            key = "plane/minio-access-key";
+            name = "plane/minio-access-key";
+          };
+          planeMinioSecretKey = {
+            key = "plane/minio-secret-key";
+            name = "plane/minio-secret-key";
+          };
+          planeLiveServerSecretKey = {
+            key = "plane/live-server-secret-key";
+            name = "plane/live-server-secret-key";
+          };
+          planeDispatcherSecret = {
+            key = "plane/dispatcher-secret";
+            name = "plane/dispatcher-secret";
+          };
+          planeHermesWebhookSecret = {
+            key = "plane/hermes-webhook-secret";
+            name = "plane/hermes-webhook-secret";
+          };
+
           tailscaleGolinkAuthKey = {
             key = "tailscale/golinkAuthKey";
             name = "tailscale/golink-auth-key";

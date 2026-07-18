@@ -58,6 +58,7 @@ in
           enable = true;
           rootRedirect = "/hermes-webui/";
           webui.enable = true;
+          plane.enable = true;
           openclaw.enable = true;
         };
         golink = enabled;
