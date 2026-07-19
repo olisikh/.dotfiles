@@ -19,6 +19,78 @@ let
     PLANE_PROXY_PORT = toString cfg.proxyPort;
   };
 
+  patchPlaneWebIndex = pkgs.writers.writePython3 "patch-plane-web-index" {
+    libraries = [];
+    doCheck = false;
+  } ''
+    from __future__ import annotations
+
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    def run(*args, check=True, timeout=60):
+        result = subprocess.run(
+            list(args),
+            capture_output=True,
+            text=True,
+            check=check,
+            timeout=timeout,
+        )
+        return result.stdout
+
+    def main():
+        state_dir = Path(os.environ.get("PLANE_STATE_DIR", ""))
+        if not state_dir:
+            raise SystemExit("PLANE_STATE_DIR is required")
+        state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+
+        output = state_dir / "plane-web-index.html"
+        container = os.environ.get("PLANE_WEB_CONTAINER", "plane-web-1")
+        src_path = os.environ.get("PLANE_WEB_SRC_PATH", "/usr/share/nginx/html/index.html")
+
+        polyfill = (
+            "<script>"
+            "window.requestIdleCallback=window.requestIdleCallback||"
+            "function(cb,opts){var start=performance.now(),timeout=(opts&&opts.timeout)||50;"
+            "return setTimeout(function(){"
+            "cb({didTimeout:false,timeRemaining:function(){return Math.max(0,timeout-(performance.now()-start));}});"
+            "},1);};"
+            "window.cancelIdleCallback=window.cancelIdleCallback||function(id){clearTimeout(id);};"
+            "</script>"
+        )
+
+        try:
+            image = run("docker", "inspect", "-f", "{{.Config.Image}}", container).strip()
+            if not image:
+                raise SystemExit(f"could not determine image for {container}")
+        except subprocess.CalledProcessError as exc:
+            raise SystemExit(f"could not inspect {container}: {exc.stderr}") from exc
+        except FileNotFoundError as exc:
+            raise SystemExit("docker CLI is not available") from exc
+
+        try:
+            html = run("docker", "run", "--rm", "--entrypoint", "cat", image, src_path)
+        except subprocess.CalledProcessError as exc:
+            raise SystemExit(f"could not extract {src_path} from {image}: {exc.stderr}") from exc
+
+        marker = "</head>"
+        if marker not in html:
+            raise SystemExit(f"{src_path} has no </head> tag; cannot inject polyfill")
+
+        patched = html.replace(marker, polyfill + marker, 1)
+
+        temporary = output.with_suffix(".tmp")
+        temporary.write_text(patched, encoding="utf-8")
+        temporary.chmod(0o600)
+        temporary.replace(output)
+        print(f"patched {output} from {image} ({len(patched)} bytes)", file=sys.stderr)
+
+    if __name__ == "__main__":
+        main()
+  '';
+
   mkMcpRunner = name: pkgs.writeShellApplication {
     inherit name;
     runtimeInputs = [ python cfg.mcpPackage ];
@@ -63,7 +135,7 @@ let
 
   supervisor = pkgs.writeShellApplication {
     name = "plane-supervisor";
-    runtimeInputs = [ pkgs.docker python ];
+    runtimeInputs = [ pkgs.docker python patchPlaneWebIndex ];
     text = ''
       set -euo pipefail
       umask 077
@@ -85,6 +157,15 @@ let
       }
 
       compose up -d --no-build
+
+      # Patch the Plane web index.html with a Safari-compatible
+      # requestIdleCallback polyfill. WebKit on iOS does not implement
+      # requestIdleCallback, which crashes Plane's board/gantt layout loader.
+      # We extract the live index.html from the running container, inject the
+      # polyfill, and bind-mount it back. This is idempotent and adapts to
+      # future Plane frontend image updates.
+      ${patchPlaneWebIndex}
+
       for _ in $(seq 1 60); do
         if ${scriptsDir}/plane-healthcheck; then
           break

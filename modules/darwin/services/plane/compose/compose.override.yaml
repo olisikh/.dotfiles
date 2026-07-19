@@ -4,6 +4,8 @@
 services:
   web:
     restart: unless-stopped
+    volumes:
+      - ${PLANE_WEB_INDEX:?required}:/usr/share/nginx/html/index.html:ro
   space:
     restart: unless-stopped
   admin:
