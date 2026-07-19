@@ -1,0 +1,39 @@
+# Local deployment overrides for the official Plane v1.3.1 Compose release.
+# Keep every host-published port loopback-only; Tailscale Serve -> Caddy is
+# the only remote-facing path.
+services:
+  web:
+    restart: unless-stopped
+  space:
+    restart: unless-stopped
+  admin:
+    restart: unless-stopped
+  live:
+    restart: unless-stopped
+  api:
+    restart: unless-stopped
+  worker:
+    restart: unless-stopped
+  beat-worker:
+    restart: unless-stopped
+  migrator:
+    restart: "no"
+  plane-db:
+    restart: unless-stopped
+  plane-redis:
+    restart: unless-stopped
+  plane-mq:
+    restart: unless-stopped
+  plane-minio:
+    restart: unless-stopped
+  proxy:
+    restart: unless-stopped
+    ports:
+      - target: 80
+        published: "${LISTEN_HTTP_PORT}"
+        host_ip: "127.0.0.1"
+        protocol: tcp
+      - target: 443
+        published: "${LISTEN_HTTPS_PORT}"
+        host_ip: "127.0.0.1"
+        protocol: tcp

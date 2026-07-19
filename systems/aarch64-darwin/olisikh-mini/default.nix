@@ -42,6 +42,12 @@ in
 
     media.spotify = enabled;
 
+    services.plane = {
+      enable = true;
+      productionActive = true;
+      canary.enable = false;
+    };
+
     containers.colima = enabled;
 
     ai = {
