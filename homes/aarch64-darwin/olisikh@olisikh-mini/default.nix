@@ -141,6 +141,10 @@ in
             key = "plane/hermes-webhook-secret";
             name = "plane/hermes-webhook-secret";
           };
+          planeHermesApiToken = {
+            key = "plane/hermes-api-token";
+            name = "plane/hermes-api-token";
+          };
           planeAdminPassword = {
             key = "plane/admin-password";
             name = "plane/admin-password";
