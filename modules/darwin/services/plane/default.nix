@@ -19,8 +19,7 @@ let
     PLANE_PROXY_PORT = toString cfg.proxyPort;
   };
 
-  patchPlaneWebIndex = pkgs.writers.writePython3 "patch-plane-web-index" {
-    libraries = [];
+  patchPlaneWebAssets = pkgs.writers.writePython3 "patch-plane-web-assets" {
     doCheck = false;
   } ''
     from __future__ import annotations
@@ -40,16 +39,7 @@ let
         )
         return result.stdout
 
-    def main():
-        state_dir = Path(os.environ.get("PLANE_STATE_DIR", ""))
-        if not state_dir:
-            raise SystemExit("PLANE_STATE_DIR is required")
-        state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-
-        output = state_dir / "plane-web-index.html"
-        container = os.environ.get("PLANE_WEB_CONTAINER", "plane-web-1")
-        src_path = os.environ.get("PLANE_WEB_SRC_PATH", "/usr/share/nginx/html/index.html")
-
+    def patch_html(html: str) -> str:
         polyfill = (
             "<script>"
             "window.requestIdleCallback=window.requestIdleCallback||"
@@ -60,9 +50,47 @@ let
             "window.cancelIdleCallback=window.cancelIdleCallback||function(id){clearTimeout(id);};"
             "</script>"
         )
+        marker = "</head>"
+        if marker not in html:
+            raise SystemExit("index.html has no </head> tag; cannot inject polyfill")
+        return html.replace(marker, polyfill + marker, 1)
+
+    def patch_sw(sw: str) -> str:
+        # Force the service worker to purge Workbox caches on activation so that
+        # devices with stale cached index.html/JS (from before the polyfill)
+        # fetch fresh assets immediately instead of crashing once.
+        eviction = (
+            "self.addEventListener('activate', function(event) {"
+            "event.waitUntil(caches.keys().then(function(names) {"
+            "return Promise.all(names.map(function(name) { return caches.delete(name); }));"
+            "}).then(function() { return self.clients.claim(); }));"
+            "});"
+        )
+        if "self.addEventListener('activate'" in sw:
+            return sw
+        # Append after the loader preamble and before the workbox define block.
+        return sw.replace('define(["./workbox-', eviction + '\ndefine(["./workbox-', 1)
+
+    def write_output(output: Path, content: str) -> None:
+        temporary = output.with_suffix(".tmp")
+        temporary.write_text(content, encoding="utf-8")
+        temporary.chmod(0o600)
+        temporary.replace(output)
+
+    def main() -> None:
+        state_dir = Path(os.environ.get("PLANE_STATE_DIR", ""))
+        if not state_dir:
+            raise SystemExit("PLANE_STATE_DIR is required")
+        state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+
+        container = os.environ.get("PLANE_WEB_CONTAINER", "plane-web-1")
+        src_index = os.environ.get("PLANE_WEB_SRC_INDEX", "/usr/share/nginx/html/index.html")
+        src_sw = os.environ.get("PLANE_WEB_SRC_SW", "/usr/share/nginx/html/sw.js")
+        image = os.environ.get("PLANE_WEB_IMAGE", "").strip()
 
         try:
-            image = run("docker", "inspect", "-f", "{{.Config.Image}}", container).strip()
+            if not image:
+                image = run("docker", "inspect", "-f", "{{.Config.Image}}", container).strip()
             if not image:
                 raise SystemExit(f"could not determine image for {container}")
         except subprocess.CalledProcessError as exc:
@@ -71,21 +99,26 @@ let
             raise SystemExit("docker CLI is not available") from exc
 
         try:
-            html = run("docker", "run", "--rm", "--entrypoint", "cat", image, src_path)
+            html = run("docker", "run", "--rm", "--entrypoint", "cat", image, src_index)
         except subprocess.CalledProcessError as exc:
-            raise SystemExit(f"could not extract {src_path} from {image}: {exc.stderr}") from exc
+            raise SystemExit(f"could not extract {src_index} from {image}: {exc.stderr}") from exc
 
-        marker = "</head>"
-        if marker not in html:
-            raise SystemExit(f"{src_path} has no </head> tag; cannot inject polyfill")
+        try:
+            sw = run("docker", "run", "--rm", "--entrypoint", "cat", image, src_sw)
+        except subprocess.CalledProcessError as exc:
+            raise SystemExit(f"could not extract {src_sw} from {image}: {exc.stderr}") from exc
 
-        patched = html.replace(marker, polyfill + marker, 1)
+        patched_html = patch_html(html)
+        patched_sw = patch_sw(sw)
 
-        temporary = output.with_suffix(".tmp")
-        temporary.write_text(patched, encoding="utf-8")
-        temporary.chmod(0o600)
-        temporary.replace(output)
-        print(f"patched {output} from {image} ({len(patched)} bytes)", file=sys.stderr)
+        html_output = state_dir / "plane-web-index.html"
+        sw_output = state_dir / "plane-web-sw.js"
+        write_output(html_output, patched_html)
+        write_output(sw_output, patched_sw)
+        print(
+            f"patched {html_output} ({len(patched_html)} bytes) and {sw_output} ({len(patched_sw)} bytes) from {image}",
+            file=sys.stderr,
+        )
 
     if __name__ == "__main__":
         main()
@@ -135,7 +168,7 @@ let
 
   supervisor = pkgs.writeShellApplication {
     name = "plane-supervisor";
-    runtimeInputs = [ pkgs.docker python patchPlaneWebIndex ];
+    runtimeInputs = [ pkgs.docker python patchPlaneWebAssets ];
     text = ''
       set -euo pipefail
       umask 077
@@ -156,15 +189,16 @@ let
           "$@"
       }
 
-      compose up -d --no-build
+      # Patch Plane web assets for iOS Safari compatibility before the web
+      # container starts, because the bind mounts must already exist. WebKit does
+      # not implement requestIdleCallback, which crashes Plane's board/gantt
+      # layout loader. We also purge Workbox caches via sw.js so devices with
+      # stale cached HTML/JS fetch fresh assets immediately.
+      PLANE_WEB_IMAGE="$(compose config --format json | ${python}/bin/python -c 'import json,sys; print(json.load(sys.stdin)["services"]["web"]["image"])')"
+      export PLANE_WEB_IMAGE
+      ${patchPlaneWebAssets}
 
-      # Patch the Plane web index.html with a Safari-compatible
-      # requestIdleCallback polyfill. WebKit on iOS does not implement
-      # requestIdleCallback, which crashes Plane's board/gantt layout loader.
-      # We extract the live index.html from the running container, inject the
-      # polyfill, and bind-mount it back. This is idempotent and adapts to
-      # future Plane frontend image updates.
-      ${patchPlaneWebIndex}
+      compose up -d --no-build
 
       for _ in $(seq 1 60); do
         if ${scriptsDir}/plane-healthcheck; then

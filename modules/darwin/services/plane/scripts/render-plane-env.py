@@ -85,7 +85,6 @@ def main() -> None:
         # validates Plane's HMAC before forwarding work to Hermes.
         "WEBHOOK_ALLOWED_HOSTS": TAILNET_HOST,
         "WEBHOOK_ALLOWED_IPS": "",
-        "PLANE_WEB_INDEX": str(RUNTIME_DIR / "plane-web-index.html"),
     }
     content = "".join(f"{key}={value}\n" for key, value in values.items())
     temporary = OUTPUT.with_suffix(".tmp")
