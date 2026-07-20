@@ -21,11 +21,11 @@ Commands:
 
   run [-s id] [--proxyman]
       Open and run emulator by id. If only one emulator exists, id is optional.
-      --proxyman uses current machine IP address with proxy port 9090.
+      --proxyman uses host localhost (127.0.0.1) with proxy port 9090.
 
   restart [-s id] [--proxyman]
        Restart emulator by id. If emulator is not running, start it first.
-       --proxyman uses current machine IP address with proxy port 9090.
+       --proxyman uses host localhost (127.0.0.1) with proxy port 9090.
 
   install <apk> [-s id]
       Install APK on emulator by id. If emulator is not running, start it first.
@@ -56,9 +56,9 @@ Examples:
   andy devices                      # list emulators
   andy run                          # run without proxy
   andy run -s 2                     # run emulator with id 2
-  andy run --proxyman               # run through current-machine-ip:9090
+  andy run --proxyman               # run through localhost:9090
   andy restart                      # restart emulator
-  andy restart --proxyman           # restart through current-machine-ip:9090
+  andy restart --proxyman           # restart through localhost:9090
   andy install app-debug.apk        # install APK on emulator
   andy uninstall com.ebay.mobile    # uninstall app
   andy shell                        # open adb shell in emulator
@@ -287,30 +287,19 @@ resolve_target_avd() {
 start_emulator() {
     local avd="$1"
     local proxyman="${2:-0}"
-    local network_interface=""
-    local host_ip=""
+    local proxy_host="127.0.0.1"
 
     if (( ! proxyman )); then
         nohup "$EMULATOR_BIN" "@$avd" >/dev/null 2>&1 &
         return 0
     fi
 
-    network_interface="$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit}')"
-    host_ip="$(ipconfig getifaddr "$network_interface" 2>/dev/null || true)"
-
-    # VPN default routes use utun interfaces, which do not expose a LAN IPv4
-    # address. Proxyman must bind to an address reachable by the emulator.
-    if [[ -z "$host_ip" && "$network_interface" != "en0" ]]; then
-        network_interface="en0"
-        host_ip="$(ipconfig getifaddr "$network_interface" 2>/dev/null || true)"
-    fi
-
-    if [[ -z "$host_ip" ]]; then
-        echo "Error: could not determine current machine IP address." >&2
+    if ! lsof -nP -iTCP:9090 -sTCP:LISTEN >/dev/null 2>&1; then
+        echo "Error: Proxyman proxy port 9090 is not listening." >&2
         exit 1
     fi
 
-    nohup "$EMULATOR_BIN" "@$avd" -http-proxy "http://$host_ip:9090" >/dev/null 2>&1 &
+    nohup "$EMULATOR_BIN" "@$avd" -http-proxy "http://$proxy_host:9090" >/dev/null 2>&1 &
 }
 
 wait_for_emulator_serial() {
