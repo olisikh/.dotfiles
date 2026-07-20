@@ -49,6 +49,16 @@ class WorkItemReferenceTests(unittest.TestCase):
             ("project-id", "work-item-id", "PERSONAL-42"),
         )
 
+    def test_extracts_plane_v131_issueexpand_project_reference(self) -> None:
+        from plane_dispatcher import extract_work_item_ref
+
+        payload = {
+            "event": "issue",
+            "data": {"id": "work-item-id", "project": "project-id", "sequence_id": 30},
+        }
+
+        self.assertEqual(extract_work_item_ref(payload), ("project-id", "work-item-id", ""))
+
     def test_rejects_non_issue_or_incomplete_events(self) -> None:
         from plane_dispatcher import extract_work_item_ref
 

@@ -205,7 +205,10 @@ def extract_work_item_ref(payload: dict[str, Any]) -> tuple[str, str, str] | Non
     data = payload.get("data", {})
     if not isinstance(data, dict):
         return None
-    project_id = data.get("project_id") or ""
+    # Plane v1.3.1's IssueExpandSerializer uses `project`; older payloads and
+    # some API paths use `project_id`. Accept both while treating the webhook
+    # body only as a reference — Hermes re-fetches live state through MCP.
+    project_id = data.get("project_id") or data.get("project") or ""
     work_item_id = data.get("id") or ""
     identifier = data.get("identifier") or ""
     if not project_id or not work_item_id:
