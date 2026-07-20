@@ -56,11 +56,15 @@ def test_deliver_marks_2xx_successful() -> None:
     try:
         original_url = hermes_consumer.HERMES_WEBHOOK_URL
         hermes_consumer.HERMES_WEBHOOK_URL = f"http://127.0.0.1:{port}/webhooks/plane-work-item"
-        assert hermes_consumer.deliver(HERMES_SECRET, ("d-1", "p-1", "w-1", "#1"))
+        assert hermes_consumer.deliver(
+            HERMES_SECRET, ("d-1", "p-1", "w-1", "#1", "issue_comment", "comment-1")
+        )
         assert len(received) == 1
         req = received[0]
         assert req["body"]["delivery_id"] == "d-1"
         assert req["body"]["project_id"] == "p-1"
+        assert req["body"]["event_type"] == "issue_comment"
+        assert req["body"]["comment_id"] == "comment-1"
         assert "X-Webhook-Timestamp" in req["headers"]
         assert "X-Webhook-Signature-V2" in req["headers"]
         assert hmac.compare_digest(

@@ -59,6 +59,16 @@ class WorkItemReferenceTests(unittest.TestCase):
 
         self.assertEqual(extract_work_item_ref(payload), ("project-id", "work-item-id", ""))
 
+    def test_extracts_project_and_work_item_ids_from_comment_event(self) -> None:
+        from plane_dispatcher import extract_work_item_ref
+
+        payload = {
+            "event": "issue_comment",
+            "data": {"id": "comment-id", "project": "project-id", "issue": "work-item-id"},
+        }
+
+        self.assertEqual(extract_work_item_ref(payload), ("project-id", "work-item-id", ""))
+
     def test_rejects_non_issue_or_incomplete_events(self) -> None:
         from plane_dispatcher import extract_work_item_ref
 
@@ -72,14 +82,20 @@ class DeliveryQueueTests(unittest.TestCase):
         self.addCleanup(queue.close)
         self.assertTrue(queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1"))
         self.assertFalse(queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1"))
-        self.assertEqual(queue.pending(), [("delivery-1", "project-1", "item-1", "PERSONAL-1")])
+        self.assertEqual(
+            queue.pending(),
+            [("delivery-1", "project-1", "item-1", "PERSONAL-1", "issue", "")],
+        )
 
     def test_claim_pending_makes_a_delivery_invisible_to_another_consumer(self) -> None:
         queue = DeliveryQueue(":memory:")
         self.addCleanup(queue.close)
         queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1")
 
-        self.assertEqual(queue.claim_pending(), [("delivery-1", "project-1", "item-1", "PERSONAL-1")])
+        self.assertEqual(
+            queue.claim_pending(),
+            [("delivery-1", "project-1", "item-1", "PERSONAL-1", "issue", "")],
+        )
         self.assertEqual(queue.claim_pending(), [])
 
     def test_finish_marks_a_claimed_delivery_as_dispatched(self) -> None:
@@ -148,6 +164,35 @@ class DeliveryIngestionTests(unittest.TestCase):
                 body,
             ),
             "rejected",
+        )
+
+    def test_accepts_valid_signed_comment_delivery_with_comment_reference(self) -> None:
+        import json
+
+        body = json.dumps(
+            {
+                "event": "issue_comment",
+                "data": {"id": "comment-1", "issue": "item-1", "project": "project-1"},
+            }
+        ).encode()
+        secret = "secret"
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        queue = DeliveryQueue(":memory:")
+        self.addCleanup(queue.close)
+
+        self.assertEqual(
+            ingest_plane_delivery(
+                queue,
+                CooldownMap(60.0),
+                secret,
+                {"X-Plane-Delivery": "delivery-comment-1", "X-Plane-Signature": signature},
+                body,
+            ),
+            "accepted",
+        )
+        self.assertEqual(
+            queue.pending(),
+            [("delivery-comment-1", "project-1", "item-1", "", "issue_comment", "comment-1")],
         )
 
     def test_rejects_unsigned_or_non_issue_delivery(self) -> None:

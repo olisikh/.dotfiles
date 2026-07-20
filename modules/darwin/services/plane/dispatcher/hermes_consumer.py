@@ -24,14 +24,16 @@ def sign(secret: str, body: bytes, timestamp: str) -> str:
     return hmac.new(secret.encode("utf-8"), signed_content, hashlib.sha256).hexdigest()
 
 
-def deliver(secret: str, delivery: tuple[str, str, str, str]) -> bool:
-    delivery_id, project_id, work_item_id, identifier = delivery
+def deliver(secret: str, delivery: tuple[str, str, str, str, str, str]) -> bool:
+    delivery_id, project_id, work_item_id, identifier, event_type, comment_id = delivery
     body = json.dumps(
         {
             "delivery_id": delivery_id,
             "project_id": project_id,
             "work_item_id": work_item_id,
             "identifier": identifier,
+            "event_type": event_type,
+            "comment_id": comment_id,
         },
         separators=(",", ":"),
         sort_keys=True,

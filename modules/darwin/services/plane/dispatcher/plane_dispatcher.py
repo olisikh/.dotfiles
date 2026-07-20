@@ -52,45 +52,65 @@ class DeliveryQueue:
               project_id TEXT NOT NULL,
               work_item_id TEXT NOT NULL,
               identifier TEXT NOT NULL,
+              event_type TEXT NOT NULL DEFAULT 'issue',
+              comment_id TEXT NOT NULL DEFAULT '',
               status TEXT NOT NULL DEFAULT 'pending'
             )
             """
         )
+        existing_columns = {
+            row[1] for row in self._conn.execute("PRAGMA table_info(deliveries)")
+        }
+        if "event_type" not in existing_columns:
+            self._conn.execute(
+                "ALTER TABLE deliveries ADD COLUMN event_type TEXT NOT NULL DEFAULT 'issue'"
+            )
+        if "comment_id" not in existing_columns:
+            self._conn.execute(
+                "ALTER TABLE deliveries ADD COLUMN comment_id TEXT NOT NULL DEFAULT ''"
+            )
         self._conn.commit()
 
     def enqueue(
-        self, delivery_id: str, project_id: str, work_item_id: str, identifier: str
+        self,
+        delivery_id: str,
+        project_id: str,
+        work_item_id: str,
+        identifier: str,
+        event_type: str = "issue",
+        comment_id: str = "",
     ) -> bool:
         with self._lock:
             cursor = self._conn.execute(
                 """
-                INSERT INTO deliveries (delivery_id, project_id, work_item_id, identifier)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO deliveries
+                  (delivery_id, project_id, work_item_id, identifier, event_type, comment_id)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(delivery_id) DO NOTHING
                 """,
-                (delivery_id, project_id, work_item_id, identifier),
+                (delivery_id, project_id, work_item_id, identifier, event_type, comment_id),
             )
             self._conn.commit()
             return cursor.rowcount == 1
 
-    def pending(self) -> list[tuple[str, str, str, str]]:
+    def pending(self) -> list[tuple[str, str, str, str, str, str]]:
         with self._lock:
             return list(
                 self._conn.execute(
                     """
-                    SELECT delivery_id, project_id, work_item_id, identifier
+                    SELECT delivery_id, project_id, work_item_id, identifier, event_type, comment_id
                     FROM deliveries WHERE status = 'pending' ORDER BY rowid
                     """
                 )
             )
 
-    def claim_pending(self) -> list[tuple[str, str, str, str]]:
+    def claim_pending(self) -> list[tuple[str, str, str, str, str, str]]:
         """Atomically claim every pending delivery for one consumer pass."""
         with self._lock:
             deliveries = list(
                 self._conn.execute(
                     """
-                    SELECT delivery_id, project_id, work_item_id, identifier
+                    SELECT delivery_id, project_id, work_item_id, identifier, event_type, comment_id
                     FROM deliveries WHERE status = 'pending' ORDER BY rowid
                     """
                 )
@@ -183,9 +203,18 @@ def ingest_plane_delivery(
     if ref is None:
         return "rejected"
     project_id, work_item_id, identifier = ref
+    event_type = payload["event"]
+    data = payload["data"]
+    comment_id = data.get("id", "") if event_type == "issue_comment" else ""
     if not cooldown.is_allowed(work_item_id):
         return "cooldown"
-    return "accepted" if queue.enqueue(delivery_id, project_id, work_item_id, identifier) else "rejected"
+    return (
+        "accepted"
+        if queue.enqueue(
+            delivery_id, project_id, work_item_id, identifier, event_type, comment_id
+        )
+        else "rejected"
+    )
 
 
 def verify_plane_signature(secret: str, body: bytes, signature: str) -> bool:
@@ -200,17 +229,23 @@ def extract_work_item_ref(payload: dict[str, Any]) -> tuple[str, str, str] | Non
     The dispatcher intentionally ignores every other event class.  It needs the
     UUID pair to re-fetch current state rather than trusting the event body.
     """
-    if payload.get("event") != "issue":
+    event = payload.get("event")
+    if event not in {"issue", "issue_comment"}:
         return None
     data = payload.get("data", {})
     if not isinstance(data, dict):
         return None
     # Plane v1.3.1's IssueExpandSerializer uses `project`; older payloads and
     # some API paths use `project_id`. Accept both while treating the webhook
-    # body only as a reference — Hermes re-fetches live state through MCP.
+    # body only as a reference — Hermes re-fetches current state through MCP.
     project_id = data.get("project_id") or data.get("project") or ""
-    work_item_id = data.get("id") or ""
-    identifier = data.get("identifier") or ""
+    if event == "issue":
+        work_item_id = data.get("id") or ""
+        identifier = data.get("identifier") or ""
+    else:
+        # IssueCommentSerializer exposes the parent work item as `issue`.
+        work_item_id = data.get("issue_id") or data.get("issue") or ""
+        identifier = ""
     if not project_id or not work_item_id:
         return None
     return project_id, work_item_id, identifier
