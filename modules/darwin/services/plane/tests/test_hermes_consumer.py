@@ -81,10 +81,10 @@ def test_deliver_marks_2xx_successful() -> None:
 
 
 class FakeDeliver:
-    calls: list[tuple[str, str, str, str]] = []
+    calls: list[tuple[str, str, str, str, str, str]] = []
 
     @classmethod
-    def deliver(cls, secret: str, delivery: tuple[str, str, str, str]) -> bool:
+    def deliver(cls, secret: str, delivery: tuple[str, str, str, str, str, str]) -> bool:
         assert secret == HERMES_SECRET
         cls.calls.append(delivery)
         return True
@@ -104,6 +104,23 @@ def test_consume_dispatches_only_claimed() -> None:
         hermes_consumer.deliver = real
     assert count == 2
     assert sorted(d[0] for d in FakeDeliver.calls) == ["d-1", "d-2"]
+    assert queue.pending() == []
+
+
+def test_consume_forwards_comment_metadata_to_hermes() -> None:
+    queue = plane_dispatcher.DeliveryQueue(":memory:")
+    queue.enqueue("d-comment", "p-1", "w-1", "", "issue_comment", "comment-1")
+    FakeDeliver.calls.clear()
+
+    try:
+        real = hermes_consumer.deliver
+        hermes_consumer.deliver = FakeDeliver.deliver
+        count = hermes_consumer.consume(queue, HERMES_SECRET)
+    finally:
+        hermes_consumer.deliver = real
+
+    assert count == 1
+    assert FakeDeliver.calls == [("d-comment", "p-1", "w-1", "", "issue_comment", "comment-1")]
     assert queue.pending() == []
 
 

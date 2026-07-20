@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import sqlite3
 import sys
+import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -75,6 +77,21 @@ class WorkItemReferenceTests(unittest.TestCase):
         self.assertIsNone(extract_work_item_ref({"event": "issue_comment", "data": {}}))
         self.assertIsNone(extract_work_item_ref({"event": "issue", "data": {"id": "x"}}))
 
+    def test_rejects_non_string_event_references(self) -> None:
+        from plane_dispatcher import extract_work_item_ref
+
+        self.assertIsNone(
+            extract_work_item_ref(
+                {"event": "issue", "data": {"id": ["item"], "project": "project"}}
+            )
+        )
+        self.assertIsNone(
+            extract_work_item_ref(
+                {"event": "issue_comment", "data": {"id": {}, "issue": "item", "project": "project"}}
+            )
+        )
+        self.assertIsNone(extract_work_item_ref({"event": ["issue"], "data": {}}))
+
 
 class DeliveryQueueTests(unittest.TestCase):
     def test_deduplicates_plane_delivery_ids(self) -> None:
@@ -86,6 +103,34 @@ class DeliveryQueueTests(unittest.TestCase):
             queue.pending(),
             [("delivery-1", "project-1", "item-1", "PERSONAL-1", "issue", "")],
         )
+
+    def test_migrates_legacy_queue_rows_with_comment_defaults(self) -> None:
+        with tempfile.NamedTemporaryFile(suffix=".sqlite3") as database_file:
+            connection = sqlite3.connect(database_file.name)
+            connection.execute(
+                """
+                CREATE TABLE deliveries (
+                  delivery_id TEXT PRIMARY KEY,
+                  project_id TEXT NOT NULL,
+                  work_item_id TEXT NOT NULL,
+                  identifier TEXT NOT NULL,
+                  status TEXT NOT NULL DEFAULT 'pending'
+                )
+                """
+            )
+            connection.execute(
+                "INSERT INTO deliveries (delivery_id, project_id, work_item_id, identifier) VALUES (?, ?, ?, ?)",
+                ("legacy-1", "project-1", "item-1", "PERSO-1"),
+            )
+            connection.commit()
+            connection.close()
+
+            queue = DeliveryQueue(database_file.name)
+            self.addCleanup(queue.close)
+            self.assertEqual(
+                queue.pending(),
+                [("legacy-1", "project-1", "item-1", "PERSO-1", "issue", "")],
+            )
 
     def test_claim_pending_makes_a_delivery_invisible_to_another_consumer(self) -> None:
         queue = DeliveryQueue(":memory:")
@@ -194,6 +239,51 @@ class DeliveryIngestionTests(unittest.TestCase):
             queue.pending(),
             [("delivery-comment-1", "project-1", "item-1", "", "issue_comment", "comment-1")],
         )
+
+    def test_accepts_comment_after_issue_within_same_ticket_cooldown(self) -> None:
+        import json
+
+        secret = "secret"
+        queue = DeliveryQueue(":memory:")
+        cooldown = CooldownMap(60.0)
+        self.addCleanup(queue.close)
+        issue_body = json.dumps(
+            {"event": "issue", "data": {"id": "item-1", "project_id": "project-1"}}
+        ).encode()
+        comment_body = json.dumps(
+            {
+                "event": "issue_comment",
+                "data": {"id": "comment-1", "issue": "item-1", "project": "project-1"},
+            }
+        ).encode()
+
+        self.assertEqual(
+            ingest_plane_delivery(
+                queue,
+                cooldown,
+                secret,
+                {
+                    "X-Plane-Delivery": "delivery-issue-1",
+                    "X-Plane-Signature": hmac.new(secret.encode(), issue_body, hashlib.sha256).hexdigest(),
+                },
+                issue_body,
+            ),
+            "accepted",
+        )
+        self.assertEqual(
+            ingest_plane_delivery(
+                queue,
+                cooldown,
+                secret,
+                {
+                    "X-Plane-Delivery": "delivery-comment-1",
+                    "X-Plane-Signature": hmac.new(secret.encode(), comment_body, hashlib.sha256).hexdigest(),
+                },
+                comment_body,
+            ),
+            "accepted",
+        )
+        self.assertEqual(len(queue.pending()), 2)
 
     def test_rejects_unsigned_or_non_issue_delivery(self) -> None:
         import json

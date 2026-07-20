@@ -206,7 +206,7 @@ def ingest_plane_delivery(
     event_type = payload["event"]
     data = payload["data"]
     comment_id = data.get("id", "") if event_type == "issue_comment" else ""
-    if not cooldown.is_allowed(work_item_id):
+    if event_type == "issue" and not cooldown.is_allowed(work_item_id):
         return "cooldown"
     return (
         "accepted"
@@ -224,13 +224,13 @@ def verify_plane_signature(secret: str, body: bytes, signature: str) -> bool:
 
 
 def extract_work_item_ref(payload: dict[str, Any]) -> tuple[str, str, str] | None:
-    """Return stable project/work-item references from a Plane issue event.
+    """Return the minimal live-state lookup reference for supported event types.
 
-    The dispatcher intentionally ignores every other event class.  It needs the
+    The dispatcher intentionally ignores every other event class. It needs the
     UUID pair to re-fetch current state rather than trusting the event body.
     """
     event = payload.get("event")
-    if event not in {"issue", "issue_comment"}:
+    if not isinstance(event, str) or event not in {"issue", "issue_comment"}:
         return None
     data = payload.get("data", {})
     if not isinstance(data, dict):
@@ -246,7 +246,11 @@ def extract_work_item_ref(payload: dict[str, Any]) -> tuple[str, str, str] | Non
         # IssueCommentSerializer exposes the parent work item as `issue`.
         work_item_id = data.get("issue_id") or data.get("issue") or ""
         identifier = ""
-    if not project_id or not work_item_id:
+        if not isinstance(data.get("id"), str) or not data["id"].strip():
+            return None
+    if not all(isinstance(value, str) and value.strip() for value in (project_id, work_item_id)):
+        return None
+    if not isinstance(identifier, str):
         return None
     return project_id, work_item_id, identifier
 
