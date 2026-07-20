@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Narrow, local-only bridge for signed Plane webhooks.
 
 The HTTP server and queueing code will only dispatch a delivery after it has
@@ -10,8 +11,32 @@ import hashlib
 import hmac
 import sqlite3
 import threading
+import time
 from http.server import BaseHTTPRequestHandler
 from typing import Any
+
+
+class CooldownMap:
+    """In-memory reject-if-too-recent map keyed by work_item_id.
+
+    This prevents two rapid Plane webhooks for the same ticket from spawning
+    concurrent Hermes sessions. It is intentionally in-process: the dispatcher
+    is a single process; duplicate delivery UUIDs are still blocked by the queue.
+    """
+
+    def __init__(self, cooldown_seconds: float) -> None:
+        self._cooldown = cooldown_seconds
+        self._lock = threading.Lock()
+        self._last_seen: dict[str, float] = {}
+
+    def is_allowed(self, work_item_id: str) -> bool:
+        now = time.monotonic()
+        with self._lock:
+            last = self._last_seen.get(work_item_id, 0.0)
+            if now - last < self._cooldown:
+                return False
+            self._last_seen[work_item_id] = now
+            return True
 
 
 class DeliveryQueue:
@@ -92,7 +117,9 @@ class DeliveryQueue:
             self._conn.close()
 
 
-def make_dispatch_handler(queue: DeliveryQueue, secret: str) -> type[BaseHTTPRequestHandler]:
+def make_dispatch_handler(
+    queue: DeliveryQueue, cooldown: CooldownMap, secret: str
+) -> type[BaseHTTPRequestHandler]:
     """Create the only HTTP surface: POST /plane, capped at one MiB."""
 
     class PlaneDispatchHandler(BaseHTTPRequestHandler):
@@ -109,8 +136,15 @@ def make_dispatch_handler(queue: DeliveryQueue, secret: str) -> type[BaseHTTPReq
                 self.send_error(413)
                 return
             body = self.rfile.read(length)
-            accepted = ingest_plane_delivery(queue, secret, dict(self.headers.items()), body)
-            self.send_response(202 if accepted else 401)
+            result = ingest_plane_delivery(
+                queue, cooldown, secret, dict(self.headers.items()), body
+            )
+            if result == "accepted":
+                self.send_response(202)
+            elif result == "cooldown":
+                self.send_response(429)
+            else:
+                self.send_response(401)
             self.send_header("Content-Length", "0")
             self.end_headers()
 
@@ -122,27 +156,36 @@ def make_dispatch_handler(queue: DeliveryQueue, secret: str) -> type[BaseHTTPReq
 
 
 def ingest_plane_delivery(
-    queue: DeliveryQueue, secret: str, headers: dict[str, str], body: bytes
-) -> bool:
-    """Authenticate and enqueue one Plane issue event without trusting its state."""
+    queue: DeliveryQueue,
+    cooldown: CooldownMap,
+    secret: str,
+    headers: dict[str, str],
+    body: bytes,
+) -> str:
+    """Authenticate, cooldown, and enqueue one Plane issue event.
+
+    Returns one of: 'accepted', 'cooldown', 'rejected'.
+    """
     normalized_headers = {key.lower(): value for key, value in headers.items()}
     delivery_id = normalized_headers.get("x-plane-delivery", "")
     signature = normalized_headers.get("x-plane-signature", "")
     if not delivery_id or not signature or not verify_plane_signature(secret, body, signature):
-        return False
+        return "rejected"
     try:
         import json
 
         payload = json.loads(body)
     except (UnicodeDecodeError, json.JSONDecodeError):
-        return False
+        return "rejected"
     if not isinstance(payload, dict):
-        return False
+        return "rejected"
     ref = extract_work_item_ref(payload)
     if ref is None:
-        return False
+        return "rejected"
     project_id, work_item_id, identifier = ref
-    return queue.enqueue(delivery_id, project_id, work_item_id, identifier)
+    if not cooldown.is_allowed(work_item_id):
+        return "cooldown"
+    return "accepted" if queue.enqueue(delivery_id, project_id, work_item_id, identifier) else "rejected"
 
 
 def verify_plane_signature(secret: str, body: bytes, signature: str) -> bool:
@@ -159,14 +202,16 @@ def extract_work_item_ref(payload: dict[str, Any]) -> tuple[str, str, str] | Non
     """
     if payload.get("event") != "issue":
         return None
-    data = payload.get("data")
+    data = payload.get("data", {})
     if not isinstance(data, dict):
         return None
-    work_item_id = data.get("id")
-    project = data.get("project_id") or data.get("project")
-    if isinstance(project, dict):
-        project = project.get("id")
-    if not isinstance(work_item_id, str) or not isinstance(project, str):
+    project_id = data.get("project_id") or ""
+    work_item_id = data.get("id") or ""
+    identifier = data.get("identifier") or ""
+    if not project_id or not work_item_id:
         return None
-    identifier = data.get("identifier")
-    return project, work_item_id, identifier if isinstance(identifier, str) else ""
+    return project_id, work_item_id, identifier
+
+
+if __name__ == "__main__":
+    raise SystemExit("Use as a module from dispatcher/run.py")

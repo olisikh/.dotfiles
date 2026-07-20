@@ -3,10 +3,13 @@ from __future__ import annotations
 import hashlib
 import hmac
 import sys
-from pathlib import Path
+import time
 import unittest
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
+
+from plane_dispatcher import CooldownMap, DeliveryQueue, ingest_plane_delivery, make_dispatch_handler
 
 
 class PlaneWebhookValidationTests(unittest.TestCase):
@@ -55,8 +58,6 @@ class WorkItemReferenceTests(unittest.TestCase):
 
 class DeliveryQueueTests(unittest.TestCase):
     def test_deduplicates_plane_delivery_ids(self) -> None:
-        from plane_dispatcher import DeliveryQueue
-
         queue = DeliveryQueue(":memory:")
         self.addCleanup(queue.close)
         self.assertTrue(queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1"))
@@ -64,8 +65,6 @@ class DeliveryQueueTests(unittest.TestCase):
         self.assertEqual(queue.pending(), [("delivery-1", "project-1", "item-1", "PERSONAL-1")])
 
     def test_claim_pending_makes_a_delivery_invisible_to_another_consumer(self) -> None:
-        from plane_dispatcher import DeliveryQueue
-
         queue = DeliveryQueue(":memory:")
         self.addCleanup(queue.close)
         queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1")
@@ -74,8 +73,6 @@ class DeliveryQueueTests(unittest.TestCase):
         self.assertEqual(queue.claim_pending(), [])
 
     def test_finish_marks_a_claimed_delivery_as_dispatched(self) -> None:
-        from plane_dispatcher import DeliveryQueue
-
         queue = DeliveryQueue(":memory:")
         self.addCleanup(queue.close)
         queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1")
@@ -87,10 +84,28 @@ class DeliveryQueueTests(unittest.TestCase):
         self.assertEqual(queue.claim_pending(), [])
 
 
+class CooldownMapTests(unittest.TestCase):
+    def test_allows_first_request_then_rejects_within_cooldown(self) -> None:
+        cooldown = CooldownMap(0.2)
+        self.assertTrue(cooldown.is_allowed("item-1"))
+        self.assertFalse(cooldown.is_allowed("item-1"))
+
+    def test_allows_after_cooldown_expires(self) -> None:
+        cooldown = CooldownMap(0.1)
+        self.assertTrue(cooldown.is_allowed("item-1"))
+        time.sleep(0.12)
+        self.assertTrue(cooldown.is_allowed("item-1"))
+
+    def test_tracks_different_keys_independently(self) -> None:
+        cooldown = CooldownMap(0.2)
+        self.assertTrue(cooldown.is_allowed("item-1"))
+        self.assertTrue(cooldown.is_allowed("item-2"))
+        self.assertFalse(cooldown.is_allowed("item-1"))
+
+
 class DeliveryIngestionTests(unittest.TestCase):
     def test_accepts_valid_signed_issue_delivery_once(self) -> None:
         import json
-        from plane_dispatcher import DeliveryQueue, ingest_plane_delivery
 
         body = json.dumps(
             {
@@ -101,41 +116,81 @@ class DeliveryIngestionTests(unittest.TestCase):
         secret = "secret"
         signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         queue = DeliveryQueue(":memory:")
+        cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
 
-        self.assertTrue(
+        self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                cooldown,
                 secret,
                 {"X-Plane-Delivery": "delivery-1", "X-Plane-Signature": signature},
                 body,
-            )
+            ),
+            "accepted",
         )
-        self.assertFalse(
+        self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                CooldownMap(60.0),
                 secret,
                 {"X-Plane-Delivery": "delivery-1", "X-Plane-Signature": signature},
                 body,
-            )
+            ),
+            "rejected",
         )
 
     def test_rejects_unsigned_or_non_issue_delivery(self) -> None:
         import json
-        from plane_dispatcher import DeliveryQueue, ingest_plane_delivery
 
         queue = DeliveryQueue(":memory:")
+        cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
-        self.assertFalse(ingest_plane_delivery(queue, "secret", {}, b"{}"))
+        self.assertEqual(ingest_plane_delivery(queue, cooldown, "secret", {}, b"{}"), "rejected")
         body = json.dumps({"event": "issue_comment", "data": {}}).encode()
         signature = hmac.new(b"secret", body, hashlib.sha256).hexdigest()
-        self.assertFalse(
+        self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                cooldown,
                 "secret",
                 {"X-Plane-Delivery": "delivery-2", "X-Plane-Signature": signature},
                 body,
-            )
+            ),
+            "rejected",
+        )
+
+    def test_rejects_delivery_within_cooldown(self) -> None:
+        import json
+
+        body = json.dumps(
+            {"event": "issue", "data": {"id": "item-1", "project_id": "project-1"}}
+        ).encode()
+        secret = "secret"
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        queue = DeliveryQueue(":memory:")
+        cooldown = CooldownMap(60.0)
+        self.addCleanup(queue.close)
+
+        self.assertEqual(
+            ingest_plane_delivery(
+                queue,
+                cooldown,
+                secret,
+                {"X-Plane-Delivery": "delivery-1", "X-Plane-Signature": signature},
+                body,
+            ),
+            "accepted",
+        )
+        self.assertEqual(
+            ingest_plane_delivery(
+                queue,
+                cooldown,
+                secret,
+                {"X-Plane-Delivery": "delivery-2", "X-Plane-Signature": signature},
+                body,
+            ),
+            "cooldown",
         )
 
 
@@ -145,12 +200,14 @@ class DispatchHttpHandlerTests(unittest.TestCase):
         import json
         import threading
         from http.server import ThreadingHTTPServer
-        from plane_dispatcher import DeliveryQueue, make_dispatch_handler
 
         secret = "secret"
         queue = DeliveryQueue(":memory:")
+        cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
-        server = ThreadingHTTPServer(("127.0.0.1", 0), make_dispatch_handler(queue, secret))
+        server = ThreadingHTTPServer(
+            ("127.0.0.1", 0), make_dispatch_handler(queue, cooldown, secret)
+        )
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         try:

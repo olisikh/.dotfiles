@@ -8,7 +8,7 @@ import threading
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 
-from plane_dispatcher import DeliveryQueue, make_dispatch_handler
+from plane_dispatcher import CooldownMap, DeliveryQueue, make_dispatch_handler
 
 
 def required_path(name: str) -> Path:
@@ -27,10 +27,30 @@ if not secret:
 
 state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
 queue = DeliveryQueue(str(state_dir / "dispatcher.sqlite3"))
+cooldown = CooldownMap(float(os.environ.get("PLANE_DISPATCHER_COOLDOWN_SECONDS", "10")))
 server = ThreadingHTTPServer(
     ("127.0.0.1", int(os.environ.get("PLANE_DISPATCHER_PORT", "9801"))),
-    make_dispatch_handler(queue, secret),
+    make_dispatch_handler(queue, cooldown, secret),
 )
+
+
+def _consumer_tick() -> None:
+    """Periodically claim pending deliveries and hand them to Hermes."""
+    import time
+
+    try:
+        from hermes_consumer import SECRET_FILE, consume
+
+        webhook_secret = SECRET_FILE.read_text(encoding="utf-8").strip()
+        if not webhook_secret:
+            raise ValueError("empty Hermes webhook secret")
+        dispatched = consume(queue, webhook_secret)
+        if dispatched:
+            print(f"plane_dispatcher_handoff: dispatched={dispatched}")
+    except Exception as exc:  # noqa: BLE001 - background worker must stay alive
+        print(f"plane_dispatcher_consumer_error: {exc}")
+    finally:
+        threading.Timer(30.0, _consumer_tick).start()
 
 
 signal.signal(
@@ -41,6 +61,7 @@ signal.signal(
     signal.SIGINT,
     lambda *_args: threading.Thread(target=server.shutdown, daemon=True).start(),
 )
+threading.Timer(30.0, _consumer_tick).start()
 try:
     server.serve_forever(poll_interval=0.5)
 finally:
