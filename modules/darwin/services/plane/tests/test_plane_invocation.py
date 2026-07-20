@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
 from plane_invocation import (
     Invocation,
+    InvocationError,
     InvocationKind,
     InvocationOperation,
     InvocationSource,
@@ -87,31 +88,61 @@ class TestCommentInvocationParser:
     def test_non_leading_mention_returns_none(self) -> None:
         assert parse_comment_invocation("c", "p", "w", "Please @Hermes help") is None
 
-    def test_empty_body_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes") is None
+    def test_empty_body_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "empty_body"
 
-    def test_bare_command_without_context_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes /go") is None
-        assert parse_comment_invocation("c", "p", "w", "@Hermes /triage") is None
+    def test_bare_command_without_context_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes /go")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "empty_body"
+        result = parse_comment_invocation("c", "p", "w", "@Hermes /triage")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "empty_body"
 
-    def test_unknown_command_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes /skill something") is None
+    def test_unknown_command_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes /skill something")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "unknown_command"
 
-    def test_unknown_flag_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes --unknown flag body") is None
+    def test_unknown_flag_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --unknown flag body")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "unknown_flag"
 
-    def test_duplicate_op_flag_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes --op go --op triage body") is None
+    def test_duplicate_op_flag_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --op go --op triage body")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "duplicate_flag"
 
-    def test_duplicate_model_flag_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes --model a --model b body") is None
+    def test_duplicate_model_flag_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --model a --model b body")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "duplicate_flag"
 
-    def test_missing_flag_value_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", "@Hermes --op") is None
-        assert parse_comment_invocation("c", "p", "w", "@Hermes --model") is None
+    def test_missing_flag_value_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --op")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "missing_flag_value"
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --model")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "missing_flag_value"
 
-    def test_malformed_quoting_is_invalid(self) -> None:
-        assert parse_comment_invocation("c", "p", "w", '@Hermes --op go "unterminated') is None
+    def test_malformed_quoting_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", '@Hermes --op go "unterminated')
+        assert isinstance(result, InvocationError)
+        assert result.reason == "malformed_quoting"
+
+    def test_invalid_op_value_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --op deploy body")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "invalid_op_value"
+
+    def test_flags_without_body_is_error(self) -> None:
+        result = parse_comment_invocation("c", "p", "w", "@Hermes --op go")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "empty_body"
 
     def test_case_insensitive_mention(self) -> None:
         invocation = parse_comment_invocation("c", "p", "w", "@HERMES /go Implement")

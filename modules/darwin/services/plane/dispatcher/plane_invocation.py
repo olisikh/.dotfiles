@@ -46,6 +46,15 @@ class Invocation:
     label_triggered: bool = False
 
 
+@dataclass(frozen=True, slots=True)
+class InvocationError:
+    """Typed user-facing parse error — the controller posts one deterministic
+    help comment for any of these reasons instead of silently ignoring."""
+
+    reason: str
+    detail: str = ""
+
+
 KNOWN_LABELS = ("hermes:triage", "hermes:go")
 
 
@@ -73,11 +82,13 @@ def parse_comment_invocation(
     project_id: str,
     work_item_id: str,
     comment_html: str,
-) -> Invocation | None:
+) -> Invocation | InvocationError | None:
     """Parse a leading ``@Hermes`` comment into a normalized invocation.
 
-    Returns ``None`` for non-leading mentions, empty/incomplete commands,
-    unsupported flags, malformed quoting, or duplicate singleton flags.
+    Returns ``None`` only when the text is not a Hermes invocation at all
+    (non-leading mention). Returns a typed ``InvocationError`` for any
+    leading-mention text that is malformed, so the controller can post one
+    deterministic help comment instead of silently swallowing user intent.
     """
     extractor = _CommentTextExtractor()
     extractor.feed(comment_html)
@@ -87,13 +98,13 @@ def parse_comment_invocation(
         return None
     context = (match.group(1) or "").strip()
     if not context:
-        return None
+        return InvocationError("empty_body")
     try:
         tokens = shlex.split(context, posix=True)
     except ValueError:
-        return None
+        return InvocationError("malformed_quoting")
     if not tokens:
-        return None
+        return InvocationError("empty_body")
 
     operation = InvocationOperation.ASK
     model_selector: str | None = None
@@ -106,28 +117,28 @@ def parse_comment_invocation(
             break
         flag_name = token[2:].lower()
         if flag_name in flags_seen:
-            return None
+            return InvocationError("duplicate_flag", flag_name)
         if flag_name not in {"op", "model"}:
-            return None
+            return InvocationError("unknown_flag", flag_name)
         flags_seen.add(flag_name)
         if i + 1 >= len(tokens):
-            return None
+            return InvocationError("missing_flag_value", flag_name)
         value = tokens[i + 1]
         if flag_name == "op":
             try:
                 operation = InvocationOperation(value.lower())
             except ValueError:
-                return None
+                return InvocationError("invalid_op_value", value)
         elif flag_name == "model":
             model_selector = value
         i += 2
 
     if flags_seen and i == len(tokens):
-        return None
+        return InvocationError("empty_body")
 
     remaining = " ".join(tokens[i:]).strip()
     if not remaining:
-        return None
+        return InvocationError("empty_body")
 
     if remaining.startswith("/"):
         command, *trailing = remaining.split(None, 1)
@@ -135,13 +146,15 @@ def parse_comment_invocation(
         if mode in {"go", "triage"} and trailing:
             operation = InvocationOperation(mode)
             body = trailing[0].strip()
+        elif mode in {"go", "triage"}:
+            return InvocationError("empty_body")
         else:
-            return None
+            return InvocationError("unknown_command", command)
     else:
         body = remaining
 
     if not body:
-        return None
+        return InvocationError("empty_body")
 
     return Invocation(
         trigger_id=trigger_id,
