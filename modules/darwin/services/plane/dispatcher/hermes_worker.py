@@ -7,6 +7,7 @@ never has Plane-write tools.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from dataclasses import dataclass
 from typing import Any
@@ -33,7 +34,7 @@ class HermesWorker:
         max_turns: int = 30,
         timeout_seconds: float = 300.0,
     ) -> None:
-        self._hermes_path = hermes_path
+        self._hermes_path = os.path.expanduser(hermes_path)
         self._max_turns = max_turns
         self._timeout = timeout_seconds
 
@@ -77,6 +78,8 @@ class HermesWorker:
             return self._failure(f"Hermes exited with code {exc.returncode}: {exc.stderr}")
         except subprocess.TimeoutExpired as exc:
             return self._failure(f"Hermes timed out after {self._timeout}s")
+        except OSError as exc:
+            return self._failure(f"Hermes worker could not start: {exc}")
 
         stdout = proc.stdout.strip()
         if proc.returncode != 0:
