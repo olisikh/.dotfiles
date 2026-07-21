@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 
 from plane_runs import Run, RunLedger
+from plane_smoke import LiveSmokeRunner, SmokeConfiguration, SmokeError
 
 
 def _public_run(run: Run) -> dict[str, object]:
@@ -29,10 +30,21 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Inspect and control Plane automation runs")
     subcommands = parser.add_subparsers(dest="command", required=True)
     subcommands.add_parser("status", help="Show sanitized aggregate metrics and active runs")
+    smoke_parser = subcommands.add_parser("smoke", help="Run explicit positive smoke tests against the live TEST project")
+    smoke_parser.add_argument("--timeout", type=float, default=300.0, help="Seconds to wait for each real webhook/run")
     for command, help_text in (("cancel", "Cancel a pending or blocked run"), ("retry", "Clone a failed or cancelled run")):
         command_parser = subcommands.add_parser(command, help=help_text)
         command_parser.add_argument("run_id")
     args = parser.parse_args()
+
+    if args.command == "smoke":
+        try:
+            report = LiveSmokeRunner(SmokeConfiguration.from_environment(), timeout_seconds=args.timeout).run()
+        except SmokeError as exc:
+            print(json.dumps({"ok": False, "error": str(exc)}, separators=(",", ":")))
+            return 1
+        print(json.dumps({"ok": True, **report}, separators=(",", ":")))
+        return 0
 
     state_dir = Path(os.environ["PLANE_STATE_DIR"])
     ledger = RunLedger(str(state_dir / "runs.sqlite3"))

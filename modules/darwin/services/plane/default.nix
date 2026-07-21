@@ -234,6 +234,9 @@ let
     text = ''
       set -euo pipefail
       export PLANE_STATE_DIR="${cfg.stateDir}"
+      export PLANE_PUBLIC_BASE="${cfg.publicBase}"
+      export PLANE_E2E_PROJECT_ID="${cfg.e2e.projectId}"
+      export PLANE_E2E_TRIGGER_TOKEN_FILE="${cfg.e2e.triggerTokenFile}"
       exec ${python}/bin/python ${dispatcherDir}/plane_automation.py "$@"
     '';
   };
@@ -338,6 +341,19 @@ in
       type = types.str;
       default = "https://olisikh-mini.bandicoot-scala.ts.net";
       description = "Public origin emitted by Plane.";
+    };
+
+    e2e = {
+      projectId = mkOption {
+        type = types.str;
+        default = "";
+        description = "Dedicated Plane project UUID used only by explicit live Hermes smoke tests.";
+      };
+      triggerTokenFile = mkOption {
+        type = types.str;
+        default = "${cfg.secretsDir}/e2e-trigger-api-token";
+        description = "SOPS-materialized API token for the non-Hermes E2E trigger identity.";
+      };
     };
 
     canary = {

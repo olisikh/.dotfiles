@@ -46,6 +46,7 @@ in
       enable = true;
       productionActive = true;
       hermesUserId = "0ba31c66-78f1-4391-9e73-c64445ca2cb2";
+      e2e.projectId = "075a4b66-ae4d-423a-a46f-817e69602a46";
       canary.enable = false;
     };
 

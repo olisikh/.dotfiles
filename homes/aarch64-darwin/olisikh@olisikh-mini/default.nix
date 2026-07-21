@@ -145,6 +145,10 @@ in
             key = "plane/hermes-api-token";
             name = "plane/hermes-api-token";
           };
+          planeE2eTriggerApiToken = {
+            key = "plane/e2e-trigger-api-token";
+            name = "plane/e2e-trigger-api-token";
+          };
           planeAdminPassword = {
             key = "plane/admin-password";
             name = "plane/admin-password";
