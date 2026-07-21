@@ -10,8 +10,8 @@ let
 
   basicConfig = {
     "$schema" = "https://opencode.ai/config.json";
-    model = "opencode-go/kimi-k2.7-code";
-    small_model = "opencode-go/deepseek-v4-flash";
+    model = "ollama-cloud/kimi-k2.7-code";
+    small_model = "ollama-cloud/deepseek-v4-flash";
     autoupdate = false;
     share = "manual";
     formatter = true;
