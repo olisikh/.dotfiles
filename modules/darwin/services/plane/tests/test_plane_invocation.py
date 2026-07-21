@@ -62,6 +62,17 @@ class TestCommentInvocationParser:
         assert invocation.model_selector == "gpt-5.6"
         assert invocation.body == "Do the work"
 
+    def test_variant_selects_reasoning_effort(self) -> None:
+        invocation = parse_comment_invocation("comment-v", "project-1", "item-1", "@Hermes --model terra --variant high Think carefully")
+        assert invocation.model_selector == "terra"
+        assert invocation.reasoning_effort == "high"
+        assert invocation.body == "Think carefully"
+
+    def test_invalid_variant_is_error(self) -> None:
+        result = parse_comment_invocation("comment-v", "project-1", "item-1", "@Hermes --variant turbo Think")
+        assert isinstance(result, InvocationError)
+        assert result.reason == "invalid_variant"
+
     def test_model_selector_without_op(self) -> None:
         invocation = parse_comment_invocation("comment-8", "project-1", "item-1", "@Hermes --model gpt-5.6 Ask question")
         assert invocation.operation == InvocationOperation.ASK

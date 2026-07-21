@@ -46,6 +46,7 @@ class Run:
     retry_count: int
     created_at: float
     updated_at: float
+    reasoning_effort: str | None = None
 
 
 _TERMINAL_STATES = frozenset({RunState.COMPLETED, RunState.FAILED, RunState.CANCELLED})
@@ -75,6 +76,7 @@ class RunLedger:
               operation TEXT NOT NULL,
               body TEXT NOT NULL,
               model_selector TEXT,
+              reasoning_effort TEXT,
               label_triggered INTEGER NOT NULL DEFAULT 0,
               state TEXT NOT NULL DEFAULT 'pending',
               lease_expires_at REAL,
@@ -87,6 +89,9 @@ class RunLedger:
             )
             """
         )
+        existing_columns = {row[1] for row in self._conn.execute("PRAGMA table_info(runs)")}
+        if "reasoning_effort" not in existing_columns:
+            self._conn.execute("ALTER TABLE runs ADD COLUMN reasoning_effort TEXT")
         self._conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_runs_work_item ON runs(work_item_id, state)"
         )
@@ -107,8 +112,8 @@ class RunLedger:
                     """
                     INSERT INTO runs (
                       run_id, trigger_id, project_id, work_item_id, operation, body,
-                      model_selector, label_triggered, state, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                      model_selector, reasoning_effort, label_triggered, state, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         run_id,
@@ -118,6 +123,7 @@ class RunLedger:
                         invocation.operation.value,
                         invocation.body,
                         invocation.model_selector,
+                        invocation.reasoning_effort,
                         int(invocation.label_triggered),
                         RunState.PENDING.value,
                         now,
@@ -128,7 +134,7 @@ class RunLedger:
             row = self._conn.execute(
                 """
                 SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                       model_selector, label_triggered, state, lease_expires_at,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                        start_comment_id, final_comment_id, worker_session_id, retry_count,
                        created_at, updated_at
                 FROM runs WHERE run_id = ?
@@ -144,7 +150,7 @@ class RunLedger:
             row = self._conn.execute(
                 """
                 SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                       model_selector, label_triggered, state, lease_expires_at,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                        start_comment_id, final_comment_id, worker_session_id, retry_count,
                        created_at, updated_at
                 FROM runs WHERE trigger_id = ?
@@ -166,7 +172,7 @@ class RunLedger:
             row = self._conn.execute(
                 """
                 SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                       model_selector, label_triggered, state, lease_expires_at,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                        start_comment_id, final_comment_id, worker_session_id, retry_count,
                        created_at, updated_at
                 FROM runs WHERE run_id = ?
@@ -259,7 +265,7 @@ class RunLedger:
             rows = self._conn.execute(
                 """
                 SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                       model_selector, label_triggered, state, lease_expires_at,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                        start_comment_id, final_comment_id, worker_session_id, retry_count,
                        created_at, updated_at
                 FROM runs
@@ -294,7 +300,7 @@ class RunLedger:
             refreshed = self._conn.execute(
                 """
                 SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                       model_selector, label_triggered, state, lease_expires_at,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                        start_comment_id, final_comment_id, worker_session_id, retry_count,
                        created_at, updated_at
                 FROM runs WHERE run_id = ?
@@ -327,7 +333,7 @@ class RunLedger:
                 rows = self._conn.execute(
                     """
                     SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                           model_selector, label_triggered, state, lease_expires_at,
+                           model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                            start_comment_id, final_comment_id, worker_session_id, retry_count,
                            created_at, updated_at
                     FROM runs
@@ -340,7 +346,7 @@ class RunLedger:
                 rows = self._conn.execute(
                     """
                     SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                           model_selector, label_triggered, state, lease_expires_at,
+                           model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                            start_comment_id, final_comment_id, worker_session_id, retry_count,
                            created_at, updated_at
                     FROM runs
@@ -404,6 +410,7 @@ class RunLedger:
                 operation=source.operation,
                 body=source.body,
                 model_selector=source.model_selector,
+                reasoning_effort=source.reasoning_effort,
                 label_triggered=source.label_triggered,
             )
         )
@@ -413,7 +420,7 @@ class RunLedger:
             rows = self._conn.execute(
                 """
                 SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
-                       model_selector, label_triggered, state, lease_expires_at,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
                        start_comment_id, final_comment_id, worker_session_id, retry_count,
                        created_at, updated_at
                 FROM runs
@@ -436,6 +443,7 @@ class RunLedger:
             operation=InvocationOperation(row["operation"]),
             body=row["body"],
             model_selector=row["model_selector"],
+            reasoning_effort=row["reasoning_effort"],
             label_triggered=bool(row["label_triggered"]),
             state=RunState(row["state"]),
             lease_expires_at=row["lease_expires_at"],

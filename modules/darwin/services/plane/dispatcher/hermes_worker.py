@@ -8,8 +8,11 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
+import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from plane_invocation import InvocationOperation
@@ -67,12 +70,14 @@ class HermesWorker:
             cmd.extend(["-m", run.model_selector])
 
         try:
+            env, temporary_home = self._variant_environment(run.reasoning_effort)
             proc = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 timeout=self._timeout,
                 check=False,
+                env=env,
             )
         except subprocess.CalledProcessError as exc:
             return self._failure(f"Hermes exited with code {exc.returncode}: {exc.stderr}")
@@ -87,6 +92,29 @@ class HermesWorker:
             return self._failure(f"Hermes exited {proc.returncode}: {stderr or stdout}")
 
         return self._parse_envelope(stdout)
+
+    def _variant_environment(self, effort: str | None) -> tuple[dict[str, str] | None, tempfile.TemporaryDirectory[str] | None]:
+        """Give one worker an isolated config with its requested reasoning effort."""
+        if effort is None:
+            return None, None
+        source_home = Path(os.environ.get("HERMES_HOME", "~/.hermes")).expanduser()
+        source_config = source_home / "config.yaml"
+        raw_config = source_config.read_text(encoding="utf-8")
+        rewritten, replacements = re.subn(
+            r"(?m)^  reasoning_effort:\s*.*$", f"  reasoning_effort: {effort}", raw_config, count=1
+        )
+        if replacements != 1:
+            raise RuntimeError("could not set agent.reasoning_effort in isolated Hermes config")
+        temporary_home = tempfile.TemporaryDirectory(prefix="plane-hermes-")
+        temp_path = Path(temporary_home.name)
+        (temp_path / "config.yaml").write_text(rewritten, encoding="utf-8")
+        (temp_path / "config.yaml").chmod(0o600)
+        source_env = source_home / ".env"
+        if source_env.exists():
+            (temp_path / ".env").symlink_to(source_env)
+        env = os.environ.copy()
+        env["HERMES_HOME"] = temporary_home.name
+        return env, temporary_home
 
     def _build_prompt(
         self, run: Run, work_item_context: dict[str, Any], *, stage: str

@@ -43,6 +43,7 @@ class Invocation:
     operation: InvocationOperation
     body: str
     model_selector: str | None = None
+    reasoning_effort: str | None = None
     label_triggered: bool = False
 
 
@@ -56,6 +57,7 @@ class InvocationError:
 
 
 KNOWN_LABELS = ("hermes:triage", "hermes:go")
+VALID_REASONING_EFFORTS = frozenset({"minimal", "low", "medium", "high", "xhigh", "max", "ultra"})
 
 
 class _CommentTextExtractor(HTMLParser):
@@ -108,6 +110,7 @@ def parse_comment_invocation(
 
     operation = InvocationOperation.ASK
     model_selector: str | None = None
+    reasoning_effort: str | None = None
     i = 0
     flags_seen: set[str] = set()
 
@@ -118,7 +121,7 @@ def parse_comment_invocation(
         flag_name = token[2:].lower()
         if flag_name in flags_seen:
             return InvocationError("duplicate_flag", flag_name)
-        if flag_name not in {"op", "model"}:
+        if flag_name not in {"op", "model", "variant"}:
             return InvocationError("unknown_flag", flag_name)
         flags_seen.add(flag_name)
         if i + 1 >= len(tokens):
@@ -131,6 +134,11 @@ def parse_comment_invocation(
                 return InvocationError("invalid_op_value", value)
         elif flag_name == "model":
             model_selector = value
+        else:
+            normalized_effort = value.lower()
+            if normalized_effort not in VALID_REASONING_EFFORTS:
+                return InvocationError("invalid_variant", value)
+            reasoning_effort = normalized_effort
         i += 2
 
     if flags_seen and i == len(tokens):
@@ -165,6 +173,7 @@ def parse_comment_invocation(
         operation=operation,
         body=body,
         model_selector=model_selector,
+        reasoning_effort=reasoning_effort,
         label_triggered=False,
     )
 

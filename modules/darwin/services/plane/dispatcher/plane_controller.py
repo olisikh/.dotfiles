@@ -24,6 +24,7 @@ HELP_MESSAGES: dict[str, str] = {
     "unknown_flag": "Unknown flag `{flag}`. Use `--op ask|triage|go` or `--model <selector>`.",
     "missing_flag_value": "Flag `{flag}` needs a value.",
     "invalid_op_value": "`{value}` is not a supported operation. Use ask, triage, or go.",
+    "invalid_variant": "`{value}` is not a supported thinking variant. Use minimal, low, medium, high, xhigh, max, or ultra.",
     "unknown_command": "Unknown command `{command}`. Use `--op` flags or a plain question.",
 }
 
