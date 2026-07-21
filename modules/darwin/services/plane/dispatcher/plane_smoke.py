@@ -230,13 +230,16 @@ class LiveSmokeRunner:
         cases: list[dict[str, object]] = []
         cleanup_error = ""
         try:
-            cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low Reply exactly: {marker}_ASK", f"{marker}_ASK"))
-            cases.append(self._comment_case(work_item_id, f"@Hermes --model luna /triage Reply exactly: {marker}_TRIAGE", f"{marker}_TRIAGE"))
-            cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low /go E2E only: do not modify files, services, or Plane. Reply exactly: {marker}_GO", f"{marker}_GO"))
-            self._settle_issue_event(work_item_id)
+            # Exercise label triggers first. The final comment /go changes ticket
+            # membership as part of its normal lifecycle, so keeping it last makes
+            # this single-user smoke deterministic without adding production
+            # concurrency machinery just for the test harness.
             cases.append(self._label_case(work_item_id, "hermes:triage"))
             self._settle_issue_event(work_item_id)
             cases.append(self._label_case(work_item_id, "hermes:go"))
+            cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low Reply exactly: {marker}_ASK", f"{marker}_ASK"))
+            cases.append(self._comment_case(work_item_id, f"@Hermes --model luna /triage Reply exactly: {marker}_TRIAGE", f"{marker}_TRIAGE"))
+            cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low /go E2E only: do not modify files, services, or Plane. Reply exactly: {marker}_GO", f"{marker}_GO"))
         finally:
             try:
                 self._api.set_labels(work_item_id, [])
