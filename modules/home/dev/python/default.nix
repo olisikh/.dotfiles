@@ -16,6 +16,7 @@ in
         pytest
         debugpy
         pyyaml
+        uv
       ]))
     ];
   };
