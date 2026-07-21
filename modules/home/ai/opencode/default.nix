@@ -23,8 +23,7 @@ let
       reserved = 8000;
     };
     instructions = [
-      "${homeDir}/.agents/skills/caveman/SKILL.md"
-      "${homeDir}/.agents/AGENTS.md"
+      # NOTE: add extra system prompts like SOUL.md, IDENTITY.md, MEMORY.md, or else.
     ];
     permission = {
       "*" = "ask";
