@@ -8,7 +8,7 @@ import sqlite3
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
@@ -73,13 +73,17 @@ def test_waiter_correlates_comment_and_label_deliveries() -> None:
         assert waiter.comment_delivery("project", "item", "comment-1") == "comment-delivery"
         assert waiter.label_cursor("project", "item") == 2
         assert waiter.label_delivery("project", "item", after_rowid=1) == "label-delivery"
+        waiter.ticket_idle("project", "item")
 
 
 def test_smoke_runner_waits_out_issue_event_cooldown_before_label_trigger() -> None:
     runner = object.__new__(LiveSmokeRunner)
+    runner._config = type("Config", (), {"project_id": "project"})()
+    runner._waiter = MagicMock()
     with patch("plane_smoke.time.sleep") as sleep:
-        runner._settle_issue_event()
+        runner._settle_issue_event("item")
     sleep.assert_called_once_with(12.0)
+    runner._waiter.ticket_idle.assert_called_once_with("project", "item")
 
 
 def test_smoke_lock_rejects_concurrent_live_run_and_cleans_up() -> None:

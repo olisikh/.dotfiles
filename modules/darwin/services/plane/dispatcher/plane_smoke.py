@@ -107,6 +107,24 @@ class SmokeWaiter:
             "label webhook delivery",
         )
 
+    def ticket_idle(self, project_id: str, work_item_id: str) -> None:
+        """Wait until prior locally-received issue work for a ticket is drained."""
+        deadline = time.monotonic() + self._timeout
+        while time.monotonic() < deadline:
+            try:
+                with sqlite3.connect(self._database) as conn:
+                    row = conn.execute(
+                        "SELECT COUNT(*) FROM deliveries WHERE project_id = ? AND work_item_id = ? "
+                        "AND status IN ('pending', 'processing')",
+                        (project_id, work_item_id),
+                    ).fetchone()
+            except sqlite3.Error:
+                row = (1,)
+            if row and int(row[0]) == 0:
+                return
+            time.sleep(self._poll)
+        raise SmokeError("timed out waiting for prior ticket deliveries to drain")
+
     def _wait_one(self, query: str, parameters: tuple[object, ...], label: str) -> str:
         deadline = time.monotonic() + self._timeout
         while time.monotonic() < deadline:
@@ -215,9 +233,9 @@ class LiveSmokeRunner:
             cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low Reply exactly: {marker}_ASK", f"{marker}_ASK"))
             cases.append(self._comment_case(work_item_id, f"@Hermes --model luna /triage Reply exactly: {marker}_TRIAGE", f"{marker}_TRIAGE"))
             cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low /go E2E only: do not modify files, services, or Plane. Reply exactly: {marker}_GO", f"{marker}_GO"))
-            self._settle_issue_event()
+            self._settle_issue_event(work_item_id)
             cases.append(self._label_case(work_item_id, "hermes:triage"))
-            self._settle_issue_event()
+            self._settle_issue_event(work_item_id)
             cases.append(self._label_case(work_item_id, "hermes:go"))
         finally:
             try:
@@ -229,9 +247,10 @@ class LiveSmokeRunner:
             raise SmokeError(f"smoke ticket cleanup failed: {cleanup_error}")
         return {"ticket_id": work_item_id, "ticket_identifier": ticket.get("identifier", ""), "cases": cases, "closed": True}
 
-    def _settle_issue_event(self) -> None:
+    def _settle_issue_event(self, work_item_id: str) -> None:
         """Avoid the dispatcher's bounded issue-event cooldown between label cases."""
         time.sleep(self._ISSUE_EVENT_SETTLE_SECONDS)
+        self._waiter.ticket_idle(self._config.project_id, work_item_id)
 
     def _comment_case(self, work_item_id: str, body: str, marker: str) -> dict[str, object]:
         comment = self._api.create_comment(work_item_id, body)
