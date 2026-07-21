@@ -287,6 +287,12 @@ in
       description = "Loopback port for signed Plane webhook ingress.";
     };
 
+    hermesUserId = mkOption {
+      type = types.str;
+      default = "";
+      description = "Plane user ID for the Hermes bot account; used to ignore its own comments.";
+    };
+
     mcpPort = mkOption {
       type = types.port;
       default = 8211;
@@ -329,6 +335,8 @@ in
         serviceConfig = (productionServiceConfig "com.olisikh.plane-dispatcher-nix" "${dispatcher}/bin/plane-dispatcher") // {
           EnvironmentVariables = commonEnvironment // {
             PLANE_DISPATCHER_PORT = toString cfg.dispatcherPort;
+            PLANE_INTERNAL_BASE_URL = "http://127.0.0.1:${toString cfg.proxyPort}";
+            PLANE_HERMES_USER_ID = cfg.hermesUserId;
           };
         };
       };

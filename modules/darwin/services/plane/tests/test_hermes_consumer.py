@@ -1,162 +1,268 @@
-import hashlib
-import hmac
+"""Tests for the consumer that drives the controller from queued deliveries.
+"""
+from __future__ import annotations
+
 import json
-import sqlite3
 import sys
 import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError
-from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
-import hermes_consumer
-import plane_dispatcher
-
-DB_PATH = ":memory:"
-PLANE_SECRET = "plane-ingress-test-secret"
-HERMES_SECRET = "hermes-webhook-test-secret"
-
-
-def test_consumer_signs_with_timestamp() -> None:
-    body = b'{"a":1}'
-    timestamp = "1234567890"
-    sig = hermes_consumer.sign(HERMES_SECRET, body, timestamp)
-    expected = hmac.new(
-        HERMES_SECRET.encode(),
-        (timestamp + "." + body.decode()).encode(),
-        hashlib.sha256,
-    ).hexdigest()
-    assert sig == expected
+from hermes_consumer import consume
+from plane_client import PlaneClient
+from plane_controller import PlaneAutomationController
+from plane_dispatcher import DeliveryQueue
+from plane_invocation import InvocationOperation
+from plane_runs import RunLedger
 
 
-def test_deliver_marks_2xx_successful() -> None:
-    import http.server
-    import threading
+class FakePlaneHandler(BaseHTTPRequestHandler):
+    def __init__(self, state: dict[str, Any], *args, **kwargs) -> None:
+        self.state = state
+        super().__init__(*args, **kwargs)
 
-    received: list[dict[str, Any]] = []
+    def log_message(self, format: str, *args: Any) -> None:
+        return
 
-    class Handler(http.server.BaseHTTPRequestHandler):
-        def do_POST(self) -> None:
-            length = int(self.headers.get("Content-Length", "0"))
-            body = self.rfile.read(length)
-            received.append({"headers": dict(self.headers), "body": json.loads(body), "raw_body": body})
-            self.send_response(204)
-            self.send_header("Content-Length", "0")
+    def do_GET(self) -> None:  # noqa: N802
+        if "/issues/" in self.path and "/comments" not in self.path:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
             self.end_headers()
+            self.wfile.write(json.dumps(self.state["issue"]).encode())
+        elif "/comments/" in self.path:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(self.state["comment"]).encode())
+        else:
+            self.send_error(404)
 
-        def log_message(self, *args: object) -> None:
-            return
+    def do_POST(self) -> None:  # noqa: N802
+        if "/comments/" in self.path:
+            length = int(self.headers.get("Content-Length", "0"))
+            body = json.loads(self.rfile.read(length))
+            body["id"] = f"new-comment-{len(self.state['comments']) + 1}"
+            self.state["comments"].append(body)
+            self.send_response(201)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(body).encode())
+        else:
+            self.send_error(404)
 
-    server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
-    port = server.server_address[1]
+
+def _make_server(state: dict[str, Any]) -> HTTPServer:
+    def handler(*args, **kwargs) -> FakePlaneHandler:
+        return FakePlaneHandler(state, *args, **kwargs)
+
+    server = HTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
+    return server
+
+
+def _client(server: HTTPServer) -> PlaneClient:
+    return PlaneClient(
+        base_url=f"http://127.0.0.1:{server.server_port}",
+        workspace_slug="ws",
+        api_key="token",
+    )
+
+
+class _FakeWorker:
+    def __init__(self, run: Any) -> None:
+        pass
+
+    def invoke(self, run: Any, context: dict[str, Any]) -> Any:
+        from hermes_worker import WorkerResult
+
+        return WorkerResult(
+            status="success",
+            final_comment_markdown=f"Answer for: {run.body}",
+            summary="answered",
+            artifacts=[],
+        )
+
+
+def _setup(
+    server_state: dict[str, Any],
+    hermes_user_id: str | None = None,
+) -> tuple[DeliveryQueue, RunLedger, PlaneAutomationController, HTTPServer]:
+    server = _make_server(server_state)
+    client = _client(server)
+    queue = DeliveryQueue(":memory:")
+    ledger = RunLedger(":memory:")
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda run: _FakeWorker(run),
+        hermes_user_id=hermes_user_id,
+    )
+    return queue, ledger, controller, server
+
+
+def test_consumes_comment_ask_delivery_to_terminal() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "item-1", "name": "Test issue", "description_html": "<p>Context</p>"},
+        "comment": {
+            "id": "comment-1",
+            "comment_html": "<p>@Hermes Explain this ticket</p>",
+            "actor": "user-1",
+        },
+        "comments": [],
+    }
+    queue, ledger, controller, server = _setup(state)
     try:
-        original_url = hermes_consumer.HERMES_WEBHOOK_URL
-        hermes_consumer.HERMES_WEBHOOK_URL = f"http://127.0.0.1:{port}/webhooks/plane-work-item"
-        assert hermes_consumer.deliver(
-            HERMES_SECRET, ("d-1", "p-1", "w-1", "#1", "issue_comment", "comment-1")
-        )
-        assert len(received) == 1
-        req = received[0]
-        assert req["body"]["delivery_id"] == "d-1"
-        assert req["body"]["project_id"] == "p-1"
-        assert req["body"]["event_type"] == "issue_comment"
-        assert req["body"]["comment_id"] == "comment-1"
-        assert "X-Webhook-Timestamp" in req["headers"]
-        assert "X-Webhook-Signature-V2" in req["headers"]
-        assert hmac.compare_digest(
-            req["headers"]["X-Webhook-Signature-V2"],
-            hmac.new(
-                HERMES_SECRET.encode(),
-                req["headers"]["X-Webhook-Timestamp"].encode("utf-8") + b"." + req["raw_body"],
-                hashlib.sha256,
-            ).hexdigest(),
-        )
+        queue.enqueue("delivery-1", "project-1", "item-1", "", "issue_comment", "comment-1")
+
+        finished = consume(queue, ledger, controller, worker_session_id="session-a")
+
+        assert finished == 1
+        assert len(state["comments"]) == 1
+        assert "Answer for: Explain this ticket" in state["comments"][0]["comment_html"]
+        assert queue.claim_pending() == []
     finally:
-        hermes_consumer.HERMES_WEBHOOK_URL = original_url
         server.shutdown()
+        server.server_close()
+        queue.close()
+        ledger.close()
 
 
-class FakeDeliver:
-    calls: list[tuple[str, str, str, str, str, str]] = []
-
-    @classmethod
-    def deliver(cls, secret: str, delivery: tuple[str, str, str, str, str, str]) -> bool:
-        assert secret == HERMES_SECRET
-        cls.calls.append(delivery)
-        return True
-
-
-def test_consume_dispatches_only_claimed() -> None:
-    queue = plane_dispatcher.DeliveryQueue(":memory:")
-    queue.enqueue("d-1", "p-1", "w-1", "#1")
-    queue.enqueue("d-2", "p-1", "w-2", "#2")
-    FakeDeliver.calls.clear()
-
+def test_skips_non_hermes_comment_delivery() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "item-1", "name": "Test issue", "description_html": ""},
+        "comment": {
+            "id": "comment-1",
+            "comment_html": "<p>Thanks for the update</p>",
+            "actor": "user-1",
+        },
+        "comments": [],
+    }
+    queue, ledger, controller, server = _setup(state)
     try:
-        real = hermes_consumer.deliver
-        hermes_consumer.deliver = FakeDeliver.deliver
-        count = hermes_consumer.consume(queue, HERMES_SECRET)
+        queue.enqueue("delivery-1", "project-1", "item-1", "", "issue_comment", "comment-1")
+
+        finished = consume(queue, ledger, controller, worker_session_id="session-a")
+
+        assert finished == 1
+        assert state["comments"] == []
     finally:
-        hermes_consumer.deliver = real
-    assert count == 2
-    assert sorted(d[0] for d in FakeDeliver.calls) == ["d-1", "d-2"]
-    assert queue.pending() == []
+        server.shutdown()
+        server.server_close()
+        queue.close()
+        ledger.close()
 
 
-def test_consume_forwards_comment_metadata_to_hermes() -> None:
-    queue = plane_dispatcher.DeliveryQueue(":memory:")
-    queue.enqueue("d-comment", "p-1", "w-1", "", "issue_comment", "comment-1")
-    FakeDeliver.calls.clear()
-
+def test_posts_help_for_malformed_hermes_comment() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "item-1", "name": "Test issue", "description_html": ""},
+        "comment": {
+            "id": "comment-1",
+            "comment_html": "<p>@Hermes --unknown-flag hi</p>",
+            "actor": "user-1",
+        },
+        "comments": [],
+    }
+    queue, ledger, controller, server = _setup(state)
     try:
-        real = hermes_consumer.deliver
-        hermes_consumer.deliver = FakeDeliver.deliver
-        count = hermes_consumer.consume(queue, HERMES_SECRET)
+        queue.enqueue("delivery-1", "project-1", "item-1", "", "issue_comment", "comment-1")
+
+        finished = consume(queue, ledger, controller, worker_session_id="session-a")
+
+        assert finished == 1
+        assert len(state["comments"]) == 1
+        assert "Unknown flag" in state["comments"][0]["comment_html"]
     finally:
-        hermes_consumer.deliver = real
+        server.shutdown()
+        server.server_close()
+        queue.close()
+        ledger.close()
 
-    assert count == 1
-    assert FakeDeliver.calls == [("d-comment", "p-1", "w-1", "", "issue_comment", "comment-1")]
-    assert queue.pending() == []
 
-
-def test_consume_skips_failed_without_finishing() -> None:
-    queue = plane_dispatcher.DeliveryQueue(":memory:")
-    queue.enqueue("d-1", "p-1", "w-1", "#1")
-    call_count = 0
-
-    def flaky(secret: str, delivery: tuple[str, str, str, str]) -> bool:
-        nonlocal call_count
-        call_count += 1
-        return False
-
+def test_consumes_label_triage_delivery() -> None:
+    state: dict[str, Any] = {
+        "issue": {
+            "id": "item-1",
+            "name": "Refactor",
+            "description_html": "<p>Migrate</p>",
+            "labels": [{"name": "hermes:triage"}],
+        },
+        "comment": {"id": "comment-1", "comment_html": "", "actor": "user-1"},
+        "comments": [],
+    }
+    queue, ledger, controller, server = _setup(state)
     try:
-        real = hermes_consumer.deliver
-        hermes_consumer.deliver = flaky
-        count = hermes_consumer.consume(queue, HERMES_SECRET)
+        queue.enqueue("delivery-1", "project-1", "item-1", "", "issue", "")
+
+        finished = consume(queue, ledger, controller, worker_session_id="session-a")
+
+        assert finished == 1
+        assert len(state["comments"]) == 1
+        run = ledger.get_run_by_trigger_id("delivery-1")
+        assert run.operation == InvocationOperation.TRIAGE
     finally:
-        hermes_consumer.deliver = real
-    assert count == 0
-    assert call_count == 1
-    # Delivery stays in processing status for a later retry.
-    with queue._lock:
-        processing = list(queue._conn.execute("SELECT status FROM deliveries"))
-    assert processing == [("processing",)]
+        server.shutdown()
+        server.server_close()
+        queue.close()
+        ledger.close()
+
+
+def test_does_not_finish_when_another_session_holds_lease() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "item-1", "name": "Test issue", "description_html": ""},
+        "comment": {
+            "id": "comment-1",
+            "comment_html": "<p>@Hermes Explain this ticket</p>",
+            "actor": "user-1",
+        },
+        "comments": [],
+    }
+    queue, ledger, controller, server = _setup(state)
+    try:
+        queue.enqueue("delivery-1", "project-1", "item-1", "", "issue_comment", "comment-1")
+        # Seed a run and lease it to another session.
+        from plane_invocation import Invocation, InvocationKind, InvocationSource
+
+        run = ledger.start_run(
+            Invocation(
+                trigger_id="delivery-1",
+                project_id="project-1",
+                work_item_id="item-1",
+                kind=InvocationKind.COMMENT,
+                source=InvocationSource.COMMENT,
+                operation=InvocationOperation.ASK,
+                body="Explain this ticket",
+            )
+        )
+        assert ledger.try_take_lease(run.run_id, "session-b", lease_seconds=60.0)
+
+        finished = consume(queue, ledger, controller, worker_session_id="session-a")
+
+        assert finished == 0
+        assert state["comments"] == []
+        # Delivery remains claimed, not finished, because the lease is held.
+        assert queue.pending() == []
+    finally:
+        server.shutdown()
+        server.server_close()
+        queue.close()
+        ledger.close()
 
 
 if __name__ == "__main__":
-    import sys
+    import signal
 
-    import __main__
+    def _timeout(_sig, _frame) -> None:
+        raise SystemExit("consumer_controller_tests_timeout")
 
-    for name in dir(__main__):
+    signal.signal(signal.SIGALRM, _timeout)
+    signal.alarm(30)
+    for name in sorted(dir()):
         if name.startswith("test_"):
-            fn = getattr(__main__, name)
+            fn = globals()[name]
             fn()
             print(f"OK {name}")
-    print("all_consumer_tests_passed")
-    sys.exit(0)
+    print("all_consumer_controller_tests_passed")

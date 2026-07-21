@@ -139,6 +139,28 @@ class RunLedger:
             raise KeyError(run_id)
         return self._row_to_run(row)
 
+    def get_run_by_trigger_id(self, trigger_id: str) -> Run:
+        with self._lock:
+            row = self._conn.execute(
+                """
+                SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
+                       model_selector, label_triggered, state, lease_expires_at,
+                       start_comment_id, final_comment_id, worker_session_id, retry_count,
+                       created_at, updated_at
+                FROM runs WHERE trigger_id = ?
+                """,
+                (trigger_id,),
+            ).fetchone()
+        if row is None:
+            raise KeyError(trigger_id)
+        return self._row_to_run(row)
+
+    def maybe_get_run_by_trigger_id(self, trigger_id: str) -> Run | None:
+        try:
+            return self.get_run_by_trigger_id(trigger_id)
+        except KeyError:
+            return None
+
     def get_run(self, run_id: str) -> Run:
         with self._lock:
             row = self._conn.execute(
