@@ -2,6 +2,7 @@
 """
 from __future__ import annotations
 
+import copy
 import json
 import sys
 import threading
@@ -310,6 +311,262 @@ def test_rejects_hermes_self_authored_comment() -> None:
     finally:
         server.shutdown()
         server.server_close()
+        ledger.close()
+
+
+class _GoPlaneClient:
+    def __init__(self, *, labels: list[dict[str, str]] | None = None) -> None:
+        self.issue = {
+            "id": "item-1",
+            "name": "Implement the feature",
+            "description_html": "<p>Detailed acceptance criteria.</p>",
+            "labels": labels or [],
+            "assignees": [],
+        }
+        self.actions: list[tuple[str, object]] = []
+        self._next_comment = 1
+
+    def get_work_item(self, project_id: str, work_item_id: str) -> dict[str, Any]:
+        return copy.deepcopy(self.issue)
+
+    def get_comment(self, project_id: str, comment_id: str) -> dict[str, Any]:
+        return {"id": comment_id, "actor": "human-user"}
+
+    def update_work_item(
+        self,
+        project_id: str,
+        work_item_id: str,
+        *,
+        assignees: list[str] | None = None,
+        labels: list[str] | None = None,
+    ) -> dict[str, Any]:
+        payload: dict[str, list[str]] = {}
+        if assignees is not None:
+            self.issue["assignees"] = [{"id": value} for value in assignees]
+            payload["assignees"] = assignees
+        if labels is not None:
+            self.issue["labels"] = [{"id": value} for value in labels]
+            payload["labels"] = labels
+        self.actions.append(("update_work_item", payload))
+        return self.issue
+
+    def create_comment(
+        self,
+        project_id: str,
+        work_item_id: str,
+        comment_html: str,
+        *,
+        external_source: str | None = None,
+        external_id: str | None = None,
+    ) -> dict[str, Any]:
+        comment_id = f"comment-{self._next_comment}"
+        self._next_comment += 1
+        self.actions.append(
+            (
+                "create_comment",
+                {
+                    "id": comment_id,
+                    "comment_html": comment_html,
+                    "external_source": external_source,
+                    "external_id": external_id,
+                },
+            )
+        )
+        return {"id": comment_id}
+
+    def update_comment(
+        self,
+        project_id: str,
+        comment_id: str,
+        comment_html: str,
+    ) -> dict[str, Any]:
+        self.actions.append(("update_comment", {"id": comment_id, "comment_html": comment_html}))
+        return {"id": comment_id}
+
+    def delete_comment(self, project_id: str, work_item_id: str, comment_id: str) -> None:
+        self.actions.append(("delete_comment", comment_id))
+
+
+class _GoWorker:
+    def __init__(self, *, preflight: str = "success", execution: str = "success") -> None:
+        self.preflight = preflight
+        self.execution = execution
+
+    def assess_go(self, run: Run, context: dict[str, Any]) -> Any:
+        from hermes_worker import WorkerResult
+
+        return WorkerResult(
+            status=self.preflight,
+            final_comment_markdown="Please clarify the intended scope.",
+            summary="preflight",
+            artifacts=[],
+        )
+
+    def execute_go(self, run: Run, context: dict[str, Any]) -> Any:
+        from hermes_worker import WorkerResult
+
+        return WorkerResult(
+            status=self.execution,
+            final_comment_markdown="Implemented the requested change.",
+            summary="executed",
+            artifacts=[],
+        )
+
+
+def _go_run(*, label_triggered: bool) -> Invocation:
+    return Invocation(
+        trigger_id="trigger-go",
+        project_id="project-1",
+        work_item_id="item-1",
+        kind=InvocationKind.LABEL if label_triggered else InvocationKind.COMMENT,
+        source=InvocationSource.LABEL if label_triggered else InvocationSource.COMMENT,
+        operation=InvocationOperation.GO,
+        body="Implement the requested change",
+        label_triggered=label_triggered,
+    )
+
+
+def test_go_label_runs_visible_lifecycle_and_cleans_up_after_final_comment() -> None:
+    client = _GoPlaneClient(labels=[{"id": "label-go", "name": "hermes:go"}])
+    ledger = RunLedger(":memory:")
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _GoWorker(),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=True))
+
+        assert controller.process_run(run, ledger) is True
+
+        assert client.actions == [
+            ("update_work_item", {"assignees": ["hermes-user"]}),
+            ("create_comment", {
+                "id": "comment-1",
+                "comment_html": "🤖 Hermes started work on this ticket.",
+                "external_source": "hermes-plane-run-start",
+                "external_id": "trigger-go",
+            }),
+            ("create_comment", {
+                "id": "comment-2",
+                "comment_html": "Implemented the requested change.",
+                "external_source": "hermes-plane-run",
+                "external_id": "trigger-go",
+            }),
+            ("delete_comment", "comment-1"),
+            ("update_work_item", {"labels": []}),
+            ("update_work_item", {"assignees": []}),
+        ]
+        updated = ledger.get_run(run.run_id)
+        assert updated.state == RunState.COMPLETED
+        assert updated.start_comment_id == "comment-1"
+        assert updated.final_comment_id == "comment-2"
+    finally:
+        ledger.close()
+
+
+def test_go_comment_keeps_labels_unchanged() -> None:
+    client = _GoPlaneClient(labels=[{"id": "label-other", "name": "keep-me"}])
+    ledger = RunLedger(":memory:")
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _GoWorker(),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=False))
+
+        assert controller.process_run(run, ledger, actor_comment_id="human-comment") is True
+
+        updates = [payload for action, payload in client.actions if action == "update_work_item"]
+        assert updates == [{"assignees": ["hermes-user"]}, {"assignees": []}]
+        assert ledger.get_run(run.run_id).state == RunState.COMPLETED
+    finally:
+        ledger.close()
+
+
+def test_go_needing_clarification_posts_once_without_claiming_ticket() -> None:
+    client = _GoPlaneClient(labels=[{"id": "label-go", "name": "hermes:go"}])
+    ledger = RunLedger(":memory:")
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _GoWorker(preflight="clarification_needed"),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=True))
+
+        assert controller.process_run(run, ledger) is True
+
+        assert client.actions == [
+            ("create_comment", {
+                "id": "comment-1",
+                "comment_html": "❓ **Clarification needed**\n\nPlease clarify the intended scope.",
+                "external_source": "hermes-plane-run",
+                "external_id": "trigger-go",
+            }),
+        ]
+        assert ledger.get_run(run.run_id).state == RunState.COMPLETED
+    finally:
+        ledger.close()
+
+
+def test_go_blocked_after_start_updates_temporary_comment_and_keeps_authorization() -> None:
+    client = _GoPlaneClient(labels=[{"id": "label-go", "name": "hermes:go"}])
+    ledger = RunLedger(":memory:")
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _GoWorker(execution="blocked"),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=True))
+
+        assert controller.process_run(run, ledger) is True
+
+        assert client.actions == [
+            ("update_work_item", {"assignees": ["hermes-user"]}),
+            ("create_comment", {
+                "id": "comment-1",
+                "comment_html": "🤖 Hermes started work on this ticket.",
+                "external_source": "hermes-plane-run-start",
+                "external_id": "trigger-go",
+            }),
+            ("update_comment", {
+                "id": "comment-1",
+                "comment_html": "🚫 **Blocked — waiting for approval**\n\nImplemented the requested change.",
+            }),
+        ]
+        assert ledger.get_run(run.run_id).state == RunState.BLOCKED
+        assert client.issue["labels"] == [{"id": "label-go", "name": "hermes:go"}]
+        assert client.issue["assignees"] == [{"id": "hermes-user"}]
+    finally:
+        ledger.close()
+
+
+def test_go_cleanup_preserves_assignees_added_during_execution() -> None:
+    client = _GoPlaneClient()
+    ledger = RunLedger(":memory:")
+
+    class _ConcurrentWorker(_GoWorker):
+        def execute_go(self, run: Run, context: dict[str, Any]) -> Any:
+            result = super().execute_go(run, context)
+            client.issue["assignees"].append({"id": "collaborator"})
+            return result
+
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _ConcurrentWorker(),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=False))
+
+        assert controller.process_run(run, ledger) is True
+
+        updates = [payload for action, payload in client.actions if action == "update_work_item"]
+        assert updates == [{"assignees": ["hermes-user"]}, {"assignees": ["collaborator"]}]
+    finally:
         ledger.close()
 
 

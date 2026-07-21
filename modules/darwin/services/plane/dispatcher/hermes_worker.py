@@ -38,8 +38,19 @@ class HermesWorker:
         self._timeout = timeout_seconds
 
     def invoke(self, run: Run, work_item_context: dict[str, Any]) -> WorkerResult:
-        """Run Hermes with a controller-authored prompt and parse the envelope."""
-        prompt = self._build_prompt(run, work_item_context)
+        """Run Hermes for a read-only ask or triage response."""
+        return self._invoke_prompt(run, self._build_prompt(run, work_item_context, stage="response"))
+
+    def assess_go(self, run: Run, work_item_context: dict[str, Any]) -> WorkerResult:
+        """Determine whether a GO request is actionable without taking action."""
+        return self._invoke_prompt(run, self._build_prompt(run, work_item_context, stage="preflight"))
+
+    def execute_go(self, run: Run, work_item_context: dict[str, Any]) -> WorkerResult:
+        """Execute an already-cleared GO request and report its terminal result."""
+        return self._invoke_prompt(run, self._build_prompt(run, work_item_context, stage="execution"))
+
+    def _invoke_prompt(self, run: Run, prompt: str) -> WorkerResult:
+        """Run a controller-authored prompt and parse the strict result envelope."""
         cmd = [
             self._hermes_path,
             "chat",
@@ -74,12 +85,28 @@ class HermesWorker:
 
         return self._parse_envelope(stdout)
 
-    def _build_prompt(self, run: Run, work_item_context: dict[str, Any]) -> str:
+    def _build_prompt(
+        self, run: Run, work_item_context: dict[str, Any], *, stage: str
+    ) -> str:
         operation_name = run.operation.value
         title = work_item_context.get("name", "Untitled")
         description = work_item_context.get("description_html", "")
+        stage_instruction = {
+            "response": "Answer or triage the ticket context. Do not mutate Plane.",
+            "preflight": (
+                "Do not execute work, write files, call external services, or mutate Plane. "
+                "Only determine whether the request is sufficiently clear to execute. "
+                "Return status=success if it is clear, or status=clarification_needed with "
+                "a concise question if it is not."
+            ),
+            "execution": (
+                "Execute the requested work now, respecting normal Hermes guardrails. "
+                "If an approval guardrail prevents the requested action, return status=blocked."
+            ),
+        }[stage]
         return (
             f"You are helping with a Plane work item. Operation: {operation_name}.\n"
+            f"Stage: {stage}. {stage_instruction}\n"
             f"Title: {title}\n"
             f"Description HTML: {description}\n"
             f"User request: {run.body}\n\n"

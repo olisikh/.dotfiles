@@ -15,13 +15,15 @@ from plane_invocation import Invocation, InvocationKind, InvocationOperation, In
 from plane_runs import Run, RunState
 
 
-def _make_run(body: str = "Explain this") -> Run:
+def _make_run(
+    body: str = "Explain this", operation: InvocationOperation = InvocationOperation.ASK
+) -> Run:
     return Run(
         run_id="run-1",
         trigger_id="trigger-1",
         project_id="project-1",
         work_item_id="item-1",
-        operation=InvocationOperation.ASK,
+        operation=operation,
         body=body,
         model_selector=None,
         label_triggered=False,
@@ -109,6 +111,41 @@ def test_validates_required_envelope_fields() -> None:
 
     assert result.status == "failure"
     assert "missing" in result.summary.lower()
+
+
+def test_go_preflight_is_read_only_and_does_not_authorize_execution() -> None:
+    worker = HermesWorker(hermes_path="/fake/hermes")
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value.stdout = _successful_stdout()
+        mock_run.return_value.stderr = ""
+        mock_run.return_value.returncode = 0
+
+        result = worker.assess_go(
+            _make_run("Implement it", InvocationOperation.GO),
+            {"name": "Test issue", "description_html": "<p>Context</p>"},
+        )
+
+    assert result.status == "success"
+    prompt = mock_run.call_args[0][0][mock_run.call_args[0][0].index("-q") + 1]
+    assert "Do not execute" in prompt
+    assert "clarification_needed" in prompt
+
+
+def test_go_execution_prompt_authorizes_actual_work() -> None:
+    worker = HermesWorker(hermes_path="/fake/hermes")
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value.stdout = _successful_stdout()
+        mock_run.return_value.stderr = ""
+        mock_run.return_value.returncode = 0
+
+        result = worker.execute_go(
+            _make_run("Implement it", InvocationOperation.GO),
+            {"name": "Test issue", "description_html": "<p>Context</p>"},
+        )
+
+    assert result.status == "success"
+    prompt = mock_run.call_args[0][0][mock_run.call_args[0][0].index("-q") + 1]
+    assert "Execute the requested work" in prompt
 
 
 if __name__ == "__main__":

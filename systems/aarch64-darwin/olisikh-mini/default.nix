@@ -45,6 +45,7 @@ in
     services.plane = {
       enable = true;
       productionActive = true;
+      hermesUserId = "0ba31c66-78f1-4391-9e73-c64445ca2cb2";
       canary.enable = false;
     };
 

@@ -31,6 +31,9 @@ if not secret:
 
 state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
 queue = DeliveryQueue(str(state_dir / "dispatcher.sqlite3"))
+recovered = queue.recover_processing()
+if recovered:
+    print(f"plane_dispatcher_recovered_processing={recovered}")
 ledger = RunLedger(str(state_dir / "runs.sqlite3"))
 cooldown = CooldownMap(float(os.environ.get("PLANE_DISPATCHER_COOLDOWN_SECONDS", "10")))
 server = ThreadingHTTPServer(

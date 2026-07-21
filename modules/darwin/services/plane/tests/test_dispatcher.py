@@ -160,6 +160,17 @@ class DeliveryQueueTests(unittest.TestCase):
 
         self.assertEqual(queue.pending(), [])
         self.assertEqual(queue.claim_pending(), [])
+    def test_recover_processing_returns_interrupted_delivery_to_pending(self) -> None:
+        queue = DeliveryQueue(":memory:")
+        self.addCleanup(queue.close)
+        queue.enqueue("delivery-1", "project-1", "item-1", "PERSONAL-1")
+        queue.claim_pending()
+
+        self.assertEqual(queue.recover_processing(), 1)
+        self.assertEqual(
+            queue.pending(),
+            [("delivery-1", "project-1", "item-1", "PERSONAL-1", "issue", "")],
+        )
 
 
 class CooldownMapTests(unittest.TestCase):

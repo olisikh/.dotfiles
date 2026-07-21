@@ -57,16 +57,53 @@ class PlaneClient:
     def get_comment(self, project_id: str, comment_id: str) -> dict[str, Any]:
         return self._request("GET", f"/projects/{project_id}/comments/{comment_id}/")
 
+    def update_work_item(
+        self,
+        project_id: str,
+        work_item_id: str,
+        *,
+        assignees: list[str] | None = None,
+        labels: list[str] | None = None,
+    ) -> dict[str, Any]:
+        payload: dict[str, list[str]] = {}
+        if assignees is not None:
+            payload["assignees"] = assignees
+        if labels is not None:
+            payload["labels"] = labels
+        if not payload:
+            raise ValueError("update_work_item requires assignees or labels")
+        return self._request("PATCH", f"/projects/{project_id}/issues/{work_item_id}/", payload)
+
     def create_comment(
         self,
         project_id: str,
         work_item_id: str,
         comment_html: str,
+        *,
+        external_source: str | None = None,
+        external_id: str | None = None,
     ) -> dict[str, Any]:
+        payload: dict[str, Any] = {"comment_html": comment_html, "access": "INTERNAL"}
+        if external_source is not None:
+            payload["external_source"] = external_source
+        if external_id is not None:
+            payload["external_id"] = external_id
         return self._request(
             "POST",
             f"/projects/{project_id}/issues/{work_item_id}/comments/",
-            {"comment_html": f"{comment_html}", "access": "INTERNAL"},
+            payload,
+        )
+
+    def update_comment(
+        self,
+        project_id: str,
+        comment_id: str,
+        comment_html: str,
+    ) -> dict[str, Any]:
+        return self._request(
+            "PATCH",
+            f"/projects/{project_id}/comments/{comment_id}/",
+            {"comment_html": comment_html, "access": "INTERNAL"},
         )
 
     def delete_comment(self, project_id: str, work_item_id: str, comment_id: str) -> None:

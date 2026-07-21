@@ -49,6 +49,25 @@ class FakePlaneHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(404)
 
+    def do_PATCH(self) -> None:  # noqa: N802
+        length = int(self.headers.get("Content-Length", "0"))
+        body = json.loads(self.rfile.read(length))
+        if "/issues/" in self.path and "/comments/" not in self.path:
+            self.state["issue"].update(body)
+            self.state["updates"].append(body)
+            result = self.state["issue"]
+        elif "/comments/" in self.path:
+            self.state["comment"].update(body)
+            self.state["updates"].append(body)
+            result = self.state["comment"]
+        else:
+            self.send_error(404)
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode())
+
     def do_DELETE(self) -> None:  # noqa: N802
         if "/comments/" in self.path:
             parts = [p for p in self.path.split("/") if p]
@@ -140,6 +159,41 @@ def test_delete_comment_records_removal() -> None:
         client = _client(server)
         client.delete_comment("project-1", "issue-1", "comment-1")
         assert state["deleted"] == ["comment-1"]
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_update_work_item_replaces_only_requested_membership_lists() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "issue-1", "name": "Test issue", "assignees": [], "labels": []},
+        "comments": [],
+        "deleted": [],
+        "updates": [],
+    }
+    server = _make_server(state)
+    try:
+        client = _client(server)
+        client.update_work_item("project-1", "issue-1", assignees=["hermes-user"], labels=["label-1"])
+        assert state["updates"] == [{"assignees": ["hermes-user"], "labels": ["label-1"]}]
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_update_comment_replaces_temporary_comment_text() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "issue-1", "name": "Test issue"},
+        "comment": {"id": "comment-1", "comment_html": "Started"},
+        "comments": [],
+        "deleted": [],
+        "updates": [],
+    }
+    server = _make_server(state)
+    try:
+        client = _client(server)
+        client.update_comment("project-1", "comment-1", "Blocked")
+        assert state["updates"] == [{"comment_html": "Blocked", "access": "INTERNAL"}]
     finally:
         server.shutdown()
         server.server_close()

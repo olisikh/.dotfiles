@@ -45,6 +45,8 @@ def consume(
         if _process_delivery(delivery, ledger, controller, worker_session_id, lease_seconds):
             queue.finish(delivery[0])
             finished += 1
+        else:
+            queue.release(delivery[0])
     return finished
 
 

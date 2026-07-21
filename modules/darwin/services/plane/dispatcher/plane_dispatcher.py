@@ -135,6 +135,28 @@ class DeliveryQueue:
             )
             self._conn.commit()
 
+    def release(self, delivery_id: str) -> None:
+        """Return an uncompleted claim to pending for a later consumer tick."""
+        with self._lock:
+            self._conn.execute(
+                "UPDATE deliveries SET status = 'pending' WHERE delivery_id = ? AND status = 'processing'",
+                (delivery_id,),
+            )
+            self._conn.commit()
+
+    def recover_processing(self) -> int:
+        """Return deliveries left claimed by a process that has exited.
+
+        The dispatcher is a singleton LaunchAgent. This runs only while that
+        agent is starting, after launchd has stopped the preceding process.
+        """
+        with self._lock:
+            cursor = self._conn.execute(
+                "UPDATE deliveries SET status = 'pending' WHERE status = 'processing'"
+            )
+            self._conn.commit()
+            return cursor.rowcount
+
     def close(self) -> None:
         with self._lock:
             self._conn.close()

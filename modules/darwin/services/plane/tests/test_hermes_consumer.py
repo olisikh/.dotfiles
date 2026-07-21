@@ -243,8 +243,11 @@ def test_does_not_finish_when_another_session_holds_lease() -> None:
 
         assert finished == 0
         assert state["comments"] == []
-        # Delivery remains claimed, not finished, because the lease is held.
-        assert queue.pending() == []
+        # Delivery is returned to pending so the periodic consumer can retry it
+        # once the other session's durable lease expires.
+        assert queue.pending() == [
+            ("delivery-1", "project-1", "item-1", "", "issue_comment", "comment-1")
+        ]
     finally:
         server.shutdown()
         server.server_close()
