@@ -350,6 +350,19 @@ class RunLedger:
                 ).fetchall()
         return [self._row_to_run(row) for row in rows]
 
+    def cancel_for_trigger(self, trigger_id: str) -> bool:
+        """Cancel a non-terminal run whose source can no longer be fetched."""
+        with self._lock:
+            row = self._conn.execute("SELECT run_id, state FROM runs WHERE trigger_id = ?", (trigger_id,)).fetchone()
+            if row is None or row["state"] in {state.value for state in TERMINAL_STATES}:
+                return False
+            self._conn.execute(
+                "UPDATE runs SET state = ?, updated_at = ? WHERE run_id = ?",
+                (RunState.CANCELLED.value, time.monotonic(), row["run_id"]),
+            )
+            self._conn.commit()
+            return True
+
     def metrics(self) -> dict[str, int | float]:
         """Return aggregate operational counts only; never include ticket bodies."""
         now = time.monotonic()

@@ -90,9 +90,12 @@ def _process_comment_delivery(
     try:
         comment = controller.plane_client.get_comment(project_id, comment_id)
     except PlaneClientError as exc:
-        # A deleted source comment cannot ever become actionable; acknowledge the
-        # delivery so it does not occupy the queue forever.
-        return exc.status == 404
+        # A deleted source comment cannot ever become actionable; clear any
+        # earlier pending run and acknowledge the delivery so it cannot replay.
+        if exc.status == 404:
+            ledger.cancel_for_trigger(delivery_id)
+            return True
+        return False
     except Exception:  # noqa: BLE001 - transient Plane fetch failures are retried later
         return False
     comment_html = comment.get("comment_html", "")
