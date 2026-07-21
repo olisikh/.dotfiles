@@ -235,6 +235,8 @@ let
       set -euo pipefail
       export PLANE_STATE_DIR="${cfg.stateDir}"
       export PLANE_PUBLIC_BASE="${cfg.publicBase}"
+      workspace_slug="$(awk -F= '/^PLANE_WORKSPACE_SLUG=/{print substr($0, index($0, "=") + 1); exit}' "${cfg.stateDir}/plane-agent.env")"
+      export PLANE_WORKSPACE_SLUG="$workspace_slug"
       export PLANE_E2E_PROJECT_ID="${cfg.e2e.projectId}"
       export PLANE_E2E_TRIGGER_TOKEN_FILE="${cfg.e2e.triggerTokenFile}"
       exec ${python}/bin/python ${dispatcherDir}/plane_automation.py "$@"
