@@ -151,13 +151,27 @@ class HermesWorker:
         )
 
     def _parse_envelope(self, stdout: str) -> WorkerResult:
+        payload = stdout.lstrip()
         try:
-            data = json.loads(stdout)
+            data = json.loads(payload)
         except json.JSONDecodeError:
-            return self._failure(
-                f"Worker envelope invalid: expected JSON, got:\n\n{stdout[:2000]}",
-                summary="worker envelope invalid: not JSON",
-            )
+            # Hermes may emit a human-readable local diagnostic before the
+            # machine contract. Accept only a complete trailing JSON envelope.
+            start = payload.find("{")
+            if start < 0:
+                data = None
+            else:
+                try:
+                    data, consumed = json.JSONDecoder().raw_decode(payload[start:])
+                    if payload[start + consumed :].strip():
+                        data = None
+                except json.JSONDecodeError:
+                    data = None
+            if data is None:
+                return self._failure(
+                    f"Worker envelope invalid: expected JSON, got:\n\n{stdout[:2000]}",
+                    summary="worker envelope invalid: not JSON",
+                )
         if not isinstance(data, dict):
             return self._failure("Worker envelope invalid: JSON root is not an object")
         required = {"status", "final_comment_markdown", "summary", "artifacts"}

@@ -150,6 +150,19 @@ def test_go_execution_prompt_authorizes_actual_work() -> None:
     assert "Execute the requested work" in prompt
 
 
+def test_accepts_json_envelope_after_hermes_cli_preamble() -> None:
+    worker = HermesWorker()
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value.stdout = "⚠ diagnostic warning\n" + _successful_stdout()
+        mock_run.return_value.stderr = ""
+        mock_run.return_value.returncode = 0
+
+        result = worker.invoke(_make_run(), {})
+
+    assert result.status == "success"
+    assert result.final_comment_markdown == "Here is the answer."
+
+
 def test_variant_environment_preserves_auth_credentials() -> None:
     with tempfile.TemporaryDirectory() as source_dir:
         source_home = Path(source_dir)
