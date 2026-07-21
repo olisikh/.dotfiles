@@ -34,6 +34,9 @@ class FakePlaneHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(self.state["issue"]).encode())
         elif "/comments/" in self.path:
+            if self.state.get("comment_missing"):
+                self.send_error(404)
+                return
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
@@ -124,6 +127,26 @@ def test_consumes_comment_ask_delivery_to_terminal() -> None:
         assert len(state["comments"]) == 1
         assert "Answer for: Explain this ticket" in state["comments"][0]["comment_html"]
         assert queue.claim_pending() == []
+    finally:
+        server.shutdown()
+        server.server_close()
+        queue.close()
+        ledger.close()
+
+
+def test_finishes_delivery_when_source_comment_was_deleted() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "item-1", "name": "Test issue", "description_html": ""},
+        "comment": {},
+        "comment_missing": True,
+        "comments": [],
+    }
+    queue, ledger, controller, server = _setup(state)
+    try:
+        queue.enqueue("delivery-1", "project-1", "item-1", "", "issue_comment", "deleted-comment")
+
+        assert consume(queue, ledger, controller, worker_session_id="session-a") == 1
+        assert queue.pending() == []
     finally:
         server.shutdown()
         server.server_close()

@@ -10,6 +10,7 @@ import os
 import time
 from typing import Any
 
+from plane_client import PlaneClientError
 from plane_controller import PlaneAutomationController
 from plane_invocation import (
     Invocation,
@@ -88,7 +89,11 @@ def _process_comment_delivery(
 ) -> bool:
     try:
         comment = controller.plane_client.get_comment(project_id, comment_id)
-    except Exception:  # noqa: BLE001 - Plane fetch failures are retried later
+    except PlaneClientError as exc:
+        # A deleted source comment cannot ever become actionable; acknowledge the
+        # delivery so it does not occupy the queue forever.
+        return exc.status == 404
+    except Exception:  # noqa: BLE001 - transient Plane fetch failures are retried later
         return False
     comment_html = comment.get("comment_html", "")
     invocation = parse_comment_invocation(delivery_id, project_id, work_item_id, comment_html)
