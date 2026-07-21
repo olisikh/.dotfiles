@@ -27,10 +27,11 @@ if not secret:
 
 state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
 queue = DeliveryQueue(str(state_dir / "dispatcher.sqlite3"))
+ledger = RunLedger(str(state_dir / "runs.sqlite3"))
 cooldown = CooldownMap(float(os.environ.get("PLANE_DISPATCHER_COOLDOWN_SECONDS", "10")))
 server = ThreadingHTTPServer(
     ("127.0.0.1", int(os.environ.get("PLANE_DISPATCHER_PORT", "9801"))),
-    make_dispatch_handler(queue, cooldown, secret),
+    make_dispatch_handler(queue, ledger, cooldown, secret),
 )
 
 
@@ -67,3 +68,4 @@ try:
 finally:
     server.server_close()
     queue.close()
+    ledger.close()

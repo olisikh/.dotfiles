@@ -12,6 +12,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
 from plane_dispatcher import CooldownMap, DeliveryQueue, ingest_plane_delivery, make_dispatch_handler
+from plane_runs import RunLedger, RunState
+from plane_invocation import InvocationOperation
+
+
+def _make_headers(delivery: str, secret: str, body: bytes) -> dict[str, str]:
+    signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    return {"X-Plane-Delivery": delivery, "X-Plane-Signature": signature}
 
 
 class PlaneWebhookValidationTests(unittest.TestCase):
@@ -185,17 +192,20 @@ class DeliveryIngestionTests(unittest.TestCase):
             }
         ).encode()
         secret = "secret"
-        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        headers = _make_headers("delivery-1", secret, body)
         queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
         cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
 
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 cooldown,
                 secret,
-                {"X-Plane-Delivery": "delivery-1", "X-Plane-Signature": signature},
+                headers,
                 body,
             ),
             "accepted",
@@ -203,13 +213,15 @@ class DeliveryIngestionTests(unittest.TestCase):
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 CooldownMap(60.0),
                 secret,
-                {"X-Plane-Delivery": "delivery-1", "X-Plane-Signature": signature},
+                headers,
                 body,
             ),
-            "rejected",
+            "accepted",
         )
+        self.assertEqual(len(queue.pending()), 1)
 
     def test_accepts_valid_signed_comment_delivery_with_comment_reference(self) -> None:
         import json
@@ -221,16 +233,19 @@ class DeliveryIngestionTests(unittest.TestCase):
             }
         ).encode()
         secret = "secret"
-        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        headers = _make_headers("delivery-comment-1", secret, body)
         queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
         self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
 
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 CooldownMap(60.0),
                 secret,
-                {"X-Plane-Delivery": "delivery-comment-1", "X-Plane-Signature": signature},
+                headers,
                 body,
             ),
             "accepted",
@@ -240,15 +255,142 @@ class DeliveryIngestionTests(unittest.TestCase):
             [("delivery-comment-1", "project-1", "item-1", "", "issue_comment", "comment-1")],
         )
 
+    def test_creates_run_for_label_trigger(self) -> None:
+        import json
+
+        body = json.dumps(
+            {
+                "event": "issue",
+                "data": {
+                    "id": "item-1",
+                    "project_id": "project-1",
+                    "identifier": "PERSONAL-1",
+                    "labels": [{"name": "hermes:go"}],
+                },
+            }
+        ).encode()
+        secret = "secret"
+        headers = _make_headers("delivery-label-1", secret, body)
+        queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
+        self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
+
+        self.assertEqual(
+            ingest_plane_delivery(queue, ledger, CooldownMap(60.0), secret, headers, body),
+            "accepted",
+        )
+        active = ledger.active_runs()
+        self.assertEqual(len(active), 1)
+        self.assertEqual(active[0].operation, InvocationOperation.GO)
+        self.assertTrue(active[0].label_triggered)
+
+    def test_creates_run_for_comment_invocation(self) -> None:
+        import json
+
+        body = json.dumps(
+            {
+                "event": "issue_comment",
+                "data": {
+                    "id": "comment-1",
+                    "issue": "item-1",
+                    "project": "project-1",
+                    "comment_html": "<p>@Hermes --op triage Check this</p>",
+                },
+            }
+        ).encode()
+        secret = "secret"
+        headers = _make_headers("delivery-comment-2", secret, body)
+        queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
+        self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
+
+        self.assertEqual(
+            ingest_plane_delivery(queue, ledger, CooldownMap(60.0), secret, headers, body),
+            "accepted",
+        )
+        active = ledger.active_runs()
+        self.assertEqual(len(active), 1)
+        self.assertEqual(active[0].operation, InvocationOperation.TRIAGE)
+        self.assertEqual(active[0].body, "Check this")
+
+    def test_duplicate_delivery_is_idempotent_for_runs(self) -> None:
+        import json
+
+        body = json.dumps(
+            {
+                "event": "issue",
+                "data": {
+                    "id": "item-1",
+                    "project_id": "project-1",
+                    "identifier": "PERSONAL-1",
+                    "labels": [{"name": "hermes:go"}],
+                },
+            }
+        ).encode()
+        secret = "secret"
+        headers = _make_headers("delivery-label-1", secret, body)
+        queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
+        self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
+
+        self.assertEqual(
+            ingest_plane_delivery(queue, ledger, CooldownMap(60.0), secret, headers, body),
+            "accepted",
+        )
+        self.assertEqual(
+            ingest_plane_delivery(queue, ledger, CooldownMap(60.0), secret, headers, body),
+            "accepted",
+        )
+        self.assertEqual(len(ledger.active_runs()), 1)
+
+    def test_ignores_non_hermes_comment_without_creating_run(self) -> None:
+        import json
+
+        body = json.dumps(
+            {
+                "event": "issue_comment",
+                "data": {
+                    "id": "comment-1",
+                    "issue": "item-1",
+                    "project": "project-1",
+                    "comment_html": "<p>Thanks for the update</p>",
+                },
+            }
+        ).encode()
+        secret = "secret"
+        headers = _make_headers("delivery-comment-plain", secret, body)
+        queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
+        self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
+
+        self.assertEqual(
+            ingest_plane_delivery(queue, ledger, CooldownMap(60.0), secret, headers, body),
+            "accepted",
+        )
+        self.assertEqual(ledger.active_runs(), [])
+
     def test_accepts_comment_after_issue_within_same_ticket_cooldown(self) -> None:
         import json
 
         secret = "secret"
         queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
         cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
         issue_body = json.dumps(
-            {"event": "issue", "data": {"id": "item-1", "project_id": "project-1"}}
+            {
+                "event": "issue",
+                "data": {
+                    "id": "item-1",
+                    "project_id": "project-1",
+                    "labels": [{"name": "hermes:go"}],
+                },
+            }
         ).encode()
         comment_body = json.dumps(
             {
@@ -260,12 +402,10 @@ class DeliveryIngestionTests(unittest.TestCase):
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 cooldown,
                 secret,
-                {
-                    "X-Plane-Delivery": "delivery-issue-1",
-                    "X-Plane-Signature": hmac.new(secret.encode(), issue_body, hashlib.sha256).hexdigest(),
-                },
+                _make_headers("delivery-issue-1", secret, issue_body),
                 issue_body,
             ),
             "accepted",
@@ -273,12 +413,10 @@ class DeliveryIngestionTests(unittest.TestCase):
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 cooldown,
                 secret,
-                {
-                    "X-Plane-Delivery": "delivery-comment-1",
-                    "X-Plane-Signature": hmac.new(secret.encode(), comment_body, hashlib.sha256).hexdigest(),
-                },
+                _make_headers("delivery-comment-1", secret, comment_body),
                 comment_body,
             ),
             "accepted",
@@ -289,14 +427,17 @@ class DeliveryIngestionTests(unittest.TestCase):
         import json
 
         queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
         cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
-        self.assertEqual(ingest_plane_delivery(queue, cooldown, "secret", {}, b"{}"), "rejected")
+        self.addCleanup(ledger.close)
+        self.assertEqual(ingest_plane_delivery(queue, ledger, cooldown, "secret", {}, b"{}"), "rejected")
         body = json.dumps({"event": "issue_comment", "data": {}}).encode()
         signature = hmac.new(b"secret", body, hashlib.sha256).hexdigest()
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 cooldown,
                 "secret",
                 {"X-Plane-Delivery": "delivery-2", "X-Plane-Signature": signature},
@@ -312,28 +453,36 @@ class DeliveryIngestionTests(unittest.TestCase):
             {"event": "issue", "data": {"id": "item-1", "project_id": "project-1"}}
         ).encode()
         secret = "secret"
-        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        headers = _make_headers("delivery-1", secret, body)
         queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
         cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
 
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 cooldown,
                 secret,
-                {"X-Plane-Delivery": "delivery-1", "X-Plane-Signature": signature},
+                headers,
                 body,
             ),
             "accepted",
         )
+        second_body = json.dumps(
+            {"event": "issue", "data": {"id": "item-1", "project_id": "project-1"}}
+        ).encode()
+        second_headers = _make_headers("delivery-2", secret, second_body)
         self.assertEqual(
             ingest_plane_delivery(
                 queue,
+                ledger,
                 cooldown,
                 secret,
-                {"X-Plane-Delivery": "delivery-2", "X-Plane-Signature": signature},
-                body,
+                second_headers,
+                second_body,
             ),
             "cooldown",
         )
@@ -348,10 +497,12 @@ class DispatchHttpHandlerTests(unittest.TestCase):
 
         secret = "secret"
         queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
         cooldown = CooldownMap(60.0)
         self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
         server = ThreadingHTTPServer(
-            ("127.0.0.1", 0), make_dispatch_handler(queue, cooldown, secret)
+            ("127.0.0.1", 0), make_dispatch_handler(queue, ledger, cooldown, secret)
         )
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()

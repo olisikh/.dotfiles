@@ -15,6 +15,9 @@ import time
 from http.server import BaseHTTPRequestHandler
 from typing import Any
 
+import plane_invocation
+from plane_runs import RunLedger
+
 
 class CooldownMap:
     """In-memory reject-if-too-recent map keyed by work_item_id.
@@ -138,7 +141,7 @@ class DeliveryQueue:
 
 
 def make_dispatch_handler(
-    queue: DeliveryQueue, cooldown: CooldownMap, secret: str
+    queue: DeliveryQueue, ledger: "RunLedger", cooldown: CooldownMap, secret: str
 ) -> type[BaseHTTPRequestHandler]:
     """Create the only HTTP surface: POST /plane, capped at one MiB."""
 
@@ -157,7 +160,7 @@ def make_dispatch_handler(
                 return
             body = self.rfile.read(length)
             result = ingest_plane_delivery(
-                queue, cooldown, secret, dict(self.headers.items()), body
+                queue, ledger, cooldown, secret, dict(self.headers.items()), body
             )
             if result == "accepted":
                 self.send_response(202)
@@ -177,12 +180,13 @@ def make_dispatch_handler(
 
 def ingest_plane_delivery(
     queue: DeliveryQueue,
+    ledger: "RunLedger",
     cooldown: CooldownMap,
     secret: str,
     headers: dict[str, str],
     body: bytes,
 ) -> str:
-    """Authenticate, cooldown, and enqueue one Plane issue event.
+    """Authenticate, cooldown, enqueue, and persist a run for one Plane event.
 
     Returns one of: 'accepted', 'cooldown', 'rejected'.
     """
@@ -208,13 +212,41 @@ def ingest_plane_delivery(
     comment_id = data.get("id", "") if event_type == "issue_comment" else ""
     if event_type == "issue" and not cooldown.is_allowed(work_item_id):
         return "cooldown"
+
+    invocation = _extract_invocation(delivery_id, project_id, work_item_id, event_type, data)
+    if isinstance(invocation, plane_invocation.InvocationError):
+        # Malformed but authentically signed Hermes mention: accept the delivery
+        # so it is not retried, but do not create a run yet. Phase 3 will post
+        # one deterministic help comment tied to the comment_id/delivery_id.
+        pass
+    elif invocation is not None:
+        ledger.start_run(invocation)
+
     return (
         "accepted"
         if queue.enqueue(
             delivery_id, project_id, work_item_id, identifier, event_type, comment_id
         )
-        else "rejected"
+        else "accepted"
     )
+
+
+def _extract_invocation(
+    delivery_id: str,
+    project_id: str,
+    work_item_id: str,
+    event_type: str,
+    data: dict[str, Any],
+) -> plane_invocation.Invocation | plane_invocation.InvocationError | None:
+    from plane_invocation import InvocationError, parse_comment_invocation, select_label_invocation
+
+    if event_type == "issue_comment":
+        comment_html = data.get("comment_html", "")
+        return parse_comment_invocation(delivery_id, project_id, work_item_id, comment_html)
+    if event_type == "issue":
+        labels = [label.get("name", "") for label in data.get("labels", []) if isinstance(label, dict)]
+        return select_label_invocation(delivery_id, project_id, work_item_id, labels)
+    return None
 
 
 def verify_plane_signature(secret: str, body: bytes, signature: str) -> bool:
