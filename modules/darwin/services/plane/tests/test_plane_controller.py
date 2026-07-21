@@ -331,7 +331,7 @@ class _GoPlaneClient:
     def get_work_item(self, project_id: str, work_item_id: str) -> dict[str, Any]:
         return copy.deepcopy(self.issue)
 
-    def get_comment(self, project_id: str, comment_id: str) -> dict[str, Any]:
+    def get_comment(self, project_id: str, work_item_id: str, comment_id: str) -> dict[str, Any]:
         return {"id": comment_id, "actor": "human-user"}
 
     def update_work_item(
@@ -379,6 +379,7 @@ class _GoPlaneClient:
     def update_comment(
         self,
         project_id: str,
+        work_item_id: str,
         comment_id: str,
         comment_html: str,
     ) -> dict[str, Any]:

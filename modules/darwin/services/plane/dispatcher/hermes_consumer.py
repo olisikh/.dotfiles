@@ -88,7 +88,7 @@ def _process_comment_delivery(
     lease_seconds: float,
 ) -> bool:
     try:
-        comment = controller.plane_client.get_comment(project_id, comment_id)
+        comment = controller.plane_client.get_comment(project_id, work_item_id, comment_id)
     except PlaneClientError as exc:
         # A deleted source comment cannot ever become actionable; clear any
         # earlier pending run and acknowledge the delivery so it cannot replay.

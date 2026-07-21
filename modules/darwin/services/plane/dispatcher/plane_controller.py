@@ -61,7 +61,9 @@ class PlaneAutomationController:
         if RunState(run.state) in {RunState.COMPLETED, RunState.FAILED, RunState.CANCELLED}:
             return True
 
-        if actor_comment_id and self._is_self_authored(run.project_id, actor_comment_id):
+        if actor_comment_id and self._is_self_authored(
+            run.project_id, run.work_item_id, actor_comment_id
+        ):
             ledger.transition(run.run_id, RunState.CANCELLED)
             return True
 
@@ -79,11 +81,11 @@ class PlaneAutomationController:
             return self._handle_go(effective_run, ledger)
         return self._transition(run, ledger, RunState.FAILED)
 
-    def _is_self_authored(self, project_id: str, comment_id: str) -> bool:
+    def _is_self_authored(self, project_id: str, work_item_id: str, comment_id: str) -> bool:
         if not self._hermes_user_id:
             return False
         try:
-            comment = self._plane.get_comment(project_id, comment_id)
+            comment = self._plane.get_comment(project_id, work_item_id, comment_id)
         except Exception:  # noqa: BLE001 - defensive guard, Plane fetch may fail
             return False
         actor = comment.get("actor", "") or comment.get("created_by", "") or ""
@@ -178,6 +180,7 @@ class PlaneAutomationController:
             try:
                 self._plane.update_comment(
                     run.project_id,
+                    run.work_item_id,
                     start_comment_id,
                     f"🚫 **Blocked — waiting for approval**\n\n{result.final_comment_markdown}",
                 )

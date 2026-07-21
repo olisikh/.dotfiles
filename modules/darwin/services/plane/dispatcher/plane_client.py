@@ -54,8 +54,10 @@ class PlaneClient:
     def get_work_item(self, project_id: str, work_item_id: str) -> dict[str, Any]:
         return self._request("GET", f"/projects/{project_id}/issues/{work_item_id}/")
 
-    def get_comment(self, project_id: str, comment_id: str) -> dict[str, Any]:
-        return self._request("GET", f"/projects/{project_id}/comments/{comment_id}/")
+    def get_comment(self, project_id: str, work_item_id: str, comment_id: str) -> dict[str, Any]:
+        return self._request(
+            "GET", f"/projects/{project_id}/issues/{work_item_id}/comments/{comment_id}/"
+        )
 
     def update_work_item(
         self,
@@ -97,18 +99,21 @@ class PlaneClient:
     def update_comment(
         self,
         project_id: str,
+        work_item_id: str,
         comment_id: str,
         comment_html: str,
     ) -> dict[str, Any]:
         return self._request(
             "PATCH",
-            f"/projects/{project_id}/comments/{comment_id}/",
+            f"/projects/{project_id}/issues/{work_item_id}/comments/{comment_id}/",
             {"comment_html": comment_html, "access": "INTERNAL"},
         )
 
     def delete_comment(self, project_id: str, work_item_id: str, comment_id: str) -> None:
         try:
-            self._request("DELETE", f"/projects/{project_id}/comments/{comment_id}/")
+            self._request(
+                "DELETE", f"/projects/{project_id}/issues/{work_item_id}/comments/{comment_id}/"
+            )
         except PlaneClientError as exc:
             if exc.status != 404:
                 raise

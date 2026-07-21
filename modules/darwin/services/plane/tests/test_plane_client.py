@@ -145,7 +145,7 @@ def test_get_comment_fetches_comment_details() -> None:
     server = _make_server(state)
     try:
         client = _client(server)
-        comment = client.get_comment("project-1", "comment-1")
+        comment = client.get_comment("project-1", "issue-1", "comment-1")
         assert comment["id"] == "comment-1"
     finally:
         server.shutdown()
@@ -196,7 +196,7 @@ def test_update_comment_replaces_temporary_comment_text() -> None:
     server = _make_server(state)
     try:
         client = _client(server)
-        client.update_comment("project-1", "comment-1", "Blocked")
+        client.update_comment("project-1", "issue-1", "comment-1", "Blocked")
         assert state["updates"] == [{"comment_html": "Blocked", "access": "INTERNAL"}]
     finally:
         server.shutdown()
