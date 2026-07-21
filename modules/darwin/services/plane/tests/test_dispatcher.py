@@ -11,7 +11,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
-from plane_dispatcher import CooldownMap, DeliveryQueue, ingest_plane_delivery, make_dispatch_handler
+from plane_dispatcher import (
+    CooldownMap,
+    DeliveryQueue,
+    ingest_plane_delivery,
+    make_dispatch_handler,
+    operational_metrics,
+)
 from plane_runs import RunLedger, RunState
 from plane_invocation import InvocationOperation
 
@@ -171,6 +177,21 @@ class DeliveryQueueTests(unittest.TestCase):
             queue.pending(),
             [("delivery-1", "project-1", "item-1", "PERSONAL-1", "issue", "")],
         )
+
+
+class OperationalMetricsTests(unittest.TestCase):
+    def test_reports_queue_and_run_counts_without_delivery_content(self) -> None:
+        queue = DeliveryQueue(":memory:")
+        ledger = RunLedger(":memory:")
+        self.addCleanup(queue.close)
+        self.addCleanup(ledger.close)
+        queue.enqueue("delivery", "project", "ticket", "PERSO-1")
+
+        metrics = operational_metrics(queue, ledger)
+
+        self.assertEqual(metrics["deliveries"]["pending"], 1)
+        self.assertEqual(metrics["runs"]["running"], 0)
+        self.assertNotIn("ticket", repr(metrics))
 
 
 class CooldownMapTests(unittest.TestCase):

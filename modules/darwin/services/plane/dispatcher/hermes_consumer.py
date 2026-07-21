@@ -47,6 +47,10 @@ def consume(
             finished += 1
         else:
             queue.release(delivery[0])
+    for run in ledger.pending_manual_retries():
+        if ledger.try_take_lease(run.run_id, worker_session_id, lease_seconds=lease_seconds):
+            if controller.process_run(run, ledger):
+                finished += 1
     return finished
 
 
@@ -113,6 +117,8 @@ def _process_comment_delivery(
     run = _ensure_run(ledger, invocation)
     if run.operation == InvocationOperation.GO and run.final_comment_id:
         return controller.recover_go_cleanup(run, ledger)
+    if run.state.value in {"completed", "failed", "cancelled"}:
+        return True
     if not ledger.try_take_lease(run.run_id, worker_session_id, lease_seconds=lease_seconds):
         return False
     return controller.process_run(run, ledger, actor_comment_id=comment_id)
@@ -143,6 +149,8 @@ def _process_label_delivery(
     run = _ensure_run(ledger, invocation)
     if run.operation == InvocationOperation.GO and run.final_comment_id:
         return controller.recover_go_cleanup(run, ledger)
+    if run.state.value in {"completed", "failed", "cancelled"}:
+        return True
     if not ledger.try_take_lease(run.run_id, worker_session_id, lease_seconds=lease_seconds):
         return False
     return controller.process_run(run, ledger)

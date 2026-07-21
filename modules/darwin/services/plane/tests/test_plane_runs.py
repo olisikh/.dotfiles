@@ -198,6 +198,43 @@ def test_active_runs_filters_by_state_and_work_item() -> None:
     assert ledger.active_runs(work_item_id="w-3") == []
 
 
+def test_metrics_report_state_counts_and_stale_lease_age_without_ticket_content() -> None:
+    ledger = RunLedger(":memory:")
+    running = ledger.start_run(_make_invocation(trigger_id="running", body="secret ticket body"))
+    ledger.try_take_lease(running.run_id, "session", lease_seconds=0)
+    blocked = ledger.start_run(_make_invocation(trigger_id="blocked", work_item_id="w-2"))
+    ledger.try_take_lease(blocked.run_id, "session", lease_seconds=60)
+    ledger.transition(blocked.run_id, RunState.BLOCKED)
+
+    metrics = ledger.metrics()
+
+    assert metrics["pending"] == 0
+    assert metrics["running"] == 1
+    assert metrics["blocked"] == 1
+    assert metrics["stale_running"] == 1
+    assert metrics["oldest_stale_lease_seconds"] >= 0
+    assert "secret ticket body" not in repr(metrics)
+
+
+def test_cancel_blocked_run_and_create_controlled_retry_of_failed_run() -> None:
+    ledger = RunLedger(":memory:")
+    blocked = ledger.start_run(_make_invocation(trigger_id="blocked"))
+    ledger.try_take_lease(blocked.run_id, "session", lease_seconds=60)
+    ledger.transition(blocked.run_id, RunState.BLOCKED)
+
+    assert ledger.cancel_run(blocked.run_id).state == RunState.CANCELLED
+
+    failed = ledger.start_run(_make_invocation(trigger_id="failed", work_item_id="other"))
+    ledger.try_take_lease(failed.run_id, "session", lease_seconds=60)
+    ledger.transition(failed.run_id, RunState.FAILED)
+    retry = ledger.create_retry(failed.run_id)
+
+    assert retry.state == RunState.PENDING
+    assert retry.trigger_id.startswith(f"manual-retry:{failed.run_id}:")
+    assert retry.work_item_id == failed.work_item_id
+    assert ledger.pending_manual_retries() == [retry]
+
+
 if __name__ == "__main__":
     import signal
 

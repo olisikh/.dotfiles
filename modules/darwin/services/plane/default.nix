@@ -17,6 +17,7 @@ let
     PLANE_PUBLIC_BASE = cfg.publicBase;
     PLANE_TAILNET_HOST = cfg.tailnetHost;
     PLANE_PROXY_PORT = toString cfg.proxyPort;
+    PLANE_MODEL_SELECTORS_JSON = builtins.toJSON cfg.modelSelectors;
   };
 
   patchPlaneWebAssets = pkgs.writers.writePython3 "patch-plane-web-assets" {
@@ -227,6 +228,16 @@ let
     '';
   };
 
+  planeAutomation = pkgs.writeShellApplication {
+    name = "plane-automation";
+    runtimeInputs = [ python ];
+    text = ''
+      set -euo pipefail
+      export PLANE_STATE_DIR="${cfg.stateDir}"
+      exec ${python}/bin/python ${dispatcherDir}/plane_automation.py "$@"
+    '';
+  };
+
   productionServiceConfig = label: program: {
     Label = label;
     KeepAlive = cfg.productionActive;
@@ -293,6 +304,15 @@ in
       description = "Plane user ID for the Hermes bot account; used to ignore its own comments.";
     };
 
+    modelSelectors = mkOption {
+      type = types.attrsOf types.str;
+      default = {
+        "gpt-5.6" = "gpt-5.6-terra";
+        fast = "gpt-5.6-luna";
+      };
+      description = "Trusted aliases allowed in Plane @Hermes --model requests. Omit --model to preserve normal Hermes routing.";
+    };
+
     mcpPort = mkOption {
       type = types.port;
       default = 8211;
@@ -322,7 +342,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ cfg.mcpPackage ];
+    environment.systemPackages = [ cfg.mcpPackage planeAutomation ];
 
     launchd.user.agents = {
       plane = {

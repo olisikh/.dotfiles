@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+from dataclasses import replace
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -15,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
 from plane_client import PlaneClient
 from plane_controller import HELP_MESSAGES, PlaneAutomationController
+from model_policy import ModelSelectorPolicy
 from plane_invocation import Invocation, InvocationError, InvocationKind, InvocationOperation, InvocationSource
 from plane_runs import Run, RunLedger, RunState
 
@@ -621,6 +623,45 @@ def test_go_recovery_cleans_terminal_run_after_crash_before_cleanup() -> None:
         assert ledger.get_run(run.run_id).start_comment_id == ""
     finally:
         ledger.close()
+
+
+def test_unknown_model_selector_posts_help_without_starting_worker() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "item-1", "name": "Test", "labels": [], "assignees": []},
+        "comment": {"id": "comment-1", "actor": {"id": "human"}},
+        "comments": [],
+    }
+    server = _make_server(state)
+    ledger = RunLedger(":memory:")
+    worker_started = False
+
+    def worker_factory(_run: Run) -> Any:
+        nonlocal worker_started
+        worker_started = True
+        return _FakeWorker(_run)
+
+    controller = PlaneAutomationController(
+        plane_client=_client(server),
+        worker_factory=worker_factory,
+        model_policy=ModelSelectorPolicy({"fast": "gpt-5.6-luna"}),
+    )
+    try:
+        invocation = Invocation(
+            trigger_id="trigger-model", project_id="project-1", work_item_id="item-1",
+            kind=InvocationKind.COMMENT, source=InvocationSource.COMMENT,
+            operation=InvocationOperation.ASK, body="Explain", model_selector="untrusted/model",
+        )
+        run = ledger.start_run(invocation)
+
+        assert controller.process_run(run, ledger) is True
+
+        assert worker_started is False
+        assert ledger.get_run(run.run_id).state == RunState.COMPLETED
+        assert "unsupported model selector" in state["comments"][0]["comment_html"].lower()
+    finally:
+        ledger.close()
+        server.shutdown()
+        server.server_close()
 
 
 if __name__ == "__main__":

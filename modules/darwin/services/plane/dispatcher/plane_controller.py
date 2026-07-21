@@ -7,9 +7,11 @@ The worker never writes to Plane.
 from __future__ import annotations
 
 import time
+from dataclasses import replace
 from typing import Any, Callable
 
 from hermes_worker import HermesWorker, WorkerResult
+from model_policy import ModelSelectorError, ModelSelectorPolicy
 from plane_client import PlaneClient
 from plane_invocation import Invocation, InvocationError, InvocationOperation
 from plane_runs import Run, RunLedger, RunState
@@ -35,11 +37,13 @@ class PlaneAutomationController:
         plane_client: PlaneClient,
         worker_factory: Callable[[Run], HermesWorker] | None = None,
         hermes_user_id: str | None = None,
+        model_policy: ModelSelectorPolicy | None = None,
     ) -> None:
         self.plane_client = plane_client
         self._plane = plane_client
         self._worker_factory = worker_factory or (lambda _run: HermesWorker())
         self._hermes_user_id = hermes_user_id
+        self._model_policy = model_policy or ModelSelectorPolicy({})
 
     def process_run(
         self,
@@ -64,10 +68,15 @@ class PlaneAutomationController:
         if parse_error is not None:
             return self._handle_parse_error(run, ledger, parse_error)
 
-        if run.operation in {InvocationOperation.ASK, InvocationOperation.TRIAGE}:
-            return self._handle_ask_or_triage(run, ledger)
-        if run.operation == InvocationOperation.GO:
-            return self._handle_go(run, ledger)
+        try:
+            effective_run = replace(run, model_selector=self._model_policy.resolve(run.model_selector))
+        except ModelSelectorError as exc:
+            return self._handle_model_selector_error(run, ledger, exc)
+
+        if effective_run.operation in {InvocationOperation.ASK, InvocationOperation.TRIAGE}:
+            return self._handle_ask_or_triage(effective_run, ledger)
+        if effective_run.operation == InvocationOperation.GO:
+            return self._handle_go(effective_run, ledger)
         return self._transition(run, ledger, RunState.FAILED)
 
     def _is_self_authored(self, project_id: str, comment_id: str) -> bool:
@@ -81,6 +90,17 @@ class PlaneAutomationController:
         if isinstance(actor, dict):
             actor = actor.get("id", "")
         return str(actor) == self._hermes_user_id
+
+    def _handle_model_selector_error(
+        self, run: Run, ledger: RunLedger, error: ModelSelectorError
+    ) -> bool:
+        choices = ", ".join(error.allowed) or "none"
+        comment = self._create_durable_comment(
+            run,
+            f"Unsupported model selector `{error.selector}`. Allowed selectors: {choices}.",
+        )
+        ledger.set_final_comment(run.run_id, comment.get("id", ""))
+        return self._transition(run, ledger, RunState.COMPLETED)
 
     def _handle_parse_error(self, run: Run, ledger: RunLedger, error: InvocationError) -> bool:
         template = HELP_MESSAGES.get(error.reason, "@Hermes could not understand that request.")

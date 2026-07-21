@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import sqlite3
 import threading
 import time
@@ -157,17 +158,55 @@ class DeliveryQueue:
             self._conn.commit()
             return cursor.rowcount
 
+    def status_counts(self) -> dict[str, int]:
+        with self._lock:
+            rows = self._conn.execute("SELECT status, COUNT(*) AS count FROM deliveries GROUP BY status").fetchall()
+        counts = {"pending": 0, "processing": 0, "dispatched": 0}
+        counts.update({str(row[0]): int(row[1]) for row in rows})
+        return counts
+
     def close(self) -> None:
         with self._lock:
             self._conn.close()
 
 
+def operational_metrics(queue: DeliveryQueue, ledger: "RunLedger") -> dict[str, object]:
+    """Return sanitized runtime metrics without ticket bodies, IDs, or secrets."""
+    return {"deliveries": queue.status_counts(), "runs": ledger.metrics()}
+
+
 def make_dispatch_handler(
     queue: DeliveryQueue, ledger: "RunLedger", cooldown: CooldownMap, secret: str
 ) -> type[BaseHTTPRequestHandler]:
-    """Create the only HTTP surface: POST /plane, capped at one MiB."""
+    """Create signed ingress plus loopback-only health and metrics endpoints."""
 
     class PlaneDispatchHandler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:  # noqa: N802 - standard-library callback name
+            metrics = operational_metrics(queue, ledger)
+            if self.path == "/healthz":
+                body = json.dumps({"status": "ok", **metrics}, separators=(",", ":")).encode()
+                content_type = "application/json"
+            elif self.path == "/metrics":
+                deliveries = metrics["deliveries"]
+                runs = metrics["runs"]
+                body = "".join(
+                    [
+                        *(f"plane_dispatcher_deliveries{{status=\"{status}\"}} {count}\n" for status, count in deliveries.items()),
+                        *(f"plane_automation_runs{{state=\"{state}\"}} {count}\n" for state, count in runs.items() if state in {"pending", "running", "blocked", "completed", "failed", "cancelled"}),
+                        f"plane_automation_stale_running {runs['stale_running']}\n",
+                        f"plane_automation_oldest_stale_lease_seconds {runs['oldest_stale_lease_seconds']}\n",
+                    ]
+                ).encode()
+                content_type = "text/plain; version=0.0.4"
+            else:
+                self.send_error(404)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         def do_POST(self) -> None:  # noqa: N802 - standard-library callback name
             if self.path != "/plane":
                 self.send_error(404)

@@ -10,6 +10,7 @@ from pathlib import Path
 
 from plane_runs import RunLedger
 
+from model_policy import ModelSelectorPolicy
 from plane_client import PlaneClient
 from plane_controller import PlaneAutomationController
 from plane_dispatcher import CooldownMap, DeliveryQueue, make_dispatch_handler
@@ -80,9 +81,11 @@ def _make_controller() -> PlaneAutomationController:
 
     plane_client = PlaneClient(base_url=base_url, workspace_slug=workspace_slug, api_key=api_key)
     hermes_user_id = os.environ.get("PLANE_HERMES_USER_ID", "")
+    model_policy = ModelSelectorPolicy.from_json(os.environ.get("PLANE_MODEL_SELECTORS_JSON", "{}"))
     return PlaneAutomationController(
         plane_client=plane_client,
         hermes_user_id=hermes_user_id or None,
+        model_policy=model_policy,
     )
 
 

@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-from plane_invocation import Invocation, InvocationOperation
+from plane_invocation import Invocation, InvocationKind, InvocationOperation, InvocationSource
 
 
 class RunState(str, Enum):
@@ -348,6 +348,66 @@ class RunLedger:
                     ORDER BY created_at
                     """,
                 ).fetchall()
+        return [self._row_to_run(row) for row in rows]
+
+    def metrics(self) -> dict[str, int | float]:
+        """Return aggregate operational counts only; never include ticket bodies."""
+        now = time.monotonic()
+        with self._lock:
+            rows = self._conn.execute("SELECT state, COUNT(*) AS count FROM runs GROUP BY state").fetchall()
+            stale = self._conn.execute(
+                "SELECT COUNT(*) AS count, MIN(lease_expires_at) AS oldest FROM runs "
+                "WHERE state = 'running' AND lease_expires_at IS NOT NULL AND lease_expires_at <= ?",
+                (now,),
+            ).fetchone()
+        counts = {state.value: 0 for state in RunState}
+        counts.update({str(row["state"]): int(row["count"]) for row in rows})
+        oldest = stale["oldest"] if stale and stale["oldest"] is not None else None
+        return {
+            **counts,
+            "stale_running": 0 if oldest is None else int(stale["count"]),
+            "oldest_stale_lease_seconds": 0.0 if oldest is None else max(0.0, now - float(oldest)),
+        }
+
+    def cancel_run(self, run_id: str) -> Run:
+        """Cancel only a non-executing pending or blocked run."""
+        run = self.get_run(run_id)
+        if run.state not in {RunState.PENDING, RunState.BLOCKED}:
+            raise ValueError("only pending or blocked runs can be cancelled")
+        return self.transition(run_id, RunState.CANCELLED)
+
+    def create_retry(self, run_id: str) -> Run:
+        """Create a new pending run from an explicitly failed or cancelled run."""
+        source = self.get_run(run_id)
+        if source.state not in {RunState.FAILED, RunState.CANCELLED}:
+            raise ValueError("only failed or cancelled runs can be retried")
+        return self.start_run(
+            Invocation(
+                trigger_id=f"manual-retry:{source.run_id}:{uuid.uuid4()}",
+                project_id=source.project_id,
+                work_item_id=source.work_item_id,
+                kind=InvocationKind.LABEL if source.label_triggered else InvocationKind.COMMENT,
+                source=InvocationSource.LABEL if source.label_triggered else InvocationSource.COMMENT,
+                operation=source.operation,
+                body=source.body,
+                model_selector=source.model_selector,
+                label_triggered=source.label_triggered,
+            )
+        )
+
+    def pending_manual_retries(self) -> list[Run]:
+        with self._lock:
+            rows = self._conn.execute(
+                """
+                SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
+                       model_selector, label_triggered, state, lease_expires_at,
+                       start_comment_id, final_comment_id, worker_session_id, retry_count,
+                       created_at, updated_at
+                FROM runs
+                WHERE state = 'pending' AND trigger_id LIKE 'manual-retry:%'
+                ORDER BY created_at
+                """
+            ).fetchall()
         return [self._row_to_run(row) for row in rows]
 
     def close(self) -> None:
