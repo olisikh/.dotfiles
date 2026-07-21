@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -146,6 +148,25 @@ def test_go_execution_prompt_authorizes_actual_work() -> None:
     assert result.status == "success"
     prompt = mock_run.call_args[0][0][mock_run.call_args[0][0].index("-q") + 1]
     assert "Execute the requested work" in prompt
+
+
+def test_variant_environment_preserves_auth_credentials() -> None:
+    with tempfile.TemporaryDirectory() as source_dir:
+        source_home = Path(source_dir)
+        (source_home / "config.yaml").write_text("agent:\n  reasoning_effort: medium\n")
+        auth = source_home / "auth.json"
+        auth.write_text('{"providers": {}}')
+        with patch.dict(os.environ, {"HERMES_HOME": str(source_home)}, clear=False):
+            env, temporary_home = HermesWorker()._variant_environment("low")
+        try:
+            assert env is not None
+            assert temporary_home is not None
+            isolated_auth = Path(temporary_home.name) / "auth.json"
+            assert isolated_auth.is_symlink()
+            assert isolated_auth.readlink() == auth
+        finally:
+            if temporary_home is not None:
+                temporary_home.cleanup()
 
 
 if __name__ == "__main__":

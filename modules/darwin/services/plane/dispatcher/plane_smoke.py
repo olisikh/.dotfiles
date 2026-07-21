@@ -18,6 +18,32 @@ class SmokeError(RuntimeError):
     """A failed prerequisite or assertion in an explicit live smoke run."""
 
 
+class SmokeLock:
+    """Exclusive, process-local guard against overlapping real Plane smoke runs."""
+
+    def __init__(self, path: Path) -> None:
+        self._path = path
+        self._held = False
+
+    def __enter__(self) -> "SmokeLock":
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            descriptor = os.open(self._path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError as exc:
+            raise SmokeError("a live Plane smoke run is already running") from exc
+        try:
+            os.write(descriptor, f"pid={os.getpid()}\n".encode())
+        finally:
+            os.close(descriptor)
+        self._held = True
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        if self._held:
+            self._path.unlink(missing_ok=True)
+            self._held = False
+
+
 @dataclass(frozen=True, slots=True)
 class SmokeConfiguration:
     state_dir: Path
@@ -171,6 +197,10 @@ class LiveSmokeRunner:
         self._timeout = timeout_seconds
 
     def run(self) -> dict[str, object]:
+        with SmokeLock(self._config.state_dir / "live-smoke.lock"):
+            return self._run_unlocked()
+
+    def _run_unlocked(self) -> dict[str, object]:
         marker = f"PLANE_E2E_{int(time.time())}"
         ticket = self._api.create_ticket(
             f"Hermes E2E smoke {marker}",

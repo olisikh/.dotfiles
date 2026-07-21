@@ -235,6 +235,15 @@ def test_cancel_blocked_run_and_create_controlled_retry_of_failed_run() -> None:
     assert ledger.pending_manual_retries() == [retry]
 
 
+def test_cancel_for_trigger_marks_only_non_terminal_run_cancelled() -> None:
+    ledger = RunLedger(":memory:")
+    active = ledger.start_run(_make_invocation(trigger_id="deleted-source"))
+
+    assert ledger.cancel_for_trigger("deleted-source") is True
+    assert ledger.get_run(active.run_id).state == RunState.CANCELLED
+    assert ledger.cancel_for_trigger("deleted-source") is False
+
+
 if __name__ == "__main__":
     import signal
 

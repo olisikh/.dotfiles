@@ -109,9 +109,10 @@ class HermesWorker:
         temp_path = Path(temporary_home.name)
         (temp_path / "config.yaml").write_text(rewritten, encoding="utf-8")
         (temp_path / "config.yaml").chmod(0o600)
-        source_env = source_home / ".env"
-        if source_env.exists():
-            (temp_path / ".env").symlink_to(source_env)
+        for credential_name in (".env", "auth.json"):
+            source_credential = source_home / credential_name
+            if source_credential.exists():
+                (temp_path / credential_name).symlink_to(source_credential)
         env = os.environ.copy()
         env["HERMES_HOME"] = temporary_home.name
         return env, temporary_home

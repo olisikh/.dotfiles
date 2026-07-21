@@ -31,6 +31,7 @@ def main() -> int:
     subcommands = parser.add_subparsers(dest="command", required=True)
     subcommands.add_parser("status", help="Show sanitized aggregate metrics and active runs")
     smoke_parser = subcommands.add_parser("smoke", help="Run explicit positive smoke tests against the live TEST project")
+    smoke_parser.add_argument("--live", action="store_true", help="Acknowledge that this creates and closes a real TEST ticket")
     smoke_parser.add_argument("--timeout", type=float, default=300.0, help="Seconds to wait for each real webhook/run")
     for command, help_text in (("cancel", "Cancel a pending or blocked run"), ("retry", "Clone a failed or cancelled run")):
         command_parser = subcommands.add_parser(command, help=help_text)
@@ -38,6 +39,9 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.command == "smoke":
+        if not args.live:
+            print(json.dumps({"ok": False, "error": "refusing live Plane mutation without --live"}, separators=(",", ":")))
+            return 1
         try:
             report = LiveSmokeRunner(SmokeConfiguration.from_environment(), timeout_seconds=args.timeout).run()
         except SmokeError as exc:

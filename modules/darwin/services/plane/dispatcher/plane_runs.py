@@ -360,7 +360,7 @@ class RunLedger:
         """Cancel a non-terminal run whose source can no longer be fetched."""
         with self._lock:
             row = self._conn.execute("SELECT run_id, state FROM runs WHERE trigger_id = ?", (trigger_id,)).fetchone()
-            if row is None or row["state"] in {state.value for state in TERMINAL_STATES}:
+            if row is None or row["state"] in {state.value for state in _TERMINAL_STATES}:
                 return False
             self._conn.execute(
                 "UPDATE runs SET state = ?, updated_at = ? WHERE run_id = ?",

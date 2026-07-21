@@ -2,14 +2,18 @@
 """Tests for opt-in live Plane E2E smoke-test orchestration primitives."""
 from __future__ import annotations
 
+import contextlib
+import io
 import sqlite3
 import sys
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
-from plane_smoke import SmokeConfiguration, SmokeError, SmokeWaiter
+from plane_smoke import SmokeConfiguration, SmokeError, SmokeLock, SmokeWaiter
+from plane_automation import main as plane_automation_main
 
 
 def test_configuration_requires_explicit_live_prerequisites() -> None:
@@ -69,6 +73,26 @@ def test_waiter_correlates_comment_and_label_deliveries() -> None:
         assert waiter.comment_delivery("project", "item", "comment-1") == "comment-delivery"
         assert waiter.label_cursor("project", "item") == 2
         assert waiter.label_delivery("project", "item", after_rowid=1) == "label-delivery"
+
+
+def test_smoke_lock_rejects_concurrent_live_run_and_cleans_up() -> None:
+    with tempfile.TemporaryDirectory() as temporary:
+        lock_path = Path(temporary) / "live-smoke.lock"
+        with SmokeLock(lock_path):
+            assert lock_path.exists()
+            try:
+                with SmokeLock(lock_path):
+                    raise AssertionError("second lock unexpectedly acquired")
+            except SmokeError as exc:
+                assert "already running" in str(exc)
+        assert not lock_path.exists()
+
+
+def test_smoke_command_requires_explicit_live_acknowledgement() -> None:
+    stdout = io.StringIO()
+    with patch.object(sys, "argv", ["plane-automation", "smoke"]), contextlib.redirect_stdout(stdout):
+        assert plane_automation_main() == 1
+    assert "--live" in stdout.getvalue()
 
 
 if __name__ == "__main__":
