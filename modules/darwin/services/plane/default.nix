@@ -307,6 +307,15 @@ in
     modelSelectors = mkOption {
       type = types.attrsOf types.str;
       default = {
+        # Stable ticket-facing names for the OpenAI Codex GPT-5.6 family.
+        terra = "gpt-5.6-terra";
+        luna = "gpt-5.6-luna";
+        sol = "gpt-5.6-sol";
+
+        # Explicit cross-provider coding route, selected only by this trusted alias.
+        kimi2 = "opencode-go/kimi-k2.7-code";
+
+        # Compatibility aliases retained for existing Plane comments.
         "gpt-5.6" = "gpt-5.6-terra";
         fast = "gpt-5.6-luna";
       };
