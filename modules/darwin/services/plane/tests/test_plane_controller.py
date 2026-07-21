@@ -459,7 +459,7 @@ def test_go_label_runs_visible_lifecycle_and_cleans_up_after_final_comment() -> 
         ]
         updated = ledger.get_run(run.run_id)
         assert updated.state == RunState.COMPLETED
-        assert updated.start_comment_id == "comment-1"
+        assert updated.start_comment_id == ""
         assert updated.final_comment_id == "comment-2"
     finally:
         ledger.close()
@@ -566,6 +566,59 @@ def test_go_cleanup_preserves_assignees_added_during_execution() -> None:
 
         updates = [payload for action, payload in client.actions if action == "update_work_item"]
         assert updates == [{"assignees": ["hermes-user"]}, {"assignees": ["collaborator"]}]
+    finally:
+        ledger.close()
+
+
+def test_go_label_withdrawn_during_preflight_does_not_claim_ticket() -> None:
+    client = _GoPlaneClient(labels=[{"id": "label-go", "name": "hermes:go"}])
+    ledger = RunLedger(":memory:")
+
+    class _WithdrawnAuthorizationWorker(_GoWorker):
+        def assess_go(self, run: Run, context: dict[str, Any]) -> Any:
+            client.issue["labels"] = []
+            return super().assess_go(run, context)
+
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _WithdrawnAuthorizationWorker(),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=True))
+
+        assert controller.process_run(run, ledger) is True
+
+        assert client.actions == []
+        assert ledger.get_run(run.run_id).state == RunState.CANCELLED
+    finally:
+        ledger.close()
+
+
+def test_go_recovery_cleans_terminal_run_after_crash_before_cleanup() -> None:
+    client = _GoPlaneClient(labels=[{"id": "label-go", "name": "hermes:go"}])
+    client.issue["assignees"] = [{"id": "hermes-user"}]
+    ledger = RunLedger(":memory:")
+    controller = PlaneAutomationController(
+        plane_client=client,
+        worker_factory=lambda _run: _GoWorker(),
+        hermes_user_id="hermes-user",
+    )
+    try:
+        run = ledger.start_run(_go_run(label_triggered=True))
+        ledger.set_start_comment(run.run_id, "comment-start")
+        ledger.set_final_comment(run.run_id, "comment-final")
+        ledger.transition(run.run_id, RunState.COMPLETED)
+        crashed_run = ledger.get_run(run.run_id)
+
+        assert controller.recover_go_cleanup(crashed_run, ledger) is True
+
+        assert client.actions == [
+            ("delete_comment", "comment-start"),
+            ("update_work_item", {"labels": []}),
+            ("update_work_item", {"assignees": []}),
+        ]
+        assert ledger.get_run(run.run_id).start_comment_id == ""
     finally:
         ledger.close()
 

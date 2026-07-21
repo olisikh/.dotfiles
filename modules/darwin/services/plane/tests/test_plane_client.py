@@ -71,6 +71,9 @@ class FakePlaneHandler(BaseHTTPRequestHandler):
 
     def do_DELETE(self) -> None:  # noqa: N802
         if "/comments/" in self.path:
+            if self.state.get("delete_status") == 404:
+                self.send_error(404)
+                return
             parts = [p for p in self.path.split("/") if p]
             comment_id = parts[-1]
             self.state["deleted"].append(comment_id)
@@ -212,6 +215,21 @@ def test_uses_plane_api_key_header_for_authenticated_requests() -> None:
         headers = {key.lower(): value for key, value in state["request_headers"][0].items()}
         assert headers["x-api-key"] == "token"
         assert "authorization" not in headers
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_delete_comment_treats_already_deleted_comment_as_success() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "issue-1", "name": "Test issue"},
+        "comments": [],
+        "deleted": [],
+        "delete_status": 404,
+    }
+    server = _make_server(state)
+    try:
+        _client(server).delete_comment("project-1", "issue-1", "comment-1")
     finally:
         server.shutdown()
         server.server_close()

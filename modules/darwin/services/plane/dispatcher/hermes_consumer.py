@@ -111,6 +111,8 @@ def _process_comment_delivery(
         return controller.process_run(run, ledger, parse_error=invocation, actor_comment_id=comment_id)
 
     run = _ensure_run(ledger, invocation)
+    if run.operation == InvocationOperation.GO and run.final_comment_id:
+        return controller.recover_go_cleanup(run, ledger)
     if not ledger.try_take_lease(run.run_id, worker_session_id, lease_seconds=lease_seconds):
         return False
     return controller.process_run(run, ledger, actor_comment_id=comment_id)
@@ -139,6 +141,8 @@ def _process_label_delivery(
         return True
 
     run = _ensure_run(ledger, invocation)
+    if run.operation == InvocationOperation.GO and run.final_comment_id:
+        return controller.recover_go_cleanup(run, ledger)
     if not ledger.try_take_lease(run.run_id, worker_session_id, lease_seconds=lease_seconds):
         return False
     return controller.process_run(run, ledger)

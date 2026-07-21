@@ -107,7 +107,11 @@ class PlaneClient:
         )
 
     def delete_comment(self, project_id: str, work_item_id: str, comment_id: str) -> None:
-        self._request("DELETE", f"/projects/{project_id}/comments/{comment_id}/")
+        try:
+            self._request("DELETE", f"/projects/{project_id}/comments/{comment_id}/")
+        except PlaneClientError as exc:
+            if exc.status != 404:
+                raise
 
 
 class PlaneClientError(Exception):

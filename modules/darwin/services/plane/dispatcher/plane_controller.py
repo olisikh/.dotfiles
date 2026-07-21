@@ -132,6 +132,13 @@ class PlaneAutomationController:
         if preflight.status != "success":
             return self._finish_without_start(run, ledger, preflight)
 
+        try:
+            work_item = self._plane.get_work_item(run.project_id, run.work_item_id)
+        except Exception:  # noqa: BLE001
+            return self._transition(run, ledger, RunState.FAILED)
+        if run.label_triggered and not self._has_go_label(work_item):
+            return self._transition(run, ledger, RunState.CANCELLED)
+
         self._assign_hermes(run, work_item)
         try:
             start = self._plane.create_comment(
@@ -167,18 +174,27 @@ class PlaneAutomationController:
             # durable result could be recorded; a later delivery can recover it.
             return self._transition(run, ledger, RunState.BLOCKED)
         ledger.set_final_comment(run.run_id, final.get("id", ""))
-
-        try:
-            self._plane.delete_comment(run.project_id, run.work_item_id, start_comment_id)
-        except Exception:  # noqa: BLE001
-            pass
-        try:
-            cleanup_work_item = self._plane.get_work_item(run.project_id, run.work_item_id)
-        except Exception:  # noqa: BLE001
-            cleanup_work_item = work_item
-        self._cleanup_go_authorization(run, cleanup_work_item)
         terminal = RunState.FAILED if result.status == "failure" else RunState.COMPLETED
-        return self._transition(run, ledger, terminal)
+        if not self._transition(run, ledger, terminal):
+            return False
+        return self.recover_go_cleanup(ledger.get_run(run.run_id), ledger)
+
+    def recover_go_cleanup(self, run: Run, ledger: RunLedger) -> bool:
+        """Finish idempotent GO cleanup after a post-result crash or retry."""
+        if not run.final_comment_id:
+            return False
+        try:
+            work_item = self._plane.get_work_item(run.project_id, run.work_item_id)
+        except Exception:  # noqa: BLE001
+            return False
+        if run.start_comment_id:
+            try:
+                self._plane.delete_comment(run.project_id, run.work_item_id, run.start_comment_id)
+            except Exception:  # noqa: BLE001
+                return False
+        self._cleanup_go_authorization(run, work_item)
+        ledger.set_start_comment(run.run_id, "")
+        return True
 
     def _finish_without_start(self, run: Run, ledger: RunLedger, result: WorkerResult) -> bool:
         try:
@@ -240,6 +256,12 @@ class PlaneAutomationController:
 
     def _start_external_source(self, run: Run) -> str:
         return "hermes-plane-comment-start" if not run.label_triggered else "hermes-plane-run-start"
+
+    def _has_go_label(self, work_item: dict[str, Any]) -> bool:
+        return any(
+            name.casefold() == "hermes:go"
+            for _label_id, name in self._named_ids(work_item.get("labels", []))
+        )
 
     def _ids(self, values: Any) -> list[str]:
         return [value for value, _name in self._named_ids(values)]
