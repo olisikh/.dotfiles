@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dispatcher"))
 
-from plane_smoke import SmokeConfiguration, SmokeError, SmokeLock, SmokeWaiter
+from plane_smoke import LiveSmokeRunner, SmokeConfiguration, SmokeError, SmokeLock, SmokeWaiter
 from plane_automation import main as plane_automation_main
 
 
@@ -73,6 +73,13 @@ def test_waiter_correlates_comment_and_label_deliveries() -> None:
         assert waiter.comment_delivery("project", "item", "comment-1") == "comment-delivery"
         assert waiter.label_cursor("project", "item") == 2
         assert waiter.label_delivery("project", "item", after_rowid=1) == "label-delivery"
+
+
+def test_smoke_runner_waits_out_issue_event_cooldown_before_label_trigger() -> None:
+    runner = object.__new__(LiveSmokeRunner)
+    with patch("plane_smoke.time.sleep") as sleep:
+        runner._settle_issue_event()
+    sleep.assert_called_once_with(12.0)
 
 
 def test_smoke_lock_rejects_concurrent_live_run_and_cleans_up() -> None:
