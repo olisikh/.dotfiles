@@ -28,7 +28,7 @@ class PlaneClient:
     ) -> dict[str, Any]:
         data = json.dumps(payload, separators=(",", ":")).encode("utf-8") if payload is not None else None
         headers = {
-            "Authorization": f"Bearer {self._api_key}",
+            "X-Api-Key": self._api_key,
             "Content-Type": "application/json",
         }
         req = Request(

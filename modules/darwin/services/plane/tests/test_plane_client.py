@@ -23,6 +23,7 @@ class FakePlaneHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self) -> None:  # noqa: N802
+        self.state.setdefault("request_headers", []).append(dict(self.headers.items()))
         if "/issues/" in self.path and "/comments" not in self.path:
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -194,6 +195,23 @@ def test_update_comment_replaces_temporary_comment_text() -> None:
         client = _client(server)
         client.update_comment("project-1", "comment-1", "Blocked")
         assert state["updates"] == [{"comment_html": "Blocked", "access": "INTERNAL"}]
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_uses_plane_api_key_header_for_authenticated_requests() -> None:
+    state: dict[str, Any] = {
+        "issue": {"id": "issue-1", "name": "Test issue"},
+        "comments": [],
+        "deleted": [],
+    }
+    server = _make_server(state)
+    try:
+        _client(server).get_work_item("project-1", "issue-1")
+        headers = {key.lower(): value for key, value in state["request_headers"][0].items()}
+        assert headers["x-api-key"] == "token"
+        assert "authorization" not in headers
     finally:
         server.shutdown()
         server.server_close()
