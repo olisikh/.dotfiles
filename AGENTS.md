@@ -15,6 +15,7 @@ nix-gens                  # list nix-darwin generations
 nix-prune-system-generations --keep 10  # retain only the newest 10 system generations
 nix-rollback              # switch to a previous generation
 andy <command>            # manage Android emulators and app install/uninstall
+iosy <command>            # manage iOS Simulators and app install/uninstall
 ```
 
 Direct flake checks are useful before switching:

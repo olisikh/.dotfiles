@@ -1,0 +1,271 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SIMCTL=""
+DEFAULT_DEVICE="${IOSY_DEVICE:-iPhone 17 Pro}"
+DEVICE="$DEFAULT_DEVICE"
+LAUNCH_AFTER_INSTALL=0
+PROXYMAN=0
+PROXYMAN_HOST="${IOSY_PROXYMAN_HOST:-127.0.0.1}"
+PROXYMAN_PORT="${IOSY_PROXYMAN_PORT:-9090}"
+TEMP_DIR=""
+APP_BUNDLE=""
+
+usage() {
+    cat <<'EOF'
+Usage: iosy <command> [args]
+
+Manage iOS Simulators from terminal. Full Xcode must be installed and selected
+with xcode-select. "IPA" means an iOS Simulator-compatible IPA; device-signed
+IPAs cannot run in Simulator.
+
+Commands:
+  devices
+      List available Simulator devices and UDIDs.
+  boot [-s device] [--proxyman]
+      Boot device, wait until ready, and open Simulator. Default: iPhone 17 Pro.
+      --proxyman configures HTTP proxy to 127.0.0.1:9090.
+  install <ipa-or-app> [-s device] [--launch] [--proxyman]
+      Install a .app bundle or extract and install Payload/*.app from an IPA.
+  proxy on|off|status [-s device]
+      Configure, disable, or inspect HTTP proxy for device. `on` uses Proxyman.
+  uninstall <bundle-id> [-s device]
+      Remove app from Simulator.
+  launch <bundle-id> [-s device] [-- args...]
+      Launch installed app. Arguments after -- pass to app.
+  terminate <bundle-id> [-s device]
+      Stop app.
+  restart <bundle-id> [-s device] [-- args...]
+      Stop then launch app.
+  screenshot [path] [-s device]
+      Save PNG. Default: ~/Desktop/iosy-YYYY-MM-DD-HHMMSS.png.
+  erase [-s device]
+      Erase all contents and settings after confirmation.
+
+Examples:
+  iosy devices
+  iosy boot -s "iPhone 17"
+  iosy boot --proxyman
+  iosy install ~/Downloads/MyApp.app --launch
+  iosy install ~/Downloads/MyApp-simulator.ipa -s booted --launch
+  iosy restart com.example.myapp
+EOF
+}
+
+init_tools() {
+    if ! SIMCTL="$(xcrun --find simctl 2>/dev/null)"; then
+        cat >&2 <<'EOF'
+Error: iOS Simulator tools unavailable.
+Install full Xcode, then select it, for example:
+  sudo xcode-select -s "/Applications/XCode-26.4.0.app/Contents/Developer"
+  sudo xcodebuild -runFirstLaunch
+EOF
+        exit 1
+    fi
+}
+
+cleanup() {
+    [[ -z "$TEMP_DIR" ]] || rm -rf "$TEMP_DIR"
+}
+
+default_screenshot_path() {
+    printf '%s/Desktop/iosy-%s.png\n' "$HOME" "$(date +%Y-%m-%d-%H%M%S)"
+}
+
+boot_device() {
+    local device="$1"
+    "$SIMCTL" boot "$device" >/dev/null 2>&1 || true
+    "$SIMCTL" bootstatus "$device" -b
+    (( ! PROXYMAN )) || configure_proxyman "$device"
+    open -a Simulator
+}
+
+configure_proxyman() {
+    local device="$1"
+
+    if ! lsof -nP -iTCP:"$PROXYMAN_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
+        echo "Error: Proxyman proxy port $PROXYMAN_PORT is not listening." >&2
+        exit 1
+    fi
+
+    "$SIMCTL" spawn "$device" defaults write com.apple.GlobalPreferences HTTPProxy -string "$PROXYMAN_HOST"
+    "$SIMCTL" spawn "$device" defaults write com.apple.GlobalPreferences HTTPPort -int "$PROXYMAN_PORT"
+    "$SIMCTL" spawn "$device" defaults write com.apple.GlobalPreferences HTTPEnable -bool true
+    echo "Proxyman enabled on $device: $PROXYMAN_HOST:$PROXYMAN_PORT"
+}
+
+disable_proxy() {
+    local device="$1"
+    "$SIMCTL" spawn "$device" defaults write com.apple.GlobalPreferences HTTPEnable -bool false
+    echo "HTTP proxy disabled on $device."
+}
+
+proxy_status() {
+    local device="$1"
+    local enabled host port
+    enabled="$("$SIMCTL" spawn "$device" defaults read com.apple.GlobalPreferences HTTPEnable 2>/dev/null || printf 'false')"
+    host="$("$SIMCTL" spawn "$device" defaults read com.apple.GlobalPreferences HTTPProxy 2>/dev/null || printf '(unset)')"
+    port="$("$SIMCTL" spawn "$device" defaults read com.apple.GlobalPreferences HTTPPort 2>/dev/null || printf '(unset)')"
+    printf 'HTTP proxy: enabled=%s host=%s port=%s\n' "$enabled" "$host" "$port"
+}
+
+app_bundle_from_input() {
+    local input="$1"
+    local app=""
+
+    if [[ -d "$input" && "$input" == *.app ]]; then
+        APP_BUNDLE="$input"
+        return
+    fi
+    if [[ ! -f "$input" || "$input" != *.ipa ]]; then
+        echo "Error: expected a .app bundle or .ipa file: $input" >&2
+        exit 1
+    fi
+
+    TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/iosy.XXXXXX")"
+    ditto -x -k "$input" "$TEMP_DIR"
+    app="$(/usr/bin/find "$TEMP_DIR/Payload" -maxdepth 1 -type d -name '*.app' -print -quit 2>/dev/null || true)"
+    if [[ -z "$app" ]]; then
+        echo "Error: IPA has no Payload/*.app bundle: $input" >&2
+        exit 1
+    fi
+    APP_BUNDLE="$app"
+}
+
+bundle_id_for_app() {
+    local app="$1"
+    local plist="$app/Info.plist"
+    [[ -f "$plist" ]] || { echo "Error: missing Info.plist in app bundle: $app" >&2; exit 1; }
+    /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist"
+}
+
+parse_device_args() {
+    DEVICE="$DEFAULT_DEVICE"
+    LAUNCH_AFTER_INSTALL=0
+    PROXYMAN=0
+    PARSED_ARGS=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        -s|--device)
+            [[ $# -gt 1 ]] || { echo "Error: $1 requires device name or UDID." >&2; exit 1; }
+            DEVICE="$2"; shift 2 ;;
+        --launch) LAUNCH_AFTER_INSTALL=1; shift ;;
+        --proxyman) PROXYMAN=1; shift ;;
+        --) shift; PARSED_ARGS+=("$@"); break ;;
+        *) PARSED_ARGS+=("$1"); shift ;;
+        esac
+    done
+}
+
+cmd_devices() { "$SIMCTL" list devices available; }
+
+cmd_boot() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -eq 0 ]] || { echo "Error: boot takes no positional arguments." >&2; exit 1; }
+    boot_device "$DEVICE"
+}
+
+cmd_install() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -eq 1 ]] || { echo "Error: install requires one .app or .ipa path." >&2; exit 1; }
+    local app bundle_id
+    app_bundle_from_input "${PARSED_ARGS[0]}"
+    app="$APP_BUNDLE"
+    bundle_id="$(bundle_id_for_app "$app")"
+    boot_device "$DEVICE"
+    if ! "$SIMCTL" install "$DEVICE" "$app"; then
+        cat >&2 <<EOF
+Error: Simulator rejected $app.
+Most likely cause: IPA was built for physical iPhone (arm64/device signing), not
+for iOS Simulator. Obtain a Simulator build (.app or Simulator-compatible IPA).
+EOF
+        exit 1
+    fi
+    echo "Installed $bundle_id on $DEVICE."
+    (( ! LAUNCH_AFTER_INSTALL )) || "$SIMCTL" launch "$DEVICE" "$bundle_id"
+}
+
+cmd_proxy() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -eq 1 ]] || { echo "Error: proxy requires on, off, or status." >&2; exit 1; }
+    case "${PARSED_ARGS[0]}" in
+    on)
+        boot_device "$DEVICE"
+        configure_proxyman "$DEVICE"
+        ;;
+    off)
+        boot_device "$DEVICE"
+        disable_proxy "$DEVICE"
+        ;;
+    status)
+        boot_device "$DEVICE"
+        proxy_status "$DEVICE"
+        ;;
+    *) echo "Error: proxy requires on, off, or status." >&2; exit 1 ;;
+    esac
+}
+
+cmd_uninstall() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -eq 1 ]] || { echo "Error: uninstall requires bundle id." >&2; exit 1; }
+    "$SIMCTL" uninstall "$DEVICE" "${PARSED_ARGS[0]}"
+}
+
+cmd_launch() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -ge 1 ]] || { echo "Error: launch requires bundle id." >&2; exit 1; }
+    "$SIMCTL" launch "$DEVICE" "${PARSED_ARGS[@]}"
+}
+
+cmd_terminate() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -eq 1 ]] || { echo "Error: terminate requires bundle id." >&2; exit 1; }
+    "$SIMCTL" terminate "$DEVICE" "${PARSED_ARGS[0]}"
+}
+
+cmd_restart() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -ge 1 ]] || { echo "Error: restart requires bundle id." >&2; exit 1; }
+    "$SIMCTL" terminate "$DEVICE" "${PARSED_ARGS[0]}" >/dev/null 2>&1 || true
+    "$SIMCTL" launch "$DEVICE" "${PARSED_ARGS[@]}"
+}
+
+cmd_screenshot() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -le 1 ]] || { echo "Error: screenshot accepts at most one path." >&2; exit 1; }
+    local path="${PARSED_ARGS[0]:-$(default_screenshot_path)}"
+    "$SIMCTL" io "$DEVICE" screenshot "$path"
+    echo "Saved $path"
+}
+
+cmd_erase() {
+    parse_device_args "$@"
+    [[ ${#PARSED_ARGS[@]} -eq 0 ]] || { echo "Error: erase takes no positional arguments." >&2; exit 1; }
+    read -r -p "Erase all apps and data on '$DEVICE'? [y/N] " reply
+    [[ "$reply" =~ ^[Yy]$ ]] || { echo "Cancelled."; return; }
+    "$SIMCTL" erase "$DEVICE"
+}
+
+main() {
+    local command="${1:-help}"
+    shift || true
+    init_tools
+    trap cleanup EXIT
+    case "$command" in
+    devices) cmd_devices "$@" ;;
+    boot|run) cmd_boot "$@" ;;
+    install) cmd_install "$@" ;;
+    proxy) cmd_proxy "$@" ;;
+    uninstall) cmd_uninstall "$@" ;;
+    launch|run-app) cmd_launch "$@" ;;
+    terminate) cmd_terminate "$@" ;;
+    restart|restart-app) cmd_restart "$@" ;;
+    screenshot) cmd_screenshot "$@" ;;
+    erase) cmd_erase "$@" ;;
+    help|-h|--help) usage ;;
+    *) echo "Error: unknown command: $command" >&2; usage >&2; exit 1 ;;
+    esac
+}
+
+main "$@"
