@@ -415,6 +415,22 @@ class RunLedger:
             )
         )
 
+    def pending_runs(self) -> list[Run]:
+        """Return every unleased run so a delivery that lost its replay can recover."""
+        with self._lock:
+            rows = self._conn.execute(
+                """
+                SELECT run_id, trigger_id, project_id, work_item_id, operation, body,
+                       model_selector, reasoning_effort, label_triggered, state, lease_expires_at,
+                       start_comment_id, final_comment_id, worker_session_id, retry_count,
+                       created_at, updated_at
+                FROM runs
+                WHERE state = 'pending'
+                ORDER BY created_at
+                """
+            ).fetchall()
+        return [self._row_to_run(row) for row in rows]
+
     def pending_manual_retries(self) -> list[Run]:
         with self._lock:
             rows = self._conn.execute(

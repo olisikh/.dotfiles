@@ -48,7 +48,10 @@ def consume(
             finished += 1
         else:
             queue.release(delivery[0])
-    for run in ledger.pending_manual_retries():
+    # Reconcile unleased runs as well as newly claimed deliveries. A webhook can
+    # be released while another per-ticket run owns the lease; its invocation is
+    # already durable in the ledger and must not depend on a later replay.
+    for run in ledger.pending_runs():
         if ledger.try_take_lease(run.run_id, worker_session_id, lease_seconds=lease_seconds):
             if controller.process_run(run, ledger):
                 finished += 1

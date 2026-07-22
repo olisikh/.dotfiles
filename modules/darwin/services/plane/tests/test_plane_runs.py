@@ -244,6 +244,14 @@ def test_cancel_for_trigger_marks_only_non_terminal_run_cancelled() -> None:
     assert ledger.cancel_for_trigger("deleted-source") is False
 
 
+def test_pending_runs_includes_normal_deliveries_for_recovery() -> None:
+    ledger = RunLedger(":memory:")
+    normal = ledger.start_run(_make_invocation(trigger_id="normal-pending"))
+    retry = ledger.start_run(_make_invocation(trigger_id="manual-retry:source:recovery"))
+
+    assert {run.run_id for run in ledger.pending_runs()} == {normal.run_id, retry.run_id}
+
+
 if __name__ == "__main__":
     import signal
 
