@@ -140,9 +140,9 @@ in
       opencode = {
         enable = true;
         config = {
-          enabled_providers = [ "github-copilot" ];
-          model = "github-copilot/gpt-5.6-terra";
-          small_model = "github-copilot/gpt-5.6-luna";
+          enabled_providers = [ "github-copilot" "openai" ];
+          model = "openai/gpt-5.6-terra";
+          small_model = "openai/gpt-5.6-luna";
         };
       };
     };

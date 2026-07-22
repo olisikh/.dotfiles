@@ -33,6 +33,7 @@ in
       skhd = enabled;
       handy = enabled;
       android-studio = enabled;
+      xcodesapp = enabled;
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;
@@ -54,6 +55,8 @@ in
     ai = {
       ollama = enabled;
       cursor = enabled;
+      codex = enabled;
+      chatgpt = enabled;
     };
   };
 
