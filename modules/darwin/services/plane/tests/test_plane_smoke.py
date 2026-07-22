@@ -52,6 +52,15 @@ def test_configuration_reads_token_without_exposing_it_in_repr() -> None:
         assert "e2e-secret-token" not in repr(config)
 
 
+def test_create_ticket_can_include_initial_label_trigger() -> None:
+    client = object.__new__(__import__("plane_smoke").PlaneE2EClient)
+    client._config = type("Config", (), {"project_id": "project"})()
+    client._request = MagicMock(return_value={"id": "ticket"})
+
+    assert client.create_ticket("ticket", "description", label_ids=["label"]) == {"id": "ticket"}
+    client._request.assert_called_once_with("POST", "/projects/project/issues/", {"name": "ticket", "description_stripped": "description", "labels": ["label"]})
+
+
 def test_waiter_correlates_comment_and_label_deliveries() -> None:
     with tempfile.TemporaryDirectory() as temporary:
         tmp_path = Path(temporary)

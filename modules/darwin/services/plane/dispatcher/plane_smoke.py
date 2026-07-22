@@ -163,8 +163,11 @@ class PlaneE2EClient:
         except urllib.error.HTTPError as exc:
             raise SmokeError(f"Plane E2E API {method} {path} failed ({exc.code})") from exc
 
-    def create_ticket(self, name: str, description: str) -> dict[str, object]:
-        result = self._request("POST", f"/projects/{self._config.project_id}/issues/", {"name": name, "description_stripped": description})
+    def create_ticket(self, name: str, description: str, *, label_ids: list[str] | None = None) -> dict[str, object]:
+        payload: dict[str, object] = {"name": name, "description_stripped": description}
+        if label_ids:
+            payload["labels"] = label_ids
+        result = self._request("POST", f"/projects/{self._config.project_id}/issues/", payload)
         if not isinstance(result, dict) or not result.get("id"):
             raise SmokeError("Plane did not return a created E2E ticket")
         return result
@@ -222,33 +225,44 @@ class LiveSmokeRunner:
 
     def _run_unlocked(self) -> dict[str, object]:
         marker = f"PLANE_E2E_{int(time.time())}"
-        ticket = self._api.create_ticket(
-            f"Hermes E2E smoke {marker}",
-            f"Disposable automated regression ticket. Never modify files, services, or integrations. Return the requested marker only: {marker}.",
-        )
-        work_item_id = str(ticket["id"])
         cases: list[dict[str, object]] = []
-        cleanup_error = ""
+        tickets: list[dict[str, object]] = []
+        cleanup_errors: list[str] = []
         try:
-            # Exercise label triggers first. The final comment /go changes ticket
-            # membership as part of its normal lifecycle, so keeping it last makes
-            # this single-user smoke deterministic without adding production
-            # concurrency machinery just for the test harness.
-            cases.append(self._label_case(work_item_id, "hermes:triage"))
-            self._settle_issue_event(work_item_id)
-            cases.append(self._label_case(work_item_id, "hermes:go"))
+            # Creation with the label exercises the reliable issue-create webhook
+            # path directly, without making the smoke depend on update-event timing.
+            for label_name in ("hermes:triage", "hermes:go"):
+                label_id = self._api.ensure_label(label_name)
+                ticket = self._api.create_ticket(
+                    f"Hermes E2E {label_name} {marker}",
+                    f"Disposable label-trigger regression ticket: {label_name}.",
+                    label_ids=[label_id],
+                )
+                tickets.append(ticket)
+                work_item_id = str(ticket["id"])
+                run = self._wait_for_run(self._waiter.label_delivery(self._config.project_id, work_item_id, after_rowid=0))
+                if not run.final_comment_id:
+                    raise SmokeError(f"{label_name} completed without a durable result")
+                cases.append({"kind": "label", "label": label_name, "run_id": run.run_id, "state": run.state.value})
+
+            ticket = self._api.create_ticket(
+                f"Hermes E2E comments {marker}",
+                f"Disposable comment-trigger regression ticket. Return requested markers only: {marker}.",
+            )
+            tickets.append(ticket)
+            work_item_id = str(ticket["id"])
             cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low Reply exactly: {marker}_ASK", f"{marker}_ASK"))
             cases.append(self._comment_case(work_item_id, f"@Hermes --model luna /triage Reply exactly: {marker}_TRIAGE", f"{marker}_TRIAGE"))
             cases.append(self._comment_case(work_item_id, f"@Hermes --model luna --variant low /go E2E only: do not modify files, services, or Plane. Reply exactly: {marker}_GO", f"{marker}_GO"))
         finally:
-            try:
-                self._api.set_labels(work_item_id, [])
-                self._api.close_ticket(work_item_id)
-            except Exception as exc:  # noqa: BLE001
-                cleanup_error = str(exc)
-        if cleanup_error:
-            raise SmokeError(f"smoke ticket cleanup failed: {cleanup_error}")
-        return {"ticket_id": work_item_id, "ticket_identifier": ticket.get("identifier", ""), "cases": cases, "closed": True}
+            for ticket in tickets:
+                try:
+                    self._api.close_ticket(str(ticket["id"]))
+                except Exception as exc:  # noqa: BLE001
+                    cleanup_errors.append(str(exc))
+        if cleanup_errors:
+            raise SmokeError(f"smoke ticket cleanup failed: {'; '.join(cleanup_errors)}")
+        return {"tickets": [{"id": ticket["id"], "identifier": ticket.get("identifier", "")} for ticket in tickets], "cases": cases, "closed": True}
 
     def _settle_issue_event(self, work_item_id: str) -> None:
         """Avoid the dispatcher's bounded issue-event cooldown between label cases."""
