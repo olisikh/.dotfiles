@@ -44,10 +44,15 @@ in
 
     services.plane = {
       enable = true;
-      productionActive = true;
+      productionActive = false;
       hermesUserId = "0ba31c66-78f1-4391-9e73-c64445ca2cb2";
       e2e.projectId = "075a4b66-ae4d-423a-a46f-817e69602a46";
       canary.enable = false;
+    };
+
+    services.vikunja = {
+      enable = true;
+      productionActive = true;
     };
 
     containers.colima = enabled;
@@ -66,7 +71,8 @@ in
           enable = true;
           rootRedirect = "/hermes-webui/";
           webui.enable = true;
-          plane.enable = true;
+          plane.enable = false;
+          vikunja.enable = true;
           openclaw.enable = true;
         };
         golink = enabled;

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${VIKUNJA_PORT:=3456}"
+response="$(curl --fail --silent --show-error --max-time 10 "http://127.0.0.1:${VIKUNJA_PORT}/api/v1/info")"
+printf '%s' "$response" | jq -e '.version | strings | select(length > 0)' >/dev/null
+printf '%s' "$response" | jq -e '.auth | objects' >/dev/null

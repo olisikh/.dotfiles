@@ -154,6 +154,15 @@ in
             name = "plane/admin-password";
           };
 
+          vikunjaDatabasePassword = {
+            key = "vikunja/database-password";
+            name = "vikunja/database-password";
+          };
+          vikunjaServiceSecret = {
+            key = "vikunja/service-secret";
+            name = "vikunja/service-secret";
+          };
+
           tailscaleGolinkAuthKey = {
             key = "tailscale/golinkAuthKey";
             name = "tailscale/golink-auth-key";

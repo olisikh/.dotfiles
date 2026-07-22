@@ -89,8 +89,19 @@ let
       }
       ''}
 
+      ${lib.optionalString caddyCfg.vikunja.enable ''
+      # Vikunja owns the Tailnet root during its evaluation. Its stock frontend
+      # is root-routed, so it must not be mounted below a shared path prefix.
+      handle {
+        reverse_proxy ${caddyCfg.vikunja.upstream} {
+          header_up Host "{http.request.host}"
+          header_up X-Forwarded-Proto "https"
+        }
+      }
+      ''}
+
       # Do not let an unmatched path fall through to a privileged application.
-      ${lib.optionalString (!caddyCfg.plane.enable) ''
+      ${lib.optionalString (!caddyCfg.plane.enable && !caddyCfg.vikunja.enable) ''
       @root path /
       redir @root ${caddyCfg.rootRedirect} permanent
       respond "Not Found" 404
@@ -209,6 +220,16 @@ in
         };
       };
 
+      vikunja = {
+        enable = mkBoolOpt false "Expose loopback-only Vikunja as the shared Tailnet HTTPS root";
+
+        upstream = mkOption {
+          type = types.str;
+          default = "127.0.0.1:3456";
+          description = "Vikunja loopback upstream which owns the Tailnet root when enabled.";
+        };
+      };
+
       openclaw = {
         enable = mkBoolOpt false "Expose OpenClaw Control UI below the shared Tailnet HTTPS proxy";
 
@@ -275,6 +296,16 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     {
+      assertions = [
+        {
+          assertion = !caddyCfg.enable || !(caddyCfg.plane.enable && caddyCfg.vikunja.enable);
+          message = "Exactly one Tailnet root owner may be enabled: Plane or Vikunja.";
+        }
+        {
+          assertion = !caddyCfg.enable || caddyCfg.plane.enable || caddyCfg.vikunja.enable;
+          message = "A running Tailscale Caddy bridge requires a Tailnet root owner.";
+        }
+      ];
       services.tailscale.enable = true;
     }
 

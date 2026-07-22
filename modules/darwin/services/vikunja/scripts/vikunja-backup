@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+
+: "${VIKUNJA_STATE_DIR:?required}"
+: "${VIKUNJA_COMPOSE_PROJECT:?required}"
+: "${VIKUNJA_ENV_FILE:?required}"
+: "${VIKUNJA_COMPOSE_FILE:?required}"
+
+state_dir="$VIKUNJA_STATE_DIR"
+backup_dir="$state_dir/backups"
+files_dir="$state_dir/data/files"
+timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+dump_tmp="$backup_dir/.vikunja-${timestamp}.dump.tmp"
+files_tmp="$backup_dir/.vikunja-${timestamp}-files.tar.gz.tmp"
+dump="$backup_dir/vikunja-${timestamp}.dump"
+files="$backup_dir/vikunja-${timestamp}-files.tar.gz"
+
+mkdir -p "$backup_dir" "$files_dir"
+chmod 700 "$backup_dir" "$files_dir"
+
+compose() {
+  docker compose \
+    --project-name "$VIKUNJA_COMPOSE_PROJECT" \
+    --env-file "$VIKUNJA_ENV_FILE" \
+    --file "$VIKUNJA_COMPOSE_FILE" \
+    "$@"
+}
+
+cleanup() {
+  rm -f "$dump_tmp" "$files_tmp"
+}
+trap cleanup EXIT
+
+compose exec -T db pg_isready -U vikunja -d vikunja >/dev/null
+compose exec -T db pg_dump -U vikunja -d vikunja --format=custom > "$dump_tmp"
+test -s "$dump_tmp"
+pg_restore --list "$dump_tmp" >/dev/null
+tar -C "$files_dir" -czf "$files_tmp" .
+test -s "$files_tmp"
+chmod 600 "$dump_tmp" "$files_tmp"
+mv "$dump_tmp" "$dump"
+mv "$files_tmp" "$files"
+find "$backup_dir" -type f -mtime +14 -delete
+trap - EXIT
