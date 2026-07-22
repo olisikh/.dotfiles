@@ -98,8 +98,10 @@ main() {
     sudo rm -- "${removal_paths[@]}"
 
     # Once their roots are gone, reclaim unreachable store paths as root too.
+    # Do NOT use nix-collect-garbage -d here: that flag deletes *all* old
+    # generations of *all* profiles, which would erase the very rollback window
+    # this script is meant to preserve.
     sudo nix-store --gc
-    sudo nix-collect-garbage -d
     printf 'Pruning complete. Retained %s newest system generations.\n' "$keep"
 }
 
