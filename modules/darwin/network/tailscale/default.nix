@@ -45,25 +45,6 @@ let
       }
       ''}
 
-      ${lib.optionalString caddyCfg.plane.enable ''
-      # Plane emits root-relative browser assets and does not accept a path in
-      # CORS_ALLOWED_ORIGINS. Preserve this legacy path as a safe redirect;
-      # Plane itself owns the Tailnet host root below.
-      @plane_legacy path ${caddyCfg.plane.prefix} ${caddyCfg.plane.prefix}/*
-      redir @plane_legacy / permanent
-
-      # Plane must be able to send a signed work-item webhook to a narrow
-      # dispatcher without exposing Hermes' privileged webhook server.
-      @plane_dispatch_bare path ${caddyCfg.plane.dispatcherPrefix}
-      redir @plane_dispatch_bare ${caddyCfg.plane.dispatcherPrefix}/ permanent
-      handle_path ${caddyCfg.plane.dispatcherPrefix}/* {
-        reverse_proxy ${caddyCfg.plane.dispatcherUpstream} {
-          header_up Host "{http.request.host}"
-          header_up X-Forwarded-Proto "https"
-        }
-      }
-      ''}
-
       ${lib.optionalString caddyCfg.openclaw.enable ''
       # OpenClaw owns its configured basePath, so preserve the prefix upstream.
       # Its WebSocket endpoint is the exact base path (without a trailing slash),
@@ -72,18 +53,6 @@ let
       @openclaw path ${caddyCfg.openclaw.prefix} ${caddyCfg.openclaw.prefix}/*
       handle @openclaw {
         reverse_proxy ${caddyCfg.openclaw.upstream} {
-          header_up X-Forwarded-Proto "https"
-        }
-      }
-      ''}
-
-      ${lib.optionalString caddyCfg.plane.enable ''
-      # This catch-all is intentionally after every explicit application route.
-      # It makes the root-relative Plane shell, assets, API and live endpoints
-      # resolve on the Tailnet hostname without exposing the Compose proxy.
-      handle {
-        reverse_proxy ${caddyCfg.plane.upstream} {
-          header_up Host "{http.request.host}"
           header_up X-Forwarded-Proto "https"
         }
       }
@@ -101,7 +70,7 @@ let
       ''}
 
       # Do not let an unmatched path fall through to a privileged application.
-      ${lib.optionalString (!caddyCfg.plane.enable && !caddyCfg.vikunja.enable) ''
+      ${lib.optionalString (!caddyCfg.vikunja.enable) ''
       @root path /
       redir @root ${caddyCfg.rootRedirect} permanent
       respond "Not Found" 404
@@ -192,34 +161,6 @@ in
         };
       };
 
-      plane = {
-        enable = mkBoolOpt false "Expose the loopback-only Plane Compose proxy below the shared Tailnet HTTPS bridge";
-
-        prefix = mkOption {
-          type = types.str;
-          default = "/plane";
-          description = "Public path prefix for Plane; the Compose upstream remains root-routed.";
-        };
-
-        upstream = mkOption {
-          type = types.str;
-          default = "127.0.0.1:28080";
-          description = "Plane Compose proxy loopback upstream.";
-        };
-
-        dispatcherPrefix = mkOption {
-          type = types.str;
-          default = "/plane-dispatch";
-          description = "Public Tailnet-only path for signed Plane webhooks.";
-        };
-
-        dispatcherUpstream = mkOption {
-          type = types.str;
-          default = "127.0.0.1:9801";
-          description = "Plane dispatcher loopback upstream.";
-        };
-      };
-
       vikunja = {
         enable = mkBoolOpt false "Expose loopback-only Vikunja as the shared Tailnet HTTPS root";
 
@@ -298,11 +239,7 @@ in
     {
       assertions = [
         {
-          assertion = !caddyCfg.enable || !(caddyCfg.plane.enable && caddyCfg.vikunja.enable);
-          message = "Exactly one Tailnet root owner may be enabled: Plane or Vikunja.";
-        }
-        {
-          assertion = !caddyCfg.enable || caddyCfg.plane.enable || caddyCfg.vikunja.enable;
+          assertion = !caddyCfg.enable || caddyCfg.vikunja.enable;
           message = "A running Tailscale Caddy bridge requires a Tailnet root owner.";
         }
       ];

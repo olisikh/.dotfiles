@@ -3,7 +3,7 @@ let
   inherit (lib) mkIf mkOption types;
   inherit (lib.${namespace}) mkBoolOpt;
 
-  cfg = config.${namespace}.services.vikunja;
+  cfg = config.${namespace}.productivity.vikunja;
   userCfg = config.${namespace}.core.user;
   python = pkgs.python312;
   composeFile = ./compose/docker-compose.yaml;
@@ -33,6 +33,52 @@ let
     runtimeInputs = [ pkgs.curl pkgs.jq ];
     text = ''
       exec ${pkgs.bash}/bin/bash ${scriptsDir}/vikunja-healthcheck
+    '';
+  };
+
+  mcpConfig = pkgs.writeText "vikunja-mcp.config.json" (builtins.toJSON {
+    logging.level = "warn";
+    modules = {
+      tasks = true;
+      projects = true;
+      labels = true;
+      notifications = true;
+      teams = false;
+      users = false;
+      webhooks = false;
+      filters = false;
+      templates = false;
+      export = false;
+      batchImport = false;
+      subscriptions = false;
+      reactions = false;
+      admin = false;
+      tokenManagement = false;
+      caldavTokens = false;
+      userDeletion = false;
+      backgrounds = false;
+    };
+  });
+
+  mcp = pkgs.writeShellApplication {
+    name = "vikunja-mcp";
+    runtimeInputs = [ pkgs.nodejs_24 ];
+    text = ''
+      set -euo pipefail
+
+      token_file="${cfg.secretsDir}/mcp-api-token"
+      if [[ ! -s "$token_file" ]]; then
+        echo "Vikunja MCP token file is missing or empty: $token_file" >&2
+        exit 1
+      fi
+
+      export VIKUNJA_URL="http://127.0.0.1:${toString cfg.port}/api/v1"
+      VIKUNJA_API_TOKEN="$(<"$token_file")"
+      export VIKUNJA_API_TOKEN
+      export VIKUNJA_MCP_CONFIG="${mcpConfig}"
+      export NODE_ENV=production
+
+      exec ${pkgs.nodejs_24}/bin/npx --yes "vikunja-mcp-ng@${cfg.mcp.packageVersion}"
     '';
   };
 
@@ -102,7 +148,7 @@ let
   };
 in
 {
-  options.${namespace}.services.vikunja = {
+  options.${namespace}.productivity.vikunja = {
     enable = mkBoolOpt false "Install Nix-managed Vikunja service definitions.";
 
     productionActive = mkBoolOpt false "Allow the Vikunja agents to start automatically.";
@@ -148,10 +194,20 @@ in
       default = "18.3";
       description = "Pinned PostgreSQL image tag used only by Vikunja.";
     };
+
+    mcp = {
+      enable = mkBoolOpt false "Install the Hermes-owned Vikunja MCP stdio adapter.";
+
+      packageVersion = mkOption {
+        type = types.str;
+        default = "0.5.2";
+        description = "Pinned vikunja-mcp-ng npm package version launched by the stdio adapter.";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ backup ];
+    environment.systemPackages = [ backup ] ++ lib.optionals cfg.mcp.enable [ mcp ];
 
     launchd.user.agents = {
       vikunja = {
