@@ -164,6 +164,11 @@ in
           diff_style = "auto";
         };
       };
+
+      sessionVariables = {
+        # NOTE: extra config for overriding the non-writeable config provided by nix
+        OPENCODE_CONFIG = "${homeDir}/.config/opencode/config.json";
+      };
     };
   };
 }
