@@ -24,10 +24,11 @@ class LeadingMentionPromptTests(unittest.TestCase):
             "What should I do next?",
         )
 
-    def test_rejects_plain_text_mid_comment_or_a_different_structured_mention(self) -> None:
+    def test_accepts_a_leading_plain_text_trigger_but_rejects_mid_comment_or_other_mentions(self) -> None:
         from vikunja_hermes_controller import extract_leading_mention_prompt
 
-        self.assertIsNone(extract_leading_mention_prompt("@Hermes help", "bot-hermes"))
+        self.assertEqual(extract_leading_mention_prompt("@Hermes help", "bot-hermes"), "help")
+        self.assertEqual(extract_leading_mention_prompt("<p>@bot-hermes hello</p>", "bot-hermes"), "hello")
         self.assertIsNone(
             extract_leading_mention_prompt(
                 "Please review <mention-user data-id=\"bot-hermes\">@Hermes</mention-user>",

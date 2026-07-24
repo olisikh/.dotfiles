@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import json
 import logging
+import re
 import sqlite3
 import subprocess
 import threading
@@ -86,14 +87,27 @@ class _LeadingMentionPromptParser(HTMLParser):
 
 
 def extract_leading_mention_prompt(comment_html: str, bot_username: str) -> str | None:
-    """Return the user prompt only for a leading structured mention of this bot."""
+    """Return a prompt for a leading structured mention or canonical literal fallback.
+
+    Vikunja 2.4's picker currently omits bot users from its project-user search.
+    Until upstream fixes that, accept only a leading, case-sensitive ``@Hermes``
+    or ``@bot-hermes`` token in otherwise plain comment text.
+    """
     parser = _LeadingMentionPromptParser(bot_username)
     try:
         parser.feed(comment_html)
         parser.close()
     except Exception:  # Defensive: malformed external HTML never becomes an invocation.
         return None
-    return parser.prompt()
+    structured = parser.prompt()
+    if structured is not None:
+        return structured
+    # Never downgrade malformed attempted structured markup to a literal trigger.
+    if "<mention-user" in comment_html.lower():
+        return None
+    plain = _html_to_text(comment_html)
+    match = re.fullmatch(r"@(Hermes|" + re.escape(bot_username) + r")(?:\s+)(.+)", plain, re.DOTALL)
+    return match.group(2).strip() if match and match.group(2).strip() else None
 
 
 class DeliveryQueue:
