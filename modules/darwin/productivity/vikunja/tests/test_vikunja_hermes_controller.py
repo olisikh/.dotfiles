@@ -40,6 +40,17 @@ class LeadingMentionPromptTests(unittest.TestCase):
                 "bot-hermes",
             )
         )
+        self.assertIsNone(
+            extract_leading_mention_prompt(
+                '<mention-user data-id="bot-hermes">@Hermes</span> invoke me', "bot-hermes"
+            )
+        )
+        self.assertIsNone(
+            extract_leading_mention_prompt(
+                '<mention-user data-id="bot-hermes"><strong>@Hermes</strong></mention-user> invoke me',
+                "bot-hermes",
+            )
+        )
 
 
 class VikunjaIngressTests(unittest.TestCase):

@@ -16,6 +16,9 @@ from pathlib import Path
 from typing import Any
 
 
+PERSONAL_PROJECT_ID = 2
+
+
 class _LeadingMentionPromptParser(HTMLParser):
     """Accept only a canonical Vikunja mention as the first meaningful content."""
 
@@ -59,9 +62,13 @@ class _LeadingMentionPromptParser(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         if self.state == "mention":
-            self.mention_depth -= 1
-            if self.mention_depth == 0:
-                self.state = "prompt"
+            # Vikunja emits a simple <mention-user> text node. Reject any
+            # mismatched/nested markup rather than treating it as an invocation.
+            if tag != "mention-user" or self.mention_depth != 1:
+                self.invalid = True
+                return
+            self.mention_depth = 0
+            self.state = "prompt"
 
     def handle_data(self, data: str) -> None:
         if self.invalid or not data:
@@ -288,14 +295,14 @@ class VikunjaHermesController:
     def process(self, delivery: tuple[str, int, int, int]) -> str:
         _trigger_id, _payload_project_id, task_id, comment_id = delivery
         task = self.client.get_task(task_id)
-        if task.get("project_id") != self.project_id:
+        if self.project_id != PERSONAL_PROJECT_ID or task.get("project_id") != PERSONAL_PROJECT_ID:
             return "ignored"
 
         comment = self.client.get_comment(task_id, comment_id)
         author = comment.get("author") if isinstance(comment, dict) else None
         if not isinstance(author, dict):
             return "ignored"
-        if author.get("id") == self.bot_user_id or author.get("username") == self.bot_username:
+        if author.get("id") == self.bot_user_id:
             return "ignored"
 
         direct_prompt = extract_leading_mention_prompt(comment.get("comment", ""), self.bot_username)
@@ -358,7 +365,8 @@ def _extract_comment_reference(payload: dict[str, Any]) -> tuple[int, int, int] 
 
 
 def ingest_vikunja_delivery(
-    queue: DeliveryQueue, secret: str, headers: dict[str, str], body: bytes
+    queue: DeliveryQueue, secret: str, headers: dict[str, str], body: bytes,
+    *, project_id: int = PERSONAL_PROJECT_ID,
 ) -> bool:
     """Verify and durably record one supported Vikunja delivery.
 
@@ -378,8 +386,10 @@ def ingest_vikunja_delivery(
     reference = _extract_comment_reference(payload)
     if reference is None:
         return False
-    project_id, task_id, comment_id = reference
-    queue.enqueue(f"task.comment.created:{task_id}:{comment_id}", project_id, task_id, comment_id)
+    payload_project_id, task_id, comment_id = reference
+    if project_id != PERSONAL_PROJECT_ID or payload_project_id != PERSONAL_PROJECT_ID:
+        return False
+    queue.enqueue(f"task.comment.created:{task_id}:{comment_id}", payload_project_id, task_id, comment_id)
     return True
 
 
@@ -400,9 +410,8 @@ def run_hermes_oneshot(
     """Invoke an isolated, reply-only Hermes turn.
 
     Safe mode prevents the worker from loading the host's Vikunja MCP server or
-    other ambient integrations. The web toolset permits factual research, but
-    no local, shell, or task-management tools are available to an untrusted
-    comment-triggered turn.
+    other ambient integrations. The empty `safe` toolset prevents untrusted
+    comment content from causing network or local side effects.
     """
     command = [
         executable,
@@ -414,7 +423,7 @@ def run_hermes_oneshot(
         "--model",
         model,
         "-t",
-        "web",
+        "safe",
         "--no-restore-cwd",
     ]
     result = subprocess.run(command, text=True, capture_output=True, timeout=300, check=False)

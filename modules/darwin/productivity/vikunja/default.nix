@@ -290,8 +290,8 @@ in
 
   config = mkIf cfg.enable {
     assertions = lib.optional cfg.hermesBot.enable {
-      assertion = cfg.hermesBot.botUserId != null;
-      message = "Vikunja Hermes bot is enabled but hermesBot.botUserId is unset.";
+      assertion = cfg.hermesBot.botUserId != null && cfg.hermesBot.projectId == 2;
+      message = "Vikunja Hermes bot must use a bot user ID and the Personal project ID 2.";
     };
 
     environment.systemPackages = [ backup ] ++ lib.optionals cfg.mcp.enable [ mcp ];
