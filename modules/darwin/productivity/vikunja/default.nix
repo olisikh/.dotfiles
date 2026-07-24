@@ -16,6 +16,7 @@ let
     VIKUNJA_ENV_FILE = "${cfg.stateDir}/vikunja.env";
     VIKUNJA_PORT = toString cfg.port;
     VIKUNJA_SERVICE_PUBLICURL = cfg.publicBase;
+    VIKUNJA_OUTGOINGREQUESTS_ALLOWNONROUTABLEIPS = lib.boolToString cfg.hermesBot.enable;
     VIKUNJA_IMAGE_TAG = cfg.vikunjaImageTag;
     POSTGRES_IMAGE_TAG = cfg.postgresImageTag;
   };
@@ -79,6 +80,29 @@ let
       export NODE_ENV=production
 
       exec ${pkgs.nodejs_24}/bin/npx --yes "vikunja-mcp-ng@${cfg.mcp.packageVersion}"
+    '';
+  };
+
+  hermesController = pkgs.writeShellApplication {
+    name = "vikunja-hermes-controller";
+    runtimeInputs = [ python pkgs.coreutils ];
+    text = ''
+      set -euo pipefail
+      mkdir -p ${lib.escapeShellArg cfg.stateDir}/logs
+      exec ${python}/bin/python ${scriptsDir}/vikunja_hermes_controller.py \
+        --api-base ${lib.escapeShellArg cfg.hermesBot.apiBase} \
+        --api-token-file ${lib.escapeShellArg "${cfg.secretsDir}/hermes-bot-api-token"} \
+        --webhook-secret-file ${lib.escapeShellArg "${cfg.secretsDir}/hermes-webhook-secret"} \
+        --state-db ${lib.escapeShellArg "${cfg.stateDir}/hermes-controller.sqlite3"} \
+        --bot-username ${lib.escapeShellArg cfg.hermesBot.botUsername} \
+        --bot-user-id ${toString cfg.hermesBot.botUserId} \
+        --project-id ${toString cfg.hermesBot.projectId} \
+        --hermes-executable ${lib.escapeShellArg cfg.hermesBot.hermesExecutable} \
+        --hermes-provider ${lib.escapeShellArg cfg.hermesBot.hermesProvider} \
+        --hermes-model ${lib.escapeShellArg cfg.hermesBot.hermesModel} \
+        --bind 127.0.0.1 \
+        --port ${toString cfg.hermesBot.port} \
+        --path ${lib.escapeShellArg cfg.hermesBot.webhookPath}
     '';
   };
 
@@ -195,6 +219,64 @@ in
       description = "Pinned PostgreSQL image tag used only by Vikunja.";
     };
 
+    hermesBot = {
+      enable = mkBoolOpt false "Run the signed Hermes comment controller for one Vikunja project.";
+
+      botUsername = mkOption {
+        type = types.str;
+        default = "bot-hermes";
+        description = "Canonical Vikunja bot username required in a leading structured mention.";
+      };
+
+      botUserId = mkOption {
+        type = types.nullOr types.ints.positive;
+        default = null;
+        description = "Numeric Vikunja bot user ID, used to ignore Hermes's own reply webhooks.";
+      };
+
+      projectId = mkOption {
+        type = types.ints.positive;
+        default = 2;
+        description = "Only Vikunja project ID accepted by the controller (Personal).";
+      };
+
+      apiBase = mkOption {
+        type = types.str;
+        default = "http://127.0.0.1:${toString cfg.port}/api/v2";
+        description = "Loopback Vikunja API v2 base URL used with the bot token.";
+      };
+
+      port = mkOption {
+        type = types.port;
+        default = 3457;
+        description = "Loopback port for the signed Vikunja webhook receiver.";
+      };
+
+      webhookPath = mkOption {
+        type = types.str;
+        default = "/hooks/vikunja-hermes";
+        description = "Exact public-path suffix accepted by the webhook receiver.";
+      };
+
+      hermesExecutable = mkOption {
+        type = types.str;
+        default = "${userCfg.home}/.local/bin/hermes";
+        description = "Hermes CLI executable used for isolated one-shot replies.";
+      };
+
+      hermesProvider = mkOption {
+        type = types.str;
+        default = "openai-codex";
+        description = "Default provider for bot turns; comment-level model selection is intentionally unsupported.";
+      };
+
+      hermesModel = mkOption {
+        type = types.str;
+        default = "gpt-5.6-terra";
+        description = "Default model for bot turns; model aliases in comments are intentionally unsupported for now.";
+      };
+    };
+
     mcp = {
       enable = mkBoolOpt false "Install the Hermes-owned Vikunja MCP stdio adapter.";
 
@@ -207,6 +289,11 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = lib.optional cfg.hermesBot.enable {
+      assertion = cfg.hermesBot.botUserId != null;
+      message = "Vikunja Hermes bot is enabled but hermesBot.botUserId is unset.";
+    };
+
     environment.systemPackages = [ backup ] ++ lib.optionals cfg.mcp.enable [ mcp ];
 
     launchd.user.agents = {
@@ -227,6 +314,11 @@ in
             }
           ];
         };
+      };
+    } // lib.optionalAttrs cfg.hermesBot.enable {
+      vikunja-hermes = {
+        path = [ config.environment.systemPath ];
+        serviceConfig = productionServiceConfig "com.olisikh.vikunja-hermes" "${hermesController}/bin/vikunja-hermes-controller";
       };
     };
   };

@@ -121,6 +121,18 @@ in
             key = "vikunja/mcp-api-token";
             name = "vikunja/mcp-api-token";
           };
+          vikunjaHermesOwnerPassword = {
+            key = "vikunja/hermes-owner-password";
+            name = "vikunja/hermes-owner-password";
+          };
+          vikunjaHermesBotApiToken = {
+            key = "vikunja/hermes-bot-api-token";
+            name = "vikunja/hermes-bot-api-token";
+          };
+          vikunjaHermesWebhookSecret = {
+            key = "vikunja/hermes-webhook-secret";
+            name = "vikunja/hermes-webhook-secret";
+          };
 
           tailscaleGolinkAuthKey = {
             key = "tailscale/golinkAuthKey";

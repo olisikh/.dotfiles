@@ -31,6 +31,7 @@ class RenderVikunjaEnvTests(unittest.TestCase):
             "VIKUNJA_SECRETS_DIR": str(secrets),
             "VIKUNJA_PORT": "3456",
             "VIKUNJA_SERVICE_PUBLICURL": "https://example.ts.net",
+            "VIKUNJA_OUTGOINGREQUESTS_ALLOWNONROUTABLEIPS": "true",
             "VIKUNJA_IMAGE_TAG": "2.3.0",
             "POSTGRES_IMAGE_TAG": "18.3",
         }
@@ -48,6 +49,7 @@ class RenderVikunjaEnvTests(unittest.TestCase):
                 for line in output.read_text(encoding="utf-8").splitlines()
             )
             self.assertEqual(values["VIKUNJA_SERVICE_PUBLICURL"], "https://example.ts.net")
+            self.assertEqual(values["VIKUNJA_OUTGOINGREQUESTS_ALLOWNONROUTABLEIPS"], "true")
             self.assertEqual(values["VIKUNJA_DATABASE_PASSWORD"], "db-password")
             self.assertEqual(values["VIKUNJA_SERVICE_SECRET"], "service-secret")
             for relative in ("data/files", "backups", "logs"):

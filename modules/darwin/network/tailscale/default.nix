@@ -58,6 +58,14 @@ let
       }
       ''}
 
+      ${lib.optionalString caddyCfg.vikunja.hermesWebhook.enable ''
+      # This narrow, signed ingress is handled before the root-routed Vikunja SPA.
+      @vikunja_hermes_webhook path ${caddyCfg.vikunja.hermesWebhook.path}
+      handle @vikunja_hermes_webhook {
+        reverse_proxy ${caddyCfg.vikunja.hermesWebhook.upstream}
+      }
+      ''}
+
       ${lib.optionalString caddyCfg.vikunja.enable ''
       # Vikunja owns the Tailnet root during its evaluation. Its stock frontend
       # is root-routed, so it must not be mounted below a shared path prefix.
@@ -163,6 +171,22 @@ in
 
       vikunja = {
         enable = mkBoolOpt false "Expose loopback-only Vikunja as the shared Tailnet HTTPS root";
+
+        hermesWebhook = {
+          enable = mkBoolOpt false "Route the signed Vikunja→Hermes webhook before the root-routed Vikunja SPA.";
+
+          path = mkOption {
+            type = types.str;
+            default = "/hooks/vikunja-hermes";
+            description = "Exact Tailnet HTTPS path forwarded to the Hermes webhook controller.";
+          };
+
+          upstream = mkOption {
+            type = types.str;
+            default = "127.0.0.1:3457";
+            description = "Loopback Hermes webhook controller upstream.";
+          };
+        };
 
         upstream = mkOption {
           type = types.str;

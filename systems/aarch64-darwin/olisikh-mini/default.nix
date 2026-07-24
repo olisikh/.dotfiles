@@ -46,6 +46,10 @@ in
       enable = true;
       productionActive = true;
       mcp.enable = true;
+      hermesBot = {
+        enable = true;
+        botUserId = 3;
+      };
     };
 
     containers.colima = enabled;
@@ -64,7 +68,10 @@ in
           enable = true;
           rootRedirect = "/hermes-webui/";
           webui.enable = true;
-          vikunja.enable = true;
+          vikunja = {
+            enable = true;
+            hermesWebhook.enable = true;
+          };
           openclaw.enable = true;
         };
         golink = enabled;
