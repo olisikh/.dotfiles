@@ -405,7 +405,7 @@ fi
 
 if [[ -z "$json" ]]; then
 	raw="$("$CODEXBAR_BIN" usage --json-only 2>/dev/null)"
-	json="$(printf '%s\n' "$raw" | awk '/^\[/{found=1} found{print}' | jq -c 'map(select(.error | not))' 2>/dev/null)"
+	json="$(printf '%s\n' "$raw" | awk '/^\[/{found=1} found{print}' | jq -c '.' 2>/dev/null)"
 	if [[ -n "$json" ]]; then
 		printf '%s\n' "$json" >"$CACHE_FILE"
 	fi
@@ -429,8 +429,10 @@ if [[ -f "$STATE_FILE" ]]; then
 	selected_provider="$(<"$STATE_FILE")"
 fi
 
-if [[ -z "$selected_provider" ]] || ! printf '%s\n' "$json" | jq -e --arg provider "$selected_provider" 'any(.[]; .provider == $provider)' >/dev/null; then
-	selected_provider="$(printf '%s\n' "$json" | jq -r 'if any(.[]; .provider == "codex") then "codex" else .[0].provider end')"
+# Only select providers that have usable data (no .error)
+working_provider_json="$(printf '%s\n' "$json" | jq -c 'map(select(.error | not))' 2>/dev/null)"
+if [[ -z "$selected_provider" ]] || ! printf '%s\n' "$working_provider_json" | jq -e --arg provider "$selected_provider" 'any(.[]; .provider == $provider)' >/dev/null; then
+	selected_provider="$(printf '%s\n' "$working_provider_json" | jq -r 'if any(.[]; .provider == "codex") then "codex" else .[0].provider end')"
 	printf '%s\n' "$selected_provider" >"$STATE_FILE"
 fi
 
@@ -521,14 +523,32 @@ while IFS= read -r provider_json; do
 		fi
 	fi
 
-	popup_usage="$(format_popup_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$label_line1" "$label_line2" "$primary_resets_at" "$secondary_resets_at" "$tertiary_resets_at")"
-	sketchybar --set "$item" \
-		drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)" \
-		icon="$icon" \
-		icon.font="$CODEXBAR_ICON_FONT" \
-		icon.color="$WHITE" \
-		icon.drawing=on \
-		label="$popup_usage" \
-		label.color="$color" \
-		background.color="$background_color"
+	error_message="$(printf '%s\n' "$provider_json" | jq -r '.error.message // empty')"
+	if [[ -n "$error_message" ]]; then
+		popup_usage="$error_message"
+		color="$RED"
+		# Dim the icon for errored providers
+		icon_color="$LABEL_COLOR"
+		drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)"
+		sketchybar --set "$item" \
+			drawing="$drawing" \
+			icon="$icon" \
+			icon.font="$CODEXBAR_ICON_FONT" \
+			icon.color="$icon_color" \
+			icon.drawing=on \
+			label="$popup_usage" \
+			label.color="$color" \
+			background.color="$background_color"
+	else
+		popup_usage="$(format_popup_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$label_line1" "$label_line2" "$primary_resets_at" "$secondary_resets_at" "$tertiary_resets_at")"
+		sketchybar --set "$item" \
+			drawing="$([[ "$provider_count" -gt 1 ]] && printf on || printf off)" \
+			icon="$icon" \
+			icon.font="$CODEXBAR_ICON_FONT" \
+			icon.color="$WHITE" \
+			icon.drawing=on \
+			label="$popup_usage" \
+			label.color="$color" \
+			background.color="$background_color"
+	fi
 done < <(printf '%s\n' "$json" | jq -c '.[]')
