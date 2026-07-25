@@ -77,8 +77,7 @@ format_percent() {
 	awk -v value="$1" 'BEGIN {
 		if (value == "") exit
 		value += 0
-		if (value == int(value)) printf "%d%%", value
-		else printf "%.1f%%", value
+		printf "%d%%", int(value + 0.5)
 	}'
 }
 
@@ -88,24 +87,36 @@ remaining_percent() {
 		remaining = 100 - used
 		if (remaining < 0) remaining = 0
 		if (remaining > 100) remaining = 100
-		if (remaining == int(remaining)) printf "%d", remaining
-		else printf "%.1f", remaining
+		printf "%d", int(remaining + 0.5)
 	}'
 }
 
 window_label() {
-	case "$1" in
+	local minutes="$1"
+	local whole rem
+
+	case "$minutes" in
 	300) printf '%s\n' "5h" ;;
 	10080) printf '%s\n' "7d" ;;
 	43200) printf '%s\n' "30d" ;;
 	"") printf '%s\n' "$2" ;;
 	*)
-		if (( "$1" >= 1440 )); then
-			printf '%dd\n' $(( "$1" / 1440 ))
-		elif (( "$1" >= 60 )); then
-			printf '%dh\n' $(( "$1" / 60 ))
+		if (( minutes >= 1440 )); then
+			whole=$(( minutes / 1440 ))
+			rem=$(( minutes % 1440 ))
+			if (( rem * 2 >= 1440 )); then
+				whole=$(( whole + 1 ))
+			fi
+			printf '%dd\n' "$whole"
+		elif (( minutes >= 60 )); then
+			whole=$(( minutes / 60 ))
+			rem=$(( minutes % 60 ))
+			if (( rem * 2 >= 60 )); then
+				whole=$(( whole + 1 ))
+			fi
+			printf '%dh\n' "$whole"
 		else
-			printf '%dm\n' "$1"
+			printf '%dm\n' "$minutes"
 		fi
 		;;
 	esac
