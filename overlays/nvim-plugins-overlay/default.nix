@@ -60,8 +60,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "lucas-garcia-rubio";
         repo = "neotest-java";
-        rev = "c8b824acd15f0f7350abf90ab4494e5beee6370c";
-        hash = "sha256-HE2IW520SGMh7sK3dOs7IMaV6HRsFXcohQDFyaHBJVw=";
+        rev = "75383a1320fe3593e67fcb18a225146751f8fef9";
+        hash = "sha256-xBzrJHcR3q+Zso0byNK8q4ql8mWGleZy9R+dK0fev14=";
       };
       dependencies = with final.vimPlugins; [ plenary-nvim nvim-nio neotest ];
     };
@@ -187,8 +187,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "nemanjamalesija";
         repo = "smart-paste.nvim";
-        rev = "7eef31499d910959fe94bb1a99dcdae6eb30f90b";
-        hash = "sha256-N5R3E2aOm8Fz7OIqah05pZYn+MT3tnPxRN6KA/7Y+bM=";
+        rev = "bb46e9a06a728d65f004ad709ff7ee0249717e5e";
+        hash = "sha256-WuKj0rnh+8lxjXZT4utXNoW169BSG4bVY1xBuUQir3c=";
       };
     };
 

@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz";
-    hash = "sha256-hxoYaCtYZ99JbL+z2FTKUcyIo+G1dmqSxsue2betrVg=";
+    hash = "sha256-Dbdx/x+UHAPs38tvf1hqZ78nwXDLesD+WqNRXLoRmC8=";
   };
 
   sourceRoot = ".";
