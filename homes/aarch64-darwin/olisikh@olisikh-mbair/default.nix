@@ -76,7 +76,6 @@ in
         zoxide = enabled;
       };
       http = {
-        postman = enabled;
         bruno = enabled;
       };
       virtualization = {

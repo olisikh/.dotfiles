@@ -16,11 +16,10 @@ in
         enable = true;
       };
 
-      homebrew = {
-        enable = true;
-        brews = [ "pinentry-mac" "JetBrains/utils/kotlin-lsp" ];
-      };
+      homebrew = enabled;
     };
+
+    security.pinentry-mac = enabled;
 
     apps = {
       macmon = enabled;
@@ -53,6 +52,8 @@ in
     containers.colima = enabled;
 
     dev = {
+      kotlin-lsp = enabled;
+
       virtualization = {
         virtualbox = enabled;
         multipass = enabled;

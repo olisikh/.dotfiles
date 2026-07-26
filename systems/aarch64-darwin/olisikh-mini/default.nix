@@ -18,6 +18,8 @@ in
       homebrew = enabled;
     };
 
+    security.pinentry-mac = enabled;
+
     fonts = {
       sf-symbols = enabled;
       sf-pro = enabled;
@@ -53,6 +55,8 @@ in
     };
 
     containers.colima = enabled;
+
+    dev.kotlin-lsp = enabled;
 
     ai = {
       ollama = enabled;

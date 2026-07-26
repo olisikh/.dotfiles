@@ -14,11 +14,10 @@ in
         enable = true;
       };
 
-      homebrew = {
-        enable = true;
-        brews = [ "pinentry-mac" "JetBrains/utils/kotlin-lsp" ];
-      };
+      homebrew = enabled;
     };
+
+    security.pinentry-mac = enabled;
 
     fonts = {
       sf-symbols = enabled;
@@ -48,8 +47,11 @@ in
       dir = "/opt/colima";
     };
 
-    dev.http = {
-      proxyman = enabled;
+    dev = {
+      kotlin-lsp = enabled;
+      http = {
+        proxyman = enabled;
+      };
     };
 
     ai = {

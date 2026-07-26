@@ -16,6 +16,10 @@ in
       docker = enabled;
       python = enabled;
       git = enabled;
+
+      http = {
+        bruno = enabled;
+      };
     };
 
     cloud = {

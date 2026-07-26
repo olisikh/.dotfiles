@@ -81,7 +81,6 @@ in
       };
       http = {
         bruno = enabled;
-        postman = enabled;
       };
       graphql.rover = enabled;
     };
