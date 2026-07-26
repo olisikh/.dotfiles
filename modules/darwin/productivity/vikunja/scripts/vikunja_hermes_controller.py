@@ -344,10 +344,12 @@ class VikunjaHermesController:
                 rendered_comments.append(f"- {username}: {text}")
         history = "\n".join(rendered_comments) or "- No prior comments."
         return (
-            "You are Hermes responding to a human's direct Vikunja prompt. Follow the human's request and "
-            "normal Hermes safety and approval rules. Do not access Vikunja directly, post comments yourself, "
-            "change task state, assign users, or change labels: this controller owns all Vikunja I/O and will "
-            "post your final response. Return only the helpful response for the human.\n\n"
+            "You are Hermes, a full Hermes agent responding to a human's direct Vikunja prompt. "
+            "Follow the human's request and normal Hermes operating rules. You may use your configured tools "
+            "and integrations, including Vikunja, when useful to complete the request. The controller will post "
+            "your final response as one bot comment after this turn, so do not create a duplicate final comment; "
+            "post Vikunja comments yourself only when the human specifically asks you to. Return the helpful "
+            "response for the human.\n\n"
             f"Ticket title: {title}\n"
             f"Ticket description: {description}\n"
             f"Comment history:\n{history}\n\n"
@@ -421,23 +423,15 @@ def run_hermes_oneshot(
     provider: str,
     model: str,
 ) -> str:
-    """Invoke an isolated, reply-only Hermes turn.
-
-    Safe mode prevents the worker from loading the host's Vikunja MCP server or
-    other ambient integrations. The empty `safe` toolset prevents untrusted
-    comment content from causing network or local side effects.
-    """
+    """Invoke a normal full-capability Hermes one-shot turn."""
     command = [
         executable,
-        "--safe-mode",
         "-z",
         prompt,
         "--provider",
         provider,
         "--model",
         model,
-        "-t",
-        "safe",
         "--no-restore-cwd",
     ]
     result = subprocess.run(command, text=True, capture_output=True, timeout=300, check=False)

@@ -159,7 +159,9 @@ class CommentControllerTests(unittest.TestCase):
         self.assertEqual(len(captured_prompts), 1)
         self.assertIn("Prepare the proposal", captured_prompts[0])
         self.assertIn("What is missing?", captured_prompts[0])
-        self.assertIn("Do not access Vikunja directly", captured_prompts[0])
+        self.assertIn("full Hermes agent", captured_prompts[0])
+        self.assertIn("may use your configured tools", captured_prompts[0])
+        self.assertNotIn("Do not access Vikunja directly", captured_prompts[0])
         self.assertEqual(client.posted, [(42, "<p>The scope is clear.</p>")])
 
     def test_ignores_self_authored_and_non_target_project_comments(self) -> None:
@@ -197,6 +199,30 @@ class CommentControllerTests(unittest.TestCase):
             )
             self.assertEqual(controller.process(("id", 2, 42, 77)), "ignored")
             self.assertFalse(client.posted)
+
+
+class HermesOneShotTests(unittest.TestCase):
+    def test_uses_normal_hermes_environment_without_safe_mode_or_toolset_restriction(self) -> None:
+        from unittest.mock import patch
+        import vikunja_hermes_controller as controller
+
+        class Result:
+            returncode = 0
+            stdout = "done\n"
+            stderr = ""
+
+        with patch.object(controller.subprocess, "run", return_value=Result()) as run:
+            self.assertEqual(
+                controller.run_hermes_oneshot(
+                    "do work", executable="hermes", provider="test-provider", model="test-model"
+                ),
+                "done",
+            )
+
+        command = run.call_args.args[0]
+        self.assertNotIn("--safe-mode", command)
+        self.assertNotIn("-t", command)
+        self.assertIn("--no-restore-cwd", command)
 
 
 class VikunjaApiClientTests(unittest.TestCase):
