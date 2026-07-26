@@ -1,7 +1,7 @@
 { lib, config, namespace, ... }:
 let
-  inherit (lib) mkIf;
-  inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib) mkIf mkMerge;
+  inherit (lib.${namespace}) mkBoolOpt mkStableBinTCC;
 
   cfg = config.${namespace}.apps.jankyborders;
   svcCfg = config.services.jankyborders;
@@ -42,13 +42,15 @@ in
     enable = mkBoolOpt false "Enable jankyborders module";
   };
 
-  config = mkIf cfg.enable {
-    services.jankyborders = {
-      enable = true;
-      active_color = "0xff7aa2f7"; # red: 0xfff7768e, white: 0xffe1e3e4, blue: 0xff7aa2f7
-      inactive_color = "0xff494d64";
-      width = 10.0;
-    };
+  config = mkIf cfg.enable (mkMerge [
+    {
+      services.jankyborders = {
+        enable = true;
+        active_color = "0xff7aa2f7"; # red: 0xfff7768e, white: 0xffe1e3e4, blue: 0xff7aa2f7
+        inactive_color = "0xff494d64";
+        width = 10.0;
+      };
+    }
 
     ############################################################
     # TCC stability
@@ -58,40 +60,14 @@ in
     # to exit-loop under launchd. Pin the binary to /usr/local/bin/borders
     # so TCC stays stable; only a real version bump re-triggers a re-grant.
     ############################################################
-
-    # 1. Copy + re-sign the binary to a stable path (sha256-guarded so
-    #    unchanged rebuilds are a no-op).
-    system.activationScripts.extraActivation.text = ''
-      __borders_src="${svcCfg.package}/bin/borders"
-      __borders_dst="${stableBin}"
-      if [ -f "$__borders_dst" ] && [ "$(shasum -a 256 "$__borders_src" | cut -d' ' -f1)" = "$(shasum -a 256 "$__borders_dst" | cut -d' ' -f1)" ]; then
-        :
-      else
-        install -m 0755 "$__borders_src" "$__borders_dst"
-        codesign --force --sign - "$__borders_dst" 2>/dev/null || true
-      fi
-    '';
-
-    # 2. Point launchd at the stable binary so TCC keys on it.
-    launchd.user.agents.jankyborders.serviceConfig.ProgramArguments =
-      lib.mkForce ([ "${stableBin}" ] ++ bordersArgs);
-
-    # 3. After userLaunchd reloads the agent, check whether borders stayed
-    #    alive. If it exit-looped (binary changed, TCC revoked), open the
-    #    Accessibility pane + post a notification so you know to re-grant.
-    system.activationScripts.postActivation.text = ''
-      __borders_user="${userCfg.username}"
-      __borders_uid="$(id -u -- "$__borders_user" 2>/dev/null || true)"
-      if [ -n "$__borders_uid" ]; then
-        sleep 2
-        if ! launchctl asuser "$__borders_uid" pgrep -x borders >/dev/null 2>&1; then
-          launchctl asuser "$__borders_uid" sudo -u "$__borders_user" \
-            open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility" 2>/dev/null || true
-          launchctl asuser "$__borders_uid" sudo -u "$__borders_user" \
-            /usr/bin/osascript -e 'display notification "borders is not running. Re-grant Accessibility in System Settings → Privacy & Security → Accessibility (look for /usr/local/bin/borders)." with title "nix-darwin" subtitle "borders needs Accessibility"' 2>/dev/null || true
-          echo "warning: borders not running after activation — likely needs Accessibility re-grant" >&2
-        fi
-      fi
-    '';
-  };
+    (mkStableBinTCC {
+      src = "${svcCfg.package}/bin/borders";
+      dst = stableBin;
+      agent = "jankyborders";
+      procName = "borders";
+      username = userCfg.username;
+      permLabel = "Accessibility";
+      programArgs = [ stableBin ] ++ bordersArgs;
+    })
+  ]);
 }

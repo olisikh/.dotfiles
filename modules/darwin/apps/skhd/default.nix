@@ -1,7 +1,7 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf optionalString;
-  inherit (lib.${namespace}) mkBoolOpt;
+  inherit (lib) mkIf mkMerge optionalString;
+  inherit (lib.${namespace}) mkBoolOpt mkStableBinTCC;
 
   cfg = config.${namespace}.apps.skhd;
   yabaiCfg = config.${namespace}.apps.yabai;
@@ -106,15 +106,17 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    services.skhd = {
-      enable = true;
-      skhdConfig = lib.concatStringsSep "\n" [
-        yabaiKeymaps
-        # handyKeymaps
-        cfg.extraConfig
-      ];
-    };
+  config = mkIf cfg.enable (mkMerge [
+    {
+      services.skhd = {
+        enable = true;
+        skhdConfig = lib.concatStringsSep "\n" [
+          yabaiKeymaps
+          # handyKeymaps
+          cfg.extraConfig
+        ];
+      };
+    }
 
     ############################################################
     # TCC stability
@@ -125,40 +127,14 @@ in
     # /usr/local/bin/skhd so TCC stays stable; only a real version bump
     # re-triggers a re-grant.
     ############################################################
-
-    # 1. Copy + re-sign the binary to a stable path (sha256-guarded so
-    #    unchanged rebuilds are a no-op).
-    system.activationScripts.extraActivation.text = ''
-      __skhd_src="${config.services.skhd.package}/bin/skhd"
-      __skhd_dst="${stableBin}"
-      if [ -f "$__skhd_dst" ] && [ "$(shasum -a 256 "$__skhd_src" | cut -d' ' -f1)" = "$(shasum -a 256 "$__skhd_dst" | cut -d' ' -f1)" ]; then
-        :
-      else
-        install -m 0755 "$__skhd_src" "$__skhd_dst"
-        codesign --force --sign - "$__skhd_dst" 2>/dev/null || true
-      fi
-    '';
-
-    # 2. Point launchd at the stable binary so TCC keys on it.
-    launchd.user.agents.skhd.serviceConfig.ProgramArguments =
-      lib.mkForce [ "${stableBin}" "-c" "/etc/skhdrc" ];
-
-    # 3. After userLaunchd reloads the agent, check whether skhd stayed
-    #    alive. If it exit-looped (binary changed, TCC revoked), open the
-    #    Accessibility pane + post a notification so you know to re-grant.
-    system.activationScripts.postActivation.text = ''
-      __skhd_user="${userCfg.username}"
-      __skhd_uid="$(id -u -- "$__skhd_user" 2>/dev/null || true)"
-      if [ -n "$__skhd_uid" ]; then
-        sleep 2
-        if ! launchctl asuser "$__skhd_uid" pgrep -x skhd >/dev/null 2>&1; then
-          launchctl asuser "$__skhd_uid" sudo -u "$__skhd_user" \
-            open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility" 2>/dev/null || true
-          launchctl asuser "$__skhd_uid" sudo -u "$__skhd_user" \
-            /usr/bin/osascript -e 'display notification "skhd is not running. Re-grant Accessibility / Input Monitoring in System Settings → Privacy & Security (look for /usr/local/bin/skhd)." with title "nix-darwin" subtitle "skhd needs Accessibility / Input Monitoring"' 2>/dev/null || true
-          echo "warning: skhd not running after activation — likely needs Accessibility / Input Monitoring re-grant" >&2
-        fi
-      fi
-    '';
-  };
+    (mkStableBinTCC {
+      src = "${config.services.skhd.package}/bin/skhd";
+      dst = stableBin;
+      agent = "skhd";
+      procName = "skhd";
+      username = userCfg.username;
+      permLabel = "Accessibility / Input Monitoring";
+      programArgs = [ stableBin "-c" "/etc/skhdrc" ];
+    })
+  ]);
 }
