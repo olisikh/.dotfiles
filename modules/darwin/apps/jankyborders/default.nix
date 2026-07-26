@@ -50,13 +50,18 @@ in
       width = 10.0;
     };
 
-    # Pin borders to a stable path so macOS TCC (Accessibility) does not revoke
-    # permission on every nix rebuild. Only re-copy + re-sign when the binary
-    # content actually changes. nix-darwin only invokes the named activation
-    # hooks (preActivation / extraActivation / postActivation); `types.lines`
-    # merges this with other modules' contributions automatically.
+    ############################################################
+    # TCC stability
+    #
+    # macOS TCC (Accessibility) keys on the binary path. nix store paths
+    # change every rebuild, silently revoking permission and causing borders
+    # to exit-loop under launchd. Pin the binary to /usr/local/bin/borders
+    # so TCC stays stable; only a real version bump re-triggers a re-grant.
+    ############################################################
+
+    # 1. Copy + re-sign the binary to a stable path (sha256-guarded so
+    #    unchanged rebuilds are a no-op).
     system.activationScripts.extraActivation.text = ''
-      # borders stable-bin: keep TCC (Accessibility) stable across rebuilds
       __borders_src="${svcCfg.package}/bin/borders"
       __borders_dst="${stableBin}"
       if [ -f "$__borders_dst" ] && [ "$(shasum -a 256 "$__borders_src" | cut -d' ' -f1)" = "$(shasum -a 256 "$__borders_dst" | cut -d' ' -f1)" ]; then
@@ -67,14 +72,13 @@ in
       fi
     '';
 
-    # Point launchd at the stable binary so TCC keys on it.
+    # 2. Point launchd at the stable binary so TCC keys on it.
     launchd.user.agents.jankyborders.serviceConfig.ProgramArguments =
       lib.mkForce ([ "${stableBin}" ] ++ bordersArgs);
 
-    # After userLaunchd has (re)loaded the agent, check whether borders actually
-    # stayed alive. If it exit-looped, the most likely cause is that the binary
-    # content changed (real version bump) and macOS revoked Accessibility.
-    # Open the Privacy pane + post a notification so you know to re-grant.
+    # 3. After userLaunchd reloads the agent, check whether borders stayed
+    #    alive. If it exit-looped (binary changed, TCC revoked), open the
+    #    Accessibility pane + post a notification so you know to re-grant.
     system.activationScripts.postActivation.text = ''
       __borders_user="${userCfg.username}"
       __borders_uid="$(id -u -- "$__borders_user" 2>/dev/null || true)"

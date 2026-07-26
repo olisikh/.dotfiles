@@ -116,13 +116,19 @@ in
       ];
     };
 
-    # Pin skhd to a stable path so macOS TCC (Accessibility / Input Monitoring)
-    # does not revoke permission on every nix rebuild. Only re-copy + re-sign
-    # when the binary content actually changes. nix-darwin only invokes the
-    # named activation hooks (preActivation / extraActivation / postActivation);
-    # `types.lines` merges this with other modules' contributions automatically.
+    ############################################################
+    # TCC stability
+    #
+    # macOS TCC (Accessibility / Input Monitoring) keys on the binary path.
+    # nix store paths change every rebuild, silently revoking permission and
+    # causing skhd to exit-loop under launchd. Pin the binary to
+    # /usr/local/bin/skhd so TCC stays stable; only a real version bump
+    # re-triggers a re-grant.
+    ############################################################
+
+    # 1. Copy + re-sign the binary to a stable path (sha256-guarded so
+    #    unchanged rebuilds are a no-op).
     system.activationScripts.extraActivation.text = ''
-      # skhd stable-bin: keep TCC (Accessibility / Input Monitoring) stable across rebuilds
       __skhd_src="${config.services.skhd.package}/bin/skhd"
       __skhd_dst="${stableBin}"
       if [ -f "$__skhd_dst" ] && [ "$(shasum -a 256 "$__skhd_src" | cut -d' ' -f1)" = "$(shasum -a 256 "$__skhd_dst" | cut -d' ' -f1)" ]; then
@@ -133,14 +139,13 @@ in
       fi
     '';
 
-    # Point launchd at the stable binary so TCC keys on it.
+    # 2. Point launchd at the stable binary so TCC keys on it.
     launchd.user.agents.skhd.serviceConfig.ProgramArguments =
       lib.mkForce [ "${stableBin}" "-c" "/etc/skhdrc" ];
 
-    # After userLaunchd has (re)loaded the agent, check whether skhd actually
-    # stayed alive. If it exit-looped, the most likely cause is that the binary
-    # content changed (real version bump) and macOS revoked Accessibility /
-    # Input Monitoring. Open the Privacy pane + post a notification.
+    # 3. After userLaunchd reloads the agent, check whether skhd stayed
+    #    alive. If it exit-looped (binary changed, TCC revoked), open the
+    #    Accessibility pane + post a notification so you know to re-grant.
     system.activationScripts.postActivation.text = ''
       __skhd_user="${userCfg.username}"
       __skhd_uid="$(id -u -- "$__skhd_user" 2>/dev/null || true)"
