@@ -1,11 +1,18 @@
-{ lib, config, namespace, ... }:
+{ lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf optionalString;
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.apps.skhd;
   yabaiCfg = config.${namespace}.apps.yabai;
+  userCfg = config.${namespace}.core.user;
   # handyCfg = config.${namespace}.apps.handy;
+
+  # Stable path on the filesystem that macOS TCC keys on. nix store paths
+  # change every rebuild, which silently revokes Accessibility / Input
+  # Monitoring permission for skhd. Copying the binary to a fixed path
+  # keeps TCC stable across rebuilds.
+  stableBin = "/usr/local/bin/skhd";
 
   # Yabai keymaps - only included when yabai is enabled
   yabaiKeymaps = optionalString yabaiCfg.enable ''
@@ -108,5 +115,45 @@ in
         cfg.extraConfig
       ];
     };
+
+    # Pin skhd to a stable path so macOS TCC (Accessibility / Input Monitoring)
+    # does not revoke permission on every nix rebuild. Only re-copy + re-sign
+    # when the binary content actually changes. nix-darwin only invokes the
+    # named activation hooks (preActivation / extraActivation / postActivation);
+    # `types.lines` merges this with other modules' contributions automatically.
+    system.activationScripts.extraActivation.text = ''
+      # skhd stable-bin: keep TCC (Accessibility / Input Monitoring) stable across rebuilds
+      __skhd_src="${config.services.skhd.package}/bin/skhd"
+      __skhd_dst="${stableBin}"
+      if [ -f "$__skhd_dst" ] && [ "$(shasum -a 256 "$__skhd_src" | cut -d' ' -f1)" = "$(shasum -a 256 "$__skhd_dst" | cut -d' ' -f1)" ]; then
+        :
+      else
+        install -m 0755 "$__skhd_src" "$__skhd_dst"
+        codesign --force --sign - "$__skhd_dst" 2>/dev/null || true
+      fi
+    '';
+
+    # Point launchd at the stable binary so TCC keys on it.
+    launchd.user.agents.skhd.serviceConfig.ProgramArguments =
+      lib.mkForce [ "${stableBin}" "-c" "/etc/skhdrc" ];
+
+    # After userLaunchd has (re)loaded the agent, check whether skhd actually
+    # stayed alive. If it exit-looped, the most likely cause is that the binary
+    # content changed (real version bump) and macOS revoked Accessibility /
+    # Input Monitoring. Open the Privacy pane + post a notification.
+    system.activationScripts.postActivation.text = ''
+      __skhd_user="${userCfg.username}"
+      __skhd_uid="$(id -u -- "$__skhd_user" 2>/dev/null || true)"
+      if [ -n "$__skhd_uid" ]; then
+        sleep 2
+        if ! launchctl asuser "$__skhd_uid" pgrep -x skhd >/dev/null 2>&1; then
+          launchctl asuser "$__skhd_uid" sudo -u "$__skhd_user" \
+            open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility" 2>/dev/null || true
+          launchctl asuser "$__skhd_uid" sudo -u "$__skhd_user" \
+            /usr/bin/osascript -e 'display notification "skhd is not running. Re-grant Accessibility / Input Monitoring in System Settings → Privacy & Security (look for /usr/local/bin/skhd)." with title "nix-darwin" subtitle "skhd needs Accessibility / Input Monitoring"' 2>/dev/null || true
+          echo "warning: skhd not running after activation — likely needs Accessibility / Input Monitoring re-grant" >&2
+        fi
+      fi
+    '';
   };
 }
