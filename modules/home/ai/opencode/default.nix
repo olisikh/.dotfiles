@@ -22,6 +22,17 @@ let
       prune = false;
       reserved = 8000;
     };
+
+    # HACK: temporary fix for headers response timeout issue with OpenAI API:
+    # https://github.com/anomalyco/opencode/issues/29548
+    provider = {
+      openai = {
+        options = {
+          headerTimeout = false;
+        };
+      };
+    };
+
     instructions = [
       # NOTE: add extra system prompts like SOUL.md, IDENTITY.md, MEMORY.md, or else.
     ];
