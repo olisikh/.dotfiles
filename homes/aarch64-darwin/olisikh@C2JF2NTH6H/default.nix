@@ -85,6 +85,10 @@ in
       graphql.rover = enabled;
     };
 
+    cloud = {
+      terraform = enabled;
+    };
+
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
