@@ -3,26 +3,23 @@
 , fetchurl
 , python3
 , jdk
-, makeWrapper
 }:
 
 let
-  version = "1.60.0";
-  timestamp = "202606262232";
-
   # The application ships with different config directories for each platform.
-  configDir = if stdenv.hostPlatform.isDarwin then
-    (if stdenv.hostPlatform.isAarch64 then "config_mac_arm" else "config_mac")
-  else
-    (if stdenv.hostPlatform.isAarch64 then "config_linux_arm" else "config_linux");
+  configDir =
+    if stdenv.hostPlatform.isDarwin then
+      (if stdenv.hostPlatform.isAarch64 then "config_mac_arm" else "config_mac")
+    else
+      (if stdenv.hostPlatform.isAarch64 then "config_linux_arm" else "config_linux");
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "jdt-language-server";
-  inherit version;
+  version = "snapshot";
 
   src = fetchurl {
     url = "https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz";
-    hash = "sha256-Dbdx/x+UHAPs38tvf1hqZ78nwXDLesD+WqNRXLoRmC8=";
+    hash = "sha256-imbvMd7CgnyrzJsbvH1WpGGU9iW93J/9ZdrTV7nxE7M=";
   };
 
   sourceRoot = ".";
