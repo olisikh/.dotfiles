@@ -13,12 +13,11 @@ in
       highlight.enable = true;
       indent.enable = false;
       folding.enable = false;
+
       grammarPackages = grammars;
       languageRegister.bruno = [ "bru" "bruno" ];
 
       settings = {
-        highlight = { enable = true; };
-        indent = { enable = false; disable = [ "python" ]; };
         incremental_selection = {
           enable = true;
           keymaps = {
