@@ -20,7 +20,7 @@ let
     compaction = {
       auto = true;
       prune = false;
-      reserved = 8000;
+      reserved = 10000;
     };
 
     # HACK: temporary fix for headers response timeout issue with OpenAI API:
