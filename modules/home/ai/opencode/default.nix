@@ -1,6 +1,6 @@
 { lib, config, namespace, pkgs, ... }:
 let
-  inherit (lib) mkIf recursiveUpdate types;
+  inherit (lib) mkIf types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
   inherit (lib.${namespace}.zsh) mkLate;
 
@@ -8,8 +8,7 @@ let
 
   homeDir = config.home.homeDirectory;
 
-  basicConfig = {
-    "$schema" = "https://opencode.ai/config.json";
+  basicSettings = {
     model = "ollama-cloud/kimi-k2.7-code";
     small_model = "ollama-cloud/deepseek-v4-flash";
     autoupdate = false;
@@ -142,17 +141,24 @@ let
     };
   };
 
-  finalConfig = recursiveUpdate basicConfig cfg.config;
+  finalSettings = lib.recursiveUpdate basicSettings cfg.settings;
 in
 {
   options.${namespace}.ai.opencode = {
     enable = mkBoolOpt false "Enable OpenCode program";
-    config = mkOpt types.attrs { } "OpenCode config attrset merged into the module's base config";
+    settings = mkOpt types.attrs { } "OpenCode settings merged into the module's base config";
   };
 
   config = mkIf cfg.enable {
     programs.opencode = {
       enable = true;
+      package = pkgs.llm-agents.opencode;
+      settings = finalSettings;
+      tui = {
+        theme = "catppuccin";
+        mouse = true;
+        diff_style = "auto";
+      };
     };
 
     programs.zsh.initContent = mkLate
@@ -161,24 +167,9 @@ in
         eval "$(opencode completion)"
       '';
 
-    home = {
-      file = {
-        ".config/llm-wiki/config.json".text = builtins.toJSON {
-          hub_path = "~/.llm-wiki/hub";
-        };
-
-        ".config/opencode/opencode.json".text = builtins.toJSON finalConfig;
-        ".config/opencode/tui.json".text = builtins.toJSON {
-          "$schema" = "https://opencode.ai/tui.json";
-          theme = "catppuccin";
-          mouse = true;
-          diff_style = "auto";
-        };
-      };
-
-      sessionVariables = {
-        # NOTE: extra config for overriding the non-writeable config provided by nix
-        OPENCODE_CONFIG = "${homeDir}/.config/opencode/config.json";
+    home.file = {
+      ".config/llm-wiki/config.json".text = builtins.toJSON {
+        hub_path = "~/.llm-wiki/hub";
       };
     };
   };

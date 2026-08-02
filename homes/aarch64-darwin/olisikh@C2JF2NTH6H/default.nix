@@ -143,7 +143,7 @@ in
       pi = enabled;
       opencode = {
         enable = true;
-        config = {
+        settings = {
           enabled_providers = [ "github-copilot" "openai" ];
           model = "openai/gpt-5.6-terra";
           small_model = "openai/gpt-5.6-luna";
