@@ -154,9 +154,13 @@ in
             key = "ai/gemini";
             name = "ai/gemini";
           };
+          ollama = {
+            key = "ai/ollama";
+            name = "ai/ollama";
+          };
           flakeHub = {
-            key = "nix/flake-hub";
-            name = "nix/flake-hub";
+            key = "nix/flakeHub";
+            name = "nix/flakeHub";
           };
         };
       };

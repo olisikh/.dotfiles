@@ -30,9 +30,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    pi = {
-      # https://github.com/lukasl-dev/pi.nix - pi terminal coding agent
-      url = "github:lukasl-dev/pi.nix";
+    llm-agents = {
+      # https://github.com/numtide/llm-agents.nix - AI coding agents & dev tools
+      url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -85,7 +85,9 @@
       src = ./.;
 
       # NOTE: add external overlays here
-      overlays = [ ];
+      overlays = with inputs; [
+        llm-agents.overlays.shared-nixpkgs
+      ];
 
       channels-config.allowUnfree = true;
 
@@ -97,7 +99,6 @@
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
         direnv-instant.homeModules.direnv-instant
-        pi.homeModules.default
       ];
 
       alias.templates.default = "empty";
