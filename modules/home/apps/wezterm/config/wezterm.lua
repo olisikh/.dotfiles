@@ -113,7 +113,7 @@ w.on("bell", function(window, pane)
 	if not bell_enabled then
 		return
 	end
-	w.run_child_process({ "afplay", w.config_dir .. "/faaah.mp3" })
+	w.run_child_process({ "afplay", w.config_dir .. "/cafi.mp3" })
 end)
 
 nav.apply_to_config(config)
