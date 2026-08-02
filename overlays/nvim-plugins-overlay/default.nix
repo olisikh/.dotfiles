@@ -177,8 +177,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "olisikh";
         repo = "faaah.nvim";
-        rev = "d31a3e6472d09ded9c958a490ad62c7a35040f93";
-        hash = "sha256-6eG76iZF1T4k1JdPLLC6mENKFeIl2dmOHJ2lUvScTl0=";
+        rev = "afa78149a46e798c4cf072583a3acb48cd45c973";
+        hash = "sha256-Ht6LRPb5Dngahe2hnXxCLAueFvoNSuEgH0rhbWbKtxc=";
       };
     };
 
