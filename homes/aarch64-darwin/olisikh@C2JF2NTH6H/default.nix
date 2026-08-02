@@ -140,6 +140,7 @@ in
 
     ai = {
       copilot = enabled;
+      pi = enabled;
       opencode = {
         enable = true;
         config = {

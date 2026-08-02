@@ -30,6 +30,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    pi = {
+      # https://github.com/lukasl-dev/pi.nix - pi terminal coding agent
+      url = "github:lukasl-dev/pi.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -91,6 +97,7 @@
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
         direnv-instant.homeModules.direnv-instant
+        pi.homeModules.default
       ];
 
       alias.templates.default = "empty";
