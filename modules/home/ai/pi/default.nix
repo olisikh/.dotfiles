@@ -12,10 +12,10 @@ let
   # /build, /general, and /explore. Plus a /commit template mirroring opencode's
   # command.commit.
   promptTemplates = [
-    "${homeDir}/.config/opencode/prompts/PLAN.md"
-    "${homeDir}/.config/opencode/prompts/BUILD.md"
-    "${homeDir}/.config/opencode/prompts/GENERAL.md"
-    "${homeDir}/.config/opencode/prompts/EXPLORE.md"
+    "${homeDir}/.config/opencode/prompts/plan.md"
+    "${homeDir}/.config/opencode/prompts/build.md"
+    "${homeDir}/.config/opencode/prompts/general.md"
+    "${homeDir}/.config/opencode/prompts/explore.md"
     ./prompts/commit.md
   ];
 

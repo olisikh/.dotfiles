@@ -76,7 +76,7 @@ let
     };
     agent = {
       plan = {
-        prompt = "${homeDir}/.config/opencode/prompts/PLAN.md";
+        prompt = "${homeDir}/.config/opencode/prompts/plan.md";
         temperature = 0.1;
         permission = {
           edit = "deny";
@@ -94,13 +94,13 @@ let
           websearch = "allow";
         };
       };
-      build.prompt = "${homeDir}/.config/opencode/prompts/BUILD.md";
+      build.prompt = "${homeDir}/.config/opencode/prompts/build.md";
       general = {
-        prompt = "${homeDir}/.config/opencode/prompts/GENERAL.md";
+        prompt = "${homeDir}/.config/opencode/prompts/general.md";
         temperature = 0.2;
       };
       explore = {
-        prompt = "${homeDir}/.config/opencode/prompts/EXPLORE.md";
+        prompt = "${homeDir}/.config/opencode/prompts/explore.md";
         temperature = 0.1;
         permission = {
           edit = "deny";
