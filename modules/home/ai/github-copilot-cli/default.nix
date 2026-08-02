@@ -11,6 +11,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.github-copilot-cli ];
+    home.packages = [ pkgs.llm-agents.copilot-cli ];
   };
 }

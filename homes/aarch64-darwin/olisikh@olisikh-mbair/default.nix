@@ -133,6 +133,7 @@ in
       gemini = enabled;
       copilot = enabled;
       opencode = enabled;
+      opencode2 = enabled;
       pi = enabled;
     };
 

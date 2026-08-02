@@ -149,6 +149,7 @@ in
           small_model = "openai/gpt-5.6-luna";
         };
       };
+      opencode2 = enabled;
     };
 
     security = {

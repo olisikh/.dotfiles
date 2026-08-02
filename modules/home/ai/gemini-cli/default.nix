@@ -11,6 +11,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.gemini-cli ];
+    home.packages = [ pkgs.llm-agents.gemini-cli ];
   };
 }
