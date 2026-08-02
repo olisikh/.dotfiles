@@ -1,18 +1,11 @@
 { lib, config, namespace, pkgs, ... }:
 let
   inherit (lib) mkIf mkMerge optionalString;
-  inherit (lib.${namespace}) mkBoolOpt mkStableBinTCC;
+  inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.apps.skhd;
   yabaiCfg = config.${namespace}.apps.yabai;
-  userCfg = config.${namespace}.core.user;
   # handyCfg = config.${namespace}.apps.handy;
-
-  # Stable path on the filesystem that macOS TCC keys on. nix store paths
-  # change every rebuild, which silently revokes Accessibility / Input
-  # Monitoring permission for skhd. Copying the binary to a fixed path
-  # keeps TCC stable across rebuilds.
-  stableBin = "/usr/local/bin/skhd";
 
   # Yabai keymaps - only included when yabai is enabled
   yabaiKeymaps = optionalString yabaiCfg.enable ''
@@ -117,24 +110,5 @@ in
         ];
       };
     }
-
-    ############################################################
-    # TCC stability
-    #
-    # macOS TCC (Accessibility / Input Monitoring) keys on the binary path.
-    # nix store paths change every rebuild, silently revoking permission and
-    # causing skhd to exit-loop under launchd. Pin the binary to
-    # /usr/local/bin/skhd so TCC stays stable; only a real version bump
-    # re-triggers a re-grant.
-    ############################################################
-    (mkStableBinTCC {
-      src = "${config.services.skhd.package}/bin/skhd";
-      dst = stableBin;
-      agent = "skhd";
-      procName = "skhd";
-      username = userCfg.username;
-      permLabel = "Accessibility / Input Monitoring";
-      programArgs = [ stableBin "-c" "/etc/skhdrc" ];
-    })
   ]);
 }
