@@ -13,29 +13,32 @@ let
     theme = "catppuccin-mocha";
 
     # Pi installs declared npm packages into its agent directory on startup.
-    # Pin the version so a future package release does not change the setup
-    # unexpectedly.
-    # @ifi/oh-pi is an installer rather than a Pi resource package. Declare
-    # the packages it installs directly so this remains compatible with the
-    # generated settings.json.
     packages = [
       "npm:pi-ollama-cloud"
 
-      "npm:@ifi/pi-plan@0.5.1"
-      "npm:@ifi/pi-spec@0.5.1"
-      "npm:@ifi/pi-extension-subagents@0.5.1"
-      "npm:@ifi/oh-pi-agents@0.5.1"
+      "npm:@ifi/pi-plan"
+      "npm:@ifi/pi-spec"
+      "npm:@ifi/pi-extension-subagents"
+      "npm:@ifi/oh-pi-agents"
       {
-        source = "npm:@ifi/oh-pi-skills@0.5.1";
+        source = "npm:@ifi/oh-pi-skills";
         skills = [
           "!skills/improve-codebase-architecture/**"
           "!skills/grill-me/**"
         ];
       }
-      "npm:@ifi/oh-pi-themes@0.5.1"
-      "npm:@ifi/oh-pi-prompts@0.5.1"
-      "npm:@ifi/oh-pi-ant-colony@0.5.1"
-      "npm:@ifi/oh-pi-extensions@0.5.1"
+      "npm:@ifi/oh-pi-themes"
+      "npm:@ifi/oh-pi-prompts"
+      "npm:@ifi/oh-pi-ant-colony"
+      {
+        source = "npm:@ifi/oh-pi-extensions";
+        extensions = [
+          "extensions/*.ts"
+          "!extensions/custom-footer.ts"
+          "!extensions/usage-tracker.ts"
+          "!extensions/git-guard.ts"
+        ];
+      }
     ];
 
     # Equivalent of opencode's compaction { auto = true; prune = false; reserved = 8000; }
@@ -49,8 +52,6 @@ let
       maxRetries = 3;
     };
 
-    # Equivalent of opencode's autoupdate = false (see also the
-    # PI_SKIP_VERSION_CHECK env set by the llm-agents package).
     enableInstallTelemetry = false;
     enableAnalytics = false;
 
@@ -64,8 +65,9 @@ in
 {
   options.${namespace}.ai.pi = {
     enable = mkBoolOpt false "Enable pi terminal coding agent";
-    keyFile = mkOpt types.str "${config.home.homeDirectory}/.config/sops-nix/secrets/ai/ollama" "Path to a file holding the ollama-cloud API key, read via `!cat` at request time. Defaults to the sops-nix materialized ai/ollama secret.";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
+    keybindings = mkOpt types.attrs { } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
+    mcps = mkOpt types.attrs { } "Pi MCPs, put under ~/.pi/agent/mcps.json";
   };
 
   config = mkIf cfg.enable {
@@ -79,6 +81,11 @@ in
       # PI_CODING_AGENT_DIR). Write the files directly; pi writes back
       # runtime edits into settings.json.
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
+      ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
+      ".pi/agent/mcps.json".text = builtins.toJSON cfg.mcps;
+
+      ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
+      ".pi/agent/extensions/git-guard.ts".source = ./extensions/git-guard.ts;
     };
   };
 }
