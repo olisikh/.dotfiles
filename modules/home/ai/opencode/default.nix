@@ -33,7 +33,7 @@ let
     };
 
     instructions = [
-      # NOTE: add extra system prompts like SOUL.md, IDENTITY.md, MEMORY.md, or else.
+      "~/.opencode/skills/wiki-manager/SKILL.md"
     ];
     permission = {
       "*" = "ask";

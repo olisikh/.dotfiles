@@ -5,40 +5,38 @@ let
 
   cfg = config.${namespace}.ai.pi;
 
-  # Mirror opencode's provider/model setup: it talks to Ollama Cloud
-  # (https://ollama.com/v1, BYOK) using kimi-k2.7-code as the main model and
-  # deepseek-v4-flash as the small model. The apiKey is read at request time
-  # from a file (pi runs `!cat ...` and caches the result), or a key can be
-  # saved with `pi /login`.
-  models = {
-    providers = {
-      ollama-cloud = {
-        baseUrl = "https://ollama.com/v1";
-        api = "openai-completions";
-        apiKey = "!cat ${cfg.keyFile}";
-        models = [
-          {
-            id = "kimi-k2.7-code";
-            reasoning = true;
-            contextWindow = 262144;
-            maxTokens = 262144;
-          }
-          {
-            id = "deepseek-v4-flash:0731";
-            reasoning = true;
-            contextWindow = 1000000;
-            maxTokens = 384000;
-          }
-        ];
-      };
-    };
-  };
-
   basicConfig = {
     defaultProvider = "ollama-cloud";
-    defaultModel = "kimi-k2.7-code";
+    defaultModel = "deepseek-v4-flash:0731:max";
+    defaultThinkingLevel = "high";
 
-    theme = "dark";
+    theme = "catppuccin-mocha";
+
+    # Pi installs declared npm packages into its agent directory on startup.
+    # Pin the version so a future package release does not change the setup
+    # unexpectedly.
+    # @ifi/oh-pi is an installer rather than a Pi resource package. Declare
+    # the packages it installs directly so this remains compatible with the
+    # generated settings.json.
+    packages = [
+      "npm:pi-ollama-cloud"
+
+      "npm:@ifi/pi-plan@0.5.1"
+      "npm:@ifi/pi-spec@0.5.1"
+      "npm:@ifi/pi-extension-subagents@0.5.1"
+      "npm:@ifi/oh-pi-agents@0.5.1"
+      {
+        source = "npm:@ifi/oh-pi-skills@0.5.1";
+        skills = [
+          "!skills/improve-codebase-architecture/**"
+          "!skills/grill-me/**"
+        ];
+      }
+      "npm:@ifi/oh-pi-themes@0.5.1"
+      "npm:@ifi/oh-pi-prompts@0.5.1"
+      "npm:@ifi/oh-pi-ant-colony@0.5.1"
+      "npm:@ifi/oh-pi-extensions@0.5.1"
+    ];
 
     # Equivalent of opencode's compaction { auto = true; prune = false; reserved = 8000; }
     compaction = {
@@ -80,7 +78,6 @@ in
       # pi reads its agent config from ~/.pi/agent (the default
       # PI_CODING_AGENT_DIR). Write the files directly; pi writes back
       # runtime edits into settings.json.
-      ".pi/agent/models.json".text = builtins.toJSON models;
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
     };
   };
