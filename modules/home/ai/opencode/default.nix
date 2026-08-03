@@ -22,10 +22,28 @@ let
       reserved = 10000;
     };
 
-    # HACK: temporary fix for headers response timeout issue with OpenAI API:
-    # https://github.com/anomalyco/opencode/issues/29548
     provider = {
+      ollama-cloud = {
+        models = {
+          "deepseek-v4-flash" = {
+            options = {
+              reasoningEffort = "max";
+            };
+          };
+        };
+      };
+
       openai = {
+        models = {
+          "gpt-5.6-luna" = {
+            options = {
+              reasoningEffort = "max";
+            };
+          };
+        };
+
+        # HACK: temporary fix for headers response timeout issue with OpenAI API:
+        # https://github.com/anomalyco/opencode/issues/29548
         options = {
           headerTimeout = false;
         };
