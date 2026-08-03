@@ -9,8 +9,8 @@ let
   homeDir = config.home.homeDirectory;
 
   basicSettings = {
-    model = "openai-codex/gpt-5.6-luna";
-    small_model = "ollama-cloud/deepseek-v4-flash";
+    model = "openai-codex/gpt-5.6-sol";
+    small_model = "openai-codex/gpt-5.6-luna";
     autoupdate = false;
     share = "manual";
     formatter = true;
@@ -35,6 +35,11 @@ let
 
       openai = {
         models = {
+          "gpt-5.6-sol" = {
+            options = {
+              reasoningEffort = "high";
+            };
+          };
           "gpt-5.6-luna" = {
             options = {
               reasoningEffort = "max";
