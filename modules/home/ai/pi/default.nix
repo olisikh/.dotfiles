@@ -7,8 +7,8 @@ let
 
   basicConfig = {
     defaultProvider = "ollama-cloud";
-    defaultModel = "deepseek-v4-flash:0731:max";
-    defaultThinkingLevel = "high";
+    defaultModel = "gpt-5.6-luna";
+    defaultThinkingLevel = "max";
 
     theme = "catppuccin-mocha";
 
