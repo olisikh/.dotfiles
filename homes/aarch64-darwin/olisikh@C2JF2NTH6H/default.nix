@@ -145,8 +145,6 @@ in
         enable = true;
         settings = {
           enabled_providers = [ "github-copilot" "openai" ];
-          model = "openai-codex/gpt-5.6-sol";
-          small_model = "openai-codex/gpt-5.6-luna";
         };
       };
       opencode2 = enabled;
