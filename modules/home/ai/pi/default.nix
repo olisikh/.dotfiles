@@ -86,6 +86,7 @@ in
 
       ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
       ".pi/agent/extensions/git-guard.ts".source = ./extensions/git-guard.ts;
+      ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
     };
   };
 }
