@@ -278,7 +278,7 @@ export default Plugin.define({
 		await ctx.session.hook("context", async (event) => {
 			event.system.push({
 				type: "text",
-				text: "Shared wiki memory is available. Before substantive work, call wiki_recall when durable project knowledge may help. Call finalize_wiki after a user-approved plan, a validated implementation, or a durable decision. Never save raw transcripts, secrets, credentials, or personal data.",
+				text: "Shared wiki memory is retrieved automatically for substantive user requests. Do not call wiki_recall unless the user requests a different topic or a deeper lookup. Call finalize_wiki after a user-approved plan, a validated implementation, or a durable decision. Never save raw transcripts, secrets, credentials, or personal data.",
 			});
 
 			const query = latestUserText(event.messages);
