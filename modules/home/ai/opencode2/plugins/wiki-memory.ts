@@ -185,15 +185,19 @@ function isSubstantive(text: string): boolean {
 
 async function recall(input: RecallInput, directory: string): Promise<string> {
 	const hub = await hubPath();
-	const topic = await inferTopic(hub, input.topic, [], directory);
-	if (!topic) {
-		return "No unambiguous wiki topic. Ask the user to choose a topic, then call wiki_recall with its slug.";
+	const inferredTopic = await inferTopic(hub, input.topic, [], directory);
+	if (input.topic && !inferredTopic) {
+		return `Wiki topic '${input.topic}' does not exist.`;
 	}
 
-	const root = path.join(hub, "topics", topic);
-	const index = await readFile(path.join(root, "_index.md"), "utf8").catch(() => "");
-	const files = await markdownFiles(path.join(root, "wiki"));
-	const documents = await Promise.all(files.map(async (file) => ({ file, content: await readFile(file, "utf8") })));
+	const topics = input.topic
+		? [inferredTopic]
+		: [...new Set([inferredTopic, ...(await topicNames(hub))].filter((topic): topic is string => Boolean(topic)))];
+	const groups = await Promise.all(topics.map(async (topic) => {
+		const root = path.join(hub, "topics", topic, "wiki");
+		return Promise.all((await markdownFiles(root)).map(async (file) => ({ topic, file, content: await readFile(file, "utf8") })));
+	}));
+	const documents = groups.flat();
 	const results = documents
 		.map((entry) => ({ ...entry, score: score(input.query, entry.content) }))
 		.filter((entry) => entry.score > 0)
@@ -201,14 +205,14 @@ async function recall(input: RecallInput, directory: string): Promise<string> {
 		.slice(0, input.max_results ?? 5);
 
 	if (!results.length) {
-		return `Wiki topic: ${topic}\nNo matching compiled articles. Topic index checked: ${path.join(root, "_index.md")}\nGap: capture or ingest evidence before relying on wiki memory.`;
+		return `Wiki topics checked: ${topics.join(", ") || "none"}\nNo matching compiled articles. Gap: capture or ingest evidence before relying on wiki memory.`;
 	}
 
 	const citations = results.map(({ file, content }) => {
 		const summary = content.replace(/^---[\s\S]*?---\s*/m, "").replace(/\s+/g, " ").slice(0, 700);
 		return `- ${file}\n  ${summary}`;
 	});
-	return `Wiki topic: ${topic}\nIndex: ${path.join(root, "_index.md")}\nRelevant cited knowledge:\n${citations.join("\n")}`;
+	return `Wiki topics searched: ${topics.join(", ")}\nRelevant cited knowledge:\n${citations.join("\n")}`;
 }
 
 function bullet(values: string[] | undefined): string {
