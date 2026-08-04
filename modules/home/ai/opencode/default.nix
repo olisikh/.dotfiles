@@ -35,23 +35,13 @@ let
 
       openai = {
         models = {
-          "gpt-5.6-sol" = {
-            options = {
-              reasoningEffort = "high";
-            };
-          };
-          "gpt-5.6-luna" = {
-            options = {
-              reasoningEffort = "max";
-            };
-          };
+          "gpt-5.6-sol".options.reasoningEffort = "high";
+          "gpt-5.6-luna".options.reasoningEffort = "max";
         };
 
         # HACK: temporary fix for headers response timeout issue with OpenAI API:
         # https://github.com/anomalyco/opencode/issues/29548
-        options = {
-          headerTimeout = false;
-        };
+        options.headerTimeout = false;
       };
     };
 
