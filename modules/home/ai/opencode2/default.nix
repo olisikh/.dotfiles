@@ -15,6 +15,11 @@ in
   config = mkIf cfg.enable {
     home.packages = [ pkgs.llm-agents.opencode2 ];
 
+    # OpenCode V2 discovers direct plugin files from this global directory.
+    # The local plugin dependency is pinned in ~/.config/opencode/package.json
+    # to the same next build as the installed opencode2 binary.
+    home.file.".config/opencode/plugins/wiki-memory.ts".source = ./plugins/wiki-memory.ts;
+
     programs.zsh.initContent = mkLate
       # zsh
       ''
