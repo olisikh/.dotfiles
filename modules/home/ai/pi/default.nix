@@ -6,7 +6,7 @@ let
   cfg = config.${namespace}.ai.pi;
 
   basicConfig = {
-    defaultProvider = "ollama-cloud";
+    defaultProvider = "openai-codex";
     defaultModel = "gpt-5.6-luna";
     defaultThinkingLevel = "max";
 
