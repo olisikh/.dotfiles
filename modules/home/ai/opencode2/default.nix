@@ -24,6 +24,7 @@ in
       # zsh
       ''
         eval "$(opencode2 --completions zsh)"
+        alias opencode="opencode2 --auto"
       '';
   };
 }
