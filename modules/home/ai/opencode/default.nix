@@ -146,6 +146,7 @@ in
   options.${namespace}.ai.opencode = {
     enable = mkBoolOpt false "Enable OpenCode program";
     settings = mkOpt types.attrs { } "OpenCode settings merged into the module's base config";
+    package = mkOpt types.package pkgs.opencode2 "OpenCode package to use";
   };
 
   config = mkIf cfg.enable {
@@ -153,7 +154,7 @@ in
     # Keep the public module name stable while installing only OpenCode V2.
     programs.opencode = {
       enable = true;
-      package = pkgs.llm-agents.opencode2;
+      package = cfg.package;
       settings = finalSettings;
       tui = {
         theme = "catppuccin";
@@ -165,21 +166,18 @@ in
     programs.zsh.initContent = mkLate
       # zsh
       ''
-        eval "$(opencode2 --completions zsh)"
-        alias opencode="opencode2 --auto"
+        if (( $+commands[opencode] )); then
+          eval "$(opencode completion)"
+        elif (( $+commands[opencode2] )); then
+          alias opencode="opencode2"
+          eval "$(opencode2 --completions zsh)"
+        fi
       '';
 
     home.file = {
       ".config/opencode/plugins/wiki-memory.ts".source = ./plugins/wiki-memory.ts;
       ".config/llm-wiki/config.json".text = builtins.toJSON {
         hub_path = "~/.llm-wiki/hub";
-      };
-      ".local/bin/opencode" = {
-        text = ''
-          #!/bin/sh
-          exec opencode2 --auto "$@"
-        '';
-        executable = true;
       };
     };
   };

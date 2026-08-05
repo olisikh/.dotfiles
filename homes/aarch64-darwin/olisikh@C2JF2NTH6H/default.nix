@@ -1,4 +1,4 @@
-{ lib, namespace, ... }:
+{ lib, namespace, pkgs, ... }:
 let
   inherit (lib.${namespace}) enabled;
 in
@@ -143,8 +143,17 @@ in
       pi = enabled;
       opencode = {
         enable = true;
+        package = pkgs.llm-agents.opencode;
         settings = {
           enabled_providers = [ "github-copilot" "openai" ];
+
+          mcp = {
+            mcp_gateway = {
+              type = "remote";
+              url = "https://mcp.aigateway.vip.ebay.com/mcp";
+              enabled = true;
+            };
+          };
         };
       };
     };
