@@ -25,11 +25,7 @@ let
     provider = {
       ollama-cloud = {
         models = {
-          "deepseek-v4-flash" = {
-            options = {
-              reasoningEffort = "max";
-            };
-          };
+          "deepseek-v4-flash".options.reasoningEffort = "max";
         };
       };
 
