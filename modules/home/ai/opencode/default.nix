@@ -45,9 +45,6 @@ let
       };
     };
 
-    instructions = [
-      "~/.opencode/skills/wiki-manager/SKILL.md"
-    ];
     permission = {
       "*" = "ask";
       read = "allow";
