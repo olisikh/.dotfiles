@@ -147,7 +147,6 @@ in
           enabled_providers = [ "github-copilot" "openai" ];
         };
       };
-      opencode2 = enabled;
     };
 
     security = {

@@ -156,9 +156,11 @@ in
   };
 
   config = mkIf cfg.enable {
+    # V2 accepts this legacy-shaped configuration and translates it in memory.
+    # Keep the public module name stable while installing only OpenCode V2.
     programs.opencode = {
       enable = true;
-      package = pkgs.llm-agents.opencode;
+      package = pkgs.llm-agents.opencode2;
       settings = finalSettings;
       tui = {
         theme = "catppuccin";
@@ -170,12 +172,21 @@ in
     programs.zsh.initContent = mkLate
       # zsh
       ''
-        eval "$(opencode completion)"
+        eval "$(opencode2 --completions zsh)"
+        alias opencode="opencode2 --auto"
       '';
 
     home.file = {
+      ".config/opencode/plugins/wiki-memory.ts".source = ./plugins/wiki-memory.ts;
       ".config/llm-wiki/config.json".text = builtins.toJSON {
         hub_path = "~/.llm-wiki/hub";
+      };
+      ".local/bin/opencode" = {
+        text = ''
+          #!/bin/sh
+          exec opencode2 --auto "$@"
+        '';
+        executable = true;
       };
     };
   };
