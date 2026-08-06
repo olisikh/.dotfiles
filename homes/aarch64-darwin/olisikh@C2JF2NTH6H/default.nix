@@ -146,14 +146,6 @@ in
         package = pkgs.llm-agents.opencode;
         settings = {
           enabled_providers = [ "github-copilot" "openai" ];
-
-          mcp = {
-            mcp_gateway = {
-              type = "remote";
-              url = "https://mcp.aigateway.vip.ebay.com/mcp";
-              enabled = true;
-            };
-          };
         };
       };
     };
