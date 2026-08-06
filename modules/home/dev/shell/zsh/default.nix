@@ -69,6 +69,9 @@ in
           # open home-manager options help (like darwin-help)
           alias hm-help="open https://nix-community.github.io/home-manager/options.xhtml"
 
+          alias pbc="pbcopy"
+          alias pbp="pbpaste"
+
           # source a local .zshrc.local file for extra customizations
           [[ -s "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
         '';
