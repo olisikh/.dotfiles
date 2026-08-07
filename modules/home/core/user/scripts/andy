@@ -379,34 +379,6 @@ wait_for_reboot() {
     exit 1
 }
 
-reset_proxy_and_network() {
-    local serial="$1"
-    local proxy=""
-    local boot_id=""
-
-    echo "Clearing proxy settings on $serial..."
-    "$ADB_BIN" -s "$serial" shell settings delete global http_proxy || true
-    "$ADB_BIN" -s "$serial" shell settings delete global global_http_proxy_host || true
-    "$ADB_BIN" -s "$serial" shell settings delete global global_http_proxy_port || true
-    "$ADB_BIN" -s "$serial" shell settings delete global global_http_proxy_exclusion_list || true
-
-    proxy="$("$ADB_BIN" -s "$serial" shell settings get global http_proxy 2>/dev/null | tr -d '\r' || true)"
-    if [[ "$proxy" == "null" || -z "$proxy" ]]; then
-        echo "Proxy cleared: $serial"
-    else
-        echo "Warning: http_proxy still set to '$proxy' on $serial" >&2
-    fi
-
-    echo "Resetting network state on $serial..."
-    "$ADB_BIN" -s "$serial" shell cmd connectivity airplane-mode enable
-    "$ADB_BIN" -s "$serial" shell cmd connectivity airplane-mode disable
-
-    echo "Rebooting: $serial"
-    boot_id="$("$ADB_BIN" -s "$serial" shell cat /proc/sys/kernel/random/boot_id | tr -d '\r')"
-    "$ADB_BIN" -s "$serial" reboot
-    wait_for_reboot "$serial" "$boot_id"
-}
-
 ensure_running_emulator() {
     local avd="$1"
     local serial=""
@@ -513,7 +485,6 @@ cmd_run() {
 
     if serial="$(find_running_serial_for_avd "$avd" 2>/dev/null)" && [[ -n "$serial" ]]; then
         wait_for_boot "$serial"
-        reset_proxy_and_network "$serial"
         echo "Running: $avd ($serial)"
         return 0
     fi
@@ -521,7 +492,6 @@ cmd_run() {
     start_emulator "$avd" "$PARSED_PROXYMAN"
     serial="$(wait_for_emulator_serial "$avd")"
     wait_for_boot "$serial"
-    reset_proxy_and_network "$serial"
     echo "Opened: $avd ($serial)"
 }
 
@@ -547,7 +517,6 @@ cmd_restart() {
     start_emulator "$avd" "$PARSED_PROXYMAN"
     serial="$(wait_for_emulator_serial "$avd")"
     wait_for_boot "$serial"
-    reset_proxy_and_network "$serial"
     echo "Restarted: $avd ($serial)"
 }
 
