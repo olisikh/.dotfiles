@@ -29,6 +29,7 @@
     ./plugins/visual-whitespace.nix
     ./plugins/snacks.nix
     ./plugins/smart-splits.nix
+    ./plugins/maximizer.nix
     ./plugins/oil.nix
     ./plugins/smart-splits.nix
     ./plugins/treesj.nix

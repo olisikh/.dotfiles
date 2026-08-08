@@ -71,7 +71,7 @@
           }
           {
             __unkeyed-1 = "<leader>o";
-            group = "[o]pencode";
+            group = "[o]pen/tools";
             icon = {
               icon = "";
               color = "purple";
@@ -99,14 +99,6 @@
             icon = {
               icon = "󱖫";
               color = "red";
-            };
-          }
-          {
-            __unkeyed-1 = "<leader>z";
-            group = "[z]ettelkasten";
-            icon = {
-              icon = "󰠮";
-              color = "yellow";
             };
           }
           {

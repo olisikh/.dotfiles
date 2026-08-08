@@ -169,22 +169,22 @@ in
         options.desc = "telescope: [s]earch [o]bsidian";
       }
       {
-        key = "<leader>zd";
+        key = "<leader>od";
         action = ":Obsidian daily<cr>";
         mode = "n";
-        options.desc = "obsidian: [z]k [d]aily";
+        options.desc = "obsidian: [o]pen [d]aily";
       }
       {
-        key = "<leader>zn";
+        key = "<leader>on";
         action = ":Obsidian new<cr>";
         mode = "n";
-        options.desc = "obsidian: [z]k [n]ew";
+        options.desc = "obsidian: [o]pen [n]ew note";
       }
       {
-        key = "<leader>zo";
+        key = "<leader>oo";
         action = ":Obsidian open<cr>";
         mode = "n";
-        options.desc = "obsidian: [z]k [o]pen";
+        options.desc = "obsidian: [o]pen note";
       }
     ];
   };
