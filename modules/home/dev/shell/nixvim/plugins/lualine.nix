@@ -13,6 +13,17 @@
             "filename"
           ];
           lualine_x = [
+            {
+              __unkeyed-1 = lib.nixvim.mkRaw ''
+                function()
+                  return vim.t["simple-zoom"] == "zoom" and "zoom" or ""
+                end
+              '';
+              color = {
+                fg = "#f9e2af";
+                gui = "bold";
+              };
+            }
             "harpoon2"
             {
               __unkeyed-1 = lib.nixvim.mkRaw ''
