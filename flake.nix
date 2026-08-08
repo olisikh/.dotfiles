@@ -59,8 +59,6 @@
       };
     };
 
-    # NOTE: since lldb is broken in nixpkgs on main, this fix is very handy
-    vscodelldb-fix.url = "github:mstone/nixpkgs/darwin-fix-vscode-lldb";
   };
 
   outputs = inputs:

@@ -417,8 +417,7 @@
         "nixvim": "nixvim",
         "snowfall-flake": "snowfall-flake",
         "snowfall-lib": "snowfall-lib",
-        "sops-nix": "sops-nix",
-        "vscodelldb-fix": "vscodelldb-fix"
+        "sops-nix": "sops-nix"
       }
     },
     "snowfall-flake": {
@@ -587,22 +586,6 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "vscodelldb-fix": {
-      "locked": {
-        "lastModified": 1712740125,
-        "narHash": "sha256-YXvbuxzaLmHgzWyQK4Cxduz8oMMaq6FgiVnqJhWCAjE=",
-        "owner": "mstone",
-        "repo": "nixpkgs",
-        "rev": "d0415e5734f5ed2c58d7ba96b5153e3028f6ca20",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mstone",
-        "ref": "darwin-fix-vscode-lldb",
-        "repo": "nixpkgs",
         "type": "github"
       }
     }
