@@ -1,8 +1,55 @@
 { nsLib, ... }:
 let
-  inherit (nsLib.nixvim) mkKeymaps mkRaw;
+  inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>c";
+      group = "[c]ode";
+      icon = {
+        icon = "";
+        color = "green";
+      };
+    }
+    {
+      key = "gr";
+      group = "[g]oto / [r]ename";
+      icon = {
+        icon = "󰞂";
+        color = "azure";
+      };
+    }
+    {
+      key = "grn";
+      desc = "lsp: re[n]ame";
+    }
+    {
+      key = "gra";
+      desc = "lsp: [a]ctions";
+    }
+    {
+      key = "grr";
+      desc = "lsp: [r]eferences";
+    }
+    {
+      key = "gri";
+      desc = "lsp: [i]mplementation";
+    }
+    {
+      key = "grt";
+      desc = "lsp: [t]ype definition";
+    }
+    {
+      key = "grD";
+      desc = "lsp: [D]eclaration";
+    }
+    {
+      key = "gO";
+      desc = "lsp: d[O]cument symbols";
+    }
+  ];
+
   plugins = {
     lsp = {
       enable = true;

@@ -3,6 +3,33 @@ let
   inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>s";
+      group = "[s]earch";
+      icon = {
+        icon = "";
+        color = "blue";
+      };
+    }
+    {
+      key = "<leader>sg";
+      desc = "telescope: [s]earch [g]rep";
+      icon = {
+        icon = "";
+        color = "blue";
+      };
+    }
+    {
+      key = "<leader>sp";
+      desc = "telescope: [s]earch [p]roject files";
+      icon = {
+        icon = "";
+        color = "blue";
+      };
+    }
+  ];
+
   plugins.telescope = {
     enable = true;
     extensions = {

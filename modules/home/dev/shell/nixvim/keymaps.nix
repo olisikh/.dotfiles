@@ -3,6 +3,17 @@ let
   inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>b";
+      group = "[b]uffer";
+      icon = {
+        icon = "󰈔";
+        color = "cyan";
+      };
+    }
+  ];
+
   keymaps = mkKeymaps [
     # -- Make sure Space is not mapped to anything, used as leader key
     # map({ 'n', 'v' }, '<Space>', '<nop>', { silent = true })

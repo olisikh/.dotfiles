@@ -3,6 +3,17 @@ let
   inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>x";
+      group = "diagnostics";
+      icon = {
+        icon = "󱖫";
+        color = "red";
+      };
+    }
+  ];
+
 
   plugins.trouble.enable = true;
 

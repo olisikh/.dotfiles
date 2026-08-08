@@ -3,6 +3,17 @@ let
   inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>f";
+      group = "[f]ile";
+      icon = {
+        icon = "󰈔";
+        color = "cyan";
+      };
+    }
+  ];
+
   plugins = {
     # NOTE: :h nvim-tree for more settings,
     # or find them here: https://github.com/nvim-tree/nvim-tree.lua/blob/48a92907575df1dbd7242975a04e98169cb3a115/doc/nvim-tree-lua.txt

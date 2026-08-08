@@ -1,5 +1,16 @@
 { ... }:
 {
+  which-key.spec = [
+    {
+      key = "<leader>o";
+      group = "[o]pen/tools";
+      icon = {
+        icon = "";
+        color = "purple";
+      };
+    }
+  ];
+
   plugins.opencode = {
     enable = true;
     settings = { };

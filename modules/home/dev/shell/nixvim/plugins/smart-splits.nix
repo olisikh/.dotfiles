@@ -1,5 +1,16 @@
 { ... }:
 {
+  which-key.spec = [
+    {
+      key = "<leader><leader>";
+      group = "window";
+      icon = {
+        icon = "";
+        color = "blue";
+      };
+    }
+  ];
+
   plugins.smart-splits.enable = true;
 
   extraConfigLua = ''

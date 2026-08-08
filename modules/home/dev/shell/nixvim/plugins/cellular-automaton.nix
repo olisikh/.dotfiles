@@ -1,4 +1,15 @@
 { pkgs, ... }: {
+  which-key.spec = [
+    {
+      key = "<leader>l";
+      group = "[l]ife";
+      icon = {
+        icon = "󰐴";
+        color = "green";
+      };
+    }
+  ];
+
   extraPlugins = with pkgs.vimPlugins; [
     cellular-automaton-nvim
   ];

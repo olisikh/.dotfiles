@@ -1,5 +1,16 @@
 { pkgs, ... }:
 {
+  which-key.spec = [
+    {
+      key = "<leader>h";
+      group = "[h]arpoon";
+      icon = {
+        icon = "󰛢";
+        color = "azure";
+      };
+    }
+  ];
+
 
   extraPlugins = with pkgs.vimPlugins; [ harpoon2 harpoon-lualine ];
 

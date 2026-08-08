@@ -5,6 +5,17 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    which-key.spec = [
+      {
+        key = "<leader>o";
+        group = "[o]pen/tools";
+        icon = {
+          icon = "";
+          color = "purple";
+        };
+      }
+    ];
+
     plugins = {
       obsidian = {
         enable = true;

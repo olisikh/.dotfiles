@@ -3,6 +3,17 @@ let
   inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>g";
+      group = "[g]it";
+      icon = {
+        icon = "";
+        color = "orange";
+      };
+    }
+  ];
+
   extraConfigLuaPre = ''
     local function format_duration_ms(ms)
       if ms < 1000 then

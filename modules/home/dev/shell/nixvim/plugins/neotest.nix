@@ -3,6 +3,17 @@ let
   inherit (nsLib.nixvim) mkKeymaps;
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>t";
+      group = "[t]est";
+      icon = {
+        icon = "󰙨";
+        color = "green";
+      };
+    }
+  ];
+
   extraPlugins = with pkgs.vimPlugins; [ neotest-maven ];
 
   extraConfigLuaPost = ''

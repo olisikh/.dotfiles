@@ -66,6 +66,17 @@ let
   ];
 in
 {
+  which-key.spec = [
+    {
+      key = "<leader>d";
+      group = "[d]ebug";
+      icon = {
+        icon = "";
+        color = "red";
+      };
+    }
+  ];
+
   plugins = {
     dap = {
       enable = true;
