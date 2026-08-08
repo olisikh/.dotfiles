@@ -1,21 +1,12 @@
 { pkgs, ... }:
 {
-  extraPlugins = [
-    (pkgs.vimUtils.buildVimPlugin {
-      name = "simple-zoom.nvim";
-      src = pkgs.fetchFromGitHub {
-        owner = "fasterius";
-        repo = "simple-zoom.nvim";
-        rev = "318aef7c894aab4bc90dfbe82fee01b130540afd";
-        hash = "sha256-rGtWGkIjfkZZF93Ve1VVhq/stZ8TQZ3hE2E9RCW4D8c=";
-      };
-    })
-  ];
+  extraPlugins = [ pkgs.vimPlugins.simple-zoom ];
 
   extraConfigLua = ''
-    require('simple-zoom').setup({ hide_tabline = false })
+    local zoom = require('simple-zoom')
+    zoom.setup()
 
-    vim.keymap.set('n', '<C-z>', '<cmd>SimpleZoomToggle<cr>', {
+    vim.keymap.set('n', '<C-z>', zoom.toggle_zoom, {
       silent = true,
       desc = 'window: toggle maximize',
     })
