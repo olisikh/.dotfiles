@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+dotfiles_root="$1"
+system="$2"
+script_dir="$3"
+shift 3
+
+darwin-rebuild switch --flake "$dotfiles_root#$system" "$@"
+"$script_dir/nix-prune-system-generations"
+
+if ! command -v yabai >/dev/null 2>&1; then
+    exit 0
+fi
+
+sip_status="$(csrutil status 2>&1 || true)"
+if echo "$sip_status" | grep -q "Filesystem Protections: disabled" &&
+    echo "$sip_status" | grep -q "Debugging Restrictions: disabled"; then
+    yabai --load-sa
+else
+    echo "Warning: yabai scripting addition not loaded."
+    echo "Required SIP features (Filesystem and Debugging protections) must be disabled."
+    echo "See: https://github.com/koekeishiya/yabai/wiki/Disabling-System-Integrity-Protection"
+fi
