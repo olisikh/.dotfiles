@@ -1,5 +1,4 @@
 local w = require("wezterm")
-local nf = w.nerdfonts
 
 local M = {}
 
@@ -29,61 +28,12 @@ function M.get_dir(tab)
 	return nil
 end
 
-local process_icons = {
-	["docker"] = nf.linux_docker,
-	["docker-compose"] = nf.linux_docker,
-	["scala"] = "",
-	["psql"] = "󱤢",
-	["usql"] = "󱤢",
-	["kuberlr"] = nf.linux_docker,
-	["ssh"] = nf.fa_exchange,
-	["ssh-add"] = nf.fa_exchange,
-	["kubectl"] = nf.linux_docker,
-	["stern"] = nf.linux_docker,
-	["nvim"] = nf.custom_vim,
-	["make"] = nf.seti_makefile,
-	["vim"] = nf.dev_vim,
-	["node"] = nf.mdi_hexagon,
-	["go"] = nf.seti_go,
-	["python3"] = "",
-	["python"] = "",
-	["zsh"] = nf.dev_terminal,
-	["bash"] = nf.cod_terminal_bash,
-	["btm"] = nf.mdi_chart_donut_variant,
-	["htop"] = nf.mdi_chart_donut_variant,
-	["cargo"] = nf.dev_rust,
-	["sudo"] = nf.fa_hashtag,
-	["lazydocker"] = nf.linux_docker,
-	["git"] = nf.dev_git,
-	["lua"] = nf.seti_lua,
-	["wget"] = nf.mdi_arrow_down_box,
-	["curl"] = nf.mdi_flattr,
-	["gh"] = nf.dev_github_badge,
-	["ruby"] = nf.cod_ruby,
-	["java"] = nf.dev_java,
-	["nix"] = "󱄅 ",
-	["gear"] = "",
-}
-
 function M.is_vim(pane)
 	-- this is set by the plugin, and unset on ExitPre in Neovim
 	return pane:get_user_vars().IS_NVIM == "true"
 end
 
-function M.get_process_icon(tab)
-	if not tab.active_pane or tab.active_pane.foreground_process_name == "" then
-		return process_icons["gear"]
-	end
-
-	local process_name = string.gsub(tab.active_pane.foreground_process_name, "(.*[/\\])(.*)", "%2")
-	if string.find(process_name, "kubectl") then
-		process_name = "kubectl"
-	end
-
-	return process_icons[process_name] or process_icons["gear"]
-end
-
-function M.build_tab_title(tab, zoom_icon)
+function M.build_tab_title(tab)
 	local tab_title = nil
 	if #tab.tab_title > 0 then
 		tab_title = tab.tab_title
@@ -91,18 +41,24 @@ function M.build_tab_title(tab, zoom_icon)
 		tab_title = M.get_dir(tab) or tab.active_pane.title
 	end
 
-	if zoom_icon and tab.active_pane.is_zoomed then
+	return tab_title
+end
+
+function M.get_zoom_icon(tab, zoom_icon)
+	if zoom_icon and tab.active_pane and tab.active_pane.is_zoomed then
 		local icon = ""
 		if type(zoom_icon) == "string" then
 			icon = zoom_icon
 		else
-			icon = " "
+			-- Keep zoom explicit, but as a trailing state marker so titles remain
+			-- easy to scan from their left edge.
+			icon = " 󰊓"
 		end
 
-		tab_title = icon .. tab_title
+		return icon
 	end
 
-	return tab_title
+	return ""
 end
 
 return M

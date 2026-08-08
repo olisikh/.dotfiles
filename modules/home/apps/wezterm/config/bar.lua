@@ -24,7 +24,7 @@ local default_config = {
 	tabs = {
 		numerals = "arabic",
 		pane_count = "superscript",
-		process_icon = true,
+		title_max_width = 18,
 		zoom_icon = true,
 		brackets = {
 			active = { "", ":" },
@@ -111,10 +111,8 @@ end
 
 local roman_numerals = { "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ" }
 
-local powerline_padding = 2
-
 -- custom tab bar
-w.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
+w.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, max_width)
 	local colors = conf.resolved_palette.tab_bar
 
 	local active_tab_index = 0
@@ -169,7 +167,7 @@ w.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
 	end
 
 	local pane_count = ""
-	if merged_config.tabs.pane_count then
+	if merged_config.tabs.pane_count and not (tab.active_pane and tab.active_pane.is_zoomed) then
 		local tabi = w.mux.get_tab(tab.tab_id)
 		local muxpanes = tabi:panes()
 		local count = #muxpanes == 1 and "" or tostring(#muxpanes)
@@ -200,19 +198,28 @@ w.on("format-tab-title", function(tab, tabs, _panes, conf, _hover, _max_width)
 		)
 	end
 
-	local icon = merged_config.tabs.process_icon and (utils.get_process_icon(tab) .. " ") or ""
-	local name = utils.build_tab_title(tab, merged_config.tabs.zoom_icon)
+	local name = utils.build_tab_title(tab)
+	local zoom = utils.get_zoom_icon(tab, merged_config.tabs.zoom_icon)
+	local prefix = index
+	local pane_count_suffix = pane_count
 
-	local tab_title = string.format("%s%s%s", index, icon, name)
-
-	-- start and end hardcoded numbers are the Powerline + " " padding
-	local filler_width = powerline_padding * 2 + string.len(index) + string.len(pane_count)
-	local width = merged_config.max_width - filler_width - 1
-	if (#tab_title + filler_width) > merged_config.max_width then
-		tab_title = w.truncate_right(tab_title, width) .. "…"
+	-- Reserve space for fixed tab state and truncate only the title. Cell width
+	-- (rather than UTF-8 byte length) keeps the zoom glyph from causing
+	-- premature truncation.
+	local fixed_width = 2
+		+ w.column_width(prefix)
+		+ w.column_width(pane_count_suffix)
+		+ w.column_width(zoom)
+		+ w.column_width(merged_config.div.r)
+	local available_width = max_width or merged_config.max_width
+	local max_name_width = math.min(merged_config.tabs.title_max_width, math.max(1, available_width - fixed_width))
+	if w.column_width(name) > max_name_width then
+		name = w.truncate_right(name, max_name_width - 1) .. "…"
 	end
 
-	local title = string.format(" %s%s%s", tab_title, pane_count, merged_config.p)
+	local tab_title = string.format("%s%s%s", prefix, name, zoom)
+
+	local title = string.format(" %s%s%s", tab_title, pane_count_suffix, merged_config.p)
 
 	return {
 		{ Background = { Color = s_bg } },

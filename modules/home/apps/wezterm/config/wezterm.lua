@@ -12,6 +12,11 @@ config.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 
 config.font = w.font("JetBrains Mono", { weight = "Medium" })
 config.font_size = 15.0
+-- Keep terminal text comfortable while making the navigation chrome denser.
+config.window_frame = {
+	font = w.font("JetBrains Mono", { weight = "Medium" }),
+	font_size = 13.0,
+}
 
 config.hide_tab_bar_if_only_one_tab = false
 config.window_background_opacity = bg_opacity
@@ -119,9 +124,6 @@ end)
 nav.apply_to_config(config)
 bar.apply_to_config(config, {
 	dividers = "arrows", -- or "slant_right", "slant_left", "arrows", "rounded", false
-	tabs = {
-		process_icon = false,
-	},
 	clock = { -- note that this overrides the whole set_right_status
 		enabled = false,
 	},
