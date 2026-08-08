@@ -4,6 +4,42 @@
 
   extraConfigLua = ''
     local _99 = require("99")
+    local opencode = vim.fn.executable("opencode2") == 1 and "opencode2" or "opencode"
+
+    local OpenCodeProvider = setmetatable({}, { __index = _99.Providers.OpenCodeProvider })
+
+    function OpenCodeProvider._build_command(_, query, context)
+      return {
+        opencode,
+        "run",
+        "--auto",
+        "--agent",
+        "build",
+        "--model",
+        context.model,
+        query,
+      }
+    end
+
+    function OpenCodeProvider._get_provider_name()
+      return "OpenCodeProvider"
+    end
+
+    function OpenCodeProvider._get_default_model()
+      return "openai/gpt-5.6-luna"
+    end
+
+    function OpenCodeProvider.fetch_models(callback)
+      vim.system({ opencode, "models" }, { text = true }, function(obj)
+        vim.schedule(function()
+          if obj.code ~= 0 then
+            callback(nil, "Failed to fetch models from " .. opencode)
+            return
+          end
+          callback(vim.split(obj.stdout, "\n", { trimempty = true }), nil)
+        end)
+      end)
+    end
 
     -- For logging that is to a file if you wish to trace through requests
     -- for reporting bugs, i would not rely on this, but instead the provided
@@ -12,54 +48,14 @@
     local basename = vim.fs.basename(cwd)
 
     _99.setup({
-    	logger = {
+      provider = OpenCodeProvider,
+      model = "openai/gpt-5.6-luna",
+      logger = {
             level = _99.DEBUG,
             path = "/tmp/" .. basename .. ".99.debug",
             print_on_error = true,
-    	},
-
-    	--- A new feature that is centered around tags
-    	completion = {
-            --- Defaults to .cursor/rules
-            -- I am going to disable these until i understand the
-            -- problem better.  Inside of cursor rules there is also
-            -- application rules, which means i need to apply these
-            -- differently
-            -- cursor_rules = "<custom path to cursor rules>"
-
-            --- A list of folders where you have your own SKILL.md
-            --- Expected format:
-            --- /path/to/dir/<skill_name>/SKILL.md
-            ---
-            --- Example:
-            --- Input Path:
-            --- "scratch/custom_rules/"
-            ---
-            --- Output Rules:
-            --- {path = "scratch/custom_rules/vim/SKILL.md", name = "vim"},
-            --- ... the other rules in that dir ...
-            ---
-            custom_rules = {
-                "scratch/custom_rules/",
-            },
-
-            --- What autocomplete do you use.  We currently only
-            --- support cmp right now
-            -- source = "cmp",
-    	},
-
-    	--- WARNING: if you change cwd then this is likely broken
-    	--- ill likely fix this in a later change
-    	---
-    	--- md_files is a list of files to look for and auto add based on the location
-    	--- of the originating request.  That means if you are at /foo/bar/baz.lua
-    	--- the system will automagically look for:
-    	--- /foo/bar/AGENT.md
-    	--- /foo/AGENT.md
-    	--- assuming that /foo is project root (based on cwd)
-    	md_files = {
-            "AGENTS.md",
-    	},
+      },
+      md_files = { "AGENTS.md" },
     })
 
     local function opts(desc)
