@@ -146,7 +146,7 @@ in
   options.${namespace}.ai.opencode = {
     enable = mkBoolOpt false "Enable OpenCode program";
     settings = mkOpt types.attrs { } "OpenCode settings merged into the module's base config";
-    package = mkOpt types.package pkgs.opencode2 "OpenCode package to use";
+    package = mkOpt types.package pkgs.llm-agents.opencode2 "OpenCode package to use";
   };
 
   config = mkIf cfg.enable {

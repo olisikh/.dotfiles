@@ -35,7 +35,6 @@ in
     };
 
     editor = {
-      obsidian = enabled;
       vscode = enabled;
       intellij-idea = {
         enable = true;

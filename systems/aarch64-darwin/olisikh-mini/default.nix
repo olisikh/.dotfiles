@@ -40,6 +40,7 @@ in
       bitwarden = enabled;
       peekaboo = enabled;
       telegram = enabled;
+      obsidian = enabled;
     };
 
     media.spotify = enabled;
