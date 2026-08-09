@@ -97,6 +97,7 @@ in
     apps = {
       wezterm = enabled;
       sketchybar = enabled;
+      obsidian = enabled;
     };
 
     editor = {

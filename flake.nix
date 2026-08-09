@@ -41,6 +41,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    obsidian-extensions = {
+      url = "github:karaolidis/nix-obsidian-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     direnv-instant = {
       url = "github:Mic92/direnv-instant";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -85,6 +90,7 @@
       # NOTE: add external overlays here
       overlays = with inputs; [
         llm-agents.overlays.shared-nixpkgs
+        obsidian-extensions.overlays.default
       ];
 
       channels-config.allowUnfree = true;

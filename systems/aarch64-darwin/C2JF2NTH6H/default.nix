@@ -38,6 +38,10 @@ in
       betterdisplay = enabled;
       codexbar = enabled;
       repobar = enabled;
+      obsidian = {
+        enable = true;
+        backend.enable = true;
+      };
     };
 
     media.spotify = enabled;

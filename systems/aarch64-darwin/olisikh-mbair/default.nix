@@ -35,7 +35,10 @@ in
       bitwarden = enabled;
       discord = enabled;
       telegram = enabled;
-      obsidian = enabled;
+      obsidian = {
+        enable = true;
+        backend.enable = true;
+      };
     };
 
     fonts = {
