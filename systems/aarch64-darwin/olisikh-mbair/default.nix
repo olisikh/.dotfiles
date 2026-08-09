@@ -48,6 +48,7 @@ in
       spotify = enabled;
       obs = enabled;
       transmission = enabled;
+      calibre = enabled;
     };
 
     containers.colima = enabled;
