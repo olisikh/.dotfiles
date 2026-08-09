@@ -6,7 +6,7 @@ let
   cfg = config.${namespace}.apps.obsidian;
   homebrewCfg = config.${namespace}.core.homebrew;
   userCfg = config.${namespace}.core.user;
-  vaultName = builtins.baseNameOf cfg.backend.vaultPath;
+  vaultName = baseNameOf cfg.backend.vaultPath;
 
   obsidianLauncher = pkgs.writeShellScript "obsidian-backend" ''
     set -eu

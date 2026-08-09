@@ -73,7 +73,8 @@ let
         "~/.agents/**" = "allow";
         "~/.config/llm-wiki/**" = "allow";
         "~/.config/opencode/**" = "allow";
-        "~/notes/**" = "allow";
+        "~/.llm-wiki/**" = "allow";
+        "${cfg.wikiPath}/**" = "allow";
       };
       task = "ask";
       question = "allow";
@@ -147,6 +148,7 @@ in
     enable = mkBoolOpt false "Enable OpenCode program";
     settings = mkOpt types.attrs { } "OpenCode settings merged into the module's base config";
     package = mkOpt types.package pkgs.llm-agents.opencode2 "OpenCode package to use";
+    wikiPath = mkOpt types.str "${homeDir}/notes/50 Knowledge/LLM Wiki/hub" "Path to the LLM Wiki hub directory";
   };
 
   config = mkIf cfg.enable {
@@ -177,7 +179,7 @@ in
     home.file = {
       ".config/opencode/plugins/wiki-memory.ts".source = ./plugins/wiki-memory.ts;
       ".config/llm-wiki/config.json".text = builtins.toJSON {
-        hub_path = "~/notes/50 Knowledge/LLM Wiki/hub";
+        hub_path = cfg.wikiPath;
       };
     };
   };
