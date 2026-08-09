@@ -32,7 +32,7 @@ in
           enable = true;
           plugins = {
             obsidian = {
-              workspaces = [
+              vaults = [
                 {
                   name = "default";
                   path = "~/notes";

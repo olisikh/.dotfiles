@@ -20,9 +20,9 @@ in
       obsidian = {
         enable = true;
         settings = {
-          inherit (cfg) workspaces;
-
           legacy_commands = false;
+
+          workspaces = cfg.vaults;
 
           # Keep inserted wikilinks readable now that note IDs are UUIDs.
           # Default id-based links would be:

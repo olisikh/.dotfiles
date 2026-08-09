@@ -33,7 +33,7 @@ in
         nixvim = {
           enable = true;
           plugins = {
-            obsidian.workspaces = [
+            obsidian.vaults = [
               {
                 name = "default";
                 path = "~/notes";

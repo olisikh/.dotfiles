@@ -160,12 +160,14 @@ in
       yazi = enabled;
       nixvim = {
         enable = true;
-        plugins.obsidian.workspaces = [
-          {
-            name = "default";
-            path = "~/notes";
-          }
-        ];
+        plugins = {
+          obsidian.vaults = [
+            {
+              name = "default";
+              path = "~/notes";
+            }
+          ];
+        };
       };
       fd = enabled;
       eza = enabled;
