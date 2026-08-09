@@ -68,6 +68,7 @@ in
 
           # open home-manager options help (like darwin-help)
           alias hm-help="open https://nix-community.github.io/home-manager/options.xhtml"
+          alias notes="nvim ~/notes"
 
           alias pbc="pbcopy"
           alias pbp="pbpaste"
