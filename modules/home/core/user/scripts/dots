@@ -18,24 +18,26 @@ Commands:
   rb                    Roll back to a previous generation
   gc                    Run Nix garbage collection
   secrets               Edit the home sops secrets file
-  sync                  Pull latest main for ~/.dotfiles, ~/.llm-harness, ~/.llm-wiki
+  sync                  Pull latest main for ~/.dotfiles, ~/.llm-harness, ~/notes
   help                  Show this help
 EOF
 }
 
 sync_repo() {
     local repo_path="$1"
+    local repo_root
     local name
-    name="$(basename "$repo_path")"
+
+    if ! repo_root="$(git -C "$repo_path" rev-parse --show-toplevel 2>/dev/null)"; then
+        echo "Error: $repo_path is not inside a git repository" >&2
+        return 1
+    fi
+    repo_root="$(cd "$repo_root" && pwd -P)"
+    name="$(basename "$repo_root")"
 
     echo "==> $name"
 
-    if [[ ! -d "$repo_path/.git" ]]; then
-        echo "Error: $name is not a git repository at $repo_path" >&2
-        return 1
-    fi
-
-    if ! git -C "$repo_path" pull --rebase --autostash origin main; then
+    if ! git -C "$repo_root" pull --rebase --autostash origin main; then
         echo "Error: failed to sync $name" >&2
         return 1
     fi
@@ -45,7 +47,7 @@ cmd_sync() {
     local repos=(
         "$HOME/.dotfiles"
         "$HOME/.llm-harness"
-        "$HOME/.llm-wiki"
+        "$HOME/notes"
     )
 
     for repo in "${repos[@]}"; do

@@ -73,7 +73,7 @@ let
         "~/.agents/**" = "allow";
         "~/.config/llm-wiki/**" = "allow";
         "~/.config/opencode/**" = "allow";
-        "~/.llm-wiki/**" = "allow";
+        "~/notes/**" = "allow";
       };
       task = "ask";
       question = "allow";
@@ -177,7 +177,7 @@ in
     home.file = {
       ".config/opencode/plugins/wiki-memory.ts".source = ./plugins/wiki-memory.ts;
       ".config/llm-wiki/config.json".text = builtins.toJSON {
-        hub_path = "~/.llm-wiki/hub";
+        hub_path = "~/notes/50 Knowledge/LLM Wiki/hub";
       };
     };
   };
