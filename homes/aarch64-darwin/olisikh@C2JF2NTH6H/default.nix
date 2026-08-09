@@ -148,9 +148,6 @@ in
         settings = {
           enabled_providers = [ "github-copilot" "openai" ];
         };
-
-        # NOTE: Store wiki knowledge outside of personal notes.
-        wikiPath = "~/.llm-wiki/hub";
       };
     };
 
