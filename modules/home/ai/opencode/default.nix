@@ -73,7 +73,6 @@ let
         "~/.agents/**" = "allow";
         "~/.config/llm-wiki/**" = "allow";
         "~/.config/opencode/**" = "allow";
-        "~/.llm-wiki/**" = "allow";
         "${cfg.wikiPath}/**" = "allow";
       };
       task = "ask";
@@ -148,7 +147,7 @@ in
     enable = mkBoolOpt false "Enable OpenCode program";
     settings = mkOpt types.attrs { } "OpenCode settings merged into the module's base config";
     package = mkOpt types.package pkgs.llm-agents.opencode2 "OpenCode package to use";
-    wikiPath = mkOpt types.str "${homeDir}/notes/50 Knowledge/LLM Wiki/hub" "Path to the LLM Wiki hub directory";
+    wikiPath = mkOpt types.str "${homeDir}/notes/50 Knowledge/LLM Wiki" "Path to the Obsidian-first LLM Wiki v2 root";
   };
 
   config = mkIf cfg.enable {

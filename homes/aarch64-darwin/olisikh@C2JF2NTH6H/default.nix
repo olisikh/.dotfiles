@@ -148,6 +148,8 @@ in
         settings = {
           enabled_providers = [ "github-copilot" "openai" ];
         };
+        # NOTE: Store the shared Wiki under the unified Obsidian notes vault.
+        wikiPath = "${homeDir}/notes/50 Knowledge/LLM Wiki";
       };
     };
 
