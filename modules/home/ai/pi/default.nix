@@ -15,6 +15,7 @@ let
     # Pi installs declared npm packages into its agent directory on startup.
     packages = [
       "npm:pi-ollama-cloud"
+      "npm:pi-dynamic-workflows"
 
       "npm:@ifi/pi-plan"
       "npm:@ifi/pi-spec"
