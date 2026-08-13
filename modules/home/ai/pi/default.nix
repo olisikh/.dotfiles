@@ -10,14 +10,15 @@ let
     defaultModel = "gpt-5.6-luna";
     defaultThinkingLevel = "max";
 
-    theme = "catppuccin-mocha";
+    theme = "catppuccin-mocha-void-tools";
 
     packages = [
       "npm:pi-ollama-cloud"
       "npm:pi-dynamic-workflows"
       "npm:pi-mcp-adapter"
+      "npm:pi-lens"
       "npm:@upstash/context7-pi"
-
+      "npm:@mariozechner/pi-tui"
       "npm:@ifi/pi-plan"
       "npm:@ifi/pi-extension-subagents"
       {
@@ -28,8 +29,6 @@ let
           "!skills/grill-me/**"
         ];
       }
-
-      "npm:@ifi/oh-pi-themes"
     ];
 
     compaction = {
@@ -44,6 +43,10 @@ let
 
     enableInstallTelemetry = false;
     enableAnalytics = false;
+
+    # pi would react to "all" steered/follow-up messages at once or "one-at-a-time"
+    steeringMode = "all";
+    followUpMode = "one-at-a-time";
 
     # pi has no built-in permission system or MCP (both are opt-in extensions),
     # matching opencode's trust-heavy defaults: keep project trust on "ask".
@@ -91,12 +94,10 @@ in
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
       ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
+      ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
 
-      ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
-      ".pi/agent/extensions/double-escape-abort.ts".source = ./extensions/double-escape-abort.ts;
-      ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
-      ".pi/agent/extensions/git-guard.ts".source = ./extensions/git-guard.ts;
-      ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
+      ".pi/agent/extensions".source = ./extensions;
+      ".pi/agent/themes".source = ./themes;
     };
   };
 }
