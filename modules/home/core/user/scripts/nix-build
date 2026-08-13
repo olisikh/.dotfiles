@@ -6,7 +6,7 @@ set -euo pipefail
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [system] [darwin-rebuild args...]
+Usage: $(basename "$0") [system] [--skip-gc] [darwin-rebuild args...]
 
 Build and switch a nix-darwin system from this flake.
 
@@ -14,6 +14,7 @@ Examples:
   $(basename "$0")
   $(basename "$0") C2JF2NTH6H
   $(basename "$0") olisikh-mini --show-trace
+  $(basename "$0") --skip-gc
 EOF
 }
 
@@ -40,6 +41,7 @@ main() {
     check_command darwin-rebuild
 
     local system=""
+    local skip_gc=false
     if [[ $# -gt 0 && "$1" != -* ]]; then
         system="$1"
         shift
@@ -47,8 +49,17 @@ main() {
         system="$(default_system)"
     fi
 
+    local -a rebuild_args=()
+    for arg in "$@"; do
+        if [[ "$arg" == "--skip-gc" ]]; then
+            skip_gc=true
+        else
+            rebuild_args+=("$arg")
+        fi
+    done
+
     sudo "$NIX_DOTFILES_SCRIPT_DIR/nix-build-privileged" \
-        "$NIX_DOTFILES_ROOT" "$system" "$NIX_DOTFILES_SCRIPT_DIR" "$@"
+        "$NIX_DOTFILES_ROOT" "$system" "$NIX_DOTFILES_SCRIPT_DIR" "$skip_gc" "${rebuild_args[@]}"
 }
 
 main "$@"

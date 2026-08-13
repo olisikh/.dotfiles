@@ -9,7 +9,7 @@ usage() {
 Usage: $(basename "$0") <command> [args...]
 
 Commands:
-  build, make           Build and switch this nix-darwin system
+  build, make           Build and switch this nix-darwin system (pass --skip-gc to skip generation pruning)
   update                Update flake inputs and pinned source hashes
   upgrade               Update, then build and switch
   tpl                   Instantiate a template from this flake
