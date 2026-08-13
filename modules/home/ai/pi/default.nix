@@ -67,6 +67,7 @@ in
   options.${namespace}.ai.pi = {
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
+    doubleEscapeWindowMs = mkOpt types.ints.positive 3000 "Milliseconds allowed between Escape presses to abort an active agent";
     keybindings = mkOpt types.attrs { } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
     mcps = mkOpt types.attrs { } "Pi MCPs, put under ~/.pi/agent/mcps.json";
   };
@@ -77,6 +78,8 @@ in
     # lukasl-dev/pi.nix home-manager module.
     home.packages = [ pkgs.llm-agents.pi ];
 
+    home.sessionVariables.PI_DOUBLE_ESCAPE_WINDOW_MS = toString cfg.doubleEscapeWindowMs;
+
     home.file = {
       # pi reads its agent config from ~/.pi/agent (the default
       # PI_CODING_AGENT_DIR). Write the files directly; pi writes back
@@ -86,6 +89,7 @@ in
       ".pi/agent/mcps.json".text = builtins.toJSON cfg.mcps;
 
       ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
+      ".pi/agent/extensions/double-escape-abort.ts".source = ./extensions/double-escape-abort.ts;
       ".pi/agent/extensions/git-guard.ts".source = ./extensions/git-guard.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
     };

@@ -9,6 +9,7 @@ local bg_opacity = 1
 local bell_enabled = true
 
 config.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
+config.enable_kitty_keyboard = true
 
 config.font = w.font("JetBrains Mono", { weight = "Medium" })
 config.font_size = 15.0
@@ -34,9 +35,8 @@ config.colors = {
 }
 
 config.keys = {
-	-- Hermes recognizes Option-Enter as a multiline key. Map Shift-Enter to its
-	-- exact escape sequence because WezTerm otherwise sends it as plain Enter.
-	{ mods = "SHIFT", key = "Enter", action = w.action({ SendString = "\x1b\r" }) },
+	-- Send Pi's Kitty keyboard sequence for a real Shift-Enter newline.
+	{ mods = "SHIFT", key = "Enter", action = w.action({ SendString = "\x1b[13;2u" }) },
 
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
 	{ mods = "OPT", key = "LeftArrow", action = w.action({ SendString = "\x1bb" }) },
