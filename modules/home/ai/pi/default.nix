@@ -12,37 +12,26 @@ let
 
     theme = "catppuccin-mocha";
 
-    # Pi installs declared npm packages into its agent directory on startup.
     packages = [
       "npm:pi-ollama-cloud"
       "npm:pi-dynamic-workflows"
+      "npm:pi-mcp-adapter"
+      "npm:@upstash/context7-pi"
 
       "npm:@ifi/pi-plan"
-      "npm:@ifi/pi-spec"
       "npm:@ifi/pi-extension-subagents"
-      "npm:@ifi/oh-pi-agents"
       {
         source = "npm:@ifi/oh-pi-skills";
         skills = [
+          "!skills/graphify/**"
           "!skills/improve-codebase-architecture/**"
           "!skills/grill-me/**"
         ];
       }
+
       "npm:@ifi/oh-pi-themes"
-      "npm:@ifi/oh-pi-prompts"
-      "npm:@ifi/oh-pi-ant-colony"
-      {
-        source = "npm:@ifi/oh-pi-extensions";
-        extensions = [
-          "extensions/*.ts"
-          "!extensions/custom-footer.ts"
-          "!extensions/usage-tracker.ts"
-          "!extensions/git-guard.ts"
-        ];
-      }
     ];
 
-    # Equivalent of opencode's compaction { auto = true; prune = false; reserved = 8000; }
     compaction = {
       enabled = true;
       reserveTokens = 10000;
@@ -61,6 +50,25 @@ let
     defaultProjectTrust = "ask";
   };
 
+  mcpConfig = recursiveUpdate
+    {
+      settings = {
+        toolPrefix = "none";
+        directTools = false;
+        scriptMode = false;
+      };
+      mcpServers = {
+        exa = {
+          url = "https://mcp.exa.ai/mcp";
+          auth = false;
+          protocolVersion = "legacy";
+          httpTransport = "streamable-http";
+          directTools = true;
+        };
+      };
+    }
+    cfg.mcps;
+
   finalConfig = recursiveUpdate basicConfig cfg.config;
 in
 {
@@ -69,27 +77,24 @@ in
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
     doubleEscapeWindowMs = mkOpt types.ints.positive 3000 "Milliseconds allowed between Escape presses to abort an active agent";
     keybindings = mkOpt types.attrs { } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
-    mcps = mkOpt types.attrs { } "Pi MCPs, put under ~/.pi/agent/mcps.json";
+    mcps = mkOpt types.attrs { } "Pi MCP adapter config merged into the default Exa server configuration";
   };
 
   config = mkIf cfg.enable {
-    # The pi binary comes from the numtide/llm-agents.nix flake (exposed as
-    # pkgs.llm-agents.pi via its shared-nixpkgs overlay) instead of the
-    # lukasl-dev/pi.nix home-manager module.
-    home.packages = [ pkgs.llm-agents.pi ];
+    home.packages = [
+      pkgs.llm-agents.pi
+    ];
 
     home.sessionVariables.PI_DOUBLE_ESCAPE_WINDOW_MS = toString cfg.doubleEscapeWindowMs;
 
     home.file = {
-      # pi reads its agent config from ~/.pi/agent (the default
-      # PI_CODING_AGENT_DIR). Write the files directly; pi writes back
-      # runtime edits into settings.json.
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
-      ".pi/agent/mcps.json".text = builtins.toJSON cfg.mcps;
+      ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
 
       ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
       ".pi/agent/extensions/double-escape-abort.ts".source = ./extensions/double-escape-abort.ts;
+      ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
       ".pi/agent/extensions/git-guard.ts".source = ./extensions/git-guard.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
     };
