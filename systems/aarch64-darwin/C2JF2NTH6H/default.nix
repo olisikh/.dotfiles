@@ -31,7 +31,6 @@ in
       yabai = enabled;
       skhd = enabled;
       handy = enabled;
-      android-studio = enabled;
       xcodesapp = enabled;
       sketchybar = enabled;
       raycast = enabled;
