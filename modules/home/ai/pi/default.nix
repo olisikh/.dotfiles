@@ -92,6 +92,10 @@ in
 
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
+      ".pi-lens/config.json".text = builtins.toJSON {
+        widget.visible = false;
+        lsp.enabled = true;
+      };
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
       ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
