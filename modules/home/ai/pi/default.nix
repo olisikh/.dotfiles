@@ -19,6 +19,8 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-lens"
       "npm:context-mode"
+      "git:github.com/DietrichGebert/ponytail"
+      "npm:@juicesharp/rpiv-todo"
       "npm:@upstash/context7-pi"
       "npm:@mariozechner/pi-tui"
       "npm:@ifi/pi-plan"
