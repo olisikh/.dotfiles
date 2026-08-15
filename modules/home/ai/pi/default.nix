@@ -11,6 +11,7 @@ let
     defaultThinkingLevel = "max";
 
     theme = "catppuccin-mocha-void-tools";
+    quietStartup = true;
 
     packages = [
       "npm:pi-ollama-cloud"
