@@ -22,10 +22,10 @@ let
       "npm:@narumitw/pi-plan-mode"
       "npm:context-mode"
       "git:github.com/DietrichGebert/ponytail"
-      "git:github.com/olisikh/pi-double-esc"
-      "npm:@juicesharp/rpiv-todo"
+      "git:github.com/olisikh/pi-double-esc@feat/allow-configuring-hint-position"
       "npm:@upstash/context7-pi"
-      "npm:@mariozechner/pi-tui@feat/allow-configuring-hint-position"
+      "npm:@mariozechner/pi-tui"
+      "npm:@juicesharp/rpiv-todo"
       "npm:@juicesharp/rpiv-ask-user-question"
       {
         source = "npm:@ifi/oh-pi-skills";
