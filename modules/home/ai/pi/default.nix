@@ -18,6 +18,7 @@ let
       "npm:pi-dynamic-workflows"
       "npm:pi-mcp-adapter"
       "npm:pi-lens"
+      "npm:context-mode"
       "npm:@upstash/context7-pi"
       "npm:@mariozechner/pi-tui"
       "npm:@ifi/pi-plan"
@@ -69,6 +70,9 @@ let
           httpTransport = "streamable-http";
           directTools = true;
         };
+        context-mode = {
+          command = "context-mode";
+        };
       };
     }
     cfg.mcps;
@@ -87,6 +91,7 @@ in
   config = mkIf cfg.enable {
     home.packages = [
       pkgs.llm-agents.pi
+      pkgs.${namespace}.context-mode
     ];
 
     home.sessionVariables.PI_DOUBLE_ESCAPE_WINDOW_MS = toString cfg.doubleEscapeWindowMs;
