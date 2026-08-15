@@ -17,14 +17,15 @@ let
       "npm:pi-ollama-cloud"
       "npm:pi-dynamic-workflows"
       "npm:pi-mcp-adapter"
+      "npm:pi-subagents"
       "npm:pi-lens"
+      "@narumitw/pi-plan-mode"
       "npm:context-mode"
       "git:github.com/DietrichGebert/ponytail"
       "npm:@juicesharp/rpiv-todo"
       "npm:@upstash/context7-pi"
       "npm:@mariozechner/pi-tui"
-      "npm:@ifi/pi-plan"
-      "npm:@ifi/pi-extension-subagents"
+      "npm:@juicesharp/rpiv-ask-user-question"
       {
         source = "npm:@ifi/oh-pi-skills";
         skills = [
