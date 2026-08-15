@@ -1,11 +1,6 @@
-import {
-	createCodingTools,
-	createReadOnlyTools,
-	getLanguageFromPath,
-	highlightCode,
-	// @ts-expect-error Pi provides this virtual module to extensions at runtime.
-} from "@earendil-works/pi-coding-agent";
-/* @ts-expect-error Pi provides these modules to extensions at runtime. */
+/* @ts-expect-error Pi provides this module to extensions at runtime. */
+import { createCodingTools, createReadOnlyTools, getLanguageFromPath, highlightCode, } from "@earendil-works/pi-coding-agent";
+/* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { Text } from "@earendil-works/pi-tui";
 
 type PiExtensionAPI = {

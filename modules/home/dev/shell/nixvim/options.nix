@@ -44,7 +44,7 @@
     scrolloff = 8;
     splitbelow = true; # when splitting horizontally
     splitright = true; # when splitting vertically
-    guicursor = "n-v-c:block-Cursor/lCursor-blinkon0,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait500-blinkoff500-blinkon500-Cursor/lCursor,sm:block-blinkwait500-blinkoff500-blinkon500";
+    guicursor = "n-v-c:block-Cursor/lCursor-blinkon0,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait800-blinkoff800-blinkon800-Cursor/lCursor,sm:block-blinkwait800-blinkoff800-blinkon800";
     hlsearch = false;
     number = true;
     relativenumber = true;

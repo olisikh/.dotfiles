@@ -1,3 +1,4 @@
+/* @ts-expect-error Pi provides this module at runtime. */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 const FRAME_INTERVAL_MS = 120;

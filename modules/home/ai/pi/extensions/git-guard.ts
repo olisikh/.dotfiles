@@ -6,6 +6,8 @@
  *
  * Dirty-repo warning removed.
  */
+
+/* @ts-expect-error Pi provides this module to extensions at runtime. */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 const INTERACTIVE_GIT_WARNING_PREFIX = "Interactive git command blocked";

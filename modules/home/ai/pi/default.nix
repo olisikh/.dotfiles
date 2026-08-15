@@ -19,12 +19,13 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
-      "@narumitw/pi-plan-mode"
+      "npm:@narumitw/pi-plan-mode"
       "npm:context-mode"
       "git:github.com/DietrichGebert/ponytail"
+      "git:github.com/olisikh/pi-double-esc"
       "npm:@juicesharp/rpiv-todo"
       "npm:@upstash/context7-pi"
-      "npm:@mariozechner/pi-tui"
+      "npm:@mariozechner/pi-tui@feat/allow-configuring-hint-position"
       "npm:@juicesharp/rpiv-ask-user-question"
       {
         source = "npm:@ifi/oh-pi-skills";
@@ -48,6 +49,8 @@ let
 
     enableInstallTelemetry = false;
     enableAnalytics = false;
+
+    showHardwareCursor = true;
 
     # pi would react to "all" steered/follow-up messages at once or "one-at-a-time"
     steeringMode = "all";
@@ -97,7 +100,11 @@ in
       pkgs.${namespace}.context-mode
     ];
 
-    home.sessionVariables.PI_DOUBLE_ESCAPE_WINDOW_MS = toString cfg.doubleEscapeWindowMs;
+    home.sessionVariables = {
+      PI_DOUBLE_ESC_MS = toString cfg.doubleEscapeWindowMs;
+      PI_DOUBLE_ESC_HINT_POSITION = "left";
+    };
+
 
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
@@ -107,10 +114,15 @@ in
       };
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
       ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
-      ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
 
-      ".pi/agent/extensions".source = ./extensions;
-      ".pi/agent/themes".source = ./themes;
+
+      ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
+      ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
+      ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
+      ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
+      ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
+
+      ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
     };
   };
 }

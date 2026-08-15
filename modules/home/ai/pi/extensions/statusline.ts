@@ -1,5 +1,8 @@
+/* @ts-expect-error Pi provides this module to extensions at runtime. */
 import path from "node:path";
+/* @ts-expect-error Pi provides this module to extensions at runtime. */
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+/* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { truncateToWidth } from "@mariozechner/pi-tui";
 
 type BranchEntries = ReturnType<ExtensionContext["sessionManager"]["getBranch"]>;

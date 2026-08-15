@@ -1,8 +1,14 @@
+/* @ts-expect-error Pi provides node. */
 import { createHash } from "node:crypto";
+/* @ts-expect-error Pi provides node. */
 import { access, appendFile, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+/* @ts-expect-error Pi provides node. */
 import { homedir } from "node:os";
+/* @ts-expect-error Pi provides node. */
 import path from "node:path";
+/* @ts-expect-error Pi provides this module at runtime. */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+/* @ts-expect-error Pi provides this module at runtime. */
 import { Type } from "typebox";
 
 const textArray = { type: "array", items: { type: "string" }, default: [] } as const;

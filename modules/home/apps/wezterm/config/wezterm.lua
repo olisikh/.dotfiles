@@ -11,7 +11,7 @@ local bell_enabled = true
 config.leader = { key = "s", mods = "CTRL", timeout_milliseconds = 1000 }
 config.enable_kitty_keyboard = true
 config.default_cursor_style = "BlinkingBlock"
-config.cursor_blink_rate = 500
+config.cursor_blink_rate = 800
 
 config.font = w.font("JetBrains Mono", { weight = "Medium" })
 config.font_size = 15.0
