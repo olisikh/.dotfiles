@@ -4,25 +4,42 @@ import {
 	type ExtensionContext,
 	// @ts-expect-error Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
-import { paintPlanMode, watchPlanMode } from "./lib/plan-mode.ts";
+import {
+	isModeChangedEvent,
+	type ModeChangedEvent,
+	subscribeToModeChanges,
+} from "./lib/mode-events.ts";
+import { borderModeFor, paintBorder } from "./lib/mode-border.ts";
 
 type ActiveTui = {
 	requestRender: () => void;
 };
 
+export {
+	borderModeFor,
+	paintBorder,
+	type BorderMode,
+} from "./lib/mode-border.ts";
+
 export default function (pi: ExtensionAPI) {
-	let planModeActive = false;
-	let stopWatchingPlanMode: (() => void) | undefined;
-	let installTimer: ReturnType<typeof setTimeout> | undefined;
+	const modes = new Map<string, ModeChangedEvent>();
 	let activeTui: ActiveTui | undefined;
 	let editorComponentInstalled = false;
+	let installTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const stopInstallTimer = () => {
 		if (installTimer) clearTimeout(installTimer);
 		installTimer = undefined;
 	};
 
-	const installPlanModeBorder = (ctx: ExtensionContext) => {
+	const requestRender = () => activeTui?.requestRender();
+	const stopWatchingModes = subscribeToModeChanges(pi, (event) => {
+		if (!isModeChangedEvent(event)) return;
+		modes.set(event.mode, event);
+		requestRender();
+	});
+
+	const installModeBorder = (ctx: ExtensionContext) => {
 		if (editorComponentInstalled || ctx.mode !== "tui" || !ctx.hasUI) return;
 		const previousEditor = ctx.ui.getEditorComponent() as
 			| ((tui: ActiveTui, theme: unknown, keybindings: unknown) => CustomEditor)
@@ -33,7 +50,8 @@ export default function (pi: ExtensionAPI) {
 					new CustomEditor(tui, theme, keybindings)) as CustomEditor;
 				activeTui = tui;
 				const applyBorderColor = () => {
-					editor.borderColor = (text: string) => paintPlanMode(planModeActive, text);
+					editor.borderColor = (text: string) =>
+						paintBorder(borderModeFor(modes), text);
 				};
 				applyBorderColor();
 				const render = editor.render.bind(editor);
@@ -47,32 +65,27 @@ export default function (pi: ExtensionAPI) {
 		editorComponentInstalled = true;
 	};
 
-	const schedulePlanModeBorder = (ctx: ExtensionContext) => {
+	const scheduleModeBorder = (ctx: ExtensionContext) => {
 		stopInstallTimer();
 		// ponytail: defer one tick so later-loaded editor extensions finish first; use explicit extension ordering if Pi adds it.
 		installTimer = setTimeout(() => {
 			installTimer = undefined;
-			installPlanModeBorder(ctx);
+			installModeBorder(ctx);
 		}, 0);
 	};
 
 	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
+		modes.clear();
 		activeTui = undefined;
 		editorComponentInstalled = false;
-		stopWatchingPlanMode?.();
-		stopWatchingPlanMode = watchPlanMode(ctx, (enabled) => {
-			planModeActive = enabled;
-			activeTui?.requestRender();
-		});
-		schedulePlanModeBorder(ctx);
+		scheduleModeBorder(ctx);
 	});
 
 	pi.on("session_shutdown", () => {
 		stopInstallTimer();
-		stopWatchingPlanMode?.();
-		stopWatchingPlanMode = undefined;
 		activeTui = undefined;
-		planModeActive = false;
 		editorComponentInstalled = false;
+		modes.clear();
+		stopWatchingModes();
 	});
 }

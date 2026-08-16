@@ -21,11 +21,16 @@ let
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
       "npm:pi-title-renamer"
-      "npm:@narumitw/pi-plan-mode"
-      "npm:@narumitw/pi-goal"
+      {
+        source = "git:github.com/olisikh/pi-extensions";
+        extensions = [
+          "packages/pi-plan-mode/src/index.ts"
+          "packages/pi-goal/src/index.ts"
+        ];
+      }
       "npm:context-mode"
       "git:github.com/DietrichGebert/ponytail"
-      "git:github.com/olisikh/pi-double-esc@fix/preserve-editor-composition"
+      "git:github.com/olisikh/pi-double-esc"
       "npm:@upstash/context7-pi"
       "npm:@juicesharp/rpiv-todo"
       "npm:@juicesharp/rpiv-ask-user-question"
@@ -129,8 +134,9 @@ in
       ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
       ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
-      ".pi/agent/extensions/lib/plan-mode.ts".source = ./extensions/lib/plan-mode.ts;
-      ".pi/agent/extensions/plan-mode-border.ts".source = ./extensions/plan-mode-border.ts;
+      ".pi/agent/extensions/mode-border.ts".source = ./extensions/mode-border.ts;
+      ".pi/agent/extensions/lib/mode-events.ts".source = ./extensions/lib/mode-events.ts;
+      ".pi/agent/extensions/lib/mode-border.ts".source = ./extensions/lib/mode-border.ts;
       ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
 
