@@ -15,7 +15,7 @@ let
 
     packages = [
       "npm:pi-ollama-cloud"
-      "npm:pi-dynamic-workflows"
+      "@quintinshaw/pi-dynamic-workflows"
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
@@ -27,7 +27,6 @@ let
       "git:github.com/DietrichGebert/ponytail"
       "git:github.com/olisikh/pi-double-esc@fix/preserve-editor-composition"
       "npm:@upstash/context7-pi"
-      "npm:@mariozechner/pi-tui"
       "npm:@juicesharp/rpiv-todo"
       "npm:@juicesharp/rpiv-ask-user-question"
     ];

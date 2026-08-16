@@ -100,7 +100,7 @@ export default function (pi: ExtensionAPI) {
 						const folder = path.basename(ctx.cwd ?? ".");
 
 						const parts = [
-							paintPlanMode(planModeActive, planModeActive ? "* plan" : "* build"),
+							paintPlanMode(planModeActive, planModeActive ? "plan" : "build"),
 							theme.fg("accent", `${provider}/${model}:${reasoning}`),
 							theme.fg(
 								"muted",
