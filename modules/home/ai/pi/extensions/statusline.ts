@@ -7,6 +7,7 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 /* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { truncateToWidth } from "@mariozechner/pi-tui";
+import { paintPlanMode, watchPlanMode } from "./lib/plan-mode.ts";
 
 type BranchEntries = ReturnType<
 	ExtensionContext["sessionManager"]["getBranch"]
@@ -27,11 +28,6 @@ type AssistantTurn = {
 	message: { role: string; usage: { cost: { total: number } } };
 };
 
-const PLAN_MODE_STATE_ENTRY = "plan-mode-state";
-const PLAN_MODE_COLOR = "#a6e3a1";
-const BUILD_MODE_COLOR = "#f38ba8";
-const PLAN_MODE_POLL_INTERVAL_MS = 250;
-
 function compact(value: number | undefined): string {
 	if (value === undefined || !Number.isFinite(value)) {
 		return "?";
@@ -43,27 +39,6 @@ function compact(value: number | undefined): string {
 		return `${(value / 1_000).toFixed(1)}k`;
 	}
 	return `${(value / 1_000_000).toFixed(1)}M`;
-}
-
-function paint(hex: string, text: string): string {
-	const red = Number.parseInt(hex.slice(1, 3), 16);
-	const green = Number.parseInt(hex.slice(3, 5), 16);
-	const blue = Number.parseInt(hex.slice(5, 7), 16);
-	return `\x1b[38;2;${red};${green};${blue}m${text}\x1b[39m`;
-}
-
-function isPlanModeEnabled(entries: BranchEntries): boolean {
-	for (let index = entries.length - 1; index >= 0; index -= 1) {
-		const entry = entries[index] as {
-			type?: string;
-			customType?: string;
-			data?: { enabled?: unknown };
-		};
-		if (entry.type === "custom" && entry.customType === PLAN_MODE_STATE_ENTRY) {
-			return entry.data?.enabled === true;
-		}
-	}
-	return false;
 }
 
 function collectCostTotals(entries: BranchEntries): CostTotals {
@@ -88,7 +63,7 @@ function collectCostTotals(entries: BranchEntries): CostTotals {
 export default function (pi: ExtensionAPI) {
 	let costTotals: CostTotals = { value: 0, available: false };
 	let planModeActive = false;
-	let planModeTimer: ReturnType<typeof setInterval> | undefined;
+	let stopWatchingPlanMode: (() => void) | undefined;
 	let requestRender: (() => void) | null = null;
 
 	const syncCostTotals = (ctx: ExtensionContext) => {
@@ -96,21 +71,13 @@ export default function (pi: ExtensionAPI) {
 		requestRender?.();
 	};
 
-	const syncPlanMode = (ctx: ExtensionContext) => {
-		const nextPlanModeActive = isPlanModeEnabled(ctx.sessionManager.getBranch());
-		if (nextPlanModeActive === planModeActive) return;
-		planModeActive = nextPlanModeActive;
-		requestRender?.();
-	};
-
 	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
 		syncCostTotals(ctx);
-		planModeActive = isPlanModeEnabled(ctx.sessionManager.getBranch());
-		clearInterval(planModeTimer);
-		planModeTimer = setInterval(
-			() => syncPlanMode(ctx),
-			PLAN_MODE_POLL_INTERVAL_MS,
-		);
+		stopWatchingPlanMode?.();
+		stopWatchingPlanMode = watchPlanMode(ctx, (enabled) => {
+			planModeActive = enabled;
+			requestRender?.();
+		});
 
 		ctx.ui.setFooter(
 			(tui: FooterTui, theme: FooterTheme, footerData: FooterData) => {
@@ -133,10 +100,7 @@ export default function (pi: ExtensionAPI) {
 						const folder = path.basename(ctx.cwd ?? ".");
 
 						const parts = [
-							paint(
-								planModeActive ? PLAN_MODE_COLOR : BUILD_MODE_COLOR,
-								planModeActive ? "plan" : "build",
-							),
+							paintPlanMode(planModeActive, planModeActive ? "* plan" : "* build"),
 							theme.fg("accent", `${provider}/${model}:${reasoning}`),
 							theme.fg(
 								"muted",
@@ -168,8 +132,8 @@ export default function (pi: ExtensionAPI) {
 	);
 
 	pi.on("session_shutdown", () => {
-		clearInterval(planModeTimer);
-		planModeTimer = undefined;
+		stopWatchingPlanMode?.();
+		stopWatchingPlanMode = undefined;
 		planModeActive = false;
 	});
 

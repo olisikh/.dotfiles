@@ -130,7 +130,9 @@ in
       ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
       ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
+      ".pi/agent/extensions/lib/plan-mode.ts".source = ./extensions/lib/plan-mode.ts;
       ".pi/agent/extensions/plan-mode-border.ts".source = ./extensions/plan-mode-border.ts;
+      ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
 
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
