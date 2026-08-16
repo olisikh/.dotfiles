@@ -1,10 +1,8 @@
-/* @ts-expect-error Pi provides this module at runtime. */
-import {
-	CustomEditor,
-	type ExtensionAPI,
-	type ExtensionContext,
+import type {
+	ExtensionAPI,
+	ExtensionContext,
+	// @ts-expect-error Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
-import type { TUI } from "@mariozechner/pi-tui";
 
 const DEFAULT_SHIMMER_INTERVAL_MS = 120;
 const DEFAULT_SPINNER_INTERVAL_MS = 120;
@@ -24,10 +22,6 @@ const CATPPUCCIN_COLORS = [
 	"#fab387", // peach
 ];
 const STALLED_COLOR = "#f38ba8";
-const NORMAL_BORDER_COLOR = "#f38ba8";
-const PLAN_MODE_BORDER_COLOR = "#a6e3a1";
-const PLAN_MODE_STATE_ENTRY = "plan-mode-state";
-const PLAN_MODE_POLL_INTERVAL_MS = 250;
 const TELEMETRY_COLOR = "#6c7086"; // Catppuccin overlay0; visible even when SGR dim is ignored.
 const INPUT_ARROW = "↑";
 const OUTPUT_ARROW = "↓";
@@ -64,8 +58,11 @@ const PHRASES = [
 
 const SHIMMER_FRAMES = ["·", "✢", "✳", "✶", "✻", "✽", "✻", "✶", "✳", "✢"];
 const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+const GRADIENT_STEP = 3;
 const GRADIENT_CYCLE_LENGTH = 8;
+const RAINBOW_CYCLE_LENGTH = CATPPUCCIN_COLORS.length * GRADIENT_STEP;
 type IndicatorType = "shimmer" | "spinner";
+type ColorMode = "none" | "rotate" | "rainbow";
 type Phase = "requesting" | "thinking" | "responding" | "tool-use";
 
 type WorkingState = {
@@ -112,8 +109,18 @@ function readPositiveInteger(
 	return Number.isInteger(candidate) && candidate > 0 ? candidate : fallback;
 }
 
-function readBoolean(value: string | undefined): boolean {
-	return value === "1" || value?.toLowerCase() === "true";
+function readColorMode(value: string | undefined): ColorMode {
+	switch (value?.trim().toLowerCase()) {
+		case "rotate":
+		case "rotation":
+		case "1":
+		case "true":
+			return "rotate";
+		case "rainbow":
+			return "rainbow";
+		default:
+			return "none";
+	}
 }
 
 function readIndicatorType(value: string | undefined): IndicatorType {
@@ -127,7 +134,7 @@ const DEFAULT_COLOR_VALUE = readHexColor(
 	readEnvironment("PI_WORKING_INDICATOR_DEFAULT_COLOR"),
 	DEFAULT_COLOR,
 );
-const ROTATE_COLORS = readBoolean(
+const COLOR_MODE = readColorMode(
 	readEnvironment("PI_WORKING_INDICATOR_ROTATE_COLORS"),
 );
 const COLOR_ROTATION_INTERVAL_MS = readPositiveInteger(
@@ -243,28 +250,12 @@ function isStalled(state: WorkingState, now: number): boolean {
 	);
 }
 
-function isPlanModeEnabled(ctx: ExtensionContext): boolean {
-	const entries = ctx.sessionManager.getBranch();
-	for (let index = entries.length - 1; index >= 0; index -= 1) {
-		const entry = entries[index];
-		if (
-			!isRecord(entry) ||
-			entry.type !== "custom" ||
-			entry.customType !== PLAN_MODE_STATE_ENTRY ||
-			!isRecord(entry.data)
-		) {
-			continue;
-		}
-		return entry.data.enabled === true;
-	}
-	return false;
-}
-
 function buildWorkingMessage(
 	state: WorkingState,
 	now: number,
 	gradientOffset: number,
 	activeColor: string,
+	colorMode: ColorMode,
 ): string {
 	const stalled = isStalled(state, now);
 	const details = [`${TIMER_ICON} ${formatDuration(now - state.startedAt)}`];
@@ -285,7 +276,7 @@ function buildWorkingMessage(
 
 	const phrase = stalled
 		? paint(STALLED_COLOR, state.phrase)
-		: gradientText(state.phrase, gradientOffset, activeColor);
+		: gradientText(state.phrase, gradientOffset, activeColor, colorMode);
 	const telemetry = paint(TELEMETRY_COLOR, `· ${details.join(" · ")}`);
 	return `${phrase} \x1b[2m${telemetry}\x1b[22m`;
 }
@@ -302,58 +293,23 @@ export default function (pi: ExtensionAPI) {
 	let colorIndex = 0;
 	let activeColor = DEFAULT_COLOR_VALUE;
 	let gradientOffset = 0;
-	let planModeActive = false;
-	let planModeTimer: ReturnType<typeof setInterval> | undefined;
-	let activeTui: TUI | undefined;
-	let editorComponentInstalled = false;
 
 	const render = () => {
 		if (!state || !activeContext) return;
 		activeContext.ui.setWorkingMessage(
-			buildWorkingMessage(state, Date.now(), gradientOffset, activeColor),
+			buildWorkingMessage(
+				state,
+				Date.now(),
+				gradientOffset,
+				activeColor,
+				COLOR_MODE,
+			),
 		);
 	};
 
 	const stopRefreshTimer = () => {
 		if (refreshTimer) clearInterval(refreshTimer);
 		refreshTimer = undefined;
-	};
-
-	const stopPlanModeTimer = () => {
-		if (planModeTimer) clearInterval(planModeTimer);
-		planModeTimer = undefined;
-	};
-
-	const refreshPlanModeBorder = (ctx: ExtensionContext) => {
-		const nextPlanModeActive = isPlanModeEnabled(ctx);
-		if (nextPlanModeActive === planModeActive) return;
-		planModeActive = nextPlanModeActive;
-		activeTui?.requestRender();
-	};
-
-	const installPlanModeBorder = (ctx: ExtensionContext) => {
-		if (editorComponentInstalled || ctx.mode !== "tui" || !ctx.hasUI) return;
-		const previousEditor = ctx.ui.getEditorComponent();
-		ctx.ui.setEditorComponent((tui, theme, keybindings) => {
-			const editor = (previousEditor?.(tui, theme, keybindings) ??
-				new CustomEditor(tui, theme, keybindings)) as CustomEditor;
-			activeTui = tui;
-			editor.borderColor = (text: string) =>
-				paint(planModeActive ? PLAN_MODE_BORDER_COLOR : NORMAL_BORDER_COLOR, text);
-			return editor;
-		});
-		editorComponentInstalled = true;
-	};
-
-	const startPlanModeTimer = (ctx: ExtensionContext) => {
-		stopPlanModeTimer();
-		planModeActive = isPlanModeEnabled(ctx);
-		if (ctx.mode !== "tui" || !ctx.hasUI) return;
-		// ponytail: poll the plan-mode entry because the package exposes no transition event; use pi.events if it adds one.
-		planModeTimer = setInterval(
-			() => refreshPlanModeBorder(ctx),
-			PLAN_MODE_POLL_INTERVAL_MS,
-		);
 	};
 
 	const applyIndicatorStyle = () => {
@@ -379,11 +335,21 @@ export default function (pi: ExtensionAPI) {
 	const startAnimationTimers = () => {
 		stopAnimationTimers();
 		gradientOffset = 0;
+		if (COLOR_MODE === "rainbow") {
+			activeColor = paletteColor(CATPPUCCIN_COLORS, gradientOffset);
+			applyIndicatorStyle();
+		}
 		tokenTimer = setInterval(() => {
 			if (state && advanceTokenCounters(state)) render();
 		}, TOKEN_COUNTER_INTERVAL_MS);
 		gradientTimer = setInterval(() => {
-			gradientOffset = (gradientOffset + 1) % GRADIENT_CYCLE_LENGTH;
+			const cycleLength =
+				COLOR_MODE === "rainbow" ? RAINBOW_CYCLE_LENGTH : GRADIENT_CYCLE_LENGTH;
+			gradientOffset = (gradientOffset + 1) % cycleLength;
+			if (COLOR_MODE === "rainbow") {
+				activeColor = paletteColor(CATPPUCCIN_COLORS, gradientOffset);
+				applyIndicatorStyle();
+			}
 			render();
 		}, SHIMMER_INTERVAL_MS);
 		phraseTimer = setInterval(() => {
@@ -391,7 +357,7 @@ export default function (pi: ExtensionAPI) {
 			state.phrase = randomPhrase(state.phrase);
 			render();
 		}, PHRASE_INTERVAL_MS);
-		if (ROTATE_COLORS) {
+		if (COLOR_MODE === "rotate") {
 			colorTimer = setInterval(() => {
 				colorIndex = (colorIndex + 1) % ROTATION_COLORS.length;
 				activeColor = ROTATION_COLORS[colorIndex];
@@ -569,14 +535,11 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
 		stopRefreshTimer();
 		stopAnimationTimers();
-		activeTui = undefined;
 		state = undefined;
 		activeContext = ctx;
 		colorIndex = 0;
 		activeColor = DEFAULT_COLOR_VALUE;
 		gradientOffset = 0;
-		installPlanModeBorder(ctx);
-		startPlanModeTimer(ctx);
 		applyIndicatorStyle();
 	});
 
@@ -599,23 +562,45 @@ export default function (pi: ExtensionAPI) {
 		handleToolEnd(ctx),
 	);
 	pi.on("agent_end", () => finishRequest());
-	pi.on("session_shutdown", () => {
-		stopPlanModeTimer();
-		activeTui = undefined;
-		planModeActive = false;
-		finishRequest();
-	});
+	pi.on("session_shutdown", () => finishRequest());
 }
 
-function gradientText(text: string, offset: number, baseColor: string): string {
+function gradientText(
+	text: string,
+	offset: number,
+	baseColor: string,
+	colorMode: ColorMode,
+): string {
 	const colors = [baseColor, lighten(baseColor)];
 	return [...text]
 		.map((character, index) => {
 			if (character === " ") return character;
-			const color = colors[Math.floor((index + offset) / 3) % colors.length];
+			const color =
+				colorMode === "rainbow"
+					? paletteColor(CATPPUCCIN_COLORS, index + offset)
+					: colors[Math.floor((index + offset) / GRADIENT_STEP) % colors.length];
 			return paint(color, character);
 		})
 		.join("");
+}
+
+function paletteColor(colors: readonly string[], position: number): string {
+	const palettePosition = position / GRADIENT_STEP;
+	const index = Math.floor(palettePosition) % colors.length;
+	const progress = palettePosition - Math.floor(palettePosition);
+	return blend(colors[index], colors[(index + 1) % colors.length], progress);
+}
+
+function blend(first: string, second: string, progress: number): string {
+	const firstRgb = rgb(first);
+	const secondRgb = rgb(second);
+	return `#${firstRgb
+		.map((channel, index) =>
+			Math.round(channel + (secondRgb[index] - channel) * progress)
+				.toString(16)
+				.padStart(2, "0"),
+		)
+		.join("")}`;
 }
 
 function lighten(hex: string): string {

@@ -95,7 +95,7 @@ in
     workingIndicator = {
       type = mkOpt (types.enum [ "shimmer" "spinner" ]) "shimmer" "Working indicator animation style";
       defaultColor = mkOpt types.str "#cba6f7" "Default hex color for the Pi working indicator";
-      rotateColors = mkBoolOpt true "Rotate the working indicator through the Catppuccin palette";
+      rotateColors = mkOpt (types.enum [ "none" "rotate" "rainbow" ]) "rainbow" "Working indicator color animation mode";
       colorRotationIntervalMs = mkOpt types.ints.positive 2500 "Milliseconds between working indicator palette colors";
       shimmerIntervalMs = mkOpt types.ints.positive 200 "Milliseconds between shimmer frames";
       spinnerIntervalMs = mkOpt types.ints.positive 120 "Milliseconds between spinner frames";
@@ -116,7 +116,7 @@ in
       PI_DOUBLE_ESC_HINT_POSITION = "left";
       PI_WORKING_INDICATOR_TYPE = cfg.workingIndicator.type;
       PI_WORKING_INDICATOR_DEFAULT_COLOR = cfg.workingIndicator.defaultColor;
-      PI_WORKING_INDICATOR_ROTATE_COLORS = if cfg.workingIndicator.rotateColors then "1" else "0";
+      PI_WORKING_INDICATOR_ROTATE_COLORS = cfg.workingIndicator.rotateColors;
       PI_WORKING_INDICATOR_COLOR_ROTATION_MS = toString cfg.workingIndicator.colorRotationIntervalMs;
       PI_WORKING_INDICATOR_SHIMMER_INTERVAL_MS = toString cfg.workingIndicator.shimmerIntervalMs;
       PI_WORKING_INDICATOR_SPINNER_INTERVAL_MS = toString cfg.workingIndicator.spinnerIntervalMs;
@@ -137,6 +137,7 @@ in
       ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
       ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
+      # ".pi/agent/extensions/plan-mode-border.ts".source = ./extensions/plan-mode-border.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
 
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
