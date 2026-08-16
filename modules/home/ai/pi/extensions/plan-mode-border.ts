@@ -6,12 +6,18 @@ import {
 } from "@mariozechner/pi-coding-agent";
 
 const PLAN_MODE_STATE_ENTRY = "plan-mode-state";
+const PLAN_MODE_WIDGET_KEY = "plan-mode-plan";
+const PLAN_MODE_PLANNING_WIDGET_TITLE = "Plan mode: planning";
 const PLAN_MODE_BORDER_COLOR = "#a6e3a1";
 const NORMAL_BORDER_COLOR = "#f38ba8";
 const PLAN_MODE_POLL_INTERVAL_MS = 250;
 
 type ActiveTui = {
 	requestRender: () => void;
+};
+
+type UiWithWidget = {
+	setWidget: (key: string, widget: unknown, ...args: unknown[]) => void;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -57,6 +63,22 @@ export default function (pi: ExtensionAPI) {
 		if (nextPlanModeActive === planModeActive) return;
 		planModeActive = nextPlanModeActive;
 		activeTui?.requestRender();
+	};
+
+	const hidePlanModePlanningWidget = (ctx: ExtensionContext) => {
+		const ui = ctx.ui as unknown as UiWithWidget;
+		const setWidget = ui.setWidget.bind(ui);
+		ui.setWidget = (key, widget, ...args) => {
+			if (
+				key === PLAN_MODE_WIDGET_KEY &&
+				Array.isArray(widget) &&
+				widget[0] === PLAN_MODE_PLANNING_WIDGET_TITLE
+			) {
+				setWidget(key, undefined, ...args);
+				return;
+			}
+			setWidget(key, widget, ...args);
+		};
 	};
 
 	const installPlanModeBorder = (ctx: ExtensionContext) => {
@@ -111,6 +133,7 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
 		activeTui = undefined;
 		editorComponentInstalled = false;
+		hidePlanModePlanningWidget(ctx);
 		schedulePlanModeBorder(ctx);
 		startPlanModeTimer(ctx);
 	});

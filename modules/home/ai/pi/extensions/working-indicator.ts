@@ -315,9 +315,19 @@ export default function (pi: ExtensionAPI) {
 	const applyIndicatorStyle = () => {
 		if (!activeContext) return;
 		const frames = INDICATOR_TYPE === "shimmer" ? SHIMMER_FRAMES : SPINNER_FRAMES;
+		const indicatorFrames =
+			COLOR_MODE === "rainbow"
+				? Array.from({ length: frames.length * RAINBOW_CYCLE_LENGTH }, (_, index) =>
+						paint(
+							paletteColor(CATPPUCCIN_COLORS, index % RAINBOW_CYCLE_LENGTH),
+							frames[index % frames.length] ?? "",
+						),
+					)
+				: frames.map((glyph) => paint(activeColor, glyph));
 		activeContext.ui.setWorkingIndicator({
-			frames: frames.map((glyph) => paint(activeColor, glyph)),
-			intervalMs: SPINNER_INTERVAL_MS,
+			frames: indicatorFrames,
+			intervalMs:
+				INDICATOR_TYPE === "shimmer" ? SHIMMER_INTERVAL_MS : SPINNER_INTERVAL_MS,
 		});
 	};
 
@@ -335,10 +345,6 @@ export default function (pi: ExtensionAPI) {
 	const startAnimationTimers = () => {
 		stopAnimationTimers();
 		gradientOffset = 0;
-		if (COLOR_MODE === "rainbow") {
-			activeColor = paletteColor(CATPPUCCIN_COLORS, gradientOffset);
-			applyIndicatorStyle();
-		}
 		tokenTimer = setInterval(() => {
 			if (state && advanceTokenCounters(state)) render();
 		}, TOKEN_COUNTER_INTERVAL_MS);
@@ -346,10 +352,6 @@ export default function (pi: ExtensionAPI) {
 			const cycleLength =
 				COLOR_MODE === "rainbow" ? RAINBOW_CYCLE_LENGTH : GRADIENT_CYCLE_LENGTH;
 			gradientOffset = (gradientOffset + 1) % cycleLength;
-			if (COLOR_MODE === "rainbow") {
-				activeColor = paletteColor(CATPPUCCIN_COLORS, gradientOffset);
-				applyIndicatorStyle();
-			}
 			render();
 		}, SHIMMER_INTERVAL_MS);
 		phraseTimer = setInterval(() => {

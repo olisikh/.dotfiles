@@ -10,7 +10,7 @@ let
     defaultModel = "gpt-5.6-luna";
     defaultThinkingLevel = "max";
 
-    theme = "catppuccin-mocha-void-tools";
+    theme = "catppuccin-mocha";
     quietStartup = true;
 
     packages = [
@@ -22,9 +22,10 @@ let
       "npm:pi-rtk-optimizer"
       "npm:pi-title-renamer"
       "npm:@narumitw/pi-plan-mode"
+      "npm:@narumitw/pi-goal"
       "npm:context-mode"
       "git:github.com/DietrichGebert/ponytail"
-      "git:github.com/olisikh/pi-double-esc@feat/allow-configuring-hint-position"
+      "git:github.com/olisikh/pi-double-esc@fix/preserve-editor-composition"
       "npm:@upstash/context7-pi"
       "npm:@mariozechner/pi-tui"
       "npm:@juicesharp/rpiv-todo"
@@ -137,7 +138,7 @@ in
       ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
       ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
-      # ".pi/agent/extensions/plan-mode-border.ts".source = ./extensions/plan-mode-border.ts;
+      ".pi/agent/extensions/plan-mode-border.ts".source = ./extensions/plan-mode-border.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
 
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
