@@ -30,14 +30,6 @@ let
       "npm:@mariozechner/pi-tui"
       "npm:@juicesharp/rpiv-todo"
       "npm:@juicesharp/rpiv-ask-user-question"
-      {
-        source = "npm:@ifi/oh-pi-skills";
-        skills = [
-          "!skills/graphify/**"
-          "!skills/improve-codebase-architecture/**"
-          "!skills/grill-me/**"
-        ];
-      }
     ];
 
     compaction = {
@@ -55,7 +47,7 @@ let
 
     showHardwareCursor = true;
 
-    # pi would react to "all" steered/follow-up messages at once or "one-at-a-time"
+    # pi would react to "all" steered/follow-up messages "all" at once or "one-at-a-time"
     steeringMode = "all";
     followUpMode = "one-at-a-time";
 
