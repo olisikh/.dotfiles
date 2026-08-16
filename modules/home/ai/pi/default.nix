@@ -19,6 +19,8 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
+      "npm:pi-rtk-optimizer"
+      "npm:pi-title-renamer"
       "npm:@narumitw/pi-plan-mode"
       "npm:context-mode"
       "git:github.com/DietrichGebert/ponytail"
@@ -90,6 +92,14 @@ in
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
     doubleEscapeWindowMs = mkOpt types.ints.positive 3000 "Milliseconds allowed between Escape presses to abort an active agent";
+    workingIndicator = {
+      type = mkOpt (types.enum [ "shimmer" "spinner" ]) "shimmer" "Working indicator animation style";
+      defaultColor = mkOpt types.str "#cba6f7" "Default hex color for the Pi working indicator";
+      rotateColors = mkBoolOpt true "Rotate the working indicator through the Catppuccin palette";
+      colorRotationIntervalMs = mkOpt types.ints.positive 2500 "Milliseconds between working indicator palette colors";
+      shimmerIntervalMs = mkOpt types.ints.positive 200 "Milliseconds between shimmer frames";
+      spinnerIntervalMs = mkOpt types.ints.positive 120 "Milliseconds between spinner frames";
+    };
     keybindings = mkOpt types.attrs { } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
     mcps = mkOpt types.attrs { } "Pi MCP adapter config merged into the default Exa server configuration";
   };
@@ -97,12 +107,19 @@ in
   config = mkIf cfg.enable {
     home.packages = [
       pkgs.llm-agents.pi
+      pkgs.rtk
       pkgs.${namespace}.context-mode
     ];
 
     home.sessionVariables = {
       PI_DOUBLE_ESC_MS = toString cfg.doubleEscapeWindowMs;
       PI_DOUBLE_ESC_HINT_POSITION = "left";
+      PI_WORKING_INDICATOR_TYPE = cfg.workingIndicator.type;
+      PI_WORKING_INDICATOR_DEFAULT_COLOR = cfg.workingIndicator.defaultColor;
+      PI_WORKING_INDICATOR_ROTATE_COLORS = if cfg.workingIndicator.rotateColors then "1" else "0";
+      PI_WORKING_INDICATOR_COLOR_ROTATION_MS = toString cfg.workingIndicator.colorRotationIntervalMs;
+      PI_WORKING_INDICATOR_SHIMMER_INTERVAL_MS = toString cfg.workingIndicator.shimmerIntervalMs;
+      PI_WORKING_INDICATOR_SPINNER_INTERVAL_MS = toString cfg.workingIndicator.spinnerIntervalMs;
     };
 
 
