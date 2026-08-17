@@ -47,7 +47,6 @@ const PHRASES = [
 	"Consulting magic 8-ball...",
 	"Negotiating with AI overlords...",
 	"Transmogrifying the data...",
-	"Meaning of life?..",
 	"Asking Calcifer...",
 	"Asking your mom...",
 	"Asking your dad...",

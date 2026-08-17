@@ -92,7 +92,7 @@ in
     workingIndicator = {
       type = mkOpt (types.enum [ "shimmer" "spinner" ]) "shimmer" "Working indicator animation style";
       defaultColor = mkOpt types.str "#cba6f7" "Default hex color for the Pi working indicator";
-      rotateColors = mkOpt (types.enum [ "none" "rotate" "rainbow" ]) "rainbow" "Working indicator color animation mode";
+      rotateColors = mkOpt (types.enum [ "none" "rotate" "rainbow" ]) "none" "Working indicator color animation mode";
       colorRotationIntervalMs = mkOpt types.ints.positive 2500 "Milliseconds between working indicator palette colors";
       shimmerIntervalMs = mkOpt types.ints.positive 200 "Milliseconds between shimmer frames";
       spinnerIntervalMs = mkOpt types.ints.positive 120 "Milliseconds between spinner frames";
