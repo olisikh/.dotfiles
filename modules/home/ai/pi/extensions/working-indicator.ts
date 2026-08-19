@@ -7,7 +7,7 @@ import type {
 const DEFAULT_SHIMMER_INTERVAL_MS = 120;
 const DEFAULT_SPINNER_INTERVAL_MS = 120;
 const TOKEN_COUNTER_INTERVAL_MS = 50;
-const TOKEN_COUNTER_ANIMATION_MS = 5_000;
+const TOKEN_COUNTER_ANIMATION_MS = 3_000;
 const PHRASE_INTERVAL_MS = 2_400;
 const DEFAULT_COLOR_ROTATION_INTERVAL_MS = 2_500;
 const STALL_TIMEOUT_MS = 3_000;
@@ -318,6 +318,8 @@ export default function (pi: ExtensionAPI) {
 	let colorIndex = 0;
 	let activeColor = DEFAULT_COLOR_VALUE;
 	let gradientOffset = 0;
+	let dialogDepth = 0;
+	let workingHiddenForDialog = false;
 
 	const render = () => {
 		if (!state || !activeContext) return;
@@ -397,6 +399,56 @@ export default function (pi: ExtensionAPI) {
 	const startRefreshTimer = () => {
 		stopRefreshTimer();
 		refreshTimer = setInterval(render, SHIMMER_INTERVAL_MS);
+	};
+
+	const enterDialog = () => {
+		dialogDepth += 1;
+		if (dialogDepth === 1 && state && activeContext) {
+			workingHiddenForDialog = true;
+			activeContext.ui.setWorkingVisible(false);
+		}
+	};
+
+	const exitDialog = () => {
+		dialogDepth = Math.max(0, dialogDepth - 1);
+		if (dialogDepth !== 0 || !workingHiddenForDialog) return;
+
+		workingHiddenForDialog = false;
+		if (!activeContext) return;
+		activeContext.ui.setWorkingVisible(true);
+		applyIndicatorStyle();
+		render();
+	};
+
+	const duringDialog = async <T>(operation: () => Promise<T>): Promise<T> => {
+		enterDialog();
+		try {
+			return await operation();
+		} finally {
+			exitDialog();
+		}
+	};
+
+	const wrapDialogUi = (ctx: ExtensionContext) => {
+		if (ctx.mode !== "tui") return;
+
+		const ui = ctx.ui;
+		const select = ui.select.bind(ui);
+		const confirm = ui.confirm.bind(ui);
+		const input = ui.input.bind(ui);
+		const editor = ui.editor.bind(ui);
+		const custom = ui.custom.bind(ui);
+
+		ui.select = ((...args: Parameters<typeof ui.select>) =>
+			duringDialog(() => select(...args))) as typeof ui.select;
+		ui.confirm = ((...args: Parameters<typeof ui.confirm>) =>
+			duringDialog(() => confirm(...args))) as typeof ui.confirm;
+		ui.input = ((...args: Parameters<typeof ui.input>) =>
+			duringDialog(() => input(...args))) as typeof ui.input;
+		ui.editor = ((...args: Parameters<typeof ui.editor>) =>
+			duringDialog(() => editor(...args))) as typeof ui.editor;
+		ui.custom = ((...args: Parameters<typeof ui.custom>) =>
+			duringDialog(() => custom(...args))) as typeof ui.custom;
 	};
 
 	const beginRequest = (ctx: ExtensionContext) => {
@@ -566,6 +618,9 @@ export default function (pi: ExtensionAPI) {
 		stopAnimationTimers();
 		state = undefined;
 		activeContext = ctx;
+		dialogDepth = 0;
+		workingHiddenForDialog = false;
+		wrapDialogUi(ctx);
 		colorIndex = 0;
 		activeColor = DEFAULT_COLOR_VALUE;
 		gradientOffset = 0;
