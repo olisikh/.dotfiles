@@ -23,3 +23,12 @@ export function paintBorder(mode: BorderMode, text: string): string {
 	const blue = Number.parseInt(hex.slice(5, 7), 16);
 	return `\x1b[38;2;${red};${green};${blue}m${text}\x1b[39m`;
 }
+
+export function mcpServerNameForTool(toolName: string): string | undefined {
+	if (!toolName.startsWith("mcp__")) return undefined;
+	const qualified = toolName.slice("mcp__".length);
+	const separator = qualified.indexOf("_");
+	return (
+		(separator > 0 ? qualified.slice(0, separator) : qualified) || undefined
+	);
+}

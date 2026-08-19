@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { borderModeFor, paintBorder } from "./mode-border.ts";
+import {
+	borderModeFor,
+	mcpServerNameForTool,
+	paintBorder,
+} from "./mode-border.ts";
 import { isModeChangedEvent, subscribeToModeChanges } from "./mode-events.ts";
 
 const snapshot = (mode, active) => ({
@@ -33,6 +37,15 @@ test("gold border painting uses the configured goal color", () => {
 		paintBorder("goal", "border"),
 		"\u001b[38;2;249;226;175mborder\u001b[39m",
 	);
+});
+
+test("MCP tool names resolve to server names", () => {
+	assert.equal(mcpServerNameForTool("mcp__exa_web_search_exa"), "exa");
+	assert.equal(
+		mcpServerNameForTool("mcp__context-mode_ctx_execute"),
+		"context-mode",
+	);
+	assert.equal(mcpServerNameForTool("bash"), undefined);
 });
 
 test("validated mode events update a fake consumer and request a render", () => {
