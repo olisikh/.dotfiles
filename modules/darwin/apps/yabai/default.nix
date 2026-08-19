@@ -73,6 +73,7 @@ in
           yabai -m rule --add app="^Transmission$" manage=off
           yabai -m rule --add app="^PSI Bridge Secure Browser$" manage=off
           yabai -m rule --add app="^IntelliJ IDEA$" manage=off
+          yabai -m rule --add app="^Android Emulator.*$" manage=off
 
           yabai -m signal --add event=window_created app="^Google Chrome$" action="yabai -m window --toggle float"
           yabai -m signal --add event=window_created app="^Brave Browser$" action="yabai -m window --toggle float"
