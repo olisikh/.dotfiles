@@ -12,6 +12,7 @@ let
 
     theme = "catppuccin-mocha";
     quietStartup = true;
+    npmCommand = [ "npm" ];
 
     packages = [
       "npm:pi-ollama-cloud"
@@ -22,7 +23,6 @@ let
       "npm:@vigolium/piolium"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
-      "npm:pi-title-renamer"
       {
         source = "git:github.com/olisikh/pi-extensions";
         extensions = [
@@ -100,40 +100,85 @@ let
         # question -> ask_user_question, webfetch/websearch -> Exa tools.
         read = "allow";
         find = "allow";
+        head = "allow";
+        tail = "allow";
         grep = "allow";
         ls = "allow";
         skill = "allow";
         todo = "allow";
+        "ctx_*" = "allow";
+
+        # Allow all pi-lens tools, including its opt-in mutating/search tools.
+        "ast_grep_*" = "allow";
+        "lens_*" = "allow";
+        "lsp_*" = "allow";
+        module_report = "allow";
+        project_report = "allow";
+        read_enclosing = "allow";
+        read_symbol = "allow";
+        symbol_search = "allow";
+
+        # User-facing questions/dialogues and subagent interviews are safe UI operations.
+        "*question*" = "allow";
+        "*dialog*" = "allow";
+        qna = "allow";
+        contact_supervisor = "allow";
         ask_user_question = "allow";
         plan_mode_question = "allow";
         plan_mode_complete = "allow";
-        lsp_diagnostics = "allow";
-        lsp_navigation = "allow";
+
         web_fetch_exa = "allow";
         web_search_exa = "allow";
 
+        # ctx_* may also be reached through the MCP proxy when direct tools are off.
+        mcp = {
+          "*" = "ask";
+
+          "ctx_*" = "allow";
+          "context-mode_ctx_*" = "allow";
+          "context-mode:ctx_*" = "allow";
+        };
+
         edit = "ask";
-        subagent = "ask";
+        subagent = "allow";
 
         bash = {
           "*" = "ask";
+
           "git status*" = "allow";
           "git log*" = "allow";
           "git diff*" = "allow";
           "git branch*" = "allow";
           "git remote*" = "allow";
           "git show*" = "allow";
-          "git push*" = "ask";
-          "git commit*" = "ask";
+          "git check-ignore*" = "allow";
+          "strings *" = "allow";
           "grep *" = "allow";
+          "cat *" = "allow";
+          "printf *" = "allow";
+          "read *" = "allow";
+          "readlink *" = "allow";
+          "echo *" = "allow";
+          "sort *" = "allow";
+          "head *" = "allow";
+          "tail *" = "allow";
+          "ls *" = "allow";
           "rg *" = "allow";
+          "wc *" = "allow";
+          "find *" = "allow";
+          "cd *" = "allow";
+          "pwd" = "allow";
+          "true" = "allow";
+          "test *" = "allow";
+          "false" = "allow";
+          "command *" = "allow";
           "nixfmt*" = "allow";
           "shfmt*" = "allow";
-          "nix-build*" = "ask";
         };
 
         external_directory = {
           "~/.agents/**" = "allow";
+          "~/.pi/**" = "allow";
           "~/.config/llm-wiki/**" = "allow";
           "~/.config/opencode/**" = "allow";
           "~/notes/50 Knowledge/LLM Wiki/**" = "allow";
