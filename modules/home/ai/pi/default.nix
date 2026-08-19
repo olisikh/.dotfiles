@@ -79,25 +79,6 @@ let
     defaultProjectTrust = "ask";
   };
 
-  brainPolicy = ''
-    # Root brain delegation policy
-
-    You are the root brain and final decision-maker. Keep user intent, scope, planning, integration, final verification, and the final answer in the parent session.
-
-    Delegate when it saves context or provides independent value:
-    - Use scout for unfamiliar, broad, or context-heavy repository work.
-    - Use oracle for ambiguous architecture or high-risk decisions.
-    - Use one worker for a bounded implementation slice.
-    - Use a fresh reviewer after non-trivial edits.
-    - Parallelize only independent read/review lanes; keep one writer per worktree.
-
-    Work directly for simple, latency-sensitive, tightly coupled, or one-file changes. Do not delegate merely to appear thorough.
-
-    Use fresh child context by default. Pass concise task packets with exact paths, constraints, acceptance criteria, and validation commands. Prefer bounded artifact handoffs over copying full child transcripts into the parent context. The host profile owns model selection: use agent roles and configured routing labels rather than hard-coding provider or model names in task policy. Escalate only for genuinely harder work, using the stronger route defined by the active profile.
-
-    For multi-step or parallel delegation, make one top-level workflowScript call with async:true. The parent must synthesize child results and inspect the final diff before completing.
-  '';
-
   mcpConfig = recursiveUpdate
     {
       settings = {
@@ -268,20 +249,22 @@ in
 
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
-      ".pi/agent/APPEND_SYSTEM.md".text = brainPolicy;
+      ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
+
+      ".pi/agent/APPEND_SYSTEM.md".source = ./prompts/brain-policy.md;
+
+      ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
+      ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
+
+      ".pi-lens/config.json".text = builtins.toJSON {
+        widget.visible = false;
+        lsp.enabled = true;
+      };
       ".pi/agent/extensions/pi-permission-system/config.json".text = builtins.toJSON permissionConfig;
       ".pi/agent/extensions/subagent/config.json".text = builtins.toJSON {
         asyncByDefault = true;
         defaultSubagentContext = "fresh";
       };
-      ".pi-lens/config.json".text = builtins.toJSON {
-        widget.visible = false;
-        lsp.enabled = true;
-      };
-      ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
-      ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
-
-
       ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
       ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
       ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
@@ -291,8 +274,6 @@ in
       ".pi/agent/extensions/lib/mode-border.ts".source = ./extensions/lib/mode-border.ts;
       ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
-
-      ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
     };
   };
 }
