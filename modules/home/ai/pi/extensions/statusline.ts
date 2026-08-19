@@ -52,6 +52,15 @@ function compact(value: number | undefined): string {
 	return `${(value / 1_000_000).toFixed(1)}M`;
 }
 
+function contextUsageColor(
+	percent: number | null | undefined,
+): "success" | "warning" | "error" | "muted" {
+	if (percent === undefined || percent === null) return "muted";
+	if (percent >= 80) return "error";
+	if (percent >= 50) return "warning";
+	return "success";
+}
+
 function collectCostTotals(entries: BranchEntries): CostTotals {
 	let value = 0;
 	let available = false;
@@ -111,14 +120,13 @@ export default function (pi: ExtensionAPI) {
 						const reasoning = pi.getThinkingLevel();
 						const branch = footerData.getGitBranch();
 						const folder = path.basename(ctx.cwd ?? ".");
+						const usageColor = contextUsageColor(usage?.percent);
+						const usageText = `${compact(usage?.tokens)} / ${compact(usage?.contextWindow)} (${usage?.percent?.toFixed(0) ?? "?"}%)`;
 
 						const parts = [
 							renderModeStatus(modes, footerData.getExtensionStatuses()),
 							theme.fg("accent", `${provider}/${model}:${reasoning}`),
-							theme.fg(
-								"muted",
-								`${compact(usage?.tokens)} / ${compact(usage?.contextWindow)} (${usage?.percent?.toFixed(0) ?? "?"}%)`,
-							),
+							theme.fg(usageColor, usageText),
 						];
 
 						if (costTotals.available) {
