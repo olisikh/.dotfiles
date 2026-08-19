@@ -141,7 +141,20 @@ in
 
     ai = {
       copilot = enabled;
-      pi = enabled;
+      pi = {
+        enable = true;
+        mcps.mcpServers.sherlockio-mcp = {
+          command = "npx";
+          args = [
+            "-y"
+            "@ebay/obsidian-mcp-client"
+            "--permissions"
+            "obsidian"
+            "--server-id"
+            "sherlockio"
+          ];
+        };
+      };
       opencode = {
         enable = true;
         package = pkgs.llm-agents.opencode;
