@@ -19,6 +19,8 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
+      "npm:@vigolium/piolium"
+      "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
       "npm:pi-title-renamer"
       {
@@ -83,11 +85,68 @@ let
     cfg.mcps;
 
   finalConfig = recursiveUpdate basicConfig cfg.config;
+
+  permissionConfig = recursiveUpdate
+    {
+      "$schema" = "https://raw.githubusercontent.com/gotgenes/pi-packages/main/packages/pi-permission-system/schemas/permissions.schema.json";
+      debugLog = false;
+      permissionReviewLog = true;
+      yoloMode = false;
+
+      permission = {
+        "*" = "ask";
+
+        # OpenCode equivalents: glob -> find, list -> ls, todowrite -> todo,
+        # question -> ask_user_question, webfetch/websearch -> Exa tools.
+        read = "allow";
+        find = "allow";
+        grep = "allow";
+        ls = "allow";
+        skill = "allow";
+        todo = "allow";
+        ask_user_question = "allow";
+        plan_mode_question = "allow";
+        plan_mode_complete = "allow";
+        lsp_diagnostics = "allow";
+        lsp_navigation = "allow";
+        web_fetch_exa = "allow";
+        web_search_exa = "allow";
+
+        edit = "ask";
+        subagent = "ask";
+
+        bash = {
+          "*" = "ask";
+          "git status*" = "allow";
+          "git log*" = "allow";
+          "git diff*" = "allow";
+          "git branch*" = "allow";
+          "git remote*" = "allow";
+          "git show*" = "allow";
+          "git push*" = "ask";
+          "git commit*" = "ask";
+          "grep *" = "allow";
+          "rg *" = "allow";
+          "nixfmt*" = "allow";
+          "shfmt*" = "allow";
+          "nix-build*" = "ask";
+        };
+
+        external_directory = {
+          "~/.agents/**" = "allow";
+          "~/.config/llm-wiki/**" = "allow";
+          "~/.config/opencode/**" = "allow";
+          "~/notes/50 Knowledge/LLM Wiki/**" = "allow";
+        };
+      };
+    }
+    cfg.permissions;
 in
 {
   options.${namespace}.ai.pi = {
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
+    permissions = mkOpt types.attrs { } "Pi permission-system config merged into the module's base policy";
     doubleEscapeWindowMs = mkOpt types.ints.positive 3000 "Milliseconds allowed between Escape presses to abort an active agent";
     workingIndicator = {
       type = mkOpt (types.enum [ "shimmer" "spinner" ]) "shimmer" "Working indicator animation style";
@@ -122,6 +181,7 @@ in
 
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
+      ".pi/agent/extensions/pi-permission-system/config.json".text = builtins.toJSON permissionConfig;
       ".pi-lens/config.json".text = builtins.toJSON {
         widget.visible = false;
         lsp.enabled = true;

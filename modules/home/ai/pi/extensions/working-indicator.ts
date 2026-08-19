@@ -7,6 +7,7 @@ import type {
 const DEFAULT_SHIMMER_INTERVAL_MS = 120;
 const DEFAULT_SPINNER_INTERVAL_MS = 120;
 const TOKEN_COUNTER_INTERVAL_MS = 50;
+const TOKEN_COUNTER_ANIMATION_MS = 5_000;
 const PHRASE_INTERVAL_MS = 2_400;
 const DEFAULT_COLOR_ROTATION_INTERVAL_MS = 2_500;
 const STALL_TIMEOUT_MS = 3_000;
@@ -64,6 +65,12 @@ type IndicatorType = "shimmer" | "spinner";
 type ColorMode = "none" | "rotate" | "rainbow";
 type Phase = "requesting" | "thinking" | "responding" | "tool-use";
 
+type CounterAnimation = {
+	target: number;
+	startValue: number;
+	startedAt: number;
+};
+
 type WorkingState = {
 	phrase: string;
 	phase: Phase;
@@ -72,8 +79,10 @@ type WorkingState = {
 	streamedChars: number;
 	inputTokens: number;
 	displayedInputTokens: number;
+	inputAnimation: CounterAnimation;
 	outputTokens: number;
 	displayedOutputChars: number;
+	outputAnimation: CounterAnimation;
 	currentAssistantChars: number;
 	currentTextBlockChars: number;
 	assistantMessageActive: boolean;
@@ -196,19 +205,29 @@ function formatTokenLine(arrow: string, tokens: number): string {
 	return `${arrow} ${formatCount(tokens)}`;
 }
 
-function advanceCounter(current: number, target: number): number {
+function advanceCounter(
+	current: number,
+	target: number,
+	animation: CounterAnimation,
+	now: number,
+): number {
 	if (current >= target) return current;
-	const gap = target - current;
-	let increment = 50;
-	if (gap < 70) {
-		increment = 3;
-	} else if (gap < 200) {
-		increment = Math.max(8, Math.ceil(gap * 0.15));
+	if (animation.target !== target) {
+		animation.target = target;
+		animation.startValue = current;
+		animation.startedAt = now;
 	}
-	return Math.min(current + increment, target);
+
+	const progress = Math.min(
+		1,
+		(now - animation.startedAt) / TOKEN_COUNTER_ANIMATION_MS,
+	);
+	return progress >= 1
+		? target
+		: animation.startValue + (target - animation.startValue) * progress;
 }
 
-function advanceTokenCounters(state: WorkingState): boolean {
+function advanceTokenCounters(state: WorkingState, now: number): boolean {
 	const outputTarget = Math.max(
 		state.streamedChars,
 		state.outputTokens * CHARS_PER_TOKEN,
@@ -216,8 +235,15 @@ function advanceTokenCounters(state: WorkingState): boolean {
 	const nextInput = advanceCounter(
 		state.displayedInputTokens,
 		state.inputTokens,
+		state.inputAnimation,
+		now,
 	);
-	const nextOutput = advanceCounter(state.displayedOutputChars, outputTarget);
+	const nextOutput = advanceCounter(
+		state.displayedOutputChars,
+		outputTarget,
+		state.outputAnimation,
+		now,
+	);
 	const changed =
 		nextInput !== state.displayedInputTokens ||
 		nextOutput !== state.displayedOutputChars;
@@ -345,7 +371,7 @@ export default function (pi: ExtensionAPI) {
 		stopAnimationTimers();
 		gradientOffset = 0;
 		tokenTimer = setInterval(() => {
-			if (state && advanceTokenCounters(state)) render();
+			if (state && advanceTokenCounters(state, Date.now())) render();
 		}, TOKEN_COUNTER_INTERVAL_MS);
 		gradientTimer = setInterval(() => {
 			const cycleLength =
@@ -386,8 +412,10 @@ export default function (pi: ExtensionAPI) {
 			streamedChars: 0,
 			inputTokens: 0,
 			displayedInputTokens: 0,
+			inputAnimation: { target: 0, startValue: 0, startedAt: 0 },
 			outputTokens: 0,
 			displayedOutputChars: 0,
+			outputAnimation: { target: 0, startValue: 0, startedAt: 0 },
 			currentAssistantChars: 0,
 			currentTextBlockChars: 0,
 			assistantMessageActive: false,
