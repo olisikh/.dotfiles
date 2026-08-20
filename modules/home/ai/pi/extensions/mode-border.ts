@@ -16,6 +16,10 @@ import {
 	mcpServerNameForTool,
 	paintBorder,
 } from "./lib/mode-border.ts";
+import { isYoloModeEnabled } from "./yolo-mode.ts";
+
+const YOLO_RENDER_KEY = Symbol.for("olisikh.pi.yolo-render");
+const BORDER_OFFSET = 2;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
@@ -53,7 +57,8 @@ function fitBorder(
 
 	let leftText = left;
 	let rightText = right;
-	const fixedWidth = 2;
+	const edgeWidth = Math.min(BORDER_OFFSET, Math.floor(width / 2));
+	const fixedWidth = edgeWidth * 2;
 	const minimumGap = 3;
 
 	while (
@@ -83,7 +88,8 @@ function fitBorder(
 		0,
 		width - fixedWidth - visibleWidth(leftText) - visibleWidth(rightText),
 	);
-	return `${border("─")}${leftText}${fill("─".repeat(gapWidth))}${rightText}${border("─")}`;
+	const edge = border("─".repeat(edgeWidth));
+	return `${edge}${leftText}${fill("─".repeat(gapWidth))}${rightText}${edge}`;
 }
 
 type ActiveTui = {
@@ -100,7 +106,8 @@ export default function (pi: ExtensionAPI) {
 	const modes = new Map<string, ModeChangedEvent>();
 	const usedMcpServers = new Set<string>();
 	let activeTui: ActiveTui | undefined;
-	let editorComponentInstalled = false;
+	let activeContext: ExtensionContext | undefined;
+	const wrappedFactories = new WeakSet<object>();
 	let installTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const stopInstallTimer = () => {
@@ -109,6 +116,7 @@ export default function (pi: ExtensionAPI) {
 	};
 
 	const requestRender = () => activeTui?.requestRender();
+	const runtime = globalThis as typeof globalThis & Record<symbol, unknown>;
 	const rememberMcpServer = (event: unknown) => {
 		const serverName = getMcpServerName(event);
 		if (!serverName || usedMcpServers.has(serverName)) return;
@@ -125,35 +133,58 @@ export default function (pi: ExtensionAPI) {
 	pi.on("tool_execution_end", rememberMcpServer);
 
 	const installModeBorder = (ctx: ExtensionContext) => {
-		if (editorComponentInstalled || ctx.mode !== "tui" || !ctx.hasUI) return;
+		if (ctx.mode !== "tui" || !ctx.hasUI) return;
 		const previousEditor = ctx.ui.getEditorComponent() as
 			| ((tui: ActiveTui, theme: unknown, keybindings: unknown) => CustomEditor)
 			| undefined;
-		ctx.ui.setEditorComponent(
-			(tui: ActiveTui, theme: unknown, keybindings: unknown) => {
-				const editor = (previousEditor?.(tui, theme, keybindings) ??
-					new CustomEditor(tui, theme, keybindings)) as CustomEditor;
-				activeTui = tui;
-				const applyBorderColor = () => {
-					editor.borderColor = (text: string) =>
-						paintBorder(borderModeFor(modes), text);
-				};
-				applyBorderColor();
-				const render = editor.render.bind(editor);
-				editor.render = (width: number) => {
-					applyBorderColor();
-					const lines = render(width);
-					if (lines.length < 2 || usedMcpServers.size === 0) return lines;
+		if (previousEditor && wrappedFactories.has(previousEditor)) return;
 
-					const label = editor.borderColor(` ${[...usedMcpServers].join(" · ")} `);
-					lines.splice(0, 1, fitBorder("", label, width, editor.borderColor));
-					return lines;
-				};
-				return editor;
-			},
-		);
-		editorComponentInstalled = true;
+		const modeBorderFactory = (
+			tui: ActiveTui,
+			theme: unknown,
+			keybindings: unknown,
+		) => {
+			const editor = (previousEditor?.(tui, theme, keybindings) ??
+				new CustomEditor(tui, theme, keybindings)) as CustomEditor;
+			activeTui = tui;
+			const applyBorderColor = () => {
+				editor.borderColor = (text: string) =>
+					paintBorder(borderModeFor(modes), text);
+			};
+			applyBorderColor();
+			const render = editor.render.bind(editor);
+			editor.render = (width: number) => {
+				applyBorderColor();
+				const lines = render(width);
+				if (lines.length < 2) return lines;
+
+				const yoloLabel = isYoloModeEnabled()
+					? `\x1b[1m${editor.borderColor(" yolo ")}\x1b[22m`
+					: "";
+				const mcpLabel =
+					usedMcpServers.size > 0
+						? `\x1b[1m${editor.borderColor(` ${[...usedMcpServers].join(" · ")} `)}\x1b[22m`
+						: "";
+				lines.splice(
+					0,
+					1,
+					fitBorder(yoloLabel, mcpLabel, width, editor.borderColor),
+				);
+				return lines;
+			};
+			return editor;
+		};
+
+		wrappedFactories.add(modeBorderFactory);
+		ctx.ui.setEditorComponent(modeBorderFactory);
 	};
+
+	const refreshModeBorder = () => {
+		// Re-wrap the editor if another extension replaced the factory after startup.
+		if (activeContext) installModeBorder(activeContext);
+		requestRender();
+	};
+	runtime[YOLO_RENDER_KEY] = refreshModeBorder;
 
 	const scheduleModeBorder = (ctx: ExtensionContext) => {
 		stopInstallTimer();
@@ -167,17 +198,20 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
 		modes.clear();
 		usedMcpServers.clear();
+		activeContext = ctx;
 		activeTui = undefined;
-		editorComponentInstalled = false;
 		scheduleModeBorder(ctx);
 	});
 
 	pi.on("session_shutdown", () => {
 		stopInstallTimer();
+		activeContext = undefined;
 		activeTui = undefined;
-		editorComponentInstalled = false;
 		modes.clear();
 		usedMcpServers.clear();
 		stopWatchingModes();
+		if (runtime[YOLO_RENDER_KEY] === refreshModeBorder) {
+			runtime[YOLO_RENDER_KEY] = undefined;
+		}
 	});
 }
