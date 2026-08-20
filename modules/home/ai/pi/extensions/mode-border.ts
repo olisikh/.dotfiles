@@ -92,6 +92,22 @@ function fitBorder(
 	return `${edge}${leftText}${fill("─".repeat(gapWidth))}${rightText}${edge}`;
 }
 
+function colorizeLabel(
+	theme: { fg?: (color: string, text: string) => string } | null,
+	token: string,
+	fallback: (text: string) => string,
+	text: string,
+): string {
+	if (theme && typeof theme.fg === "function") {
+		try {
+			return theme.fg(token, text);
+		} catch {
+			return fallback(text);
+		}
+	}
+	return fallback(text);
+}
+
 type ActiveTui = {
 	requestRender: () => void;
 };
@@ -148,6 +164,9 @@ export default function (pi: ExtensionAPI) {
 
 	const installModeBorder = (ctx: ExtensionContext) => {
 		if (ctx.mode !== "tui" || !ctx.hasUI) return;
+		const appTheme = ctx.ui.theme as {
+			fg?: (color: string, text: string) => string;
+		} | null;
 		const previousEditor = ctx.ui.getEditorComponent() as
 			| EditorFactory
 			| undefined;
@@ -176,11 +195,11 @@ export default function (pi: ExtensionAPI) {
 					if (lines.length < 2) return lines;
 
 					const yoloLabel = isYoloModeEnabled()
-						? `\x1b[1m${editor.borderColor(" yolo ")}\x1b[22m`
+						? `\x1b[1m${colorizeLabel(appTheme, "error", editor.borderColor, "\x1b[7m yolo \x1b[27m")}\x1b[22m`
 						: "";
 					const mcpLabel =
 						usedMcpServers.size > 0
-							? `\x1b[1m${editor.borderColor(` ${[...usedMcpServers].join(" · ")} `)}\x1b[22m`
+							? `\x1b[1m${colorizeLabel(appTheme, "mdLink", editor.borderColor, `\x1b[7m ${[...usedMcpServers].join(" · ")} \x1b[27m`)}\x1b[22m`
 							: "";
 					lines.splice(
 						0,
