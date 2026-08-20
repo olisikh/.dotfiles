@@ -8,5 +8,6 @@ runCommand "qmd" {
 } ''
   mkdir -p "$out/bin"
   makeWrapper ${nodejs_24}/bin/npx "$out/bin/qmd" \
-    --add-flags "--yes @tobilu/qmd@2.8.3"
+    --run 'export NPM_CONFIG_CACHE="''${NPM_CONFIG_CACHE:-$HOME/.cache/qmd/npm}"' \
+    --add-flags "--yes --package=@tobilu/qmd@2.8.3 qmd"
 ''

@@ -37,7 +37,6 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
-      "npm:pi-memory"
       "npm:@vigolium/piolium"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
@@ -173,6 +172,7 @@ let
           "git remote*" = "allow";
           "git show*" = "allow";
           "git check-ignore*" = "allow";
+          "git ls-files*" = "allow";
           "strings *" = "allow";
           "grep *" = "allow";
           "pgrep *" = "allow";
@@ -250,7 +250,8 @@ in
     ];
 
     home.sessionVariables = {
-      PI_MEMORY_DIR = "${config.home.homeDirectory}/.llm-memory";
+      LLM_NOTES_ROOT = "${config.home.homeDirectory}/notes";
+      LLM_NOTES_QMD_COLLECTION = "notes";
       PI_DOUBLE_ESC_MS = toString cfg.doubleEscapeWindowMs;
       PI_DOUBLE_ESC_HINT_POSITION = "left";
       PI_WORKING_INDICATOR_TYPE = cfg.workingIndicator.type;
@@ -289,6 +290,7 @@ in
       ".pi/agent/extensions/lib/mode-border.ts".source = ./extensions/lib/mode-border.ts;
       ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
+      ".pi/agent/extensions/yolo-mode.ts".source = ./extensions/yolo-mode.ts;
     };
   };
 }
