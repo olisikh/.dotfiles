@@ -27,6 +27,12 @@ let
       };
     };
 
+   smartCompact = {
+     autoTrigger = true;
+     autoTriggerStrategy = "settled";
+     minContextPercent = 80;
+   };
+
     theme = "catppuccin-mocha";
     quietStartup = true;
     npmCommand = [ "npm" ];
@@ -39,6 +45,7 @@ let
       "npm:pi-subagents"
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
+      "npm:pi-smart-compact"
       {
         source = "git:github.com/olisikh/pi-extensions";
         extensions = [
