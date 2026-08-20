@@ -56,7 +56,6 @@ let
         ];
       }
       "npm:context-mode"
-      "git:github.com/DietrichGebert/ponytail"
       "git:github.com/olisikh/pi-double-esc"
       "npm:@upstash/context7-pi"
       "npm:@juicesharp/rpiv-todo"

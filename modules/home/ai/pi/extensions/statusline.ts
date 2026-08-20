@@ -135,7 +135,7 @@ export default function (pi: ExtensionAPI) {
 
 						parts.push(theme.fg("muted", `${folder}:${branch ?? "-"}`));
 
-						return [truncateToWidth(parts.join(theme.fg("dim", " | ")), width)];
+						return [truncateToWidth(parts.join(theme.fg("dim", " · ")), width)];
 					},
 				};
 			},
