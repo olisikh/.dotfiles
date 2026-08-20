@@ -37,8 +37,6 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
-      "npm:pi-vim"
-      "npm:pi-smart-compact"
       "npm:@vigolium/piolium"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
