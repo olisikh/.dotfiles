@@ -154,9 +154,8 @@ let
         mcp = {
           "*" = "ask";
 
-          "mcp__ctx_*" = "allow";
-          "mcp__context-mode_ctx_*" = "allow";
-          "mcp__context-mode:ctx_*" = "allow";
+          "mcp__context-mode*" = "allow";
+          "mcp__exa*" = "allow";
         };
 
         edit = "ask";
