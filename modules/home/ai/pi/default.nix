@@ -37,6 +37,8 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
+      "npm:pi-vim"
+      "npm:pi-smart-compact"
       "npm:@vigolium/piolium"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
@@ -114,8 +116,6 @@ let
       permission = {
         "*" = "ask";
 
-        # OpenCode equivalents: glob -> find, list -> ls, todowrite -> todo,
-        # question -> ask_user_question, webfetch/websearch -> Exa tools.
         read = "allow";
         find = "allow";
         head = "allow";
@@ -125,8 +125,6 @@ let
         skill = "allow";
         todo = "allow";
         "ctx_*" = "allow";
-
-        # Allow all pi-lens tools, including its opt-in mutating/search tools.
         "ast_grep_*" = "allow";
         "lens_*" = "allow";
         "lsp_*" = "allow";
@@ -135,30 +133,15 @@ let
         read_enclosing = "allow";
         read_symbol = "allow";
         symbol_search = "allow";
-
-        # User-facing questions/dialogues and subagent interviews are safe UI operations.
-        "*question*" = "allow";
-        "*dialog*" = "allow";
-        qna = "allow";
         contact_supervisor = "allow";
         ask_user_question = "allow";
         plan_mode_question = "allow";
         plan_mode_complete = "allow";
         "subagent_*" = "allow";
 
-        web_fetch_exa = "allow";
-        web_search_exa = "allow";
+        "mcp__context-mode*" = "allow";
+        "mcp__exa*" = "allow";
 
-
-        # ctx_* may also be reached through the MCP proxy when direct tools are off.
-        mcp = {
-          "*" = "ask";
-
-          "mcp__context-mode*" = "allow";
-          "mcp__exa*" = "allow";
-        };
-
-        edit = "ask";
         subagent = "allow";
 
         bash = {
@@ -181,6 +164,8 @@ let
           "while *" = "allow";
           "if *" = "allow";
           "test *" = "allow";
+          "tr *" = "allow";
+          "exit *" = "allow";
           "cat *" = "allow";
           "printf *" = "allow";
           "read *" = "allow";
