@@ -209,6 +209,7 @@ let
           "jq *" = "allow";
           "id *" = "allow";
           "shfmt*" = "allow";
+          "qmd *" = "allow";
         };
 
         external_directory = {
