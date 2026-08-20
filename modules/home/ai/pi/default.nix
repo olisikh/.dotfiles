@@ -203,6 +203,7 @@ let
           "env" = "allow";
           "printenv" = "allow";
           "export *" = "allow";
+          "timeout *" = "allow";
         };
 
         external_directory = {
