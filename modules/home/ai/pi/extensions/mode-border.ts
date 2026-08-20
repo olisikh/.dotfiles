@@ -201,29 +201,23 @@ export default function (pi: ExtensionAPI) {
 			factory && wrappedFactories.has(factory)
 				? factory
 				: createModeBorderFactory(factory);
-		const existingUiState = ui[MODE_BORDER_UI_KEY] as
-			| BorderUiState
-			| undefined;
+		const existingUiState = ui[MODE_BORDER_UI_KEY] as BorderUiState | undefined;
 
 		if (existingUiState) {
 			existingUiState.wrapFactory = wrapFactory;
-			existingUiState.originalSetEditorComponent(
-				wrapFactory(previousEditor),
-			);
+			existingUiState.originalSetEditorComponent(wrapFactory(previousEditor));
 			return;
 		}
 
-		const originalSetEditorComponent = ctx.ui.setEditorComponent.bind(
-			ctx.ui,
-		) as (factory: EditorFactory) => void;
+		const originalSetEditorComponent = ctx.ui.setEditorComponent.bind(ctx.ui) as (
+			factory: EditorFactory,
+		) => void;
 		const borderUiState: BorderUiState = {
 			originalSetEditorComponent,
 			wrapFactory,
 			proxySetEditorComponent: (factory) => {
 				const currentState = ui[MODE_BORDER_UI_KEY] as BorderUiState;
-				currentState.originalSetEditorComponent(
-					currentState.wrapFactory(factory),
-				);
+				currentState.originalSetEditorComponent(currentState.wrapFactory(factory));
 			},
 		};
 		ui[MODE_BORDER_UI_KEY] = borderUiState;
