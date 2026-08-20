@@ -75,7 +75,7 @@ let
     enableInstallTelemetry = false;
     enableAnalytics = false;
 
-    showHardwareCursor = true;
+    showHardwareCursor = false;
 
     # pi would react to "all" steered/follow-up messages "all" at once or "one-at-a-time"
     steeringMode = "all";
