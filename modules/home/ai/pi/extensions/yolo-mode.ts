@@ -150,7 +150,6 @@ async function handleYolo(
 	}
 
 	ctx.ui.setStatus("pi-permission-system", enabled ? "yolo" : undefined);
-	ctx.ui.notify(`YOLO mode ${enabled ? "enabled" : "disabled"}.`, "info");
 }
 
 export default function (pi: ExtensionAPI): void {

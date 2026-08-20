@@ -34,11 +34,10 @@ let
     packages = [
       "npm:pi-ollama-cloud"
       "@quintinshaw/pi-dynamic-workflows"
+      "npm:@gotgenes/pi-permission-system"
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
-      "npm:@vigolium/piolium"
-      "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
       {
         source = "git:github.com/olisikh/pi-extensions";
