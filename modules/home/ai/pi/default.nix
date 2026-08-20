@@ -45,7 +45,9 @@ let
       "npm:pi-subagents"
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
-      "npm:pi-smart-compact"
+      # BUG: figure out why both of these make pi to fail at startup
+      # "npm:pi-smart-compact"
+      # "npm:pi-vim"
       {
         source = "git:github.com/olisikh/pi-extensions";
         extensions = [
@@ -198,6 +200,9 @@ let
           "id *" = "allow";
           "shfmt*" = "allow";
           "qmd *" = "allow";
+          "env" = "allow";
+          "printenv" = "allow";
+          "export *" = "allow";
         };
 
         external_directory = {
