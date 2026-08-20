@@ -124,7 +124,7 @@ in
         eslint_d
         google-java-format
         lombok
-        nixpkgs-fmt
+        nixfmt
       ];
 
       # NOTE: auto-load all plugins from ~/Develop/nvim-plugins folder (my own convention)

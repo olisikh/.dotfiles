@@ -37,6 +37,7 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
+      "npm:pi-memory"
       "npm:@vigolium/piolium"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-rtk-optimizer"
@@ -144,17 +145,19 @@ let
         ask_user_question = "allow";
         plan_mode_question = "allow";
         plan_mode_complete = "allow";
+        "subagent_*" = "allow";
 
         web_fetch_exa = "allow";
         web_search_exa = "allow";
+
 
         # ctx_* may also be reached through the MCP proxy when direct tools are off.
         mcp = {
           "*" = "ask";
 
-          "ctx_*" = "allow";
-          "context-mode_ctx_*" = "allow";
-          "context-mode:ctx_*" = "allow";
+          "mcp__ctx_*" = "allow";
+          "mcp__context-mode_ctx_*" = "allow";
+          "mcp__context-mode:ctx_*" = "allow";
         };
 
         edit = "ask";
@@ -172,6 +175,9 @@ let
           "git check-ignore*" = "allow";
           "strings *" = "allow";
           "grep *" = "allow";
+          "pgrep *" = "allow";
+          "ps *" = "allow";
+          "awk *" = "allow";
           "cat *" = "allow";
           "printf *" = "allow";
           "read *" = "allow";
@@ -193,9 +199,12 @@ let
           "dirname *" = "allow";
           "which *" = "allow";
           "whoami" = "allow";
+          "set *" = "allow";
+          "trap *" = "allow";
           "command *" = "allow";
           "nixfmt*" = "allow";
           "jq *" = "allow";
+          "id *" = "allow";
           "shfmt*" = "allow";
         };
 
@@ -233,9 +242,11 @@ in
       pkgs.llm-agents.pi
       pkgs.rtk
       pkgs.${namespace}.context-mode
+      pkgs.${namespace}.qmd
     ];
 
     home.sessionVariables = {
+      PI_MEMORY_DIR = "${config.home.homeDirectory}/.llm-memory";
       PI_DOUBLE_ESC_MS = toString cfg.doubleEscapeWindowMs;
       PI_DOUBLE_ESC_HINT_POSITION = "left";
       PI_WORKING_INDICATOR_TYPE = cfg.workingIndicator.type;

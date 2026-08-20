@@ -63,6 +63,7 @@ in
     dev.kotlin-lsp = enabled;
 
     ai = {
+      qmd = enabled;
       ollama = enabled;
       voicebox = enabled;
       codex = enabled;

@@ -126,7 +126,7 @@ final: prev: {
     };
 
 
-    # HACK: prevert SSL errors as nix fails to fetch these plugins from codeberg.org git repos.
+    # HACK: prevent SSL errors as nix fails to fetch these plugins from codeberg.org git repos.
     nvim-dap-virtual-text = final.vimUtils.buildVimPlugin {
       name = "nvim-dap-virtual-text";
       src = final.fetchFromGitHub {

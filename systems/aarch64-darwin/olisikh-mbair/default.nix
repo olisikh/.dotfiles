@@ -66,6 +66,7 @@ in
     };
 
     ai = {
+      qmd = enabled;
       ollama = enabled;
       codex = enabled;
       chatgpt = enabled;

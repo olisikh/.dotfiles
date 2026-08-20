@@ -59,6 +59,7 @@ in
     };
 
     ai = {
+      qmd = enabled;
       ollama = enabled;
       cursor = enabled;
       codex = enabled;
