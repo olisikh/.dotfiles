@@ -34,8 +34,29 @@ let
    };
 
     theme = "catppuccin-mocha";
+
+    # Keep pi-vim's reverse-video mode label readable on Catppuccin Mocha.
+    # The default `borderMuted` (surface0) makes INSERT look like dark text
+    # on a grey block after reverse video is applied. Values must be theme
+    # color TOKENS (keys in the theme's `colors` map), not var names like
+    # "peach" — those throw in Theme.fg() and silently fall back to grey.
+    piVim = {
+      modeColors = {
+        insert = "success";
+        normal = "accent";
+        visual = "mdLink";
+        ex = "warning";
+      };
+    };
+
     quietStartup = true;
     npmCommand = [ "npm" ];
+
+    # pi-vim owns the prompt editor; vim-style half-page session scroll needs
+    # pi's fullscreen tui-mode (pi owns the transcript viewport, like nvim owns
+    # its buffer). In regular mode the transcript is Wezterm's scrollback, which
+    # pi cannot scroll.
+    tuiMode = "fullscreen";
 
     packages = [
       "npm:pi-ollama-cloud"
@@ -45,7 +66,6 @@ let
       "npm:pi-subagents"
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
-      "git:github.com/olisikh/pi-smart-compact@fix/node-target-pi-loader"
       "git:github.com/olisikh/pi-vim@fix/standalone-bun-pi"
       {
         source = "git:github.com/olisikh/pi-extensions";
@@ -55,7 +75,6 @@ let
         ];
       }
       "npm:context-mode"
-      "git:github.com/olisikh/pi-double-esc"
       "npm:@upstash/context7-pi"
       "npm:@juicesharp/rpiv-todo"
       "npm:@juicesharp/rpiv-ask-user-question"
@@ -73,6 +92,7 @@ let
 
     enableInstallTelemetry = false;
     enableAnalytics = false;
+    hideThinkingBlock = true;
 
     showHardwareCursor = false;
 
@@ -202,6 +222,7 @@ let
           "printenv" = "allow";
           "export *" = "allow";
           "timeout *" = "allow";
+          "diff *" = "allow";
         };
 
         external_directory = {
@@ -229,7 +250,16 @@ in
       shimmerIntervalMs = mkOpt types.ints.positive 200 "Milliseconds between shimmer frames";
       spinnerIntervalMs = mkOpt types.ints.positive 120 "Milliseconds between spinner frames";
     };
-    keybindings = mkOpt types.attrs { } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
+    keybindings = mkOpt types.attrs {
+      # pi-vim owns the prompt; Ctrl+D/U scroll the session transcript a
+      # half-page (vim-style) instead of exiting pi or deleting a line.
+      # Requires tuiMode = "fullscreen" (tui.altScreen.* target the viewport).
+      "app.exit" = [ ];
+      "tui.editor.deleteCharForward" = [ "delete" ];
+      "tui.editor.deleteToLineStart" = [ ];
+      "tui.altScreen.halfPageDown" = [ "ctrl+d" ];
+      "tui.altScreen.halfPageUp" = [ "ctrl+u" ];
+    } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
     mcps = mkOpt types.attrs { } "Pi MCP adapter config merged into the default Exa server configuration";
   };
 
@@ -283,6 +313,8 @@ in
       ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
       ".pi/agent/extensions/yolo-mode.ts".source = ./extensions/yolo-mode.ts;
+      ".pi/agent/extensions/vim-editor.ts".source = ./extensions/vim-editor.ts;
+      ".pi/agent/extensions/lib/double-esc.ts".source = ./extensions/lib/double-esc.ts;
     };
   };
 }
