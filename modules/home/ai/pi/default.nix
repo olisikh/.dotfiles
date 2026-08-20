@@ -178,6 +178,10 @@ let
           "pgrep *" = "allow";
           "ps *" = "allow";
           "awk *" = "allow";
+          "for *" = "allow";
+          "while *" = "allow";
+          "if *" = "allow";
+          "test *" = "allow";
           "cat *" = "allow";
           "printf *" = "allow";
           "read *" = "allow";
@@ -194,7 +198,6 @@ let
           "pwd" = "allow";
           "sed *" = "allow";
           "true" = "allow";
-          "test *" = "allow";
           "false" = "allow";
           "dirname *" = "allow";
           "which *" = "allow";
