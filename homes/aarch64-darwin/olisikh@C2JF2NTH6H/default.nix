@@ -144,7 +144,8 @@ in
       pi = {
         enable = true;
         config = {
-          defaultModel = "openai-codex/gpt-5.6-terra";
+          defaultModel = "gpt-5.6-terra";
+          defaultProvider = "openai-codex";
           defaultThinkingLevel = "high";
           subagents = {
             modelScope.allow = [ "openai-codex/*" ];
