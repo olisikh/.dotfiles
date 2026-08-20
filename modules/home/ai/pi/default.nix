@@ -45,9 +45,8 @@ let
       "npm:pi-subagents"
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
-      # BUG: figure out why both of these make pi to fail at startup
-      # "npm:pi-smart-compact"
-      # "npm:pi-vim"
+      "git:github.com/olisikh/pi-smart-compact@fix/node-target-pi-loader"
+      "git:github.com/olisikh/pi-vim@fix/standalone-bun-pi"
       {
         source = "git:github.com/olisikh/pi-extensions";
         extensions = [

@@ -4,14 +4,6 @@ import type {
 	// @ts-expect-error Pi provides this module at runtime.
 } from "@earendil-works/pi-coding-agent";
 
-type PermissionSystemGlobal = typeof globalThis & {
-	__piPermissionSystem?: {
-		toggleYoloMode(options?: { persist?: boolean; source?: string }): {
-			error?: string;
-		};
-	};
-};
-
 type YoloState = { enabled: boolean; initialized: boolean };
 type RuntimePermissionManager = {
 	isYoloEnabled: () => boolean;
@@ -20,13 +12,15 @@ type RuntimePermissionService = {
 	resolver?: {
 		permissionManager?: RuntimePermissionManager;
 	};
+	session?: {
+		config?: { yoloMode?: boolean };
+	};
 };
 const PERMISSION_SERVICE_KEY = Symbol.for(
 	"@gotgenes/pi-permission-system:service",
 );
 const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
 const YOLO_RENDER_KEY = Symbol.for("olisikh.pi.yolo-render");
-const LOCAL_API_KEY = Symbol.for("olisikh.pi.yolo-local-api");
 
 function yoloState(): YoloState {
 	const global = globalThis as typeof globalThis & Record<symbol, unknown>;
@@ -49,45 +43,16 @@ function requestYoloRender(): void {
 	if (typeof requestRender === "function") requestRender();
 }
 
-function permissionManager(): RuntimePermissionManager | undefined {
+function permissionService(): RuntimePermissionService | undefined {
 	const global = globalThis as typeof globalThis & Record<symbol, unknown>;
-	const service = global[PERMISSION_SERVICE_KEY] as
-		| RuntimePermissionService
-		| undefined;
-	return service?.resolver?.permissionManager;
+	return global[PERMISSION_SERVICE_KEY] as RuntimePermissionService | undefined;
 }
 
-function installRuntimePermissionSystem():
-	| NonNullable<PermissionSystemGlobal["__piPermissionSystem"]>
-	| undefined {
-	const global = globalThis as PermissionSystemGlobal;
-	if (global.__piPermissionSystem) return global.__piPermissionSystem;
-
-	const toggleYoloMode = (options?: {
-		persist?: boolean;
-		source?: string;
-	}): { error?: string } => {
-		if (options?.persist === true) {
-			return { error: "YOLO persistence is disabled" };
-		}
-		const manager = permissionManager();
-		if (!manager) return { error: "permission system is not ready" };
-		manager.isYoloEnabled = () => yoloState().enabled;
-		yoloState().enabled = !yoloState().enabled;
-		return {};
-	};
-
-	(global as typeof globalThis & Record<symbol, unknown>)[LOCAL_API_KEY] = true;
-	global.__piPermissionSystem = { toggleYoloMode };
-	return global.__piPermissionSystem;
+function permissionManager(): RuntimePermissionManager | undefined {
+	return permissionService()?.resolver?.permissionManager;
 }
 
 function bindRuntimePermissionManager(): void {
-	const global = globalThis as typeof globalThis &
-		Record<symbol, unknown> &
-		PermissionSystemGlobal;
-	const officialApi =
-		global.__piPermissionSystem && global[LOCAL_API_KEY] !== true;
 	const manager = permissionManager();
 	if (!manager) return;
 	const state = yoloState();
@@ -95,29 +60,18 @@ function bindRuntimePermissionManager(): void {
 		state.enabled = manager.isYoloEnabled();
 		state.initialized = true;
 	}
-	if (officialApi) return;
-	// ponytail: bind the current package's private reader until its public runtime API ships.
+	// ponytail: bind the current package's private readers until its public runtime API ships.
 	manager.isYoloEnabled = () => yoloState().enabled;
-	if (!global.__piPermissionSystem) installRuntimePermissionSystem();
+	const runtimeConfig = permissionService()?.session?.config;
+	if (runtimeConfig) runtimeConfig.yoloMode = state.enabled;
 }
 
-function setYoloMode(enabled: boolean, source: string): string | undefined {
-	const permissionSystem =
-		(globalThis as PermissionSystemGlobal).__piPermissionSystem ??
-		installRuntimePermissionSystem();
-	if (!permissionSystem) {
-		return "pi-permission-system runtime API is unavailable";
-	}
+function setYoloMode(enabled: boolean): string | undefined {
+	if (!permissionManager()) return "permission system is not ready";
 
 	bindRuntimePermissionManager();
 	const state = yoloState();
 	if (state.enabled === enabled) return undefined;
-
-	const result = permissionSystem.toggleYoloMode({
-		persist: false,
-		source,
-	});
-	if (result.error) return result.error;
 
 	state.enabled = enabled;
 	bindRuntimePermissionManager();
@@ -143,7 +97,7 @@ async function handleYolo(
 		return;
 	}
 
-	const error = setYoloMode(enabled, "yolo-command");
+	const error = setYoloMode(enabled);
 	if (error) {
 		ctx.ui.notify(`Unable to change YOLO mode: ${error}`, "error");
 		return;
@@ -154,6 +108,7 @@ async function handleYolo(
 
 export default function (pi: ExtensionAPI): void {
 	pi.on("session_start", () => bindRuntimePermissionManager());
+	pi.events.on("permissions:ready", () => bindRuntimePermissionManager());
 
 	pi.registerCommand("yolo", {
 		description: "Toggle permission-system YOLO mode for this Pi process",

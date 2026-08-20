@@ -96,6 +96,20 @@ type ActiveTui = {
 	requestRender: () => void;
 };
 
+type EditorFactory = (
+	tui: ActiveTui,
+	theme: unknown,
+	keybindings: unknown,
+) => CustomEditor;
+
+type BorderUiState = {
+	originalSetEditorComponent: (factory: EditorFactory) => void;
+	wrapFactory: (factory: EditorFactory | undefined) => EditorFactory;
+	proxySetEditorComponent: (factory: EditorFactory) => void;
+};
+
+const MODE_BORDER_UI_KEY = Symbol.for("olisikh.pi.mode-border-ui");
+
 export {
 	borderModeFor,
 	paintBorder,
@@ -135,48 +149,91 @@ export default function (pi: ExtensionAPI) {
 	const installModeBorder = (ctx: ExtensionContext) => {
 		if (ctx.mode !== "tui" || !ctx.hasUI) return;
 		const previousEditor = ctx.ui.getEditorComponent() as
-			| ((tui: ActiveTui, theme: unknown, keybindings: unknown) => CustomEditor)
+			| EditorFactory
 			| undefined;
 		if (previousEditor && wrappedFactories.has(previousEditor)) return;
 
-		const modeBorderFactory = (
-			tui: ActiveTui,
-			theme: unknown,
-			keybindings: unknown,
-		) => {
-			const editor = (previousEditor?.(tui, theme, keybindings) ??
-				new CustomEditor(tui, theme, keybindings)) as CustomEditor;
-			activeTui = tui;
-			const applyBorderColor = () => {
-				editor.borderColor = (text: string) =>
-					paintBorder(borderModeFor(modes), text);
-			};
-			applyBorderColor();
-			const render = editor.render.bind(editor);
-			editor.render = (width: number) => {
+		const createModeBorderFactory = (
+			baseEditor: EditorFactory | undefined,
+		): EditorFactory => {
+			const modeBorderFactory = (
+				tui: ActiveTui,
+				theme: unknown,
+				keybindings: unknown,
+			) => {
+				const editor = (baseEditor?.(tui, theme, keybindings) ??
+					new CustomEditor(tui, theme, keybindings)) as CustomEditor;
+				activeTui = tui;
+				const applyBorderColor = () => {
+					editor.borderColor = (text: string) =>
+						paintBorder(borderModeFor(modes), text);
+				};
 				applyBorderColor();
-				const lines = render(width);
-				if (lines.length < 2) return lines;
+				const render = editor.render.bind(editor);
+				editor.render = (width: number) => {
+					applyBorderColor();
+					const lines = render(width);
+					if (lines.length < 2) return lines;
 
-				const yoloLabel = isYoloModeEnabled()
-					? `\x1b[1m${editor.borderColor(" yolo ")}\x1b[22m`
-					: "";
-				const mcpLabel =
-					usedMcpServers.size > 0
-						? `\x1b[1m${editor.borderColor(` ${[...usedMcpServers].join(" · ")} `)}\x1b[22m`
+					const yoloLabel = isYoloModeEnabled()
+						? `\x1b[1m${editor.borderColor(" yolo ")}\x1b[22m`
 						: "";
-				lines.splice(
-					0,
-					1,
-					fitBorder(yoloLabel, mcpLabel, width, editor.borderColor),
-				);
-				return lines;
+					const mcpLabel =
+						usedMcpServers.size > 0
+							? `\x1b[1m${editor.borderColor(` ${[...usedMcpServers].join(" · ")} `)}\x1b[22m`
+							: "";
+					lines.splice(
+						0,
+						1,
+						fitBorder(yoloLabel, mcpLabel, width, editor.borderColor),
+					);
+					return lines;
+				};
+				return editor;
 			};
-			return editor;
+
+			wrappedFactories.add(modeBorderFactory);
+			return modeBorderFactory;
 		};
 
-		wrappedFactories.add(modeBorderFactory);
-		ctx.ui.setEditorComponent(modeBorderFactory);
+		const ui = ctx.ui as typeof ctx.ui & Record<symbol, unknown>;
+		const wrapFactory = (factory: EditorFactory | undefined) =>
+			factory && wrappedFactories.has(factory)
+				? factory
+				: createModeBorderFactory(factory);
+		const existingUiState = ui[MODE_BORDER_UI_KEY] as
+			| BorderUiState
+			| undefined;
+
+		if (existingUiState) {
+			existingUiState.wrapFactory = wrapFactory;
+			existingUiState.originalSetEditorComponent(
+				wrapFactory(previousEditor),
+			);
+			return;
+		}
+
+		const originalSetEditorComponent = ctx.ui.setEditorComponent.bind(
+			ctx.ui,
+		) as (factory: EditorFactory) => void;
+		const borderUiState: BorderUiState = {
+			originalSetEditorComponent,
+			wrapFactory,
+			proxySetEditorComponent: (factory) => {
+				const currentState = ui[MODE_BORDER_UI_KEY] as BorderUiState;
+				currentState.originalSetEditorComponent(
+					currentState.wrapFactory(factory),
+				);
+			},
+		};
+		ui[MODE_BORDER_UI_KEY] = borderUiState;
+		// SAFETY: Pi exposes this setter as a mutable callable UI method; the cast only narrows its factory signature for the proxy.
+		(
+			ctx.ui as unknown as {
+				setEditorComponent: (factory: EditorFactory) => void;
+			}
+		).setEditorComponent = borderUiState.proxySetEditorComponent;
+		originalSetEditorComponent(wrapFactory(previousEditor));
 	};
 
 	const refreshModeBorder = () => {
