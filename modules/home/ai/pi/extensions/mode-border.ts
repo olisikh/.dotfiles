@@ -19,7 +19,6 @@ import {
 import { isYoloModeEnabled } from "./yolo-mode.ts";
 
 const YOLO_RENDER_KEY = Symbol.for("olisikh.pi.yolo-render");
-const BORDER_OFFSET = 2;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
@@ -57,13 +56,10 @@ function fitBorder(
 
 	let leftText = left;
 	let rightText = right;
-	const edgeWidth = Math.min(BORDER_OFFSET, Math.floor(width / 2));
-	const fixedWidth = edgeWidth * 2;
 	const minimumGap = 3;
 
 	while (
-		fixedWidth + visibleWidth(leftText) + visibleWidth(rightText) + minimumGap >
-			width &&
+		visibleWidth(leftText) + visibleWidth(rightText) + minimumGap > width &&
 		visibleWidth(rightText) > 0
 	) {
 		rightText = truncateToWidth(
@@ -73,8 +69,7 @@ function fitBorder(
 		);
 	}
 	while (
-		fixedWidth + visibleWidth(leftText) + visibleWidth(rightText) + minimumGap >
-			width &&
+		visibleWidth(leftText) + visibleWidth(rightText) + minimumGap > width &&
 		visibleWidth(leftText) > 0
 	) {
 		leftText = truncateToWidth(
@@ -86,10 +81,9 @@ function fitBorder(
 
 	const gapWidth = Math.max(
 		0,
-		width - fixedWidth - visibleWidth(leftText) - visibleWidth(rightText),
+		width - visibleWidth(leftText) - visibleWidth(rightText),
 	);
-	const edge = border("─".repeat(edgeWidth));
-	return `${edge}${leftText}${fill("─".repeat(gapWidth))}${rightText}${edge}`;
+	return `${leftText}${fill("─".repeat(gapWidth))}${rightText}`;
 }
 
 function colorizeLabel(
