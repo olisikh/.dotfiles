@@ -22,10 +22,17 @@ export type DoubleEscAction = "abort" | "suppress" | "timeout";
 export type HintPosition = "left" | "center" | "right";
 
 const DEFAULT_DEBOUNCE_MS = 1500;
-const DEFAULT_HINT_POSITION: HintPosition = "right";
+const DEFAULT_HINT_POSITION: HintPosition = "left";
+
+function readEnvironment(name: string): string | undefined {
+ const processLike = globalThis as typeof globalThis & {
+  process?: { env?: Record<string, string | undefined> };
+ };
+ return processLike.process?.env?.[name];
+}
 
 export function getDoubleEscDebounceMs(): number {
- const env = process.env.PI_DOUBLE_ESC_MS;
+ const env = readEnvironment("PI_DOUBLE_ESC_MS");
  if (env) {
   const parsed = parseInt(env, 10);
   if (!Number.isNaN(parsed) && parsed > 0) return parsed;
@@ -35,7 +42,9 @@ export function getDoubleEscDebounceMs(): number {
 
 /** Where the "esc again to abort" hint sits in the editor border. */
 export function getHintPosition(): HintPosition {
- const position = process.env.PI_DOUBLE_ESC_HINT_POSITION?.trim().toLowerCase();
+ const position = readEnvironment("PI_DOUBLE_ESC_HINT_POSITION")
+  ?.trim()
+  .toLowerCase();
  if (position === "left" || position === "center" || position === "right") {
   return position;
  }

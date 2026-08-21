@@ -1,8 +1,22 @@
-import type {
-	ExtensionAPI,
-	ExtensionCommandContext,
-	// @ts-expect-error Pi provides this module at runtime.
-} from "@earendil-works/pi-coding-agent";
+const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
+
+type ExtensionAPI = {
+	on: (event: string, handler: (...args: unknown[]) => void) => void;
+	events: {
+		emit: (channel: string, value: unknown) => void;
+		on: (channel: string, handler: (...args: unknown[]) => void) => () => void;
+	};
+	registerCommand: (name: string, command: unknown) => void;
+	registerShortcut: (name: string, shortcut: unknown) => void;
+	sendUserMessage: (message: string) => void;
+};
+
+type ExtensionCommandContext = {
+	ui: {
+		notify: (message: string, level: "warning" | "error") => void;
+		setStatus: (key: string, value: string | undefined) => void;
+	};
+};
 
 type YoloState = { enabled: boolean; initialized: boolean };
 type RuntimePermissionManager = {
@@ -20,7 +34,6 @@ const PERMISSION_SERVICE_KEY = Symbol.for(
 	"@gotgenes/pi-permission-system:service",
 );
 const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
-const YOLO_RENDER_KEY = Symbol.for("olisikh.pi.yolo-render");
 
 function yoloState(): YoloState {
 	const global = globalThis as typeof globalThis & Record<symbol, unknown>;
@@ -35,12 +48,6 @@ function yoloState(): YoloState {
 export function isYoloModeEnabled(): boolean {
 	const global = globalThis as typeof globalThis & Record<symbol, unknown>;
 	return (global[YOLO_STATE_KEY] as YoloState | undefined)?.enabled === true;
-}
-
-function requestYoloRender(): void {
-	const global = globalThis as typeof globalThis & Record<symbol, unknown>;
-	const requestRender = global[YOLO_RENDER_KEY];
-	if (typeof requestRender === "function") requestRender();
 }
 
 function permissionService(): RuntimePermissionService | undefined {
@@ -66,6 +73,10 @@ function bindRuntimePermissionManager(): void {
 	if (runtimeConfig) runtimeConfig.yoloMode = state.enabled;
 }
 
+function publishYoloState(pi: ExtensionAPI, enabled: boolean): void {
+	pi.events.emit(UPPER_STATUS_EVENT, { version: 1, source: "yolo", enabled });
+}
+
 function setYoloMode(enabled: boolean): string | undefined {
 	if (!permissionManager()) return "permission system is not ready";
 
@@ -75,11 +86,11 @@ function setYoloMode(enabled: boolean): string | undefined {
 
 	state.enabled = enabled;
 	bindRuntimePermissionManager();
-	requestYoloRender();
 	return undefined;
 }
 
 async function handleYolo(
+	pi: ExtensionAPI,
 	requested: string,
 	ctx: ExtensionCommandContext,
 ): Promise<void> {
@@ -103,12 +114,17 @@ async function handleYolo(
 		return;
 	}
 
+	publishYoloState(pi, isYoloModeEnabled());
 	ctx.ui.setStatus("pi-permission-system", enabled ? "yolo" : undefined);
 }
 
 export default function (pi: ExtensionAPI): void {
-	pi.on("session_start", () => bindRuntimePermissionManager());
-	pi.events.on("permissions:ready", () => bindRuntimePermissionManager());
+	const syncYoloState = () => {
+		bindRuntimePermissionManager();
+		publishYoloState(pi, isYoloModeEnabled());
+	};
+	pi.on("session_start", syncYoloState);
+	pi.events.on("permissions:ready", syncYoloState);
 
 	pi.registerCommand("yolo", {
 		description: "Toggle permission-system YOLO mode for this Pi process",
@@ -119,7 +135,7 @@ export default function (pi: ExtensionAPI): void {
 			);
 		},
 		handler: async (args: string, ctx: ExtensionCommandContext) =>
-			handleYolo(args, ctx),
+			handleYolo(pi, args, ctx),
 	});
 
 	pi.registerShortcut("ctrl+alt+y", {

@@ -18,6 +18,7 @@ import { homedir } from "node:os";
 import path from "node:path";
 /* @ts-expect-error Pi provides this module at runtime. */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { Text } from "@mariozechner/pi-tui";
 /* @ts-expect-error Pi provides this module at runtime. */
 import { Type } from "typebox";
 
@@ -53,6 +54,7 @@ type PiContext = {
 	sessionManager?: { getSessionId?: () => string };
 };
 type BeforeAgentStartEvent = { prompt?: string; systemPrompt: string };
+type EntryTheme = { fg: (color: string, text: string) => string };
 
 const redactions: Array<[RegExp, string]> = [
 	[/\b(?:sk|rk|pk)_[A-Za-z0-9_-]{16,}\b/g, "[REDACTED_API_KEY]"],
@@ -457,6 +459,11 @@ function isSubstantive(text: string): boolean {
 
 export default function (pi: ExtensionAPI) {
 	const recalled = new Set<string>();
+	pi.registerEntryRenderer(
+		"wiki-memory-search",
+		(_entry: unknown, _options: unknown, theme: EntryTheme) =>
+			new Text(theme.fg("muted", "⌕ Searching memory…"), 0, 0),
+	);
 	pi.registerTool({
 		name: "wiki_recall",
 		label: "Wiki Recall",
@@ -537,6 +544,7 @@ export default function (pi: ExtensionAPI) {
 			const key = `${ctx.cwd}:${query}`;
 			if (!query || !isSubstantive(query) || recalled.has(key)) return;
 			recalled.add(key);
+			pi.appendEntry("wiki-memory-search", { phase: "searching" });
 			try {
 				const memory = await recall({ query, max_results: 3 }, ctx.cwd ?? cwd());
 				return {

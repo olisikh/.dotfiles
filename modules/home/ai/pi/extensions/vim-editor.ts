@@ -15,8 +15,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 /* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { matchesKey, visibleWidth } from "@mariozechner/pi-tui";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import {
   createDoubleEscState,
   expireDoubleEsc,
@@ -27,7 +25,10 @@ import {
   type HintPosition,
 } from "./lib/double-esc.ts";
 
+const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
+
 type PiVimEditor = {
+  getMode?: () => string;
   setAbortGuard?: (fn: (() => boolean) | null) => void;
   render: (width: number) => string[];
   handleInput: (data: string) => void;
@@ -40,11 +41,21 @@ type PiVimHandle = {
 };
 
 function piVimCloneUrl(): string {
-  const home = process.env.HOME;
-  if (!home) throw new Error("HOME is required to locate the pi-vim clone");
-  return pathToFileURL(
-    join(home, ".pi/agent/git/github.com/olisikh/pi-vim/index.ts"),
-  ).href;
+  const home = readEnvironment("HOME");
+  if (!home?.startsWith("/")) {
+    throw new Error("an absolute HOME is required to locate the pi-vim clone");
+  }
+  return `file://${`${home}/.pi/agent/git/github.com/olisikh/pi-vim/index.ts`
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/")}`;
+}
+
+function readEnvironment(name: string): string | undefined {
+  const processLike = globalThis as typeof globalThis & {
+    process?: { env?: Record<string, string | undefined> };
+  };
+  return processLike.process?.env?.[name];
 }
 
 type DoubleEscGuard = {
@@ -96,17 +107,19 @@ function makeDoubleEscGuard(
 }
 
 const HINT_LABEL = " esc again to abort ";
+const HINT_LEFT_OFFSET = 2;
 
-function styleHintLabel(theme: unknown, text: string): string {
-  const t = theme as { fg?: (color: string, text: string) => string } | null;
-  if (t && typeof t.fg === "function") {
-    try {
-      return t.fg("warning", `\x1b[7m${text}\x1b[27m`);
-    } catch {
-      return text;
-    }
-  }
-  return text;
+function stripModeLabel(
+  line: string,
+  width: number,
+  border: (text: string) => string,
+): string {
+  const labelStart = line.lastIndexOf("\x1b[7m");
+  if (labelStart < 0) return line;
+  const content = line.slice(0, labelStart);
+  return (
+    content + border("─".repeat(Math.max(0, width - visibleWidth(content))))
+  );
 }
 
 function renderHintLine(
@@ -120,8 +133,14 @@ function renderHintLine(
   if (width <= hintWidth) return borderFn("─".repeat(width));
   const remaining = width - hintWidth;
   switch (position) {
-    case "left":
-      return hintLabel + borderFn("─".repeat(remaining));
+    case "left": {
+      const offset = Math.min(HINT_LEFT_OFFSET, remaining);
+      return (
+        borderFn("─".repeat(offset)) +
+        hintLabel +
+        borderFn("─".repeat(remaining - offset))
+      );
+    }
     case "right":
       return borderFn("─".repeat(remaining)) + hintLabel;
     case "center": {
@@ -154,7 +173,7 @@ export default function (pi: ExtensionAPI) {
     cleanup = handle.cleanup;
     let requestRender: (() => void) | null = null;
     const doubleEsc = makeDoubleEscGuard(ctx, () => requestRender?.());
-    const hintLabel = styleHintLabel(ctx.ui?.theme, HINT_LABEL);
+    const hintLabel = HINT_LABEL;
     const hintPosition = getHintPosition();
     ctx.ui.setEditorComponent(
       (tui: unknown, editorTheme: unknown, kb: unknown) => {
@@ -162,10 +181,23 @@ export default function (pi: ExtensionAPI) {
         requestRender = () =>
           (tui as { requestRender?: () => void }).requestRender?.();
         editor.setAbortGuard?.(doubleEsc.guard);
+        pi.events.emit(UPPER_STATUS_EVENT, {
+          version: 1,
+          source: "vim",
+          mode: editor.getMode?.() ?? "insert",
+        });
 
         const render = editor.render.bind(editor);
         editor.render = (width: number) => {
           const lines = render(width);
+          if (lines.length > 0) {
+            const last = lines.length - 1;
+            lines[last] = stripModeLabel(
+              lines[last],
+              width,
+              editor.borderColor,
+            );
+          }
           if (doubleEsc.isHintActive() && lines.length > 0) {
             const last = lines.length - 1;
             lines[last] = renderHintLine(
@@ -184,6 +216,11 @@ export default function (pi: ExtensionAPI) {
             doubleEsc.handleOtherKey();
           }
           handleInput(data);
+          pi.events.emit(UPPER_STATUS_EVENT, {
+            version: 1,
+            source: "vim",
+            mode: editor.getMode?.() ?? "insert",
+          });
         };
 
         return editor;
