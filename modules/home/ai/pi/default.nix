@@ -314,7 +314,6 @@ in
       ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
       ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
       ".pi/agent/extensions/lib/mode-events.ts".source = ./extensions/lib/mode-events.ts;
-      ".pi/agent/extensions/lib/persistent-state.ts".source = ./extensions/lib/persistent-state.ts;
       ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
       ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
       ".pi/agent/extensions/yolo-mode.ts".source = ./extensions/yolo-mode.ts;

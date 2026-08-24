@@ -1,5 +1,3 @@
-import { loadPersistentPiState, saveYoloMode } from "./lib/persistent-state.ts";
-
 const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
 
 type ExtensionAPI = {
@@ -8,6 +6,7 @@ type ExtensionAPI = {
 		emit: (channel: string, value: unknown) => void;
 		on: (channel: string, handler: (...args: unknown[]) => void) => () => void;
 	};
+	appendEntry: (customType: string, data: unknown) => void;
 	registerCommand: (name: string, command: unknown) => void;
 	registerShortcut: (name: string, shortcut: unknown) => void;
 	sendUserMessage: (message: string) => void;
@@ -20,7 +19,11 @@ type ExtensionCommandContext = {
 	};
 };
 
-type YoloState = { enabled: boolean; initialized: boolean };
+type SessionEntry = { type?: unknown; customType?: unknown; data?: unknown };
+type SessionContext = {
+	sessionManager: { getEntries: () => SessionEntry[] };
+};
+type YoloState = { enabled: boolean };
 type RuntimePermissionManager = {
 	isYoloEnabled: () => boolean;
 };
@@ -36,13 +39,34 @@ const PERMISSION_SERVICE_KEY = Symbol.for(
 	"@gotgenes/pi-permission-system:service",
 );
 const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
+const YOLO_STATE_ENTRY = "olisikh:yolo-state";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null;
+}
+
+function restoreYoloState(ctx: SessionContext): boolean {
+	const entries = ctx.sessionManager.getEntries();
+	for (let index = entries.length - 1; index >= 0; index -= 1) {
+		const entry = entries[index];
+		if (
+			entry.type === "custom" &&
+			entry.customType === YOLO_STATE_ENTRY &&
+			isRecord(entry.data) &&
+			typeof entry.data.enabled === "boolean"
+		) {
+			return entry.data.enabled;
+		}
+	}
+	return false;
+}
 
 function yoloState(): YoloState {
 	const global = globalThis as typeof globalThis & Record<symbol, unknown>;
 	const existing = global[YOLO_STATE_KEY] as YoloState | undefined;
 	if (existing) return existing;
 
-	const state = { enabled: false, initialized: false };
+	const state = { enabled: false };
 	global[YOLO_STATE_KEY] = state;
 	return state;
 }
@@ -65,10 +89,6 @@ function bindRuntimePermissionManager(): void {
 	const manager = permissionManager();
 	if (!manager) return;
 	const state = yoloState();
-	if (!state.initialized) {
-		state.enabled = manager.isYoloEnabled();
-		state.initialized = true;
-	}
 	// ponytail: bind the current package's private readers until its public runtime API ships.
 	manager.isYoloEnabled = () => yoloState().enabled;
 	const runtimeConfig = permissionService()?.session?.config;
@@ -116,27 +136,26 @@ async function handleYolo(
 		return;
 	}
 
-	saveYoloMode(enabled);
+	pi.appendEntry(YOLO_STATE_ENTRY, { enabled });
 	publishYoloState(pi, isYoloModeEnabled());
 	ctx.ui.setStatus("pi-permission-system", enabled ? "yolo" : undefined);
 }
 
 export default function (pi: ExtensionAPI): void {
-	const syncYoloState = () => {
-		const persisted = loadPersistentPiState();
-		if (persisted.yoloEnabled !== undefined) {
-			const state = yoloState();
-			state.enabled = persisted.yoloEnabled;
-			state.initialized = true;
-		}
+	const syncRuntimeYoloState = () => {
 		bindRuntimePermissionManager();
 		publishYoloState(pi, isYoloModeEnabled());
 	};
-	pi.on("session_start", syncYoloState);
-	pi.events.on("permissions:ready", syncYoloState);
+	pi.on("session_start", (...args: unknown[]) => {
+		const ctx = args[1] as SessionContext | undefined;
+		if (!ctx) return;
+		yoloState().enabled = restoreYoloState(ctx);
+		syncRuntimeYoloState();
+	});
+	pi.events.on("permissions:ready", syncRuntimeYoloState);
 
 	pi.registerCommand("yolo", {
-		description: "Toggle permission-system YOLO mode across Pi restarts",
+		description: "Toggle permission-system YOLO mode for the current Pi session",
 		getArgumentCompletions: (prefix: string) => {
 			const normalized = prefix.trim().toLowerCase();
 			return ["on", "off"].flatMap((value) =>
@@ -149,8 +168,6 @@ export default function (pi: ExtensionAPI): void {
 
 	pi.registerShortcut("ctrl+alt+y", {
 		description: "Toggle permission-system YOLO mode",
-		handler: async () => {
-			pi.sendUserMessage("/yolo");
-		},
+		handler: async (ctx: ExtensionCommandContext) => handleYolo(pi, "", ctx),
 	});
 }
