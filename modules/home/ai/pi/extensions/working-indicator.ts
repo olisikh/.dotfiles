@@ -3,6 +3,7 @@ import type {
   ExtensionContext,
   // @ts-expect-error Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
+import type { PiForegroundTheme } from "./lib/pi-theme.ts";
 
 const DEFAULT_SHIMMER_INTERVAL_MS = 120;
 const DEFAULT_SPINNER_INTERVAL_MS = 120;
@@ -69,10 +70,6 @@ type CounterAnimation = {
   target: number;
   startValue: number;
   startedAt: number;
-};
-
-type WorkingTheme = {
-  fg(color: string, text: string): string;
 };
 
 type WorkingState = {
@@ -294,7 +291,7 @@ function buildWorkingMessage(
   gradientOffset: number,
   activeColor: string,
   colorMode: ColorMode,
-  theme: WorkingTheme,
+  theme: PiForegroundTheme,
 ): string {
   const stalled = isStalled(state, now);
   const details = [`${TIMER_ICON} ${formatDuration(now - state.startedAt)}`];

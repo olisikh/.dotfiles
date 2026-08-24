@@ -1,16 +1,12 @@
 /* @ts-expect-error Pi provides this module at runtime. */
 import { truncateToWidth } from "@mariozechner/pi-tui";
-
-type Theme = {
-  fg: (color: string, text: string) => string;
-  bold: (text: string) => string;
-};
+import type { PiTextTheme } from "./lib/pi-theme.ts";
 
 type Context = {
   mode: string;
   cwd: string;
   ui: {
-    setHeader: (factory: (_tui: unknown, theme: Theme) => Header) => void;
+    setHeader: (factory: (_tui: unknown, theme: PiTextTheme) => Header) => void;
   };
 };
 

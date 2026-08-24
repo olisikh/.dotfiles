@@ -5,6 +5,8 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 /* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import type { PiInverseTheme, PiThemeColor } from "./lib/pi-theme.ts";
+import type { PiRenderTui } from "./lib/pi-tui.ts";
 const WIDGET_KEY = "zz-olisikh-upper-statusline";
 const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
 const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
@@ -12,12 +14,7 @@ const GAP_WIDTH = 2;
 const MAX_RECENT_MCPS = 3;
 const MCP_HISTORY_ENTRY = "olisikh:upper-status-mcps";
 
-type WidgetTui = { requestRender(): void };
-type WidgetTheme = {
-	fg(color: string, text: string): string;
-	inverse(text: string): string;
-};
-type WidgetFactory = (tui: WidgetTui, theme: WidgetTheme) => unknown;
+type WidgetFactory = (tui: PiRenderTui, theme: PiInverseTheme) => unknown;
 type WidgetUi = {
 	setWidget: (key: string, widget: unknown, ...options: unknown[]) => void;
 };
@@ -121,7 +118,7 @@ function rememberMcp(state: StatusState, server: string): void {
 
 function renderLine(
 	state: StatusState,
-	theme: WidgetTheme,
+	theme: PiInverseTheme,
 	width: number,
 ): string {
 	const left = [
@@ -142,11 +139,15 @@ function renderLine(
 	return truncateToWidth(left, width);
 }
 
-function badge(theme: WidgetTheme, color: string, text: string): string {
+function badge(
+	theme: PiInverseTheme,
+	color: PiThemeColor,
+	text: string,
+): string {
 	return theme.inverse(theme.fg(color, ` ${text} `));
 }
 
-function vimColor(mode: string): string {
+function vimColor(mode: string): PiThemeColor {
 	switch (mode) {
 		case "insert":
 			return "success";

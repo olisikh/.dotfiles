@@ -20,6 +20,7 @@ import path from "node:path";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 /* @ts-expect-error Pi provides this module at runtime. */
 import { Type } from "typebox";
+import type { PiItalicTheme } from "./lib/pi-theme.ts";
 
 type RecallInput = { query: string; topic?: string; max_results?: number };
 type FinalizeInput = {
@@ -53,11 +54,6 @@ type PiContext = {
   sessionManager?: { getSessionId?: () => string };
 };
 type BeforeAgentStartEvent = { prompt?: string; systemPrompt: string };
-type EntryTheme = {
-  fg: (color: string, text: string) => string;
-  italic: (text: string) => string;
-};
-
 const redactions: Array<[RegExp, string]> = [
   [/\b(?:sk|rk|pk)_[A-Za-z0-9_-]{16,}\b/g, "[REDACTED_API_KEY]"],
   [/\bgh[pousr]_[A-Za-z0-9]{20,}\b/g, "[REDACTED_GITHUB_TOKEN]"],
@@ -479,7 +475,7 @@ export default function (pi: ExtensionAPI) {
   });
   pi.registerEntryRenderer(
     "wiki-memory-search",
-    (_entry: unknown, _options: unknown, theme: EntryTheme) => ({
+    (_entry: unknown, _options: unknown, theme: PiItalicTheme) => ({
       render: () => [theme.fg("muted", theme.italic(" Searching memory..."))],
       invalidate() {},
     }),

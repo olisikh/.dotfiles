@@ -1,15 +1,16 @@
 /* @ts-expect-error Pi provides this virtual module to extensions at runtime. */
-import { createCodingTools, createReadOnlyTools, getLanguageFromPath, highlightCode, } from "@earendil-works/pi-coding-agent";
+import {
+	createCodingTools,
+	createReadOnlyTools,
+	getLanguageFromPath,
+	highlightCode,
+} from "@earendil-works/pi-coding-agent";
 /* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { Text } from "@earendil-works/pi-tui";
+import type { PiTextTheme } from "./lib/pi-theme.ts";
 
 type PiExtensionAPI = {
 	registerTool: (definition: unknown) => void;
-};
-
-type PiTheme = {
-	fg: (color: string, text: string) => string;
-	bold: (text: string) => string;
 };
 
 type ReadArguments = {
@@ -175,7 +176,7 @@ export function maskNonCommentHashes(source: string): {
 	return { source: maskedSource, placeholder };
 }
 
-function renderCommand(command: string, theme: PiTheme): string {
+function renderCommand(command: string, theme: PiTextTheme): string {
 	const source = command.replace(/\r\n?/g, "\n").trimEnd();
 	const { source: sourceForHighlight, placeholder } =
 		maskNonCommentHashes(source);
@@ -212,12 +213,20 @@ function renderCommand(command: string, theme: PiTheme): string {
 	return `${header}\n${numberedLines.join("\n")}`;
 }
 
-function renderToolTitle(toolName: string, details: string, theme: PiTheme): string {
+function renderToolTitle(
+	toolName: string,
+	details: string,
+	theme: PiTextTheme,
+): string {
 	const title = theme.fg("toolTitle", theme.bold(toolName));
 	return details ? `${title} ${theme.fg("toolOutput", details)}` : title;
 }
 
-function renderPathToolCall(toolName: string, args: PathArguments, theme: PiTheme): string {
+function renderPathToolCall(
+	toolName: string,
+	args: PathArguments,
+	theme: PiTextTheme,
+): string {
 	const rawPath = args.file_path ?? args.path ?? "";
 	return renderToolTitle(toolName, rawPath, theme);
 }
@@ -225,7 +234,7 @@ function renderPathToolCall(toolName: string, args: PathArguments, theme: PiThem
 function renderSearchToolCall(
 	toolName: string,
 	args: Record<string, unknown>,
-	theme: PiTheme,
+	theme: PiTextTheme,
 ): string {
 	const pattern = typeof args.pattern === "string" ? args.pattern : "";
 	let path = "";
@@ -256,7 +265,7 @@ function renderSearchToolCall(
 	return renderToolTitle(toolName, details.join(" "), theme);
 }
 
-function renderReadCall(args: ReadArguments, theme: PiTheme): string {
+function renderReadCall(args: ReadArguments, theme: PiTextTheme): string {
 	const rawPath = args.file_path ?? args.path ?? "";
 	const language = getLanguageFromPath(rawPath);
 	const startLine = args.offset ?? 1;
@@ -275,17 +284,13 @@ function renderReadCall(args: ReadArguments, theme: PiTheme): string {
 		languageLabel = theme.fg("dim", ` · ${language}`);
 	}
 
-	return (
-		renderToolTitle("read", rawPath, theme) +
-		range +
-		languageLabel
-	);
+	return renderToolTitle("read", rawPath, theme) + range + languageLabel;
 }
 
 function renderToolCall(
 	toolName: string,
 	args: Record<string, unknown>,
-	theme: PiTheme,
+	theme: PiTextTheme,
 ): string {
 	if (toolName === "bash") {
 		const command = typeof args.command === "string" ? args.command : "";
@@ -303,7 +308,10 @@ function renderToolCall(
 export default function (pi: PiExtensionAPI) {
 	const cwd = currentWorkingDirectory();
 	const originalTools = new Map(
-		[...createCodingTools(cwd), ...createReadOnlyTools(cwd)].map((tool) => [tool.name, tool]),
+		[...createCodingTools(cwd), ...createReadOnlyTools(cwd)].map((tool) => [
+			tool.name,
+			tool,
+		]),
 	);
 
 	// Keep execution, schemas, prompt guidance, and result rendering from Pi;
@@ -311,7 +319,7 @@ export default function (pi: PiExtensionAPI) {
 	for (const originalTool of originalTools.values()) {
 		pi.registerTool({
 			...originalTool,
-			renderCall(args: Record<string, unknown>, theme: PiTheme) {
+			renderCall(args: Record<string, unknown>, theme: PiTextTheme) {
 				return new Text(renderToolCall(originalTool.name, args, theme), 0, 0);
 			},
 		});

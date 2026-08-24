@@ -7,6 +7,8 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 /* @ts-expect-error Pi provides this module to extensions at runtime. */
 import { truncateToWidth } from "@mariozechner/pi-tui";
+import type { PiForegroundTheme, PiThemeColor } from "./lib/pi-theme.ts";
+import type { PiRenderTui } from "./lib/pi-tui.ts";
 import {
 	subscribeToModeChanges,
 	type ModeChangedEvent,
@@ -21,8 +23,6 @@ interface CostTotals {
 	available: boolean;
 }
 
-type FooterTui = { requestRender(): void };
-type FooterTheme = { fg(color: string, text: string): string };
 type FooterData = {
 	onBranchChange(listener: () => void): () => void;
 	getExtensionStatuses(): ReadonlyMap<string, string>;
@@ -102,7 +102,7 @@ export default function (pi: ExtensionAPI) {
 		syncCostTotals(ctx);
 
 		ctx.ui.setFooter(
-			(tui: FooterTui, theme: FooterTheme, footerData: FooterData) => {
+			(tui: PiRenderTui, theme: PiForegroundTheme, footerData: FooterData) => {
 				requestRender = () => tui.requestRender();
 				const unsubscribe = footerData.onBranchChange(() => tui.requestRender());
 
@@ -175,7 +175,7 @@ export default function (pi: ExtensionAPI) {
 function renderModeStatus(
 	modes: ReadonlyMap<string, ModeChangedEvent>,
 	statuses: ReadonlyMap<string, string>,
-	theme: FooterTheme,
+	theme: PiForegroundTheme,
 ): string {
 	const visibleModes = [...modes.values()]
 		.filter((event) => event.state !== "off")
@@ -200,7 +200,7 @@ function modePriority(mode: string): number {
 	return 2;
 }
 
-function colorForMode(mode: string): string {
+function colorForMode(mode: string): PiThemeColor {
 	if (mode === "goal") return MODE_COLORS.goal;
 	if (mode === "plan") return MODE_COLORS.plan;
 	return MODE_COLORS.unknown;
