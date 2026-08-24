@@ -61,7 +61,8 @@ let
     packages = [
       "npm:pi-ollama-cloud"
       "npm:@capyup/pi-auto-compact"
-      "@quintinshaw/pi-dynamic-workflows"
+      "npm:@quintinshaw/pi-dynamic-workflows"
+      "npm:@gaodes/pi-graphify"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
@@ -260,6 +261,10 @@ in
       "tui.editor.deleteToLineStart" = [ ];
       "tui.altScreen.halfPageDown" = [ "ctrl+d" ];
       "tui.altScreen.halfPageUp" = [ "ctrl+u" ];
+      # pi-vim opens fullscreen transcript search with `/`; retain Pi's
+      # defaults and add Vim-style result navigation while search is active.
+      "tui.altScreen.searchNext" = [ "enter" "ctrl+g" "n" ];
+      "tui.altScreen.searchPrevious" = [ "shift+enter" "ctrl+shift+g" "shift+n" ];
     } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
     mcps = mkOpt types.attrs { } "Pi MCP adapter config merged into the default Exa server configuration";
   };

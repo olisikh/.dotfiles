@@ -128,8 +128,8 @@ function renderLine(
 	const servers = state.recentMcps;
 	if (servers.length === 0) return truncateToWidth(left, width);
 
-	const fullRight = badge(theme, "mdLink", `MCP: ${servers.join(" · ")}`);
-	const compactRight = badge(theme, "mdLink", `MCP: ${servers.length}`);
+	const fullRight = badge(theme, "mdLink", servers.join(" · "));
+	const compactRight = badge(theme, "mdLink", servers.length.toString());
 	for (const right of [fullRight, compactRight]) {
 		const remaining = width - visibleWidth(left) - GAP_WIDTH;
 		if (remaining >= visibleWidth(right)) {
