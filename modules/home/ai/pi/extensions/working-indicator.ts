@@ -8,6 +8,7 @@ const DEFAULT_SHIMMER_INTERVAL_MS = 120;
 const DEFAULT_SPINNER_INTERVAL_MS = 120;
 const TOKEN_COUNTER_INTERVAL_MS = 50;
 const TOKEN_COUNTER_ANIMATION_MS = 3_000;
+const TOKEN_DELTA_VISIBLE_MS = 1_000;
 const PHRASE_INTERVAL_MS = 2_400;
 const DEFAULT_COLOR_ROTATION_INTERVAL_MS = 2_500;
 const STALL_TIMEOUT_MS = 3_000;
@@ -78,9 +79,13 @@ type WorkingState = {
 	thinkingStartedAt?: number;
 	streamedChars: number;
 	inputTokens: number;
+	inputTokenDelta: number;
+	inputTokenDeltaExpiresAt: number;
 	displayedInputTokens: number;
 	inputAnimation: CounterAnimation;
 	outputTokens: number;
+	outputTokenDelta: number;
+	outputTokenDeltaExpiresAt: number;
 	displayedOutputChars: number;
 	outputAnimation: CounterAnimation;
 	currentAssistantChars: number;
@@ -201,8 +206,9 @@ function formatCount(tokens: number): string {
 	return Math.max(0, Math.round(tokens)).toLocaleString("en-US");
 }
 
-function formatTokenLine(arrow: string, tokens: number): string {
-	return `${arrow} ${formatCount(tokens)}`;
+function formatTokenLine(arrow: string, tokens: number, delta = 0): string {
+	const formattedDelta = delta > 0 ? ` +${formatCount(delta)}` : "";
+	return `${arrow} ${formatCount(tokens)}${formattedDelta}`;
 }
 
 function advanceCounter(
@@ -252,17 +258,21 @@ function advanceTokenCounters(state: WorkingState, now: number): boolean {
 	return changed;
 }
 
-function recordUsage(state: WorkingState, message: unknown): void {
+function recordUsage(state: WorkingState, message: unknown, now: number): void {
 	if (!isRecord(message) || !isRecord(message.usage)) return;
 
 	const input = Number(message.usage.input ?? message.usage.inputTokens);
 	if (Number.isFinite(input) && input > 0) {
 		state.inputTokens += input;
+		state.inputTokenDelta = input;
+		state.inputTokenDeltaExpiresAt = now + TOKEN_DELTA_VISIBLE_MS;
 	}
 
 	const output = Number(message.usage.output ?? message.usage.outputTokens);
 	if (Number.isFinite(output) && output > 0) {
 		state.outputTokens += output;
+		state.outputTokenDelta = output;
+		state.outputTokenDeltaExpiresAt = now + TOKEN_DELTA_VISIBLE_MS;
 	}
 }
 
@@ -287,12 +297,16 @@ function buildWorkingMessage(
 
 	const inputTokens = Math.round(state.displayedInputTokens);
 	if (inputTokens > 0) {
-		details.push(formatTokenLine(INPUT_ARROW, inputTokens));
+		const inputDelta =
+			now < state.inputTokenDeltaExpiresAt ? state.inputTokenDelta : 0;
+		details.push(formatTokenLine(INPUT_ARROW, inputTokens, inputDelta));
 	}
 
 	const outputTokens = Math.round(state.displayedOutputChars / CHARS_PER_TOKEN);
 	if (outputTokens > 0) {
-		details.push(formatTokenLine(OUTPUT_ARROW, outputTokens));
+		const outputDelta =
+			now < state.outputTokenDeltaExpiresAt ? state.outputTokenDelta : 0;
+		details.push(formatTokenLine(OUTPUT_ARROW, outputTokens, outputDelta));
 	}
 
 	if (stalled) {
@@ -463,9 +477,13 @@ export default function (pi: ExtensionAPI) {
 			startedAt: Date.now(),
 			streamedChars: 0,
 			inputTokens: 0,
+			inputTokenDelta: 0,
+			inputTokenDeltaExpiresAt: 0,
 			displayedInputTokens: 0,
 			inputAnimation: { target: 0, startValue: 0, startedAt: 0 },
 			outputTokens: 0,
+			outputTokenDelta: 0,
+			outputTokenDeltaExpiresAt: 0,
 			displayedOutputChars: 0,
 			outputAnimation: { target: 0, startValue: 0, startedAt: 0 },
 			currentAssistantChars: 0,
@@ -597,7 +615,7 @@ export default function (pi: ExtensionAPI) {
 	const handleTurnEnd = (event: unknown, ctx: ExtensionContext) => {
 		activeContext = ctx;
 		if (!state || !isRecord(event)) return;
-		recordUsage(state, event.message);
+		recordUsage(state, event.message, Date.now());
 		render();
 	};
 

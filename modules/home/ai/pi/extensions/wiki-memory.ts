@@ -470,7 +470,7 @@ export default function (pi: ExtensionAPI) {
 	pi.registerEntryRenderer(
 		"wiki-memory-search",
 		(_entry: unknown, _options: unknown, theme: EntryTheme) => ({
-			render: () => [theme.fg("muted", "⌕ Searching memory…")],
+			render: () => [theme.fg("muted", "   Searching memory...")],
 			invalidate() {},
 		}),
 	);
