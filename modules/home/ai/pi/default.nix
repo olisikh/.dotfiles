@@ -163,6 +163,7 @@ let
         ask_user_question = "allow";
         plan_mode_question = "allow";
         plan_mode_complete = "allow";
+        "graphify_*" = "allow";
         "subagent_*" = "allow";
 
         "mcp__context-mode*" = "allow";
