@@ -24,7 +24,6 @@ const CATPPUCCIN_COLORS = [
   "#fab387", // peach
 ];
 const STALLED_COLOR = "#f38ba8";
-const TELEMETRY_COLOR = "#6c7086"; // Catppuccin overlay0; visible even when SGR dim is ignored.
 const INPUT_ARROW = "↑";
 const OUTPUT_ARROW = "↓";
 const TIMER_ICON = "󰔟";
@@ -70,6 +69,10 @@ type CounterAnimation = {
   target: number;
   startValue: number;
   startedAt: number;
+};
+
+type WorkingTheme = {
+  fg(color: string, text: string): string;
 };
 
 type WorkingState = {
@@ -291,6 +294,7 @@ function buildWorkingMessage(
   gradientOffset: number,
   activeColor: string,
   colorMode: ColorMode,
+  theme: WorkingTheme,
 ): string {
   const stalled = isStalled(state, now);
   const details = [`${TIMER_ICON} ${formatDuration(now - state.startedAt)}`];
@@ -316,8 +320,9 @@ function buildWorkingMessage(
   const phrase = stalled
     ? paint(STALLED_COLOR, state.phrase)
     : gradientText(state.phrase, gradientOffset, activeColor, colorMode);
-  const telemetry = paint(TELEMETRY_COLOR, `· ${details.join(" · ")}`);
-  return `${phrase} \x1b[2m${telemetry}\x1b[22m`;
+  const telemetryText = `· ${details.join(" · ")}`;
+  const telemetry = theme.fg("dim", telemetryText);
+  return `${phrase} ${telemetry}`;
 }
 
 export default function (pi: ExtensionAPI) {
@@ -337,6 +342,7 @@ export default function (pi: ExtensionAPI) {
 
   const render = () => {
     if (!state || !activeContext) return;
+    const theme = activeContext.ui.theme;
     activeContext.ui.setWorkingMessage(
       buildWorkingMessage(
         state,
@@ -344,6 +350,7 @@ export default function (pi: ExtensionAPI) {
         gradientOffset,
         activeColor,
         COLOR_MODE,
+        theme,
       ),
     );
   };
@@ -725,6 +732,8 @@ function lighten(hex: string): string {
   return `#${channels.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
 }
 
+// Pi theme helpers accept named tokens; arbitrary user colors and
+// per-character gradients require this truecolor fallback.
 function paint(hex: string, text: string): string {
   const [red, green, blue] = rgb(hex);
   return `\x1b[38;2;${red};${green};${blue}m${text}\x1b[39m`;

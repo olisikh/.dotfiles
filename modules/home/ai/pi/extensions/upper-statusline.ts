@@ -13,7 +13,10 @@ const MAX_RECENT_MCPS = 3;
 const MCP_HISTORY_ENTRY = "olisikh:upper-status-mcps";
 
 type WidgetTui = { requestRender(): void };
-type WidgetTheme = { fg(color: string, text: string): string };
+type WidgetTheme = {
+	fg(color: string, text: string): string;
+	inverse(text: string): string;
+};
 type WidgetFactory = (tui: WidgetTui, theme: WidgetTheme) => unknown;
 type WidgetUi = {
 	setWidget: (key: string, widget: unknown, ...options: unknown[]) => void;
@@ -140,7 +143,7 @@ function renderLine(
 }
 
 function badge(theme: WidgetTheme, color: string, text: string): string {
-	return `\x1b[7m${theme.fg(color, ` ${text} `)}\x1b[27m`;
+	return theme.inverse(theme.fg(color, ` ${text} `));
 }
 
 function vimColor(mode: string): string {

@@ -33,10 +33,10 @@ type AssistantTurn = {
 };
 
 const MODE_COLORS = {
-	build: "#f38ba8",
-	plan: "#a6e3a1",
-	goal: "#f9e2af",
-	unknown: "#cba6f7",
+	build: "error",
+	plan: "success",
+	goal: "warning",
+	unknown: "accent",
 } as const;
 
 function compact(value: number | undefined): string {
@@ -124,7 +124,7 @@ export default function (pi: ExtensionAPI) {
 						const usageText = `${compact(usage?.tokens)} / ${compact(usage?.contextWindow)} (${usage?.percent?.toFixed(0) ?? "?"}%)`;
 
 						const parts = [
-							renderModeStatus(modes, footerData.getExtensionStatuses()),
+							renderModeStatus(modes, footerData.getExtensionStatuses(), theme),
 							theme.fg("accent", `${provider}/${model}:${reasoning}`),
 							theme.fg(usageColor, usageText),
 						];
@@ -175,11 +175,12 @@ export default function (pi: ExtensionAPI) {
 function renderModeStatus(
 	modes: ReadonlyMap<string, ModeChangedEvent>,
 	statuses: ReadonlyMap<string, string>,
+	theme: FooterTheme,
 ): string {
 	const visibleModes = [...modes.values()]
 		.filter((event) => event.state !== "off")
 		.sort((left, right) => modePriority(left.mode) - modePriority(right.mode));
-	if (visibleModes.length === 0) return paint(MODE_COLORS.build, "build");
+	if (visibleModes.length === 0) return theme.fg(MODE_COLORS.build, "build");
 
 	return visibleModes
 		.map((event) => {
@@ -188,7 +189,7 @@ function renderModeStatus(
 			let text = `${event.mode} ${event.state.replaceAll("_", " ")}`;
 			if (status)
 				text = event.mode === "plan" ? status : `${event.mode} ${status}`;
-			return paint(colorForMode(event.mode), text);
+			return theme.fg(colorForMode(event.mode), text);
 		})
 		.join(" + ");
 }
@@ -203,11 +204,4 @@ function colorForMode(mode: string): string {
 	if (mode === "goal") return MODE_COLORS.goal;
 	if (mode === "plan") return MODE_COLORS.plan;
 	return MODE_COLORS.unknown;
-}
-
-function paint(hex: string, text: string): string {
-	const red = Number.parseInt(hex.slice(1, 3), 16);
-	const green = Number.parseInt(hex.slice(3, 5), 16);
-	const blue = Number.parseInt(hex.slice(5, 7), 16);
-	return `\x1b[38;2;${red};${green};${blue}m${text}\x1b[39m`;
 }

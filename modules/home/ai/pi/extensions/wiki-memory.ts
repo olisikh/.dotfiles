@@ -53,7 +53,10 @@ type PiContext = {
   sessionManager?: { getSessionId?: () => string };
 };
 type BeforeAgentStartEvent = { prompt?: string; systemPrompt: string };
-type EntryTheme = { fg: (color: string, text: string) => string };
+type EntryTheme = {
+  fg: (color: string, text: string) => string;
+  italic: (text: string) => string;
+};
 
 const redactions: Array<[RegExp, string]> = [
   [/\b(?:sk|rk|pk)_[A-Za-z0-9_-]{16,}\b/g, "[REDACTED_API_KEY]"],
@@ -477,7 +480,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerEntryRenderer(
     "wiki-memory-search",
     (_entry: unknown, _options: unknown, theme: EntryTheme) => ({
-      render: () => [theme.fg("muted", "\x1b[3m Searching memory...\x1b[23m")],
+      render: () => [theme.fg("muted", theme.italic(" Searching memory..."))],
       invalidate() {},
     }),
   );

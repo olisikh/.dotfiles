@@ -112,9 +112,9 @@ const HINT_LEFT_OFFSET = 2;
 function dimHintLabel(theme: unknown, text: string): string {
   const t = theme as { fg?: (color: string, value: string) => string } | null;
   try {
-    return t?.fg?.("dim", text) ?? `\x1b[2m${text}\x1b[22m`;
+    return t?.fg?.("dim", text) ?? text;
   } catch {
-    return `\x1b[2m${text}\x1b[22m`;
+    return text;
   }
 }
 
@@ -123,6 +123,8 @@ function stripModeLabel(
   width: number,
   border: (text: string) => string,
 ): string {
+  // pi-vim emits the reverse-video mode label; detect its boundary so the
+  // host can replace it without reimplementing the editor renderer.
   const labelStart = line.lastIndexOf("\x1b[7m");
   if (labelStart < 0) return line;
   const content = line.slice(0, labelStart);
