@@ -1,3 +1,5 @@
+import { loadPersistentPiState, saveYoloMode } from "./lib/persistent-state.ts";
+
 const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
 
 type ExtensionAPI = {
@@ -114,12 +116,19 @@ async function handleYolo(
 		return;
 	}
 
+	saveYoloMode(enabled);
 	publishYoloState(pi, isYoloModeEnabled());
 	ctx.ui.setStatus("pi-permission-system", enabled ? "yolo" : undefined);
 }
 
 export default function (pi: ExtensionAPI): void {
 	const syncYoloState = () => {
+		const persisted = loadPersistentPiState();
+		if (persisted.yoloEnabled !== undefined) {
+			const state = yoloState();
+			state.enabled = persisted.yoloEnabled;
+			state.initialized = true;
+		}
 		bindRuntimePermissionManager();
 		publishYoloState(pi, isYoloModeEnabled());
 	};
@@ -127,7 +136,7 @@ export default function (pi: ExtensionAPI): void {
 	pi.events.on("permissions:ready", syncYoloState);
 
 	pi.registerCommand("yolo", {
-		description: "Toggle permission-system YOLO mode for this Pi process",
+		description: "Toggle permission-system YOLO mode across Pi restarts",
 		getArgumentCompletions: (prefix: string) => {
 			const normalized = prefix.trim().toLowerCase();
 			return ["on", "off"].flatMap((value) =>

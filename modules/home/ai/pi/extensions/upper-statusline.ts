@@ -9,6 +9,8 @@ const WIDGET_KEY = "zz-olisikh-upper-statusline";
 const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
 const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
 const GAP_WIDTH = 2;
+const MAX_RECENT_MCPS = 3;
+const MCP_HISTORY_ENTRY = "olisikh:upper-status-mcps";
 
 type WidgetTui = { requestRender(): void };
 type WidgetTheme = { fg(color: string, text: string): string };
@@ -26,7 +28,7 @@ type ToolEvent = {
 type StatusState = {
 	vimMode: string;
 	yoloEnabled: boolean;
-	activeMcps: Map<string, string>;
+	recentMcps: string[];
 };
 
 type UpperStatusEvent =
@@ -83,6 +85,37 @@ function serverFromQualifiedTool(toolName: string): string | undefined {
 	);
 }
 
+function normalizedMcpHistory(value: unknown): string[] {
+	if (!Array.isArray(value)) return [];
+
+	return value
+		.filter((name): name is string => typeof name === "string" && name.length > 0)
+		.filter((name, index, names) => names.lastIndexOf(name) === index)
+		.slice(-MAX_RECENT_MCPS);
+}
+
+function restoreMcpHistory(ctx: ExtensionContext): string[] {
+	const entries = ctx.sessionManager.getEntries();
+	for (let index = entries.length - 1; index >= 0; index -= 1) {
+		const entry = entries[index];
+		if (
+			entry.type === "custom" &&
+			entry.customType === MCP_HISTORY_ENTRY &&
+			isRecord(entry.data)
+		) {
+			return normalizedMcpHistory(entry.data.recentMcps);
+		}
+	}
+	return [];
+}
+
+function rememberMcp(state: StatusState, server: string): void {
+	state.recentMcps = normalizedMcpHistory([
+		...state.recentMcps.filter((name) => name !== server),
+		server,
+	]);
+}
+
 function renderLine(
 	state: StatusState,
 	theme: WidgetTheme,
@@ -92,7 +125,7 @@ function renderLine(
 		badge(theme, vimColor(state.vimMode), state.vimMode.toUpperCase()),
 		...(state.yoloEnabled ? [badge(theme, "error", "YOLO")] : []),
 	].join(theme.fg("dim", " · "));
-	const servers = [...new Set(state.activeMcps.values())];
+	const servers = state.recentMcps;
 	if (servers.length === 0) return truncateToWidth(left, width);
 
 	const fullRight = badge(theme, "mdLink", `MCP: ${servers.join(" · ")}`);
@@ -130,7 +163,7 @@ export default function (pi: ExtensionAPI): void {
 	const state: StatusState = {
 		vimMode: "insert",
 		yoloEnabled: isYoloModeEnabled(),
-		activeMcps: new Map(),
+		recentMcps: [],
 	};
 	let requestRender: (() => void) | undefined;
 	let activeContext: ExtensionContext | undefined;
@@ -159,7 +192,7 @@ export default function (pi: ExtensionAPI): void {
 		activeContext = ctx;
 		state.vimMode = "insert";
 		state.yoloEnabled = isYoloModeEnabled();
-		state.activeMcps.clear();
+		state.recentMcps = restoreMcpHistory(ctx);
 
 		// SAFETY: Pi exposes setWidget as a mutable UI method; this narrower shape
 		// only models the callback and placement arguments used by this wrapper.
@@ -193,11 +226,8 @@ export default function (pi: ExtensionAPI): void {
 	pi.on("tool_execution_start", (event: ToolEvent) => {
 		const server = mcpServerName(event);
 		if (!server) return;
-		state.activeMcps.set(event.toolCallId ?? `${server}:${Date.now()}`, server);
-		refresh();
-	});
-	pi.on("tool_execution_end", (event: ToolEvent) => {
-		if (event.toolCallId) state.activeMcps.delete(event.toolCallId);
+		rememberMcp(state, server);
+		pi.appendEntry(MCP_HISTORY_ENTRY, { recentMcps: [...state.recentMcps] });
 		refresh();
 	});
 
@@ -207,7 +237,6 @@ export default function (pi: ExtensionAPI): void {
 		restoreWidgetSetter = undefined;
 		activeContext = undefined;
 		requestRender = undefined;
-		state.activeMcps.clear();
 		stopWatchingStatus();
 	});
 }

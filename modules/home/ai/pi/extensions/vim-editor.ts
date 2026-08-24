@@ -109,6 +109,15 @@ function makeDoubleEscGuard(
 const HINT_LABEL = " esc again to abort ";
 const HINT_LEFT_OFFSET = 2;
 
+function dimHintLabel(theme: unknown, text: string): string {
+  const t = theme as { fg?: (color: string, value: string) => string } | null;
+  try {
+    return t?.fg?.("dim", text) ?? `\x1b[2m${text}\x1b[22m`;
+  } catch {
+    return `\x1b[2m${text}\x1b[22m`;
+  }
+}
+
 function stripModeLabel(
   line: string,
   width: number,
@@ -173,7 +182,7 @@ export default function (pi: ExtensionAPI) {
     cleanup = handle.cleanup;
     let requestRender: (() => void) | null = null;
     const doubleEsc = makeDoubleEscGuard(ctx, () => requestRender?.());
-    const hintLabel = HINT_LABEL;
+    const hintLabel = dimHintLabel(ctx.ui?.theme, HINT_LABEL);
     const hintPosition = getHintPosition();
     ctx.ui.setEditorComponent(
       (tui: unknown, editorTheme: unknown, kb: unknown) => {

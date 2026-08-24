@@ -18,7 +18,6 @@ import { homedir } from "node:os";
 import path from "node:path";
 /* @ts-expect-error Pi provides this module at runtime. */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { Text } from "@mariozechner/pi-tui";
 /* @ts-expect-error Pi provides this module at runtime. */
 import { Type } from "typebox";
 
@@ -164,6 +163,7 @@ type QmdResult = {
 };
 
 let qmdReady: Promise<void> | undefined;
+let qmdInitialized = false;
 
 function notesRoot(): string {
 	const configured = env.LLM_NOTES_ROOT?.trim();
@@ -219,6 +219,7 @@ async function ensureQmd(): Promise<void> {
 		}
 	}
 	await runQmd(["update", "-c", collection]);
+	qmdInitialized = true;
 }
 
 function ensureQmdOnce(): Promise<void> {
@@ -227,7 +228,9 @@ function ensureQmdOnce(): Promise<void> {
 }
 
 async function qmdRecall(input: RecallInput): Promise<string | undefined> {
-	await ensureQmdOnce();
+	// Startup warms QMD in the background. Do not make an interactive prompt
+	// wait for collection setup; the registry fallback is available immediately.
+	if (!qmdInitialized) return undefined;
 	const limit = Math.min(8, Math.max(1, Math.floor(input.max_results ?? 5)));
 	const { stdout } = await runQmd([
 		"search",
@@ -459,10 +462,17 @@ function isSubstantive(text: string): boolean {
 
 export default function (pi: ExtensionAPI) {
 	const recalled = new Set<string>();
+	// Warm QMD during startup so the first substantive prompt does not pay for
+	// collection validation/indexing. recall() still falls back to the registry.
+	pi.on("session_start", () => {
+		void ensureQmdOnce().catch(() => undefined);
+	});
 	pi.registerEntryRenderer(
 		"wiki-memory-search",
-		(_entry: unknown, _options: unknown, theme: EntryTheme) =>
-			new Text(theme.fg("muted", "⌕ Searching memory…"), 0, 0),
+		(_entry: unknown, _options: unknown, theme: EntryTheme) => ({
+			render: () => [theme.fg("muted", "⌕ Searching memory…")],
+			invalidate() {},
+		}),
 	);
 	pi.registerTool({
 		name: "wiki_recall",
