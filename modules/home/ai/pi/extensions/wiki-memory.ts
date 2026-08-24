@@ -1,32 +1,34 @@
-/* @ts-expect-error Pi provides node. */
-import { createHash } from "node:crypto";
-/* @ts-expect-error Pi provides node. */
+// @ts-ignore Pi provides node at runtime.
 import { execFile } from "node:child_process";
-/* @ts-expect-error Pi provides node. */
-import { cwd, env } from "node:process";
+// @ts-ignore Pi provides node at runtime.
+import { createHash } from "node:crypto";
+// @ts-ignore Pi provides node at runtime.
 import {
 	access,
 	appendFile,
 	mkdir,
 	readFile,
 	writeFile,
-	// @ts-expect-error Pi provides node.
+	// @ts-ignore Pi provides node at runtime.
 } from "node:fs/promises";
-/* @ts-expect-error Pi provides node. */
+// @ts-ignore Pi provides node at runtime.
 import { homedir } from "node:os";
-/* @ts-expect-error Pi provides node. */
+// @ts-ignore Pi provides node at runtime.
 import path from "node:path";
+// @ts-ignore Pi provides node at runtime.
+import { cwd, env } from "node:process";
+// @ts-ignore Pi provides this module at runtime.
 import type {
 	BeforeAgentStartEvent,
 	EntryRenderer,
-	ToolDefinition,
 	ExtensionAPI,
 	ExtensionContext,
-	// @ts-ignore Pi provides this module at runtime.
+	ToolDefinition,
 } from "@mariozechner/pi-coding-agent";
-// @ts-expect-error Pi provides typebox at runtime.
+// @ts-ignore Pi provides typebox at runtime.
 import { Type } from "typebox";
 import type { PiItalicTheme } from "./lib/pi-theme.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 
 type RecallInput = { query: string; topic?: string; max_results?: number };
 type WikiToolUpdate = Parameters<ToolDefinition["execute"]>[3];
@@ -475,7 +477,9 @@ export default function (pi: ExtensionAPI) {
 			_options: Parameters<EntryRenderer>[1],
 			theme: PiItalicTheme,
 		) => ({
-			render: () => [theme.fg("muted", theme.italic(" Searching memory..."))],
+			render: () => [
+				theme.fg(PI_THEME_COLORS.muted, theme.italic(" Searching memory...")),
+			],
 			invalidate() {},
 		}),
 	);

@@ -8,9 +8,21 @@ import type {
 	ToolExecutionStartEvent,
 	TurnEndEvent,
 	TurnStartEvent,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
+import {
+	PI_WORKING_COLOR_MODES,
+	PI_WORKING_INDICATOR_TYPES,
+	PI_WORKING_PHASES,
+	type PiWorkingColorMode,
+	type PiWorkingIndicatorType,
+	type PiWorkingPhase,
+} from "./lib/pi-constants.ts";
 import type { PiForegroundTheme } from "./lib/pi-theme.ts";
+import {
+	CATPPUCCIN_MOCHA,
+	CATPPUCCIN_MOCHA_PALETTE,
+	PI_THEME_COLORS,
+} from "./lib/pi-theme.ts";
 
 const DEFAULT_SHIMMER_INTERVAL_MS = 120;
 const DEFAULT_SPINNER_INTERVAL_MS = 120;
@@ -21,17 +33,8 @@ const PHRASE_INTERVAL_MS = 2_400;
 const DEFAULT_COLOR_ROTATION_INTERVAL_MS = 2_500;
 const STALL_TIMEOUT_MS = 3_000;
 const CHARS_PER_TOKEN = 4;
-const DEFAULT_COLOR = "#cba6f7";
-const CATPPUCCIN_COLORS = [
-	"#cba6f7", // mauve
-	"#b4befe", // lavender
-	"#89b4fa", // blue
-	"#94e2d5", // teal
-	"#a6e3a1", // green
-	"#f9e2af", // yellow
-	"#fab387", // peach
-];
-const STALLED_COLOR = "#f38ba8";
+const DEFAULT_COLOR = CATPPUCCIN_MOCHA.mauve;
+const STALLED_COLOR = CATPPUCCIN_MOCHA.red;
 const INPUT_ARROW = "↑";
 const OUTPUT_ARROW = "↓";
 const TIMER_ICON = "󰔟";
@@ -68,10 +71,10 @@ const SHIMMER_FRAMES = ["·", "✢", "✳", "✶", "✻", "✽", "✻", "✶", "
 const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const GRADIENT_STEP = 3;
 const GRADIENT_CYCLE_LENGTH = 8;
-const RAINBOW_CYCLE_LENGTH = CATPPUCCIN_COLORS.length * GRADIENT_STEP;
-type IndicatorType = "shimmer" | "spinner";
-type ColorMode = "none" | "rotate" | "rainbow";
-type Phase = "requesting" | "thinking" | "responding" | "tool-use";
+const RAINBOW_CYCLE_LENGTH = CATPPUCCIN_MOCHA_PALETTE.length * GRADIENT_STEP;
+type IndicatorType = PiWorkingIndicatorType;
+type ColorMode = PiWorkingColorMode;
+type Phase = PiWorkingPhase;
 
 type CounterAnimation = {
 	target: number;
@@ -131,20 +134,22 @@ function readPositiveInteger(
 
 function readColorMode(value: string | undefined): ColorMode {
 	switch (value?.trim().toLowerCase()) {
-		case "rotate":
+		case PI_WORKING_COLOR_MODES.rotate:
 		case "rotation":
 		case "1":
 		case "true":
-			return "rotate";
-		case "rainbow":
-			return "rainbow";
+			return PI_WORKING_COLOR_MODES.rotate;
+		case PI_WORKING_COLOR_MODES.rainbow:
+			return PI_WORKING_COLOR_MODES.rainbow;
 		default:
-			return "none";
+			return PI_WORKING_COLOR_MODES.none;
 	}
 }
 
 function readIndicatorType(value: string | undefined): IndicatorType {
-	return value === "spinner" ? "spinner" : "shimmer";
+	return value === PI_WORKING_INDICATOR_TYPES.spinner
+		? PI_WORKING_INDICATOR_TYPES.spinner
+		: PI_WORKING_INDICATOR_TYPES.shimmer;
 }
 
 const INDICATOR_TYPE = readIndicatorType(
@@ -171,7 +176,7 @@ const SPINNER_INTERVAL_MS = readPositiveInteger(
 );
 const ROTATION_COLORS = [
 	DEFAULT_COLOR_VALUE,
-	...CATPPUCCIN_COLORS.filter((color) => color !== DEFAULT_COLOR_VALUE),
+	...CATPPUCCIN_MOCHA_PALETTE.filter((color) => color !== DEFAULT_COLOR_VALUE),
 ];
 
 type AssistantMessage = Extract<TurnEndEvent["message"], { role: "assistant" }>;
@@ -277,7 +282,7 @@ function isStalled(state: WorkingState, now: number): boolean {
 	return (
 		state.lastTokenAt > 0 &&
 		now - state.lastTokenAt >= STALL_TIMEOUT_MS &&
-		state.phase !== "tool-use" &&
+		state.phase !== PI_WORKING_PHASES.toolUse &&
 		state.activeTools === 0
 	);
 }
@@ -315,7 +320,7 @@ function buildWorkingMessage(
 		? paint(STALLED_COLOR, state.phrase)
 		: gradientText(state.phrase, gradientOffset, activeColor, colorMode);
 	const telemetryText = `· ${details.join(" · ")}`;
-	const telemetry = theme.fg("dim", telemetryText);
+	const telemetry = theme.fg(PI_THEME_COLORS.dim, telemetryText);
 	return `${phrase} ${telemetry}`;
 }
 
@@ -356,12 +361,15 @@ export default function (pi: ExtensionAPI) {
 
 	const applyIndicatorStyle = () => {
 		if (!activeContext) return;
-		const frames = INDICATOR_TYPE === "shimmer" ? SHIMMER_FRAMES : SPINNER_FRAMES;
+		const frames =
+			INDICATOR_TYPE === PI_WORKING_INDICATOR_TYPES.shimmer
+				? SHIMMER_FRAMES
+				: SPINNER_FRAMES;
 		const indicatorFrames =
-			COLOR_MODE === "rainbow"
+			COLOR_MODE === PI_WORKING_COLOR_MODES.rainbow
 				? Array.from({ length: frames.length * RAINBOW_CYCLE_LENGTH }, (_, index) =>
 						paint(
-							paletteColor(CATPPUCCIN_COLORS, index % RAINBOW_CYCLE_LENGTH),
+							paletteColor(CATPPUCCIN_MOCHA_PALETTE, index % RAINBOW_CYCLE_LENGTH),
 							frames[index % frames.length] ?? "",
 						),
 					)
@@ -369,7 +377,9 @@ export default function (pi: ExtensionAPI) {
 		activeContext.ui.setWorkingIndicator({
 			frames: indicatorFrames,
 			intervalMs:
-				INDICATOR_TYPE === "shimmer" ? SHIMMER_INTERVAL_MS : SPINNER_INTERVAL_MS,
+				INDICATOR_TYPE === PI_WORKING_INDICATOR_TYPES.shimmer
+					? SHIMMER_INTERVAL_MS
+					: SPINNER_INTERVAL_MS,
 		});
 	};
 
@@ -392,7 +402,9 @@ export default function (pi: ExtensionAPI) {
 		}, TOKEN_COUNTER_INTERVAL_MS);
 		gradientTimer = setInterval(() => {
 			const cycleLength =
-				COLOR_MODE === "rainbow" ? RAINBOW_CYCLE_LENGTH : GRADIENT_CYCLE_LENGTH;
+				COLOR_MODE === PI_WORKING_COLOR_MODES.rainbow
+					? RAINBOW_CYCLE_LENGTH
+					: GRADIENT_CYCLE_LENGTH;
 			gradientOffset = (gradientOffset + 1) % cycleLength;
 			render();
 		}, SHIMMER_INTERVAL_MS);
@@ -401,7 +413,7 @@ export default function (pi: ExtensionAPI) {
 			state.phrase = randomPhrase(state.phrase);
 			render();
 		}, PHRASE_INTERVAL_MS);
-		if (COLOR_MODE === "rotate") {
+		if (COLOR_MODE === PI_WORKING_COLOR_MODES.rotate) {
 			colorTimer = setInterval(() => {
 				colorIndex = (colorIndex + 1) % ROTATION_COLORS.length;
 				activeColor = ROTATION_COLORS[colorIndex];
@@ -474,7 +486,7 @@ export default function (pi: ExtensionAPI) {
 		previousPhrase = phrase;
 		state = {
 			phrase,
-			phase: "requesting",
+			phase: PI_WORKING_PHASES.requesting,
 			startedAt: Date.now(),
 			streamedChars: 0,
 			inputTokens: 0,
@@ -506,7 +518,10 @@ export default function (pi: ExtensionAPI) {
 			return;
 		}
 
-		state.phase = state.activeTools > 0 ? "tool-use" : "requesting";
+		state.phase =
+			state.activeTools > 0
+				? PI_WORKING_PHASES.toolUse
+				: PI_WORKING_PHASES.requesting;
 		state.thinkingStartedAt = undefined;
 		state.lastTokenAt = 0;
 		state.currentAssistantChars = 0;
@@ -544,16 +559,17 @@ export default function (pi: ExtensionAPI) {
 		const now = Date.now();
 		switch (assistantEvent.type) {
 			case "thinking_start":
-				state.phase = "thinking";
+				state.phase = PI_WORKING_PHASES.thinking;
 				state.thinkingStartedAt = now;
 				state.lastTokenAt = 0;
 				break;
 			case "thinking_delta":
-				state.phase = "thinking";
+				state.phase = PI_WORKING_PHASES.thinking;
 				state.thinkingStartedAt ??= now;
 				break;
 			case "thinking_end":
-				if (state.phase === "thinking") state.phase = "requesting";
+				if (state.phase === PI_WORKING_PHASES.thinking)
+					state.phase = PI_WORKING_PHASES.requesting;
 				state.thinkingStartedAt = undefined;
 				break;
 			case "text_start":
@@ -562,11 +578,11 @@ export default function (pi: ExtensionAPI) {
 					state.currentAssistantChars = 0;
 				}
 				state.currentTextBlockChars = 0;
-				state.phase = "responding";
+				state.phase = PI_WORKING_PHASES.responding;
 				state.thinkingStartedAt = undefined;
 				break;
 			case "text_delta":
-				state.phase = "responding";
+				state.phase = PI_WORKING_PHASES.responding;
 				state.thinkingStartedAt = undefined;
 				if (typeof assistantEvent.delta === "string") {
 					addStreamedText(assistantEvent.delta.length, now);
@@ -580,7 +596,7 @@ export default function (pi: ExtensionAPI) {
 				break;
 			}
 			case "toolcall_start":
-				state.phase = "tool-use";
+				state.phase = PI_WORKING_PHASES.toolUse;
 				state.thinkingStartedAt = undefined;
 				state.lastTokenAt = 0;
 				break;
@@ -592,7 +608,10 @@ export default function (pi: ExtensionAPI) {
 				state.currentAssistantChars = 0;
 				state.assistantMessageActive = false;
 				state.thinkingStartedAt = undefined;
-				state.phase = state.activeTools > 0 ? "tool-use" : "responding";
+				state.phase =
+					state.activeTools > 0
+						? PI_WORKING_PHASES.toolUse
+						: PI_WORKING_PHASES.responding;
 				break;
 			}
 			default:
@@ -608,7 +627,7 @@ export default function (pi: ExtensionAPI) {
 		if (!state) return;
 
 		state.activeTools += 1;
-		state.phase = "tool-use";
+		state.phase = PI_WORKING_PHASES.toolUse;
 		state.lastTokenAt = 0;
 		render();
 	};
@@ -625,8 +644,8 @@ export default function (pi: ExtensionAPI) {
 		if (!state) return;
 
 		state.activeTools = Math.max(0, state.activeTools - 1);
-		if (state.activeTools === 0 && state.phase === "tool-use") {
-			state.phase = "responding";
+		if (state.activeTools === 0 && state.phase === PI_WORKING_PHASES.toolUse) {
+			state.phase = PI_WORKING_PHASES.responding;
 		}
 		state.lastTokenAt = 0;
 		render();
@@ -682,8 +701,8 @@ function gradientText(
 		.map((character, index) => {
 			if (character === " ") return character;
 			const color =
-				colorMode === "rainbow"
-					? paletteColor(CATPPUCCIN_COLORS, index + offset)
+				colorMode === PI_WORKING_COLOR_MODES.rainbow
+					? paletteColor(CATPPUCCIN_MOCHA_PALETTE, index + offset)
 					: colors[Math.floor((index + offset) / GRADIENT_STEP) % colors.length];
 			return paint(color, character);
 		})

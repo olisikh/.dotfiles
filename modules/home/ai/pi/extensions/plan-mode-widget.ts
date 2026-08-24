@@ -1,12 +1,13 @@
+// @ts-ignore Pi provides this module at runtime.
 import type {
 	ExtensionAPI,
 	ExtensionContext,
 	SessionStartEvent,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
+import { PI_WIDGET_KEYS } from "./lib/pi-constants.ts";
 import type { PiWidgetUi } from "./lib/pi-widgets.ts";
 
-const PLAN_MODE_WIDGET_KEY = "plan-mode-plan";
+const PLAN_MODE_WIDGET_KEY = PI_WIDGET_KEYS.planModePlan;
 const PLAN_MODE_PLANNING_WIDGET_TITLE = "Plan mode: planning";
 
 export default function (pi: ExtensionAPI): void {

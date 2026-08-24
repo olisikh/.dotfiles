@@ -3,11 +3,11 @@ import type {
 	ExtensionAPI,
 	ExtensionContext,
 	SessionStartEvent,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
-/* @ts-ignore Pi provides this module at runtime. */
+// @ts-ignore Pi provides this module at runtime.
 import { truncateToWidth } from "@mariozechner/pi-tui";
 import type { PiTextTheme } from "./lib/pi-theme.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 import type { PiRenderTui } from "./lib/pi-tui.ts";
 
 export default function (pi: ExtensionAPI): void {
@@ -20,14 +20,14 @@ export default function (pi: ExtensionAPI): void {
 			return {
 				render(width: number) {
 					return [
-						`${theme.fg("accent", "Pi")} ${theme.bold(project)}\n\n`,
+						`${theme.fg(PI_THEME_COLORS.accent, "Pi")} ${theme.bold(project)}\n\n`,
 						"",
-						theme.fg("dim", "Useful commands:\n"),
-						theme.fg("dim", "  /hotkeys  - display hotkeys\n"),
-						theme.fg("dim", "  /settings - display settings\n"),
-						theme.fg("dim", "  /resume   - resume session\n"),
-						theme.fg("dim", "  /reload   - reload harness\n"),
-						theme.fg("dim", "  /new      - start a new session\n"),
+						theme.fg(PI_THEME_COLORS.dim, "Useful commands:\n"),
+						theme.fg(PI_THEME_COLORS.dim, "  /hotkeys  - display hotkeys\n"),
+						theme.fg(PI_THEME_COLORS.dim, "  /settings - display settings\n"),
+						theme.fg(PI_THEME_COLORS.dim, "  /resume   - resume session\n"),
+						theme.fg(PI_THEME_COLORS.dim, "  /reload   - reload harness\n"),
+						theme.fg(PI_THEME_COLORS.dim, "  /new      - start a new session\n"),
 						"",
 					].map((line) => truncateToWidth(line, width));
 				},

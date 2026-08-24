@@ -313,21 +313,7 @@ in
         asyncByDefault = true;
         defaultSubagentContext = "fresh";
       };
-      ".pi/agent/extensions/statusline.ts".source = ./extensions/statusline.ts;
-      ".pi/agent/extensions/upper-statusline.ts".source = ./extensions/upper-statusline.ts;
-      ".pi/agent/extensions/prompt-latency.ts".source = ./extensions/prompt-latency.ts;
-      ".pi/agent/extensions/welcome.ts".source = ./extensions/welcome.ts;
-      ".pi/agent/extensions/built-in-tool-renderer.ts".source = ./extensions/built-in-tool-renderer.ts;
-      ".pi/agent/extensions/wiki-memory.ts".source = ./extensions/wiki-memory.ts;
-      ".pi/agent/extensions/lib/mode-events.ts".source = ./extensions/lib/mode-events.ts;
-      ".pi/agent/extensions/lib/pi-theme.ts".source = ./extensions/lib/pi-theme.ts;
-      ".pi/agent/extensions/lib/pi-tui.ts".source = ./extensions/lib/pi-tui.ts;
-      ".pi/agent/extensions/lib/pi-widgets.ts".source = ./extensions/lib/pi-widgets.ts;
-      ".pi/agent/extensions/plan-mode-widget.ts".source = ./extensions/plan-mode-widget.ts;
-      ".pi/agent/extensions/working-indicator.ts".source = ./extensions/working-indicator.ts;
-      ".pi/agent/extensions/yolo-mode.ts".source = ./extensions/yolo-mode.ts;
-      ".pi/agent/extensions/vim-editor.ts".source = ./extensions/vim-editor.ts;
-      ".pi/agent/extensions/lib/double-esc.ts".source = ./extensions/lib/double-esc.ts;
+      ".pi/agent/extensions/olisikh".source = ./extensions;
     };
   };
 }

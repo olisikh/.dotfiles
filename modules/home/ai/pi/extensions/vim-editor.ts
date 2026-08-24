@@ -11,32 +11,34 @@
 // Nix this file is a symlink into the store, so a relative `../git/...` would
 // resolve against the store path where the git clone does not exist.
 
+// @ts-ignore Pi provides this module at runtime.
 import type {
 	ExtensionAPI,
 	ExtensionContext,
 	KeybindingsManager,
 	SessionStartEvent,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
+// @ts-ignore Pi provides this module at runtime.
 import {
-	matchesKey,
 	type EditorTheme,
+	matchesKey,
 	type TUI,
 	visibleWidth,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-tui";
 import {
 	createDoubleEscState,
 	expireDoubleEsc,
 	getDoubleEscDebounceMs,
 	getHintPosition,
+	type HintPosition,
 	pressEsc,
 	pressOtherKey,
-	type HintPosition,
 } from "./lib/double-esc.ts";
+import { PI_EXTENSION_EVENTS, PI_VIM_MODES } from "./lib/pi-constants.ts";
 import type { PiForegroundTheme } from "./lib/pi-theme.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 
-const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
+const UPPER_STATUS_EVENT = PI_EXTENSION_EVENTS.upperStatusChanged;
 const HINT_LABEL = " esc again to abort ";
 const HINT_LEFT_OFFSET = 2;
 
@@ -131,7 +133,7 @@ function dimHintLabel(
 	text: string,
 ): string {
 	try {
-		return theme?.fg?.("dim", text) ?? text;
+		return theme?.fg?.(PI_THEME_COLORS.dim, text) ?? text;
 	} catch {
 		return text;
 	}
@@ -221,7 +223,7 @@ export default function (pi: ExtensionAPI) {
 					pi.events.emit(UPPER_STATUS_EVENT, {
 						version: 1,
 						source: "vim",
-						mode: editor.getMode?.() ?? "insert",
+						mode: editor.getMode?.() ?? PI_VIM_MODES.insert,
 					});
 
 					const render = editor.render.bind(editor);
@@ -252,7 +254,7 @@ export default function (pi: ExtensionAPI) {
 						pi.events.emit(UPPER_STATUS_EVENT, {
 							version: 1,
 							source: "vim",
-							mode: editor.getMode?.() ?? "insert",
+							mode: editor.getMode?.() ?? PI_VIM_MODES.insert,
 						});
 					};
 

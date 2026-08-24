@@ -1,4 +1,4 @@
-/* @ts-expect-error Pi provides this module to extensions at runtime. */
+// @ts-expect-error Pi provides node at runtime.
 import path from "node:path";
 import type {
 	ExtensionAPI,
@@ -6,16 +6,22 @@ import type {
 	SessionStartEvent,
 	SessionTreeEvent,
 	TurnEndEvent,
-	// @ts-expect-error Pi provides this module at runtime.
+// @ts-expect-error Pi provides node at runtime.
 } from "@mariozechner/pi-coding-agent";
-// @ts-expect-error Pi provides this module at runtime.
+// @ts-expect-error Pi provides node at runtime.
 import { truncateToWidth } from "@mariozechner/pi-tui";
-import type { PiForegroundTheme, PiThemeColor } from "./lib/pi-theme.ts";
-import type { PiRenderTui } from "./lib/pi-tui.ts";
 import {
-	subscribeToModeChanges,
 	type ModeChangedEvent,
+	subscribeToModeChanges,
 } from "./lib/mode-events.ts";
+import { PI_MODE_STATUSES } from "./lib/pi-constants.ts";
+import type {
+	PiForegroundTheme,
+	PiNamedThemeColor,
+	PiThemeColor,
+} from "./lib/pi-theme.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
+import type { PiRenderTui } from "./lib/pi-tui.ts";
 
 type BranchEntries = ReturnType<
 	ExtensionContext["sessionManager"]["getBranch"]
@@ -32,10 +38,10 @@ type FooterData = {
 	getGitBranch(): string | null;
 };
 const MODE_COLORS = {
-	build: "error",
-	plan: "success",
-	goal: "warning",
-	unknown: "accent",
+	[PI_MODE_STATUSES.build]: PI_THEME_COLORS.error,
+	[PI_MODE_STATUSES.plan]: PI_THEME_COLORS.success,
+	[PI_MODE_STATUSES.goal]: PI_THEME_COLORS.warning,
+	[PI_MODE_STATUSES.unknown]: PI_THEME_COLORS.accent,
 } as const;
 
 function compact(value: number | undefined): string {
@@ -53,11 +59,11 @@ function compact(value: number | undefined): string {
 
 function contextUsageColor(
 	percent: number | null | undefined,
-): "success" | "warning" | "error" | "muted" {
-	if (percent === undefined || percent === null) return "muted";
-	if (percent >= 80) return "error";
-	if (percent >= 50) return "warning";
-	return "success";
+): PiNamedThemeColor {
+	if (percent === undefined || percent === null) return PI_THEME_COLORS.muted;
+	if (percent >= 80) return PI_THEME_COLORS.error;
+	if (percent >= 50) return PI_THEME_COLORS.warning;
+	return PI_THEME_COLORS.success;
 }
 
 function collectCostTotals(entries: BranchEntries): CostTotals {
@@ -114,7 +120,8 @@ export default function (pi: ExtensionAPI) {
 					render(width: number): string[] {
 						const usage = ctx.getContextUsage();
 						const provider =
-							(ctx.model as { provider?: string } | undefined)?.provider ?? "unknown";
+							(ctx.model as { provider?: string } | undefined)?.provider ??
+							PI_MODE_STATUSES.unknown;
 						const model = ctx.model?.id ?? "no-model";
 						const reasoning = pi.getThinkingLevel();
 						const branch = footerData.getGitBranch();
@@ -124,17 +131,21 @@ export default function (pi: ExtensionAPI) {
 
 						const parts = [
 							renderModeStatus(modes, footerData.getExtensionStatuses(), theme),
-							theme.fg("accent", `${provider}/${model}:${reasoning}`),
+							theme.fg(PI_THEME_COLORS.accent, `${provider}/${model}:${reasoning}`),
 							theme.fg(usageColor, usageText),
 						];
 
 						if (costTotals.available) {
-							parts.push(theme.fg("warning", `$${costTotals.value.toFixed(2)}`));
+							parts.push(
+								theme.fg(PI_THEME_COLORS.warning, `$${costTotals.value.toFixed(2)}`),
+							);
 						}
 
-						parts.push(theme.fg("muted", `${folder}:${branch ?? "-"}`));
+						parts.push(theme.fg(PI_THEME_COLORS.muted, `${folder}:${branch ?? "-"}`));
 
-						return [truncateToWidth(parts.join(theme.fg("dim", " · ")), width)];
+						return [
+							truncateToWidth(parts.join(theme.fg(PI_THEME_COLORS.dim, " · ")), width),
+						];
 					},
 				};
 			},
@@ -171,30 +182,36 @@ function renderModeStatus(
 	theme: PiForegroundTheme,
 ): string {
 	const visibleModes = [...modes.values()]
-		.filter((event) => event.state !== "off")
+		.filter((event) => event.state !== PI_MODE_STATUSES.off)
 		.sort((left, right) => modePriority(left.mode) - modePriority(right.mode));
-	if (visibleModes.length === 0) return theme.fg(MODE_COLORS.build, "build");
+	if (visibleModes.length === 0) {
+		return theme.fg(MODE_COLORS[PI_MODE_STATUSES.build], PI_MODE_STATUSES.build);
+	}
 
 	return visibleModes
 		.map((event) => {
-			const statusKey = event.mode === "plan" ? "plan-mode" : event.mode;
+			const statusKey =
+				event.mode === PI_MODE_STATUSES.plan
+					? PI_MODE_STATUSES.planMode
+					: event.mode;
 			const status = statuses.get(statusKey)?.trim();
 			let text = `${event.mode} ${event.state.replaceAll("_", " ")}`;
 			if (status)
-				text = event.mode === "plan" ? status : `${event.mode} ${status}`;
+				text =
+					event.mode === PI_MODE_STATUSES.plan ? status : `${event.mode} ${status}`;
 			return theme.fg(colorForMode(event.mode), text);
 		})
 		.join(" + ");
 }
 
 function modePriority(mode: string): number {
-	if (mode === "goal") return 0;
-	if (mode === "plan") return 1;
+	if (mode === PI_MODE_STATUSES.goal) return 0;
+	if (mode === PI_MODE_STATUSES.plan) return 1;
 	return 2;
 }
 
 function colorForMode(mode: string): PiThemeColor {
-	if (mode === "goal") return MODE_COLORS.goal;
-	if (mode === "plan") return MODE_COLORS.plan;
-	return MODE_COLORS.unknown;
+	if (mode === PI_MODE_STATUSES.goal) return MODE_COLORS[PI_MODE_STATUSES.goal];
+	if (mode === PI_MODE_STATUSES.plan) return MODE_COLORS[PI_MODE_STATUSES.plan];
+	return MODE_COLORS[PI_MODE_STATUSES.unknown];
 }

@@ -1,0 +1,18 @@
+{
+  "name": "olisikh-pi-extensions",
+  "private": true,
+  "pi": {
+    "extensions": [
+      "./statusline.ts",
+      "./upper-statusline.ts",
+      "./prompt-latency.ts",
+      "./welcome.ts",
+      "./built-in-tool-renderer.ts",
+      "./wiki-memory.ts",
+      "./plan-mode-widget.ts",
+      "./working-indicator.ts",
+      "./yolo-mode.ts",
+      "./vim-editor.ts"
+    ]
+  }
+}

@@ -1,11 +1,18 @@
+// @ts-ignore Pi provides this module at runtime.
 import type {
 	ExtensionAPI,
 	ExtensionContext,
 	SessionStartEvent,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
+import {
+	PI_EXTENSION_ENTRIES,
+	PI_EXTENSION_EVENTS,
+	PI_RUNTIME_SYMBOLS,
+	PI_STATUS_KEYS,
+} from "./lib/pi-constants.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 
-const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
+const UPPER_STATUS_EVENT = PI_EXTENSION_EVENTS.upperStatusChanged;
 type YoloState = { enabled: boolean };
 type RuntimePermissionManager = {
 	isYoloEnabled: () => boolean;
@@ -18,11 +25,9 @@ type RuntimePermissionService = {
 		config?: { yoloMode?: boolean };
 	};
 };
-const PERMISSION_SERVICE_KEY = Symbol.for(
-	"@gotgenes/pi-permission-system:service",
-);
-const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
-const YOLO_STATE_ENTRY = "olisikh:yolo-state";
+const PERMISSION_SERVICE_KEY = PI_RUNTIME_SYMBOLS.permissionService;
+const YOLO_STATE_KEY = PI_RUNTIME_SYMBOLS.yoloState;
+const YOLO_STATE_ENTRY = PI_EXTENSION_ENTRIES.yoloState;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
@@ -79,7 +84,11 @@ function bindRuntimePermissionManager(): void {
 }
 
 function publishYoloState(pi: ExtensionAPI, enabled: boolean): void {
-	pi.events.emit(UPPER_STATUS_EVENT, { version: 1, source: "yolo", enabled });
+	pi.events.emit(UPPER_STATUS_EVENT, {
+		version: 1,
+		source: PI_STATUS_KEYS.yolo,
+		enabled,
+	});
 }
 
 function setYoloMode(enabled: boolean): string | undefined {
@@ -109,19 +118,22 @@ async function handleYolo(
 	} else if (value === "") {
 		enabled = !state.enabled;
 	} else {
-		ctx.ui.notify("Usage: /yolo [on|off]", "warning");
+		ctx.ui.notify("Usage: /yolo [on|off]", PI_THEME_COLORS.warning);
 		return;
 	}
 
 	const error = setYoloMode(enabled);
 	if (error) {
-		ctx.ui.notify(`Unable to change YOLO mode: ${error}`, "error");
+		ctx.ui.notify(`Unable to change YOLO mode: ${error}`, PI_THEME_COLORS.error);
 		return;
 	}
 
 	pi.appendEntry(YOLO_STATE_ENTRY, { enabled });
 	publishYoloState(pi, isYoloModeEnabled());
-	ctx.ui.setStatus("pi-permission-system", enabled ? "yolo" : undefined);
+	ctx.ui.setStatus(
+		PI_STATUS_KEYS.permissionSystem,
+		enabled ? PI_STATUS_KEYS.yolo : undefined,
+	);
 }
 
 export default function (pi: ExtensionAPI): void {
@@ -133,7 +145,7 @@ export default function (pi: ExtensionAPI): void {
 		yoloState().enabled = restoreYoloState(ctx);
 		syncRuntimeYoloState();
 	});
-	pi.events.on("permissions:ready", syncRuntimeYoloState);
+	pi.events.on(PI_EXTENSION_EVENTS.permissionsReady, syncRuntimeYoloState);
 
 	pi.registerCommand("yolo", {
 		description: "Toggle permission-system YOLO mode for the current Pi session",

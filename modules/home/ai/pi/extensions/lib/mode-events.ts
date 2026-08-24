@@ -1,10 +1,12 @@
+import { PI_EXTENSION_EVENTS } from "./pi-constants.ts";
+
 type ModeEventBus = {
 	events: {
 		on: (channel: string, handler: (value: unknown) => void) => () => void;
 	};
 };
 
-export const MODE_CHANGED_EVENT = "pi:mode-changed" as const;
+export const MODE_CHANGED_EVENT = PI_EXTENSION_EVENTS.modeChanged;
 
 export interface ModeChangedEvent {
 	version: 1;
@@ -36,10 +38,12 @@ export function subscribeToModeChanges(
 }
 
 function safeField(value: unknown): value is string {
-	return (
-		typeof value === "string" &&
-		value.length > 0 &&
-		value.length <= 64 &&
-		!/[\u0000-\u001f\u007f]/u.test(value)
-	);
+	if (typeof value !== "string" || value.length === 0 || value.length > 64) {
+		return false;
+	}
+
+	return !Array.from(value).some((character) => {
+		const codePoint = character.codePointAt(0);
+		return codePoint !== undefined && (codePoint <= 0x1f || codePoint === 0x7f);
+	});
 }

@@ -1,14 +1,15 @@
-// @ts-ignore Pi provides this virtual module to extensions at runtime.
+// @ts-expect-error Pi provides this virtual module to extensions at runtime.
 import {
 	createCodingTools,
 	createReadOnlyTools,
+	type ExtensionAPI,
 	getLanguageFromPath,
 	highlightCode,
-	type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent";
-/* @ts-ignore Pi provides this module to extensions at runtime. */
+// @ts-expect-error Pi provides this module to extensions at runtime.
 import { Text } from "@earendil-works/pi-tui";
 import type { PiTextTheme } from "./lib/pi-theme.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 
 type ReadArguments = {
 	path?: string;
@@ -189,23 +190,23 @@ function renderCommand(command: string, theme: PiTextTheme): string {
 	}
 
 	if (lines.length <= 1) {
-		return `${theme.fg("bashMode", "$ ")}${lines[0] ?? ""}`;
+		return `${theme.fg(PI_THEME_COLORS.bashMode, "$ ")}${lines[0] ?? ""}`;
 	}
 
 	const lineNumberWidth = String(lines.length).length;
 	const numberedLines = lines.map((line, index) => {
 		const lineNumber = String(index + 1).padStart(lineNumberWidth, " ");
-		const gutter = theme.fg("dim", `${lineNumber} │ `);
+		const gutter = theme.fg(PI_THEME_COLORS.dim, `${lineNumber} │ `);
 		let prompt = "  ";
 		if (index === 0) {
-			prompt = theme.fg("bashMode", "$ ");
+			prompt = theme.fg(PI_THEME_COLORS.bashMode, "$ ");
 		}
 		return `${gutter}${prompt}${line}`;
 	});
 
 	const header =
-		theme.fg("bashMode", theme.bold("bash")) +
-		theme.fg("dim", ` · ${lines.length} lines`);
+		theme.fg(PI_THEME_COLORS.bashMode, theme.bold("bash")) +
+		theme.fg(PI_THEME_COLORS.dim, ` · ${lines.length} lines`);
 
 	return `${header}\n${numberedLines.join("\n")}`;
 }
@@ -215,8 +216,10 @@ function renderToolTitle(
 	details: string,
 	theme: PiTextTheme,
 ): string {
-	const title = theme.fg("toolTitle", theme.bold(toolName));
-	return details ? `${title} ${theme.fg("toolOutput", details)}` : title;
+	const title = theme.fg(PI_THEME_COLORS.toolTitle, theme.bold(toolName));
+	return details
+		? `${title} ${theme.fg(PI_THEME_COLORS.toolOutput, details)}`
+		: title;
 }
 
 function renderPathToolCall(
@@ -273,12 +276,15 @@ function renderReadCall(args: ReadArguments, theme: PiTextTheme): string {
 
 	let range = "";
 	if (args.offset !== undefined || args.limit !== undefined) {
-		range = theme.fg("warning", `:${startLine}${endLine ? `-${endLine}` : ""}`);
+		range = theme.fg(
+			PI_THEME_COLORS.warning,
+			`:${startLine}${endLine ? `-${endLine}` : ""}`,
+		);
 	}
 
 	let languageLabel = "";
 	if (language) {
-		languageLabel = theme.fg("dim", ` · ${language}`);
+		languageLabel = theme.fg(PI_THEME_COLORS.dim, ` · ${language}`);
 	}
 
 	return renderToolTitle("read", rawPath, theme) + range + languageLabel;

@@ -1,30 +1,41 @@
+// @ts-ignore Pi provides this module at runtime.
 import type {
 	ExtensionAPI,
 	ExtensionContext,
 	SessionStartEvent,
 	ToolExecutionStartEvent,
-	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
 // @ts-ignore Pi provides this module at runtime.
 import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import {
+	PI_EXTENSION_ENTRIES,
+	PI_EXTENSION_EVENTS,
+	PI_RUNTIME_SYMBOLS,
+	PI_STATUS_KEYS,
+	PI_VIM_MODES,
+	PI_WIDGET_KEYS,
+	PI_WIDGET_PLACEMENTS,
+} from "./lib/pi-constants.ts";
 import type {
 	PiInverseTheme,
-	PiTheme,
+	PiItalicTheme,
 	PiTextTheme,
+	PiTheme,
 	PiThemeColor,
-  PiItalicTheme,
 } from "./lib/pi-theme.ts";
+import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 import type {
 	PiWidgetFactory,
 	PiWidgetOptions,
 	PiWidgetUi,
 } from "./lib/pi-widgets.ts";
-const WIDGET_KEY = "zz-olisikh-upper-statusline";
-const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
-const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
+
+const WIDGET_KEY = PI_WIDGET_KEYS.upperStatusline;
+const UPPER_STATUS_EVENT = PI_EXTENSION_EVENTS.upperStatusChanged;
+const YOLO_STATE_KEY = PI_RUNTIME_SYMBOLS.yoloState;
 const GAP_WIDTH = 2;
 const MAX_RECENT_MCPS = 3;
-const MCP_HISTORY_ENTRY = "olisikh:upper-status-mcps";
+const MCP_HISTORY_ENTRY = PI_EXTENSION_ENTRIES.upperStatusMcpHistory;
 
 type StatusState = {
 	vimMode: string;
@@ -34,14 +45,14 @@ type StatusState = {
 
 type UpperStatusEvent =
 	| { version: 1; source: "vim"; mode: string }
-	| { version: 1; source: "yolo"; enabled: boolean };
+	| { version: 1; source: typeof PI_STATUS_KEYS.yolo; enabled: boolean };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
 }
 
 function isBelowEditor(options: PiWidgetOptions): boolean {
-	return options?.placement === "belowEditor";
+	return options?.placement === PI_WIDGET_PLACEMENTS.belowEditor;
 }
 
 function isYoloModeEnabled(): boolean {
@@ -52,7 +63,9 @@ function isYoloModeEnabled(): boolean {
 
 function isUpperStatusEvent(value: unknown): value is UpperStatusEvent {
 	if (!isRecord(value) || value.version !== 1) return false;
-	if (value.source === "yolo") return typeof value.enabled === "boolean";
+	if (value.source === PI_STATUS_KEYS.yolo) {
+		return typeof value.enabled === "boolean";
+	}
 	return (
 		value.source === "vim" &&
 		typeof value.mode === "string" &&
@@ -119,20 +132,22 @@ function rememberMcp(state: StatusState, server: string): void {
 	]);
 }
 
-function renderLine(
-	state: StatusState,
-	theme: PiTheme,
-	width: number,
-): string {
+function renderLine(state: StatusState, theme: PiTheme, width: number): string {
 	const left = [
 		badge(theme, vimColor(state.vimMode), state.vimMode.toUpperCase(), true),
-		...(state.yoloEnabled ? [badge(theme, "error", "YOLO", true)] : []),
-	].join(theme.fg("dim", " · "));
+		...(state.yoloEnabled
+			? [badge(theme, PI_THEME_COLORS.error, "YOLO", true)]
+			: []),
+	].join(theme.fg(PI_THEME_COLORS.dim, " · "));
 	const servers = state.recentMcps;
 	if (servers.length === 0) return truncateToWidth(left, width);
 
-	const fullRight = badge(theme, "mdLink", servers.join(" · "));
-	const compactRight = badge(theme, "mdLink", servers.length.toString());
+	const fullRight = badge(theme, PI_THEME_COLORS.mdLink, servers.join(" · "));
+	const compactRight = badge(
+		theme,
+		PI_THEME_COLORS.mdLink,
+		servers.length.toString(),
+	);
 	for (const right of [fullRight, compactRight]) {
 		const remaining = width - visibleWidth(left) - GAP_WIDTH;
 		if (remaining >= visibleWidth(right)) {
@@ -157,23 +172,23 @@ function badge(
 
 function vimColor(mode: string): PiThemeColor {
 	switch (mode) {
-		case "insert":
-			return "success";
-		case "normal":
-			return "mdLink";
-		case "visual":
-		case "visual-line":
-			return "accent";
-		case "ex":
-			return "warning";
+		case PI_VIM_MODES.insert:
+			return PI_THEME_COLORS.success;
+		case PI_VIM_MODES.normal:
+			return PI_THEME_COLORS.mdLink;
+		case PI_VIM_MODES.visual:
+		case PI_VIM_MODES.visualLine:
+			return PI_THEME_COLORS.accent;
+		case PI_VIM_MODES.ex:
+			return PI_THEME_COLORS.warning;
 		default:
-			return "muted";
+			return PI_THEME_COLORS.muted;
 	}
 }
 
 export default function (pi: ExtensionAPI): void {
 	const state: StatusState = {
-		vimMode: "insert",
+		vimMode: PI_VIM_MODES.insert,
 		yoloEnabled: isYoloModeEnabled(),
 		recentMcps: [],
 	};
@@ -202,7 +217,7 @@ export default function (pi: ExtensionAPI): void {
 		restoreWidgetSetter?.();
 		restoreWidgetSetter = undefined;
 		activeContext = ctx;
-		state.vimMode = "insert";
+		state.vimMode = PI_VIM_MODES.insert;
 		state.yoloEnabled = isYoloModeEnabled();
 		state.recentMcps = restoreMcpHistory(ctx);
 
