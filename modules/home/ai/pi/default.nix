@@ -68,7 +68,11 @@ let
       "npm:pi-subagents"
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
-      "git:github.com/olisikh/pi-vim@fix/standalone-bun-pi"
+      "npm:context-mode"
+      "npm:@upstash/context7-pi"
+      "npm:@juicesharp/rpiv-todo"
+      "npm:@juicesharp/rpiv-ask-user-question"
+      "git:github.com/olisikh/pi-vim"
       {
         source = "git:github.com/olisikh/pi-extensions";
         extensions = [
@@ -76,10 +80,6 @@ let
           "packages/pi-goal/src/index.ts"
         ];
       }
-      "npm:context-mode"
-      "npm:@upstash/context7-pi"
-      "npm:@juicesharp/rpiv-todo"
-      "npm:@juicesharp/rpiv-ask-user-question"
     ];
 
     compaction = {
