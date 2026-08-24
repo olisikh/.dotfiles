@@ -1,29 +1,30 @@
 import type {
 	ExtensionAPI,
 	ExtensionContext,
-	// @ts-expect-error Pi provides this module to extensions at runtime.
+	SessionStartEvent,
+	ToolExecutionStartEvent,
+	// @ts-ignore Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
-/* @ts-expect-error Pi provides this module to extensions at runtime. */
+// @ts-ignore Pi provides this module at runtime.
 import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
-import type { PiInverseTheme, PiThemeColor } from "./lib/pi-theme.ts";
-import type { PiRenderTui } from "./lib/pi-tui.ts";
+import type {
+	PiInverseTheme,
+	PiTheme,
+	PiTextTheme,
+	PiThemeColor,
+  PiItalicTheme,
+} from "./lib/pi-theme.ts";
+import type {
+	PiWidgetFactory,
+	PiWidgetOptions,
+	PiWidgetUi,
+} from "./lib/pi-widgets.ts";
 const WIDGET_KEY = "zz-olisikh-upper-statusline";
 const UPPER_STATUS_EVENT = "olisikh:upper-status-changed";
 const YOLO_STATE_KEY = Symbol.for("olisikh.pi.yolo-state");
 const GAP_WIDTH = 2;
 const MAX_RECENT_MCPS = 3;
 const MCP_HISTORY_ENTRY = "olisikh:upper-status-mcps";
-
-type WidgetFactory = (tui: PiRenderTui, theme: PiInverseTheme) => unknown;
-type WidgetUi = {
-	setWidget: (key: string, widget: unknown, ...options: unknown[]) => void;
-};
-type ToolEvent = {
-	toolCallId?: string;
-	toolName?: string;
-	args?: unknown;
-	result?: unknown;
-};
 
 type StatusState = {
 	vimMode: string;
@@ -39,8 +40,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
 }
 
-function isBelowEditor(options: unknown): boolean {
-	return isRecord(options) && options.placement === "belowEditor";
+function isBelowEditor(options: PiWidgetOptions): boolean {
+	return options?.placement === "belowEditor";
 }
 
 function isYoloModeEnabled(): boolean {
@@ -60,7 +61,9 @@ function isUpperStatusEvent(value: unknown): value is UpperStatusEvent {
 	);
 }
 
-function mcpServerName(event: ToolEvent): string | undefined {
+function mcpServerName(
+	event: Pick<ToolExecutionStartEvent, "toolName" | "args">,
+): string | undefined {
 	if (typeof event.toolName !== "string") return undefined;
 	const toolName = event.toolName.trim();
 	const direct = serverFromQualifiedTool(toolName);
@@ -118,12 +121,12 @@ function rememberMcp(state: StatusState, server: string): void {
 
 function renderLine(
 	state: StatusState,
-	theme: PiInverseTheme,
+	theme: PiTheme,
 	width: number,
 ): string {
 	const left = [
-		badge(theme, vimColor(state.vimMode), state.vimMode.toUpperCase()),
-		...(state.yoloEnabled ? [badge(theme, "error", "YOLO")] : []),
+		badge(theme, vimColor(state.vimMode), state.vimMode.toUpperCase(), true),
+		...(state.yoloEnabled ? [badge(theme, "error", "YOLO", true)] : []),
 	].join(theme.fg("dim", " · "));
 	const servers = state.recentMcps;
 	if (servers.length === 0) return truncateToWidth(left, width);
@@ -140,10 +143,15 @@ function renderLine(
 }
 
 function badge(
-	theme: PiInverseTheme,
+	theme: PiInverseTheme & PiItalicTheme & PiTextTheme,
 	color: PiThemeColor,
 	text: string,
+	bold: boolean = false,
+	italic: boolean = false,
 ): string {
+	if (bold) text = theme.bold(text);
+	if (italic) text = theme.italic(text);
+
 	return theme.inverse(theme.fg(color, ` ${text} `));
 }
 
@@ -152,10 +160,10 @@ function vimColor(mode: string): PiThemeColor {
 		case "insert":
 			return "success";
 		case "normal":
-			return "accent";
+			return "mdLink";
 		case "visual":
 		case "visual-line":
-			return "mdLink";
+			return "accent";
 		case "ex":
 			return "warning";
 		default:
@@ -173,7 +181,7 @@ export default function (pi: ExtensionAPI): void {
 	let activeContext: ExtensionContext | undefined;
 	let restoreWidgetSetter: (() => void) | undefined;
 
-	const widgetFactory: WidgetFactory = (tui, theme) => {
+	const widgetFactory: PiWidgetFactory = (tui, theme) => {
 		requestRender = () => tui.requestRender();
 		return {
 			invalidate() {},
@@ -190,7 +198,7 @@ export default function (pi: ExtensionAPI): void {
 		},
 	);
 
-	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
+	pi.on("session_start", (_event: SessionStartEvent, ctx: ExtensionContext) => {
 		restoreWidgetSetter?.();
 		restoreWidgetSetter = undefined;
 		activeContext = ctx;
@@ -200,14 +208,14 @@ export default function (pi: ExtensionAPI): void {
 
 		// SAFETY: Pi exposes setWidget as a mutable UI method; this narrower shape
 		// only models the callback and placement arguments used by this wrapper.
-		const ui = ctx.ui as unknown as WidgetUi;
+		const ui = ctx.ui as PiWidgetUi;
 		const previousSetWidget = ui.setWidget;
 		const setWidget = previousSetWidget.bind(ui);
 		let reordering = false;
 		const installLast = () => setWidget(WIDGET_KEY, widgetFactory);
-		const proxySetWidget: WidgetUi["setWidget"] = (key, widget, ...options) => {
-			setWidget(key, widget, ...options);
-			if (reordering || key === WIDGET_KEY || isBelowEditor(options[0])) return;
+		const proxySetWidget: PiWidgetUi["setWidget"] = (key, widget, options) => {
+			setWidget(key, widget, options);
+			if (reordering || key === WIDGET_KEY || isBelowEditor(options)) return;
 
 			// Pi renders above-editor widgets in registration order. Reinsert this
 			// widget after every other above-editor update so it remains adjacent to
@@ -227,7 +235,7 @@ export default function (pi: ExtensionAPI): void {
 		installLast();
 	});
 
-	pi.on("tool_execution_start", (event: ToolEvent) => {
+	pi.on("tool_execution_start", (event: ToolExecutionStartEvent) => {
 		const server = mcpServerName(event);
 		if (!server) return;
 		rememberMcp(state, server);

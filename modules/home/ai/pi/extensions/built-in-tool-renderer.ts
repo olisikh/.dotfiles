@@ -1,17 +1,14 @@
-/* @ts-expect-error Pi provides this virtual module to extensions at runtime. */
+// @ts-ignore Pi provides this virtual module to extensions at runtime.
 import {
 	createCodingTools,
 	createReadOnlyTools,
 	getLanguageFromPath,
 	highlightCode,
+	type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent";
-/* @ts-expect-error Pi provides this module to extensions at runtime. */
+/* @ts-ignore Pi provides this module to extensions at runtime. */
 import { Text } from "@earendil-works/pi-tui";
 import type { PiTextTheme } from "./lib/pi-theme.ts";
-
-type PiExtensionAPI = {
-	registerTool: (definition: unknown) => void;
-};
 
 type ReadArguments = {
 	path?: string;
@@ -184,7 +181,7 @@ function renderCommand(command: string, theme: PiTextTheme): string {
 
 	try {
 		// highlightCode uses the active Pi theme and returns ANSI-styled lines.
-		lines = highlightCode(sourceForHighlight, "bash", theme).map((line: string) =>
+		lines = highlightCode(sourceForHighlight, "bash").map((line: string) =>
 			line.replaceAll(placeholder, "#"),
 		);
 	} catch {
@@ -305,7 +302,7 @@ function renderToolCall(
 	return renderSearchToolCall(toolName, args, theme);
 }
 
-export default function (pi: PiExtensionAPI) {
+export default function (pi: ExtensionAPI) {
 	const cwd = currentWorkingDirectory();
 	const originalTools = new Map(
 		[...createCodingTools(cwd), ...createReadOnlyTools(cwd)].map((tool) => [

@@ -3,9 +3,12 @@ import path from "node:path";
 import type {
 	ExtensionAPI,
 	ExtensionContext,
+	SessionStartEvent,
+	SessionTreeEvent,
+	TurnEndEvent,
 	// @ts-expect-error Pi provides this module at runtime.
 } from "@mariozechner/pi-coding-agent";
-/* @ts-expect-error Pi provides this module to extensions at runtime. */
+// @ts-expect-error Pi provides this module at runtime.
 import { truncateToWidth } from "@mariozechner/pi-tui";
 import type { PiForegroundTheme, PiThemeColor } from "./lib/pi-theme.ts";
 import type { PiRenderTui } from "./lib/pi-tui.ts";
@@ -28,10 +31,6 @@ type FooterData = {
 	getExtensionStatuses(): ReadonlyMap<string, string>;
 	getGitBranch(): string | null;
 };
-type AssistantTurn = {
-	message: { role: string; usage: { cost: { total: number } } };
-};
-
 const MODE_COLORS = {
 	build: "error",
 	plan: "success",
@@ -97,7 +96,7 @@ export default function (pi: ExtensionAPI) {
 		requestRender?.();
 	};
 
-	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
+	pi.on("session_start", (_event: SessionStartEvent, ctx: ExtensionContext) => {
 		modes.clear();
 		syncCostTotals(ctx);
 
@@ -121,7 +120,7 @@ export default function (pi: ExtensionAPI) {
 						const branch = footerData.getGitBranch();
 						const folder = path.basename(ctx.cwd ?? ".");
 						const usageColor = contextUsageColor(usage?.percent);
-						const usageText = `${compact(usage?.tokens)} / ${compact(usage?.contextWindow)} (${usage?.percent?.toFixed(0) ?? "?"}%)`;
+						const usageText = `${compact(usage?.tokens ?? undefined)} / ${compact(usage?.contextWindow)} (${usage?.percent?.toFixed(0) ?? "?"}%)`;
 
 						const parts = [
 							renderModeStatus(modes, footerData.getExtensionStatuses(), theme),
@@ -142,13 +141,7 @@ export default function (pi: ExtensionAPI) {
 		);
 	});
 
-	pi.on("session_switch", (_event: unknown, ctx: ExtensionContext) =>
-		syncCostTotals(ctx),
-	);
-	pi.on("session_tree", (_event: unknown, ctx: ExtensionContext) =>
-		syncCostTotals(ctx),
-	);
-	pi.on("session_fork", (_event: unknown, ctx: ExtensionContext) =>
+	pi.on("session_tree", (_event: SessionTreeEvent, ctx: ExtensionContext) =>
 		syncCostTotals(ctx),
 	);
 
@@ -159,7 +152,7 @@ export default function (pi: ExtensionAPI) {
 		requestRender = null;
 	});
 
-	pi.on("turn_end", (event: AssistantTurn) => {
+	pi.on("turn_end", (event: TurnEndEvent) => {
 		if (event.message.role !== "assistant") {
 			return;
 		}
