@@ -1,4 +1,9 @@
-{ lib, config, namespace, ... }:
+{
+  lib,
+  config,
+  namespace,
+  ...
+}:
 let
   inherit (lib) mkIf;
   inherit (lib.${namespace}.zsh) mkMid;
@@ -12,10 +17,12 @@ in
   };
 
   config = mkIf cfg.enable {
-    assertions = [{
-      assertion = zshCfg.enable;
-      message = "Antidote requires zsh to be enabled (dev.shell.zsh.enable = true)";
-    }];
+    assertions = [
+      {
+        assertion = zshCfg.enable;
+        message = "Antidote requires zsh to be enabled (dev.shell.zsh.enable = true)";
+      }
+    ];
 
     programs.zsh.antidote = {
       enable = true;
@@ -40,30 +47,12 @@ in
       ];
     };
 
-    # Pin the antidote home deterministically inside zsh, ordered BEFORE the
-    # home-manager antidote block (which is mkOrder 550 and runs `antidote load`).
-    # Without this, any miss on the ANTIDOTE_HOME env handoff (which churns on
-    # flake updates) silently falls back to ~/Library/Caches/antidote on macOS,
-    # making antidote re-clone all plugins into the wrong, volatile location.
-    # Env var wins over the zstyle in antidote 2.x; both point at the same dir
-    # so whichever resolve, the result is identical. home.sessionVariables below
-    # still covers `antidote` CLI invocations from non-zsh shells.
-    programs.zsh.initContent = lib.mkMerge [
-      (lib.mkOrder 549 ''
-        export ANTIDOTE_HOME="$HOME/.cache/antidote"
-        zstyle ':antidote:home' dir "$HOME/.cache/antidote"
-      '')
-      (mkMid
+    programs.zsh.initContent =
+      mkMid
         # zsh
         ''
           zstyle ':fzf-tab:*' use-fzf-default-opts yes
           zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-        ''
-      )
-    ];
-
-    home.sessionVariables = {
-      ANTIDOTE_HOME = "${config.home.homeDirectory}/.cache/antidote";
-    };
+        '';
   };
 }

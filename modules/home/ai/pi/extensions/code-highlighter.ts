@@ -132,6 +132,7 @@ const LUMIS_LANGUAGE_PROFILE = [
 	"markdown",
 	"markdown_inline",
 	"make",
+	"wasm",
 	"protobuf",
 	"regex",
 	"sql",
