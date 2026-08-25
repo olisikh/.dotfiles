@@ -127,10 +127,6 @@ let
           httpTransport = "streamable-http";
           directTools = true;
         };
-        context-mode = {
-          command = "context-mode";
-          directTools = true;
-        };
       };
     }
     cfg.mcps;
