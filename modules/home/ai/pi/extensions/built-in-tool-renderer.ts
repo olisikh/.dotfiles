@@ -1,14 +1,21 @@
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import {
 	createCodingTools,
 	createReadOnlyTools,
-	type ExtensionAPI,
+	getAgentDir,
 	getLanguageFromPath,
-	highlightCode,
-// @ts-expect-error Pi provides this virtual module to extensions at runtime.
+	getMarkdownTheme,
+	type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent";
-// @ts-expect-error Pi provides this module to extensions at runtime.
 import { Text } from "@earendil-works/pi-tui";
-import type { PiTextTheme } from "./lib/pi-theme.ts";
+import {
+	createCodeHighlighter,
+	normalizeLumisLanguage,
+	type CodeHighlighter,
+	type LumisHighlighter,
+} from "./lib/code-highlighter.ts";
+import type { PiNamedThemeColor, PiTextTheme } from "./lib/pi-theme.ts";
 import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 
 type ReadArguments = {
@@ -23,6 +30,26 @@ type PathArguments = {
 	file_path?: string;
 };
 
+type RenderOptions = {
+	expanded?: boolean;
+	isPartial?: boolean;
+};
+
+type RenderContext = {
+	args?: unknown;
+	expanded?: boolean;
+	isError?: boolean;
+};
+
+type RenderResult = (
+	result: unknown,
+	options: unknown,
+	theme: PiTextTheme,
+	context: unknown,
+) => Text;
+
+const MARKDOWN_HIGHLIGHT_SUPPRESSOR = "\u200b";
+
 function currentWorkingDirectory(): string {
 	const processLike = (
 		globalThis as typeof globalThis & {
@@ -32,162 +59,139 @@ function currentWorkingDirectory(): string {
 	return processLike?.cwd?.() ?? ".";
 }
 
-const BASH_HASH_PLACEHOLDER = "__PI_BASH_HASH__";
-
-type BashMaskState = {
-	quote: "'" | '"' | undefined;
-	inComment: boolean;
-	atWordStart: boolean;
-};
-
-type BashMaskConsumption = {
-	text: string;
-	nextIndex: number;
-};
-
-function isBashWordBoundary(character: string): boolean {
-	return /\s/u.test(character) || "|&;()<>".includes(character);
-}
-
-function consumeBashCommentCharacter(
-	state: BashMaskState,
-	character: string,
-): string {
-	if (character === "\n") {
-		state.inComment = false;
-		state.atWordStart = true;
+// Home Manager exposes this extension through a read-only Nix-store symlink.
+// Resolve its runtime dependencies from Pi's writable managed npm root instead
+// of trying to create node_modules beside the extension. Bun's compiled Pi
+// loader does not honor Node's require.resolve() search paths here, so these
+// package entry points are intentionally resolved as absolute files.
+async function loadManagedModule<T>(specifier: string): Promise<T> {
+	const managedNodeModules = join(getAgentDir(), "npm", "node_modules");
+	const relativePath =
+		specifier === "@lumis-sh/lumis"
+			? "@lumis-sh/lumis/dist/index.js"
+			: specifier === "@lumis-sh/lumis/bundles/full"
+				? "@lumis-sh/lumis/dist/bundles/full.js"
+				: undefined;
+	if (!relativePath) {
+		throw new Error(`Unsupported managed module: ${specifier}`);
 	}
-	return character;
+	return (await import(
+		pathToFileURL(join(managedNodeModules, relativePath)).href
+	)) as T;
 }
 
-function consumeBashQuotedCharacter(
+async function loadCodeHighlighter(): Promise<CodeHighlighter> {
+	const { createHighlighter } = await loadManagedModule<{
+		createHighlighter: (options: {
+			languages: unknown[];
+		}) => Promise<LumisHighlighter>;
+	}>("@lumis-sh/lumis");
+	const { bundledLanguages } = await loadManagedModule<{
+		bundledLanguages: Record<string, unknown>;
+	}>("@lumis-sh/lumis/bundles/full");
+
+	const languageNames = [
+		"bash",
+		"nix",
+		"javascript",
+		"typescript",
+		"python",
+		"java",
+		"scala",
+		"kotlin",
+	] as const;
+	const languages = Object.fromEntries(
+		languageNames.map((name) => [name, bundledLanguages[name]]),
+	);
+	const lumis = await createHighlighter({ languages: Object.values(languages) });
+	return createCodeHighlighter(lumis, languages);
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+	return value && typeof value === "object"
+		? (value as Record<string, unknown>)
+		: {};
+}
+
+function textContent(result: unknown): string {
+	const content = asRecord(result).content;
+	if (!Array.isArray(content)) {
+		return "";
+	}
+	return content
+		.flatMap((item) => {
+			const record = asRecord(item);
+			return record.type === "text" ? [String(record.text ?? "")] : [];
+		})
+		.join("\n")
+		.replace(/\r/g, "");
+}
+
+function pathArgument(args: Record<string, unknown>): string {
+	if (typeof args.file_path === "string") {
+		return args.file_path;
+	}
+	if (typeof args.path === "string") {
+		return args.path;
+	}
+	return "";
+}
+
+function replaceTabs(text: string): string {
+	return text.replace(/\t/g, "   ");
+}
+
+function trimTrailingEmptyLines(lines: string[]): string[] {
+	let end = lines.length;
+	while (end > 0 && lines[end - 1] === "") {
+		end -= 1;
+	}
+	return lines.slice(0, end);
+}
+
+function lumisLanguageForPath(rawPath: string): string | undefined {
+	const fromPi = normalizeLumisLanguage(getLanguageFromPath(rawPath));
+	if (fromPi) {
+		return fromPi;
+	}
+
+	const basename = rawPath.split(/[\\/]/).pop()?.toLowerCase() ?? "";
+	const extension = basename.split(".").pop();
+	if (extension === "nix") {
+		return "nix";
+	}
+	if (extension === "kts") {
+		return "kotlin";
+	}
+	return undefined;
+}
+
+function highlightedLines(
 	source: string,
-	index: number,
-	state: BashMaskState,
-): BashMaskConsumption {
-	const character = source[index];
-	if (state.quote === "'") {
-		if (character === "'") {
-			state.quote = undefined;
-		}
-		return { text: character, nextIndex: index };
-	}
-
-	if (character === "\\" && source[index + 1] !== undefined) {
-		return { text: character + source[index + 1], nextIndex: index + 1 };
-	}
-	if (character === '"') {
-		state.quote = undefined;
-	}
-	return { text: character, nextIndex: index };
-}
-
-function consumeBashEscapedCharacter(
-	source: string,
-	index: number,
-	state: BashMaskState,
-	placeholder: string,
-): BashMaskConsumption {
-	const escaped = source[index + 1];
-	if (escaped === undefined) {
-		return { text: source[index], nextIndex: index };
-	}
-
-	if (escaped !== "\n") {
-		state.atWordStart = false;
-	}
-	return {
-		text: `${source[index]}${escaped === "#" ? placeholder : escaped}`,
-		nextIndex: index + 1,
-	};
-}
-
-function consumeBashHash(state: BashMaskState, placeholder: string): string {
-	const startsComment = state.atWordStart;
-	state.atWordStart = false;
-	if (startsComment) {
-		state.inComment = true;
-	}
-	return startsComment ? "#" : placeholder;
-}
-
-// Keep embedded hashes out of the Bash highlighter's comment rule, then restore them.
-export function maskNonCommentHashes(source: string): {
-	source: string;
-	placeholder: string;
-} {
-	let placeholder = BASH_HASH_PLACEHOLDER;
-	while (source.includes(placeholder)) {
-		placeholder = `_${placeholder}`;
-	}
-
-	const state: BashMaskState = {
-		quote: undefined,
-		inComment: false,
-		atWordStart: true,
-	};
-	let maskedSource = "";
-
-	for (let index = 0; index < source.length; index += 1) {
-		const character = source[index];
-
-		if (state.inComment) {
-			maskedSource += consumeBashCommentCharacter(state, character);
-			continue;
-		}
-
-		if (state.quote) {
-			const consumed = consumeBashQuotedCharacter(source, index, state);
-			maskedSource += consumed.text;
-			index = consumed.nextIndex;
-			continue;
-		}
-
-		if (character === "\\") {
-			const consumed = consumeBashEscapedCharacter(
-				source,
-				index,
-				state,
-				placeholder,
-			);
-			maskedSource += consumed.text;
-			index = consumed.nextIndex;
-			continue;
-		}
-
-		if (character === "'" || character === '"') {
-			maskedSource += character;
-			state.quote = character;
-			state.atWordStart = false;
-			continue;
-		}
-
-		if (character === "#") {
-			maskedSource += consumeBashHash(state, placeholder);
-			continue;
-		}
-
-		maskedSource += character;
-		state.atWordStart = isBashWordBoundary(character);
-	}
-
-	return { source: maskedSource, placeholder };
-}
-
-function renderCommand(command: string, theme: PiTextTheme): string {
-	const source = command.replace(/\r\n?/g, "\n").trimEnd();
-	const { source: sourceForHighlight, placeholder } =
-		maskNonCommentHashes(source);
-	let lines: string[];
-
-	try {
-		// highlightCode uses the active Pi theme and returns ANSI-styled lines.
-		lines = highlightCode(sourceForHighlight, "bash").map((line: string) =>
-			line.replaceAll(placeholder, "#"),
+	language: string | undefined,
+	theme: PiTextTheme,
+	highlighter: CodeHighlighter,
+): string[] {
+	const normalized = replaceTabs(source.replace(/\r/g, ""));
+	if (!language) {
+		return trimTrailingEmptyLines(
+			normalized
+				.split("\n")
+				.map((line) => theme.fg(PI_THEME_COLORS.toolOutput, line)),
 		);
-	} catch {
-		lines = source.split("\n");
 	}
+	return trimTrailingEmptyLines(
+		highlighter(normalized, language, theme).split("\n"),
+	);
+}
+
+function renderCommand(
+	command: string,
+	theme: PiTextTheme,
+	highlighter: CodeHighlighter,
+): string {
+	const source = command.replace(/\r\n?/g, "\n").trimEnd();
+	const lines = highlighter(source, "bash", theme).split("\n");
 
 	if (lines.length <= 1) {
 		return `${theme.fg(PI_THEME_COLORS.bashMode, "$ ")}${lines[0] ?? ""}`;
@@ -267,7 +271,7 @@ function renderSearchToolCall(
 
 function renderReadCall(args: ReadArguments, theme: PiTextTheme): string {
 	const rawPath = args.file_path ?? args.path ?? "";
-	const language = getLanguageFromPath(rawPath);
+	const language = lumisLanguageForPath(rawPath);
 	const startLine = args.offset ?? 1;
 	let endLine = "";
 	if (args.limit !== undefined) {
@@ -290,26 +294,341 @@ function renderReadCall(args: ReadArguments, theme: PiTextTheme): string {
 	return renderToolTitle("read", rawPath, theme) + range + languageLabel;
 }
 
+function renderWriteCall(
+	args: Record<string, unknown>,
+	theme: PiTextTheme,
+	highlighter: CodeHighlighter,
+	expanded: boolean,
+): string {
+	const rawPath = pathArgument(args);
+	const content = typeof args.content === "string" ? args.content : undefined;
+	let text = renderToolTitle("write", rawPath, theme);
+
+	if (content === undefined) {
+		if (args.content !== undefined) {
+			text += `\n\n${theme.fg(PI_THEME_COLORS.error, "[invalid content arg - expected string]")}`;
+		}
+		return text;
+	}
+
+	const language = lumisLanguageForPath(rawPath);
+	const lines = highlightedLines(content, language, theme, highlighter);
+	const maxLines = expanded ? lines.length : 10;
+	const displayLines = lines.slice(0, maxLines);
+	const remaining = lines.length - displayLines.length;
+	if (displayLines.length > 0) {
+		text += `\n\n${displayLines.join("\n")}`;
+	}
+	if (remaining > 0) {
+		text += theme.fg(
+			PI_THEME_COLORS.muted,
+			`\n... (${remaining} more lines, expand to show)`,
+		);
+	}
+	return text;
+}
+
 function renderToolCall(
 	toolName: string,
 	args: Record<string, unknown>,
 	theme: PiTextTheme,
+	highlighter: CodeHighlighter,
+	expanded: boolean,
 ): string {
 	if (toolName === "bash") {
 		const command = typeof args.command === "string" ? args.command : "";
-		return renderCommand(command, theme);
+		return renderCommand(command, theme, highlighter);
 	}
 	if (toolName === "read") {
 		return renderReadCall(args as ReadArguments, theme);
 	}
-	if (toolName === "edit" || toolName === "write") {
+	if (toolName === "write") {
+		return renderWriteCall(args, theme, highlighter, expanded);
+	}
+	if (toolName === "edit") {
 		return renderPathToolCall(toolName, args as PathArguments, theme);
 	}
 	return renderSearchToolCall(toolName, args, theme);
 }
 
-export default function (pi: ExtensionAPI) {
+function truncationRecord(result: unknown): Record<string, unknown> {
+	const details = asRecord(asRecord(result).details);
+	return asRecord(details.truncation);
+}
+
+function formatSize(value: unknown): string {
+	if (typeof value !== "number" || !Number.isFinite(value)) {
+		return "size limit";
+	}
+	if (value >= 1024 * 1024) {
+		return `${(value / (1024 * 1024)).toFixed(1)}MB`;
+	}
+	if (value >= 1024) {
+		return `${Math.round(value / 1024)}KB`;
+	}
+	return `${value}B`;
+}
+
+function appendReadTruncation(
+	text: string,
+	result: unknown,
+	theme: PiTextTheme,
+): string {
+	const truncation = truncationRecord(result);
+	if (truncation.truncated !== true) {
+		return text;
+	}
+
+	let notice: string;
+	if (truncation.firstLineExceedsLimit === true) {
+		notice = `[First line exceeds ${formatSize(truncation.maxBytes)} limit]`;
+	} else if (truncation.truncatedBy === "lines") {
+		notice = `[Truncated: showing ${String(truncation.outputLines ?? "some")} of ${String(truncation.totalLines ?? "many")} lines (${String(truncation.maxLines ?? "configured")} line limit)]`;
+	} else {
+		notice = `[Truncated: ${String(truncation.outputLines ?? "some")} lines shown (${formatSize(truncation.maxBytes)} limit)]`;
+	}
+	return `${text}\n${theme.fg(PI_THEME_COLORS.warning, notice)}`;
+}
+
+function renderReadResult(
+	result: unknown,
+	options: unknown,
+	theme: PiTextTheme,
+	context: unknown,
+	highlighter: CodeHighlighter,
+): Text {
+	const renderOptions = asRecord(options) as RenderOptions;
+	const renderContext = asRecord(context) as RenderContext;
+	const isError = renderContext.isError === true;
+	const output = textContent(result);
+
+	if (!renderOptions.expanded && !isError) {
+		return new Text("", 0, 0);
+	}
+	if (isError) {
+		return new Text(
+			output ? `\n${theme.fg(PI_THEME_COLORS.error, output)}` : "",
+			0,
+			0,
+		);
+	}
+
+	const args = asRecord(renderContext.args);
+	const rawPath = pathArgument(args);
+	const lines = highlightedLines(
+		output,
+		lumisLanguageForPath(rawPath),
+		theme,
+		highlighter,
+	);
+	let text = lines.length > 0 ? `\n${lines.join("\n")}` : "";
+	text = appendReadTruncation(text, result, theme);
+	return new Text(text, 0, 0);
+}
+
+type ParsedDiffLine = {
+	prefix: string;
+	lineNum: string;
+	content: string;
+};
+
+function parseDiffLine(line: string): ParsedDiffLine | undefined {
+	const match = line.match(/^([+-\s])(\s*\d*)\s(.*)$/);
+	return match
+		? { prefix: match[1], lineNum: match[2], content: match[3] }
+		: undefined;
+}
+
+function renderLumisDiff(
+	diff: string,
+	language: string | undefined,
+	theme: PiTextTheme,
+	highlighter: CodeHighlighter,
+): string {
+	return diff
+		.split("\n")
+		.map((line) => {
+			const parsed = parseDiffLine(line);
+			if (!parsed) {
+				return theme.fg(PI_THEME_COLORS.toolDiffContext, line);
+			}
+
+			const code = language
+				? highlighter(replaceTabs(parsed.content), language, theme)
+				: theme.fg(PI_THEME_COLORS.toolOutput, replaceTabs(parsed.content));
+			let prefixColor: PiNamedThemeColor = PI_THEME_COLORS.toolDiffContext;
+			if (parsed.prefix === "+") {
+				prefixColor = PI_THEME_COLORS.toolDiffAdded;
+			} else if (parsed.prefix === "-") {
+				prefixColor = PI_THEME_COLORS.toolDiffRemoved;
+			}
+			return `${theme.fg(prefixColor, `${parsed.prefix}${parsed.lineNum} `)}${code}`;
+		})
+		.join("\n");
+}
+
+function renderEditResult(
+	result: unknown,
+	_themeOptions: unknown,
+	theme: PiTextTheme,
+	context: unknown,
+	highlighter: CodeHighlighter,
+): Text {
+	const renderContext = asRecord(context) as RenderContext;
+	if (renderContext.isError === true) {
+		const output = textContent(result);
+		return new Text(output ? theme.fg(PI_THEME_COLORS.error, output) : "", 0, 0);
+	}
+
+	const details = asRecord(asRecord(result).details);
+	const diff = typeof details.diff === "string" ? details.diff : "";
+	if (!diff) {
+		return new Text("", 0, 0);
+	}
+
+	const args = asRecord(renderContext.args);
+	const rawPath = pathArgument(args);
+	return new Text(
+		`\n${renderLumisDiff(diff, lumisLanguageForPath(rawPath), theme, highlighter)}`,
+		0,
+		0,
+	);
+}
+
+function markdownSyntaxTheme(activeTheme?: PiTextTheme): PiTextTheme {
+	if (activeTheme) {
+		return activeTheme;
+	}
+
+	const markdownTheme = getMarkdownTheme();
+	return {
+		fg(color: PiNamedThemeColor, text: string) {
+			switch (color) {
+				case PI_THEME_COLORS.syntaxComment:
+					return markdownTheme.quote(text);
+				case PI_THEME_COLORS.syntaxKeyword:
+					return markdownTheme.listBullet(text);
+				case PI_THEME_COLORS.syntaxFunction:
+					return markdownTheme.link(text);
+				case PI_THEME_COLORS.syntaxVariable:
+					return markdownTheme.heading(text);
+				case PI_THEME_COLORS.syntaxString:
+					return markdownTheme.code(text);
+				case PI_THEME_COLORS.syntaxNumber:
+					return markdownTheme.heading(text);
+				case PI_THEME_COLORS.syntaxType:
+					return markdownTheme.code(text);
+				case PI_THEME_COLORS.syntaxOperator:
+					return markdownTheme.listBullet(text);
+				default:
+					return markdownTheme.codeBlock(text);
+			}
+		},
+		bold: markdownTheme.bold,
+	};
+}
+
+type MarkdownFence = {
+	indent: string;
+	marker: string;
+	info: string;
+	body: string[];
+};
+
+function parseMarkdownFence(line: string): MarkdownFence | undefined {
+	const match = line.match(/^([ \t]{0,3})(`{3,}|~{3,})(.*)$/);
+	if (!match) {
+		return undefined;
+	}
+	const info = match[3].trim();
+	if (match[2][0] === "`" && info.includes("`")) {
+		return undefined;
+	}
+	return { indent: match[1], marker: match[2], info, body: [] };
+}
+
+function isMarkdownFenceClose(line: string, fence: MarkdownFence): boolean {
+	const candidate = line.replace(/^[ \\t]{0,3}/, "");
+	if (!candidate || candidate[0] !== fence.marker[0]) {
+		return false;
+	}
+
+	let markerLength = 0;
+	while (candidate[markerLength] === fence.marker[0]) {
+		markerLength += 1;
+	}
+	return (
+		markerLength >= fence.marker.length &&
+		candidate.slice(markerLength).trim().length === 0
+	);
+}
+
+function transformMarkdownFence(
+	fence: MarkdownFence,
+	closingLine: string | undefined,
+	theme: PiTextTheme,
+	highlighter: CodeHighlighter,
+): string[] {
+	const languageToken = fence.info.split(/[ \t]+/, 1)[0] ?? "";
+	const language = normalizeLumisLanguage(
+		languageToken.replace(/^\{\.?/, "").replace(/\}?$/, ""),
+	);
+	const sourceLines = fence.body.map((line) =>
+		line.startsWith(fence.indent) ? line.slice(fence.indent.length) : line,
+	);
+	const body = language
+		? highlighter(sourceLines.join("\n"), language, theme)
+				.split("\n")
+				.map((line) => `${fence.indent}${line}`)
+		: fence.body;
+
+	let opening = `${fence.indent}${fence.marker}`;
+	if (fence.info) {
+		opening += ` ${fence.info}${MARKDOWN_HIGHLIGHT_SUPPRESSOR}`;
+	}
+
+	return [opening, ...body, ...(closingLine ? [closingLine] : [])];
+}
+
+function highlightMarkdownCodeBlocks(
+	markdown: string,
+	highlighter: CodeHighlighter,
+	activeTheme: PiTextTheme | undefined,
+): string {
+	const output: string[] = [];
+	const theme = markdownSyntaxTheme(activeTheme);
+	let fence: MarkdownFence | undefined;
+
+	for (const line of markdown.split("\n")) {
+		if (!fence) {
+			const opening = parseMarkdownFence(line);
+			if (opening) {
+				fence = opening;
+			} else {
+				output.push(line);
+			}
+			continue;
+		}
+
+		if (isMarkdownFenceClose(line, fence)) {
+			output.push(...transformMarkdownFence(fence, line, theme, highlighter));
+			fence = undefined;
+		} else {
+			fence.body.push(line);
+		}
+	}
+
+	if (fence) {
+		output.push(...transformMarkdownFence(fence, undefined, theme, highlighter));
+	}
+
+	return output.join("\n");
+}
+
+export default async function (pi: ExtensionAPI) {
+	const highlighter = await loadCodeHighlighter();
 	const cwd = currentWorkingDirectory();
+	let activeTheme: PiTextTheme | undefined;
 	const originalTools = new Map(
 		[...createCodingTools(cwd), ...createReadOnlyTools(cwd)].map((tool) => [
 			tool.name,
@@ -317,14 +636,46 @@ export default function (pi: ExtensionAPI) {
 		]),
 	);
 
-	// Keep execution, schemas, prompt guidance, and result rendering from Pi;
-	// replace only the call-row presentation for every built-in tool.
+	// Markdown transformers are display-only. They disable Pi's text highlighter
+	// for fenced blocks, then replace supported blocks with Lumis ANSI tokens.
+	pi.registerMarkdownTransformer((markdown: string) =>
+		highlightMarkdownCodeBlocks(markdown, highlighter, activeTheme),
+	);
+
+	// Keep execution, schemas, prompt guidance, and result handling from Pi;
+	// replace only the presentation of built-in tools.
 	for (const originalTool of originalTools.values()) {
-		pi.registerTool({
+		const renderResultOverrides: Record<string, RenderResult> = {};
+		if (originalTool.name === "read") {
+			renderResultOverrides.read = (result, options, theme, context) =>
+				renderReadResult(result, options, theme, context, highlighter);
+		}
+		if (originalTool.name === "edit") {
+			renderResultOverrides.edit = (result, options, theme, context) =>
+				renderEditResult(result, options, theme, context, highlighter);
+		}
+
+		const registeredTool = {
 			...originalTool,
-			renderCall(args: Record<string, unknown>, theme: PiTextTheme) {
-				return new Text(renderToolCall(originalTool.name, args, theme), 0, 0);
+			renderCall(args: unknown, theme: PiTextTheme, context: unknown) {
+				activeTheme = theme;
+				const renderContext = asRecord(context);
+				return new Text(
+					renderToolCall(
+						originalTool.name,
+						asRecord(args),
+						theme,
+						highlighter,
+						renderContext.expanded === true,
+					),
+					0,
+					0,
+				);
 			},
-		});
+			...(renderResultOverrides[originalTool.name]
+				? { renderResult: renderResultOverrides[originalTool.name] }
+				: {}),
+		};
+		pi.registerTool(registeredTool);
 	}
 }

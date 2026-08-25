@@ -27,7 +27,19 @@ export const PI_THEME_COLORS = {
 	success: "success",
 	toolOutput: "toolOutput",
 	toolTitle: "toolTitle",
+	toolDiffAdded: "toolDiffAdded",
+	toolDiffRemoved: "toolDiffRemoved",
+	toolDiffContext: "toolDiffContext",
 	warning: "warning",
+	syntaxComment: "syntaxComment",
+	syntaxKeyword: "syntaxKeyword",
+	syntaxFunction: "syntaxFunction",
+	syntaxVariable: "syntaxVariable",
+	syntaxString: "syntaxString",
+	syntaxNumber: "syntaxNumber",
+	syntaxType: "syntaxType",
+	syntaxOperator: "syntaxOperator",
+	syntaxPunctuation: "syntaxPunctuation",
 } as const satisfies Record<string, PiThemeColor>;
 
 export type PiNamedThemeColor =

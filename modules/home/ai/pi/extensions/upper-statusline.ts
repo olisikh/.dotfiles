@@ -142,7 +142,7 @@ function renderLine(state: StatusState, theme: PiTheme, width: number): string {
 	const servers = state.recentMcps;
 	if (servers.length === 0) return truncateToWidth(left, width);
 
-	const fullRight = badge(theme, PI_THEME_COLORS.mdLink, servers.join(" · "));
+	const fullRight = badge(theme, PI_THEME_COLORS.mdLink, servers.join(" · "), true);
 	const compactRight = badge(
 		theme,
 		PI_THEME_COLORS.mdLink,

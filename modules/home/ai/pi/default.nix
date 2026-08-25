@@ -58,6 +58,9 @@ let
     # pi cannot scroll.
     tuiMode = "fullscreen";
 
+    # These runtime packages are installed by Pi into ~/.pi/agent/npm. The
+    # Home Manager extension tree is a read-only Nix-store symlink, so its
+    # package dependencies must not be installed with bun/npm in that tree.
     packages = [
       "npm:pi-ollama-cloud"
       "npm:@capyup/pi-auto-compact"
@@ -68,6 +71,8 @@ let
       "npm:pi-subagents"
       "npm:pi-lens"
       "npm:pi-rtk-optimizer"
+      "npm:@lumis-sh/lumis@0.7.0"
+      "npm:@lumis-sh/wasm-bundle-full@0.1.1"
       "npm:context-mode"
       "npm:@upstash/context7-pi"
       "npm:@juicesharp/rpiv-todo"
