@@ -111,6 +111,7 @@ const LUMIS_LANGUAGE_PROFILE = [
 	"swift",
 	"typescript",
 	"tsx",
+	"vim",
 	// Web languages and templates.
 	"css",
 	"html",
