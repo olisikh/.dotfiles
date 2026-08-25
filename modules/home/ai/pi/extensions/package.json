@@ -7,7 +7,7 @@
       "./upper-statusline.ts",
       "./prompt-latency.ts",
       "./welcome.ts",
-      "./built-in-tool-renderer.ts",
+      "./code-highlighter.ts",
       "./wiki-memory.ts",
       "./plan-mode-widget.ts",
       "./working-indicator.ts",

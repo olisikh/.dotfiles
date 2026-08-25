@@ -3,6 +3,7 @@ import { PI_THEME_COLORS } from "./pi-theme.ts";
 
 /** The small part of Lumis's highlighter API used by the renderer. */
 export type LumisHighlighter = {
+	loadLanguage: (language: unknown) => Promise<void>;
 	highlightIter: (
 		source: string,
 		language: unknown,
@@ -23,7 +24,7 @@ export type CodeHighlighter = (
 	theme: PiTextTheme,
 ) => string;
 
-/** Languages deliberately loaded by the Pi extension's local Lumis bundle. */
+/** Languages and aliases currently loaded from the local Lumis bundle. */
 const LUMIS_LANGUAGE_ALIASES: Record<string, string> = {
 	bash: "bash",
 	sh: "bash",
@@ -46,6 +47,28 @@ const LUMIS_LANGUAGE_ALIASES: Record<string, string> = {
 	kt: "kotlin",
 	kts: "kotlin",
 };
+
+export function registerLumisLanguages(
+	languages: Record<string, unknown>,
+): void {
+	for (const [id, language] of Object.entries(languages)) {
+		const normalizedId = id.trim().toLowerCase();
+		if (!normalizedId) {
+			continue;
+		}
+		LUMIS_LANGUAGE_ALIASES[normalizedId] = id;
+
+		const aliases = (language as { aliases?: unknown }).aliases;
+		if (!Array.isArray(aliases)) {
+			continue;
+		}
+		for (const alias of aliases) {
+			if (typeof alias === "string" && alias.trim()) {
+				LUMIS_LANGUAGE_ALIASES[alias.trim().toLowerCase()] = id;
+			}
+		}
+	}
+}
 
 export function normalizeLumisLanguage(
 	language: string | undefined,

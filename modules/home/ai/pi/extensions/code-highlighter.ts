@@ -12,6 +12,7 @@ import { Text } from "@earendil-works/pi-tui";
 import {
 	createCodeHighlighter,
 	normalizeLumisLanguage,
+	registerLumisLanguages,
 	type CodeHighlighter,
 	type LumisHighlighter,
 } from "./lib/code-highlighter.ts";
@@ -90,20 +91,20 @@ async function loadCodeHighlighter(): Promise<CodeHighlighter> {
 		bundledLanguages: Record<string, unknown>;
 	}>("@lumis-sh/lumis/bundles/full");
 
-	const languageNames = [
-		"bash",
-		"nix",
-		"javascript",
-		"typescript",
-		"python",
-		"java",
-		"scala",
-		"kotlin",
-	] as const;
-	const languages = Object.fromEntries(
-		languageNames.map((name) => [name, bundledLanguages[name]]),
-	);
-	const lumis = await createHighlighter({ languages: Object.values(languages) });
+	// Register the complete bundle lazily, then load one parser at a time. Passing
+	// all handles as individual languages makes Lumis instantiate every WASM
+	// module concurrently and can exceed the runtime's memory limit.
+	const lumis = await createHighlighter({ languages: [bundledLanguages] });
+	const languages: Record<string, unknown> = {};
+	for (const [name, language] of Object.entries(bundledLanguages)) {
+		try {
+			await lumis.loadLanguage(language);
+			languages[name] = language;
+		} catch {
+			// Keep a parser that the active runtime cannot load as plain text.
+		}
+	}
+	registerLumisLanguages(languages);
 	return createCodeHighlighter(lumis, languages);
 }
 
