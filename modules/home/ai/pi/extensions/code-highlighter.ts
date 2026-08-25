@@ -81,6 +81,65 @@ async function loadManagedModule<T>(specifier: string): Promise<T> {
 	)) as T;
 }
 
+/**
+ * Common source languages plus data, configuration, and injected utility
+ * grammars. Keep this list curated: every loaded parser stays resident in Pi.
+ */
+const LUMIS_LANGUAGE_PROFILE = [
+	// Shells and general-purpose languages.
+	"bash",
+	"fish",
+	"powershell",
+	"zsh",
+	"c",
+	"cpp",
+	"csharp",
+	"dart",
+	"elixir",
+	"go",
+	"java",
+	"javascript",
+	"kotlin",
+	"lua",
+	"nix",
+	"php",
+	"python",
+	"r",
+	"ruby",
+	"rust",
+	"scala",
+	"swift",
+	"typescript",
+	"tsx",
+	// Web languages and templates.
+	"css",
+	"html",
+	"scss",
+	"svelte",
+	"vue",
+	// Data, configuration, documentation, and injection utilities.
+	"comment",
+	"csv",
+	"diff",
+	"dockerfile",
+	"graphql",
+	"hcl",
+	"ini",
+	"jq",
+	"json",
+	"json5",
+	"markdown",
+	"markdown_inline",
+	"make",
+	"protobuf",
+	"regex",
+	"sql",
+	"terraform",
+	"toml",
+	"yaml",
+	"xml",
+] as const;
+
 async function loadCodeHighlighter(): Promise<CodeHighlighter> {
 	const { createHighlighter } = await loadManagedModule<{
 		createHighlighter: (options: {
@@ -91,12 +150,19 @@ async function loadCodeHighlighter(): Promise<CodeHighlighter> {
 		bundledLanguages: Record<string, unknown>;
 	}>("@lumis-sh/lumis/bundles/full");
 
-	// Register the complete bundle lazily, then load one parser at a time. Passing
-	// all handles as individual languages makes Lumis instantiate every WASM
-	// module concurrently and can exceed the runtime's memory limit.
-	const lumis = await createHighlighter({ languages: [bundledLanguages] });
+	// Register the selected profile lazily, then load one parser at a time.
+	// Passing all handles as individual languages makes Lumis instantiate every
+	// WASM module concurrently and can exceed the runtime's memory limit.
+	const profileLanguages: Record<string, unknown> = {};
+	for (const name of LUMIS_LANGUAGE_PROFILE) {
+		const language = bundledLanguages[name];
+		if (language) {
+			profileLanguages[name] = language;
+		}
+	}
+	const lumis = await createHighlighter({ languages: [profileLanguages] });
 	const languages: Record<string, unknown> = {};
-	for (const [name, language] of Object.entries(bundledLanguages)) {
+	for (const [name, language] of Object.entries(profileLanguages)) {
 		try {
 			await lumis.loadLanguage(language);
 			languages[name] = language;
