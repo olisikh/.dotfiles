@@ -244,6 +244,7 @@ in
   options.${namespace}.ai.pi = {
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
+    models = mkOpt types.attrs { } "Pi models.json configuration, including built-in model overrides";
     permissions = mkOpt types.attrs { } "Pi permission-system config merged into the module's base policy";
     doubleEscapeWindowMs = mkOpt types.ints.positive 3000 "Milliseconds allowed between Escape presses to abort an active agent";
     workingIndicator = {
@@ -295,6 +296,9 @@ in
 
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
+      ".pi/agent/models.json" = lib.mkIf (cfg.models != { }) {
+        text = builtins.toJSON cfg.models;
+      };
       ".pi/agent/auto-compact-settings.json".text = builtins.toJSON {
         autoCompactPercent = 80;
       };

@@ -143,6 +143,13 @@ in
       copilot = enabled;
       pi = {
         enable = true;
+        models = {
+          providers.openai-codex.modelOverrides = {
+            "gpt-5.6-sol".contextWindow = 900000;
+            "gpt-5.6-terra".contextWindow = 900000;
+            "gpt-5.6-luna".contextWindow = 900000;
+          };
+        };
         config = {
           defaultModel = "gpt-5.6-terra";
           defaultProvider = "openai-codex";
