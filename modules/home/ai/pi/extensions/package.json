@@ -1,5 +1,5 @@
 {
-  "name": "olisikh-pi-extensions",
+  "name": "olisikh-pi-runtime",
   "private": true,
   "pi": {
     "extensions": [
@@ -9,10 +9,10 @@
       "./welcome.ts",
       "./code-highlighter.ts",
       "./wiki-memory.ts",
-      "./plan-mode-widget.ts",
       "./working-indicator.ts",
       "./yolo-mode.ts",
-      "./vim-editor.ts"
+      "./vim-editor.ts",
+      "./modes.ts"
     ]
   }
 }

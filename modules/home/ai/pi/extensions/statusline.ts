@@ -6,7 +6,7 @@ import type {
 	SessionStartEvent,
 	SessionTreeEvent,
 	TurnEndEvent,
-// @ts-expect-error Pi provides node at runtime.
+	// @ts-expect-error Pi provides node at runtime.
 } from "@mariozechner/pi-coding-agent";
 // @ts-expect-error Pi provides node at runtime.
 import { truncateToWidth } from "@mariozechner/pi-tui";
@@ -190,6 +190,14 @@ function renderModeStatus(
 
 	return visibleModes
 		.map((event) => {
+			if (event.source === "olisikh:modes") {
+				if (event.mode === PI_MODE_STATUSES.goal) {
+					return theme.fg(MODE_COLORS[PI_MODE_STATUSES.goal], PI_MODE_STATUSES.goal);
+				}
+				if (event.mode === PI_MODE_STATUSES.plan) {
+					return theme.fg(MODE_COLORS[PI_MODE_STATUSES.plan], PI_MODE_STATUSES.plan);
+				}
+			}
 			const statusKey =
 				event.mode === PI_MODE_STATUSES.plan
 					? PI_MODE_STATUSES.planMode

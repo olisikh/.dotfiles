@@ -78,13 +78,6 @@ let
       "npm:@juicesharp/rpiv-todo"
       "npm:@juicesharp/rpiv-ask-user-question"
       "git:github.com/olisikh/pi-vim"
-      {
-        source = "git:github.com/olisikh/pi-extensions";
-        extensions = [
-          "packages/pi-plan-mode/src/index.ts"
-          "packages/pi-goal/src/index.ts"
-        ];
-      }
     ];
 
     compaction = {
@@ -162,8 +155,8 @@ let
         symbol_search = "allow";
         contact_supervisor = "allow";
         ask_user_question = "allow";
-        plan_mode_question = "allow";
-        plan_mode_complete = "allow";
+        goal_complete = "allow";
+        plan_ready = "allow";
         "graphify_*" = "allow";
         "subagent_*" = "allow";
 
@@ -305,6 +298,8 @@ in
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
 
       ".pi/agent/APPEND_SYSTEM.md".source = ./prompts/brain-policy.md;
+      ".pi/agent/modes/plan.md".source = ./prompts/plan-mode.md;
+      ".pi/agent/modes/goal.md".source = ./prompts/goal-mode.md;
 
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
       ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
