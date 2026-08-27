@@ -12,8 +12,13 @@ ACTIVE_SPACE=$(echo "$SPACES_JSON" | jq -r '.[] | select(.["has-focus"] == true)
 
 # For each space 1-10
 for sid in {1..10}; do
-	# Get window IDs for this space
-	SPACE_WINDOW_IDS=$(echo "$SPACES_JSON" | jq -r ".[] | select(.index == $sid) | .windows[]?" 2>/dev/null)
+	# Yabai repeats sticky/all-spaces windows in every space's `windows` list.
+	# Assign those windows to the active space instead of displaying them everywhere.
+	SPACE_WINDOW_IDS=$(echo "$WINDOWS_JSON" | jq -r \
+		--arg sid "$sid" \
+		--arg active_space "$ACTIVE_SPACE" \
+		'.[] | select((.["is-sticky"] == true and $sid == $active_space) or (.["is-sticky"] != true and (.space | tostring) == $sid)) | .id' \
+		2>/dev/null)
 
 	# Build icon string (max 4 icons)
 	ICON_STRING=""
@@ -27,7 +32,7 @@ for sid in {1..10}; do
 			ICON_STRING="${ICON_STRING}${icon_result}"
 			ICON_COUNT=$((ICON_COUNT + 1))
 			[ "$ICON_COUNT" -ge "${MAX_SPACE_ICONS:-4}" ] && break
-		done <<< "$SPACE_WINDOW_IDS"
+		done <<<"$SPACE_WINDOW_IDS"
 	fi
 
 	# Set colors based on active state
