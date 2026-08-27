@@ -6,3 +6,5 @@ result
 secrets.yaml
 .DS_Store
 __pycache__/
+
+graphify-out/
