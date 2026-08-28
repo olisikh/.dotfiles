@@ -27,6 +27,13 @@ Commands:
        Restart emulator by id. If emulator is not running, start it first.
        --proxyman uses host localhost (127.0.0.1) with proxy port 9090.
 
+  network-status [-s id]
+      Report whether Android considers the emulator's mobile network validated.
+
+  network-reset [-s id]
+      Reconnect Android's emulated mobile network and wait for validation.
+      Does not clear app data or change macOS proxy settings.
+
   install <apk> [-s id]
       Install APK on emulator by id. If emulator is not running, start it first.
 
@@ -59,6 +66,8 @@ Examples:
   andy run --proxyman               # run through localhost:9090
   andy restart                      # restart emulator
   andy restart --proxyman           # restart through localhost:9090
+  andy network-status               # report Android network validation
+  andy network-reset                # reconnect Android mobile data safely
   andy install app-debug.apk        # install APK on emulator
   andy uninstall com.ebay.mobile    # uninstall app
   andy shell                        # open adb shell in emulator
@@ -379,6 +388,30 @@ wait_for_reboot() {
     exit 1
 }
 
+network_is_validated() {
+    local serial="$1"
+    local connectivity=""
+
+    connectivity="$("$ADB_BIN" -s "$serial" shell dumpsys connectivity 2>/dev/null || true)"
+    grep -Eq 'NetworkAgentInfo\{network\{.*CONNECTED.*IS_VALIDATED' <<< "$connectivity"
+}
+
+wait_for_network_validation() {
+    local serial="$1"
+    local attempt=0
+
+    for attempt in $(seq 1 30); do
+        if network_is_validated "$serial"; then
+            return 0
+        fi
+
+        sleep 2
+    done
+
+    echo "Error: Android network did not validate within 60 seconds." >&2
+    exit 1
+}
+
 ensure_running_emulator() {
     local avd="$1"
     local serial=""
@@ -518,6 +551,61 @@ cmd_restart() {
     serial="$(wait_for_emulator_serial "$avd")"
     wait_for_boot "$serial"
     echo "Restarted: $avd ($serial)"
+}
+
+cmd_network_status() {
+    local avd=""
+    local serial=""
+    local mobile_data=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -gt 0 || "$PARSED_PROXYMAN" -ne 0 ]]; then
+        echo "Error: network-status accepts only -s <id>." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+    mobile_data="$("$ADB_BIN" -s "$serial" shell settings get global mobile_data | tr -d '\r')"
+
+    if ! network_is_validated "$serial"; then
+        echo "Network: not validated ($avd, $serial; mobile data: ${mobile_data:-unknown})" >&2
+        exit 1
+    fi
+
+    echo "Network: validated ($avd, $serial; mobile data: ${mobile_data:-unknown})"
+}
+
+cmd_network_reset() {
+    local avd=""
+    local serial=""
+    local mobile_data=""
+
+    parse_device_args "$@"
+
+    if [[ ${#PARSED_ARGS[@]} -gt 0 || "$PARSED_PROXYMAN" -ne 0 ]]; then
+        echo "Error: network-reset accepts only -s <id>." >&2
+        usage >&2
+        exit 1
+    fi
+
+    avd="$(resolve_target_avd "$PARSED_DEVICE_ID")"
+    serial="$(ensure_running_emulator "$avd")"
+    mobile_data="$("$ADB_BIN" -s "$serial" shell settings get global mobile_data | tr -d '\r')"
+
+    if [[ "$mobile_data" != "1" ]]; then
+        echo "Error: mobile data is disabled; refusing to change it automatically." >&2
+        exit 1
+    fi
+
+    "$ADB_BIN" -s "$serial" shell svc data disable
+    sleep 2
+    "$ADB_BIN" -s "$serial" shell svc data enable
+    wait_for_network_validation "$serial"
+
+    echo "Reset Android network: validated ($avd, $serial)"
 }
 
 cmd_install() {
@@ -848,6 +936,14 @@ main() {
     restart)
         init_tools
         cmd_restart "$@"
+        ;;
+    network-status)
+        init_tools
+        cmd_network_status "$@"
+        ;;
+    network-reset)
+        init_tools
+        cmd_network_reset "$@"
         ;;
     install)
         init_tools
