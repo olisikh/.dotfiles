@@ -135,7 +135,7 @@ export default function modes(pi: ExtensionAPI) {
     if (state.mode === "build") return;
     if (state.mode === "goal" && state.goal && !state.goal.paused) {
       return {
-        systemPrompt: `${event.systemPrompt}\n\n<active_goal>\nObjective: ${state.goal.objective}\nKeep working toward this objective. Do not treat a partial result, a plan, a failed check, or a request for clarification as completion. Call goal_complete only after the objective is fully complete and verified, with concrete evidence.\n</active_goal>`,
+        systemPrompt: `${event.systemPrompt}\n\n<active_goal>\nObjective: ${state.goal.objective}\nKeep working toward this objective. Do not treat a partial result, a plan, a failed check, or a request for clarification as completion. Call goal_complete only after the objective is fully complete and verified, with concrete evidence. After calling goal_complete, send its returned report to the user as a normal assistant response.\n</active_goal>`,
       };
     }
     if (state.mode === "plan" && state.plan) {
@@ -194,7 +194,7 @@ export default function modes(pi: ExtensionAPI) {
     name: "goal_complete",
     label: "Goal Complete",
     description:
-      "Finish the active goal after all requested work is implemented and verified.",
+      "Finish the active goal after all requested work is implemented and verified. The returned report is passed to the model so it can send the report to the user as a normal assistant response.",
     parameters: Type.Object({
       summary: Type.String({ minLength: 1, maxLength: 4_000 }),
       evidence: Type.String({ minLength: 1, maxLength: 4_000 }),
@@ -205,11 +205,22 @@ export default function modes(pi: ExtensionAPI) {
           "goal_complete is only available while a goal is active",
         );
       }
+      const objective = state.goal.objective;
+      const report = [
+        `Goal complete: ${objective}`,
+        "",
+        "Summary:",
+        params.summary,
+        "",
+        "Evidence:",
+        params.evidence,
+      ].join("\n");
       enterBuild(ctx, `Goal complete: ${params.summary}`);
+      // Keep the turn open so Pi can give the report to the model for a normal
+      // assistant response instead of ending on the tool result.
       return {
-        content: [{ type: "text", text: `Goal complete: ${params.summary}` }],
+        content: [{ type: "text", text: report }],
         details: { summary: params.summary, evidence: params.evidence },
-        terminate: true,
       };
     },
   });
