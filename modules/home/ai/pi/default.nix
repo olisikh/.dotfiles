@@ -1,9 +1,169 @@
-{ lib, config, namespace, pkgs, ... }:
+{
+  lib,
+  config,
+  namespace,
+  pkgs,
+  ...
+}:
 let
   inherit (lib) mkIf recursiveUpdate types;
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.ai.pi;
+
+  # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
+  # The companion extension turns these picker-only -900k IDs back into the
+  # real GPT-5.6 IDs immediately before each OpenAI request.
+  gpt56OpenaiModels = [
+    {
+      id = "gpt-5.6-sol-900k";
+      name = "GPT-5.6 Sol (900k)";
+      api = "openai-responses";
+      reasoning = true;
+      input = [
+        "text"
+        "image"
+      ];
+      contextWindow = 900000;
+      maxTokens = 128000;
+      cost = {
+        input = 4;
+        output = 20;
+        cacheRead = 0.4;
+        cacheWrite = 5;
+        tiers = [
+          {
+            inputTokensAbove = 272000;
+            input = 8;
+            output = 30;
+            cacheRead = 0.8;
+            cacheWrite = 10;
+          }
+        ];
+      };
+    }
+    {
+      id = "gpt-5.6-terra-900k";
+      name = "GPT-5.6 Terra (900k)";
+      api = "openai-responses";
+      reasoning = true;
+      input = [
+        "text"
+        "image"
+      ];
+      contextWindow = 900000;
+      maxTokens = 128000;
+      cost = {
+        input = 2;
+        output = 12;
+        cacheRead = 0.2;
+        cacheWrite = 2.5;
+        tiers = [
+          {
+            inputTokensAbove = 272000;
+            input = 4;
+            output = 18;
+            cacheRead = 0.4;
+            cacheWrite = 5;
+          }
+        ];
+      };
+    }
+    {
+      id = "gpt-5.6-luna-900k";
+      name = "GPT-5.6 Luna (900k)";
+      api = "openai-responses";
+      reasoning = true;
+      input = [
+        "text"
+        "image"
+      ];
+      contextWindow = 900000;
+      maxTokens = 128000;
+      cost = {
+        input = 0.2;
+        output = 1.2;
+        cacheRead = 0.02;
+        cacheWrite = 0.25;
+        tiers = [
+          {
+            inputTokensAbove = 272000;
+            input = 0.4;
+            output = 1.8;
+            cacheRead = 0.04;
+            cacheWrite = 0.5;
+          }
+        ];
+      };
+    }
+  ];
+
+  # The Codex catalog uses a separate subscription price card.
+  codexGpt56Costs = {
+    "gpt-5.6-sol-900k" = {
+      input = 5;
+      output = 30;
+      cacheRead = 0.5;
+      cacheWrite = 6.25;
+      tiers = [
+        {
+          inputTokensAbove = 272000;
+          input = 10;
+          output = 45;
+          cacheRead = 1;
+          cacheWrite = 12.5;
+        }
+      ];
+    };
+    "gpt-5.6-terra-900k" = {
+      input = 2;
+      output = 12;
+      cacheRead = 0.2;
+      cacheWrite = 2.5;
+      tiers = [
+        {
+          inputTokensAbove = 272000;
+          input = 4;
+          output = 18;
+          cacheRead = 0.4;
+          cacheWrite = 5;
+        }
+      ];
+    };
+    "gpt-5.6-luna-900k" = {
+      input = 0.2;
+      output = 1.2;
+      cacheRead = 0.02;
+      cacheWrite = 0.25;
+      tiers = [
+        {
+          inputTokensAbove = 272000;
+          input = 0.4;
+          output = 1.8;
+          cacheRead = 0.04;
+          cacheWrite = 0.5;
+        }
+      ];
+    };
+  };
+
+  gpt56CodexModels = map (
+    model:
+    model
+    // {
+      api = "openai-codex-responses";
+      cost = builtins.getAttr model.id codexGpt56Costs;
+    }
+  ) gpt56OpenaiModels;
+
+  baseModels = {
+    providers = {
+      openai.models = gpt56OpenaiModels;
+      "openai-codex".models = gpt56CodexModels;
+    };
+  };
+
+  finalModels = recursiveUpdate baseModels cfg.models;
 
   basicConfig = {
     defaultProvider = "openai-codex";
@@ -18,20 +178,32 @@ let
         allow = [ "openai-codex/gpt-5.6-luna" ];
       };
       agentOverrides = {
-        scout = { thinking = "max"; };
-        researcher = { thinking = "max"; };
-        worker = { thinking = "max"; };
-        reviewer = { thinking = "max"; };
-        oracle = { thinking = "max"; };
-        delegate = { thinking = "max"; };
+        scout = {
+          thinking = "max";
+        };
+        researcher = {
+          thinking = "max";
+        };
+        worker = {
+          thinking = "max";
+        };
+        reviewer = {
+          thinking = "max";
+        };
+        oracle = {
+          thinking = "max";
+        };
+        delegate = {
+          thinking = "max";
+        };
       };
     };
 
-   smartCompact = {
-     autoTrigger = true;
-     autoTriggerStrategy = "settled";
-     minContextPercent = 80;
-   };
+    smartCompact = {
+      autoTrigger = true;
+      autoTriggerStrategy = "settled";
+      minContextPercent = 80;
+    };
 
     theme = "catppuccin-mocha";
 
@@ -105,146 +277,156 @@ let
     defaultProjectTrust = "ask";
   };
 
-  mcpConfig = recursiveUpdate
-    {
-      settings = {
-        toolPrefix = "mcp";
-        directTools = false;
-        scriptMode = false;
+  mcpConfig = recursiveUpdate {
+    settings = {
+      toolPrefix = "mcp";
+      directTools = false;
+      scriptMode = false;
+    };
+    mcpServers = {
+      exa = {
+        url = "https://mcp.exa.ai/mcp";
+        auth = false;
+        protocolVersion = "legacy";
+        httpTransport = "streamable-http";
+        directTools = true;
       };
-      mcpServers = {
-        exa = {
-          url = "https://mcp.exa.ai/mcp";
-          auth = false;
-          protocolVersion = "legacy";
-          httpTransport = "streamable-http";
-          directTools = true;
-        };
-      };
-    }
-    cfg.mcps;
+    };
+  } cfg.mcps;
 
   finalConfig = recursiveUpdate basicConfig cfg.config;
 
-  permissionConfig = recursiveUpdate
-    {
-      "$schema" = "https://raw.githubusercontent.com/gotgenes/pi-packages/main/packages/pi-permission-system/schemas/permissions.schema.json";
-      debugLog = false;
-      permissionReviewLog = true;
-      yoloMode = false;
+  permissionConfig = recursiveUpdate {
+    "$schema" =
+      "https://raw.githubusercontent.com/gotgenes/pi-packages/main/packages/pi-permission-system/schemas/permissions.schema.json";
+    debugLog = false;
+    permissionReviewLog = true;
+    yoloMode = false;
 
-      permission = {
+    permission = {
+      "*" = "ask";
+
+      read = "allow";
+      find = "allow";
+      head = "allow";
+      tail = "allow";
+      grep = "allow";
+      ls = "allow";
+      skill = "allow";
+      todo = "allow";
+      "ctx_*" = "allow";
+      "ast_grep_*" = "allow";
+      "lens_*" = "allow";
+      "lsp_*" = "allow";
+      module_report = "allow";
+      project_report = "allow";
+      read_enclosing = "allow";
+      read_symbol = "allow";
+      symbol_search = "allow";
+      contact_supervisor = "allow";
+      ask_user_question = "allow";
+      goal_complete = "allow";
+      plan_ready = "allow";
+      "graphify_*" = "allow";
+      "subagent_*" = "allow";
+
+      "mcp__context-mode*" = "allow";
+      "mcp__exa*" = "allow";
+
+      subagent = "allow";
+
+      bash = {
         "*" = "ask";
 
-        read = "allow";
-        find = "allow";
-        head = "allow";
-        tail = "allow";
-        grep = "allow";
-        ls = "allow";
-        skill = "allow";
-        todo = "allow";
-        "ctx_*" = "allow";
-        "ast_grep_*" = "allow";
-        "lens_*" = "allow";
-        "lsp_*" = "allow";
-        module_report = "allow";
-        project_report = "allow";
-        read_enclosing = "allow";
-        read_symbol = "allow";
-        symbol_search = "allow";
-        contact_supervisor = "allow";
-        ask_user_question = "allow";
-        goal_complete = "allow";
-        plan_ready = "allow";
-        "graphify_*" = "allow";
-        "subagent_*" = "allow";
-
-        "mcp__context-mode*" = "allow";
-        "mcp__exa*" = "allow";
-
-        subagent = "allow";
-
-        bash = {
-          "*" = "ask";
-
-          "git status*" = "allow";
-          "git log*" = "allow";
-          "git diff*" = "allow";
-          "git branch*" = "allow";
-          "git remote*" = "allow";
-          "git show*" = "allow";
-          "git check-ignore*" = "allow";
-          "git ls-files*" = "allow";
-          "strings *" = "allow";
-          "grep *" = "allow";
-          "pgrep *" = "allow";
-          "ps *" = "allow";
-          "awk *" = "allow";
-          "for *" = "allow";
-          "while *" = "allow";
-          "if *" = "allow";
-          "test *" = "allow";
-          "tr *" = "allow";
-          "exit *" = "allow";
-          "cat *" = "allow";
-          "printf *" = "allow";
-          "read *" = "allow";
-          "readlink *" = "allow";
-          "echo *" = "allow";
-          "sort *" = "allow";
-          "head *" = "allow";
-          "tail *" = "allow";
-          "ls *" = "allow";
-          "rg *" = "allow";
-          "wc *" = "allow";
-          "find *" = "allow";
-          "cd *" = "allow";
-          "pwd" = "allow";
-          "sed *" = "allow";
-          "true" = "allow";
-          "false" = "allow";
-          "dirname *" = "allow";
-          "which *" = "allow";
-          "whoami" = "allow";
-          "set *" = "allow";
-          "trap *" = "allow";
-          "command *" = "allow";
-          "nixfmt*" = "allow";
-          "jq *" = "allow";
-          "id *" = "allow";
-          "shfmt*" = "allow";
-          "qmd *" = "allow";
-          "env" = "allow";
-          "printenv" = "allow";
-          "export *" = "allow";
-          "timeout *" = "allow";
-          "diff *" = "allow";
-        };
-
-        external_directory = {
-          "~/.agents/**" = "allow";
-          "~/.pi/**" = "allow";
-          "~/.config/llm-wiki/**" = "allow";
-          "~/.config/opencode/**" = "allow";
-          "~/notes/50 Knowledge/LLM Wiki/**" = "allow";
-        };
+        "git status*" = "allow";
+        "git log*" = "allow";
+        "git diff*" = "allow";
+        "git branch*" = "allow";
+        "git remote*" = "allow";
+        "git show*" = "allow";
+        "git check-ignore*" = "allow";
+        "git ls-files*" = "allow";
+        "strings *" = "allow";
+        "grep *" = "allow";
+        "pgrep *" = "allow";
+        "ps *" = "allow";
+        "awk *" = "allow";
+        "for *" = "allow";
+        "while *" = "allow";
+        "if *" = "allow";
+        "test *" = "allow";
+        "tr *" = "allow";
+        "exit *" = "allow";
+        "cat *" = "allow";
+        "printf *" = "allow";
+        "read *" = "allow";
+        "readlink *" = "allow";
+        "echo *" = "allow";
+        "sort *" = "allow";
+        "head *" = "allow";
+        "tail *" = "allow";
+        "ls *" = "allow";
+        "rg *" = "allow";
+        "wc *" = "allow";
+        "find *" = "allow";
+        "cd *" = "allow";
+        "pwd" = "allow";
+        "sed *" = "allow";
+        "true" = "allow";
+        "false" = "allow";
+        "dirname *" = "allow";
+        "which *" = "allow";
+        "whoami" = "allow";
+        "set *" = "allow";
+        "trap *" = "allow";
+        "command *" = "allow";
+        "nixfmt*" = "allow";
+        "jq *" = "allow";
+        "id *" = "allow";
+        "shfmt*" = "allow";
+        "qmd *" = "allow";
+        "env" = "allow";
+        "printenv" = "allow";
+        "export *" = "allow";
+        "timeout *" = "allow";
+        "diff *" = "allow";
       };
-    }
-    cfg.permissions;
+
+      external_directory = {
+        "~/.agents/**" = "allow";
+        "~/.pi/**" = "allow";
+        "~/.config/llm-wiki/**" = "allow";
+        "~/.config/opencode/**" = "allow";
+        "~/notes/50 Knowledge/LLM Wiki/**" = "allow";
+      };
+    };
+  } cfg.permissions;
 in
 {
   options.${namespace}.ai.pi = {
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
     models = mkOpt types.attrs { } "Pi models.json configuration, including built-in model overrides";
-    permissions = mkOpt types.attrs { } "Pi permission-system config merged into the module's base policy";
-    doubleEscapeWindowMs = mkOpt types.ints.positive 3000 "Milliseconds allowed between Escape presses to abort an active agent";
+    permissions =
+      mkOpt types.attrs { }
+        "Pi permission-system config merged into the module's base policy";
+    doubleEscapeWindowMs =
+      mkOpt types.ints.positive 3000
+        "Milliseconds allowed between Escape presses to abort an active agent";
     workingIndicator = {
-      type = mkOpt (types.enum [ "shimmer" "spinner" ]) "shimmer" "Working indicator animation style";
+      type = mkOpt (types.enum [
+        "shimmer"
+        "spinner"
+      ]) "shimmer" "Working indicator animation style";
       defaultColor = mkOpt types.str "#cba6f7" "Default hex color for the Pi working indicator";
-      rotateColors = mkOpt (types.enum [ "none" "rotate" "rainbow" ]) "none" "Working indicator color animation mode";
-      colorRotationIntervalMs = mkOpt types.ints.positive 2500 "Milliseconds between working indicator palette colors";
+      rotateColors = mkOpt (types.enum [
+        "none"
+        "rotate"
+        "rainbow"
+      ]) "none" "Working indicator color animation mode";
+      colorRotationIntervalMs =
+        mkOpt types.ints.positive 2500
+          "Milliseconds between working indicator palette colors";
       shimmerIntervalMs = mkOpt types.ints.positive 200 "Milliseconds between shimmer frames";
       spinnerIntervalMs = mkOpt types.ints.positive 120 "Milliseconds between spinner frames";
     };
@@ -259,10 +441,20 @@ in
       "tui.altScreen.halfPageUp" = [ "ctrl+u" ];
       # pi-vim opens fullscreen transcript search with `/`; retain Pi's
       # defaults and add Vim-style result navigation while search is active.
-      "tui.altScreen.searchNext" = [ "enter" "ctrl+g" "n" ];
-      "tui.altScreen.searchPrevious" = [ "shift+enter" "ctrl+shift+g" "shift+n" ];
+      "tui.altScreen.searchNext" = [
+        "enter"
+        "ctrl+g"
+        "n"
+      ];
+      "tui.altScreen.searchPrevious" = [
+        "shift+enter"
+        "ctrl+shift+g"
+        "shift+n"
+      ];
     } "Pi keybindings, put under ~/.pi/agent/keybindings.json";
-    mcps = mkOpt types.attrs { } "Pi MCP adapter config merged into the default Exa server configuration";
+    mcps =
+      mkOpt types.attrs { }
+        "Pi MCP adapter config merged into the default Exa server configuration";
   };
 
   config = mkIf cfg.enable {
@@ -286,12 +478,9 @@ in
       PI_WORKING_INDICATOR_SPINNER_INTERVAL_MS = toString cfg.workingIndicator.spinnerIntervalMs;
     };
 
-
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
-      ".pi/agent/models.json" = lib.mkIf (cfg.models != { }) {
-        text = builtins.toJSON cfg.models;
-      };
+      ".pi/agent/models.json".text = builtins.toJSON finalModels;
       ".pi/agent/auto-compact-settings.json".text = builtins.toJSON {
         autoCompactPercent = 80;
       };

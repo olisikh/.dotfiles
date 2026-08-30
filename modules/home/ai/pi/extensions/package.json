@@ -12,7 +12,8 @@
       "./working-indicator.ts",
       "./yolo-mode.ts",
       "./vim-editor.ts",
-      "./modes.ts"
+      "./modes.ts",
+      "./openai-context-variants.ts"
     ]
   }
 }

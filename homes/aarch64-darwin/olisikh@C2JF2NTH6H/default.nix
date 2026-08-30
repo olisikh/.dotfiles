@@ -1,4 +1,9 @@
-{ lib, namespace, pkgs, ... }:
+{
+  lib,
+  namespace,
+  pkgs,
+  ...
+}:
 let
   inherit (lib.${namespace}) enabled;
 in
@@ -143,13 +148,6 @@ in
       copilot = enabled;
       pi = {
         enable = true;
-        models = {
-          providers.openai-codex.modelOverrides = {
-            "gpt-5.6-sol".contextWindow = 900000;
-            "gpt-5.6-terra".contextWindow = 900000;
-            "gpt-5.6-luna".contextWindow = 900000;
-          };
-        };
         config = {
           defaultModel = "gpt-5.6-terra";
           defaultProvider = "openai-codex";
@@ -184,7 +182,10 @@ in
         enable = true;
         package = pkgs.llm-agents.opencode;
         settings = {
-          enabled_providers = [ "github-copilot" "openai" ];
+          enabled_providers = [
+            "github-copilot"
+            "openai"
+          ];
         };
       };
     };
