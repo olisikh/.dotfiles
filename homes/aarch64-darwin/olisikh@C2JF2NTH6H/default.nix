@@ -149,7 +149,7 @@ in
       pi = {
         enable = true;
         config = {
-          defaultModel = "gpt-5.6-terra";
+          defaultModel = "gpt-5.6-terra-900k";
           defaultProvider = "openai-codex";
           defaultThinkingLevel = "high";
           subagents = {
@@ -160,7 +160,7 @@ in
                 thinking = "medium";
               };
               oracle = {
-                model = "openai-codex/gpt-5.6-terra";
+                model = "openai-codex/gpt-5.6-terra-900k";
                 thinking = "medium";
               };
             };
