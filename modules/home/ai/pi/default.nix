@@ -348,6 +348,9 @@ let
       "graphify_*" = "allow";
       "subagent_*" = "allow";
 
+      resolve-library-id = "allow";
+      query-docs = "allow";
+
       "mcp__context-mode*" = "allow";
       "mcp__exa*" = "allow";
 
