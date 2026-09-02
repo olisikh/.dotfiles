@@ -89,6 +89,16 @@ in
     };
   };
 
+  # Moshi uses this host's normal SSH server; the daemon adds Easy Pair,
+  # Herdr detection, and agent-event delivery without exposing a web port.
+  homebrew.brews = [
+    "mosh"
+    {
+      name = "rjyo/moshi/moshi-hook";
+      trusted = true;
+    }
+  ];
+
   networking = {
     inherit hostName computerName;
     localHostName = hostName;
