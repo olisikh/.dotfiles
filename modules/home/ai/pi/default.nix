@@ -333,6 +333,8 @@ let
       "mcp__context-mode*" = "allow";
       "mcp__exa*" = "allow";
 
+      finalize_wiki = "allow";
+
       subagent = "allow";
 
       bash = {

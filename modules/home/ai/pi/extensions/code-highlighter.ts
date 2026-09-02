@@ -16,7 +16,11 @@ import {
 	type CodeHighlighter,
 	type LumisHighlighter,
 } from "./lib/code-highlighter.ts";
-import type { PiNamedThemeColor, PiTextTheme } from "./lib/pi-theme.ts";
+import type {
+	PiNamedThemeColor,
+	PiTextTheme,
+	PiTheme,
+} from "./lib/pi-theme.ts";
 import { PI_THEME_COLORS } from "./lib/pi-theme.ts";
 
 type ReadArguments = {
@@ -45,7 +49,7 @@ type RenderContext = {
 type RenderResult = (
 	result: unknown,
 	options: unknown,
-	theme: PiTextTheme,
+	theme: PiTheme,
 	context: unknown,
 ) => Text;
 
@@ -539,7 +543,7 @@ function renderLumisDiff(
 function renderEditResult(
 	result: unknown,
 	_themeOptions: unknown,
-	theme: PiTextTheme,
+	theme: PiTheme,
 	context: unknown,
 	highlighter: CodeHighlighter,
 ): Text {
@@ -561,6 +565,7 @@ function renderEditResult(
 		`\n${renderLumisDiff(diff, lumisLanguageForPath(rawPath), theme, highlighter)}`,
 		0,
 		0,
+		(text: string) => theme.bg("toolSuccessBg", text),
 	);
 }
 
