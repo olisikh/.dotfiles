@@ -20,6 +20,12 @@ let
       name = "GPT-5.6 Sol (900k)";
       api = "openai-responses";
       reasoning = true;
+      # GPT-5.6 exposes `max` for the provider's highest effort. Keep Pi's
+      # `xhigh` option available by mapping it to that provider value.
+      thinkingLevelMap = {
+        max = "max";
+        xhigh = "max";
+      };
       input = [
         "text"
         "image"
@@ -47,6 +53,12 @@ let
       name = "GPT-5.6 Terra (900k)";
       api = "openai-responses";
       reasoning = true;
+      # GPT-5.6 exposes `max` for the provider's highest effort. Keep Pi's
+      # `xhigh` option available by mapping it to that provider value.
+      thinkingLevelMap = {
+        max = "max";
+        xhigh = "max";
+      };
       input = [
         "text"
         "image"
@@ -74,6 +86,12 @@ let
       name = "GPT-5.6 Luna (900k)";
       api = "openai-responses";
       reasoning = true;
+      # GPT-5.6 exposes `max` for the provider's highest effort. Keep Pi's
+      # `xhigh` option available by mapping it to that provider value.
+      thinkingLevelMap = {
+        max = "max";
+        xhigh = "max";
+      };
       input = [
         "text"
         "image"
