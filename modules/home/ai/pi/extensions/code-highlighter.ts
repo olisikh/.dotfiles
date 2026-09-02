@@ -519,6 +519,15 @@ function trimDiffElisionMarkers(diff: string): string {
 	return lines.join("\n");
 }
 
+function backgroundFromForeground(
+	theme: PiTheme,
+	color: PiNamedThemeColor,
+	text: string,
+): string {
+	const backgroundAnsi = theme.getFgAnsi(color).replace("\x1b[38;", "\x1b[48;");
+	return `${backgroundAnsi}${text}\x1b[49m`;
+}
+
 function renderLumisDiff(
 	diff: string,
 	language: string | undefined,
@@ -540,10 +549,18 @@ function renderLumisDiff(
 			let codeWithBackground = code;
 			if (parsed.prefix === "+") {
 				prefixColor = PI_THEME_COLORS.toolDiffAdded;
-				codeWithBackground = theme.bg(PI_THEME_COLORS.toolDiffAdded, code);
+				codeWithBackground = backgroundFromForeground(
+					theme,
+					PI_THEME_COLORS.toolDiffAdded,
+					code,
+				);
 			} else if (parsed.prefix === "-") {
 				prefixColor = PI_THEME_COLORS.toolDiffRemoved;
-				codeWithBackground = theme.bg(PI_THEME_COLORS.toolDiffRemoved, code);
+				codeWithBackground = backgroundFromForeground(
+					theme,
+					PI_THEME_COLORS.toolDiffRemoved,
+					code,
+				);
 			}
 			return `${theme.fg(prefixColor, `${parsed.prefix}${parsed.lineNum} `)}${codeWithBackground}`;
 		})
@@ -740,6 +757,7 @@ export default async function (pi: ExtensionAPI) {
 
 		const registeredTool = {
 			...originalTool,
+			...(originalTool.name === "edit" ? { renderShell: "self" as const } : {}),
 			renderCall(args: unknown, theme: PiTextTheme, context: unknown) {
 				activeTheme = theme;
 				const renderContext = asRecord(context);
