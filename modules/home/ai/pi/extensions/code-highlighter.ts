@@ -512,13 +512,20 @@ function parseDiffLine(line: string): ParsedDiffLine | undefined {
 		: undefined;
 }
 
+function trimDiffElisionMarkers(diff: string): string {
+	const lines = diff.split("\n");
+	if (lines[0]?.trim() === "...") lines.shift();
+	if (lines.at(-1)?.trim() === "...") lines.pop();
+	return lines.join("\n");
+}
+
 function renderLumisDiff(
 	diff: string,
 	language: string | undefined,
-	theme: PiTextTheme,
+	theme: PiTheme,
 	highlighter: CodeHighlighter,
 ): string {
-	return diff
+	return trimDiffElisionMarkers(diff)
 		.split("\n")
 		.map((line) => {
 			const parsed = parseDiffLine(line);
@@ -530,12 +537,15 @@ function renderLumisDiff(
 				? highlighter(replaceTabs(parsed.content), language, theme)
 				: theme.fg(PI_THEME_COLORS.toolOutput, replaceTabs(parsed.content));
 			let prefixColor: PiNamedThemeColor = PI_THEME_COLORS.toolDiffContext;
+			let codeWithBackground = code;
 			if (parsed.prefix === "+") {
 				prefixColor = PI_THEME_COLORS.toolDiffAdded;
+				codeWithBackground = theme.bg(PI_THEME_COLORS.toolDiffAdded, code);
 			} else if (parsed.prefix === "-") {
 				prefixColor = PI_THEME_COLORS.toolDiffRemoved;
+				codeWithBackground = theme.bg(PI_THEME_COLORS.toolDiffRemoved, code);
 			}
-			return `${theme.fg(prefixColor, `${parsed.prefix}${parsed.lineNum} `)}${code}`;
+			return `${theme.fg(prefixColor, `${parsed.prefix}${parsed.lineNum} `)}${codeWithBackground}`;
 		})
 		.join("\n");
 }
@@ -565,7 +575,6 @@ function renderEditResult(
 		`\n${renderLumisDiff(diff, lumisLanguageForPath(rawPath), theme, highlighter)}`,
 		0,
 		0,
-		(text: string) => theme.bg("toolSuccessBg", text),
 	);
 }
 
