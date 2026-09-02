@@ -64,7 +64,9 @@ export const PI_EXTENSION_ENTRIES = {
 } as const;
 
 export const PI_RUNTIME_SYMBOLS = {
-	permissionService: Symbol.for("@gotgenes/pi-permission-system:service"),
+	permissionServices: Symbol.for(
+		"@gotgenes/pi-permission-system:session-services",
+	),
 	yoloState: Symbol.for("olisikh.pi.yolo-state"),
 } as const;
 
