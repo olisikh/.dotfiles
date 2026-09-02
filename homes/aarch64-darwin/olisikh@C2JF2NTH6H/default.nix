@@ -169,6 +169,7 @@ in
 
     ai = {
       copilot = enabled;
+      herdr = enabled;
       pi = {
         enable = true;
         config = {

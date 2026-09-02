@@ -137,6 +137,7 @@ in
       whisper = enabled;
       gemini = enabled;
       copilot = enabled;
+      herdr = enabled;
       opencode = enabled;
       pi = enabled;
     };
