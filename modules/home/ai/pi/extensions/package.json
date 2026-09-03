@@ -9,6 +9,7 @@
       "./welcome.ts",
       "./code-highlighter.ts",
       "./wiki-memory.ts",
+      "./graphify-integration.ts",
       "./working-indicator.ts",
       "./yolo-mode.ts",
       "./vim-editor.ts",
