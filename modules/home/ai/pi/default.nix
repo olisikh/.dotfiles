@@ -11,12 +11,9 @@ let
 
   cfg = config.${namespace}.ai.pi;
 
-  # Herdr embeds this asset in its 0.8.2 binary. Keep the Home Manager copy
-  # pinned to the same release and install it at Herdr's canonical path.
-  herdrPiIntegration = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/herdrdev/herdr/v0.8.2/src/integration/assets/pi/herdr-agent-state.ts";
-    hash = "sha256-mxxBzXJSD8Kr5fKirsmVwSqSbM6ETfRyx/1fyuT02/o=";
-  };
+  # Herdr ships this integration in the Nix package; use that copy so the
+  # hook always matches the installed Herdr version.
+  herdrPiIntegration = "${pkgs.llm-agents.herdr}/share/herdr/integrations/pi/herdr-agent-state.ts";
 
   # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
   # The companion extension turns these picker-only -900k IDs back into the
