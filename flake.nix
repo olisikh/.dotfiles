@@ -30,6 +30,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     llm-agents = {
       # https://github.com/numtide/llm-agents.nix - AI coding agents & dev tools
       url = "github:numtide/llm-agents.nix";
@@ -103,6 +108,7 @@
         sops-nix.homeManagerModules.sops
         nixvim.homeModules.nixvim
         direnv-instant.homeModules.direnv-instant
+        hermes-agent.homeManagerModules.default
       ];
 
       alias.templates.default = "empty";

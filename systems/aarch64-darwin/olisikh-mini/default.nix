@@ -63,10 +63,6 @@ in
     dev.kotlin-lsp = enabled;
 
     ai = {
-      hermes = {
-        enable = true;
-        managedPlugins = [ "herdr-agent-state" ];
-      };
       qmd = enabled;
       ollama = enabled;
       voicebox = enabled;
