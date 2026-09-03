@@ -190,16 +190,69 @@ in
             };
           };
         };
-        mcps.mcpServers.sherlockio-mcp = {
-          command = "npx";
-          args = [
-            "-y"
-            "@ebay/obsidian-mcp-client"
-            "--permissions"
-            "obsidian"
-            "--server-id"
-            "sherlockio"
-          ];
+
+        mcps = {
+          mcpServers = {
+            sherlockio = {
+              command = "npx";
+              args = [
+                "-y"
+                "@ebay/obsidian-mcp-client"
+                "--permissions"
+                "obsidian"
+                "--server-id"
+                "sherlockio"
+              ];
+            };
+            compass = {
+              command = "npx";
+              args = [
+                "-y"
+                "@ebay/obsidian-mcp-client"
+                "--permissions"
+                "obsidian"
+                "--server-id"
+                "compass-mcp"
+              ];
+            };
+            vector = {
+              command = "npx";
+              args = [
+                "-y"
+                "@ebay/obsidian-mcp-client"
+                "--permissions"
+                "obsidian"
+                "--server-id"
+                "obsidian-compass-vector"
+              ];
+            };
+            deepsights = {
+              command = "npx";
+              args = [
+                "-y"
+                "@ebay/obsidian-mcp-client"
+                "--permissions"
+                "obsidian"
+                "--server-id"
+                "deepsights-mcp"
+              ];
+            };
+            figma = {
+              command = "npx";
+              args = [
+                "-y"
+                "@ebay/obsidian-mcp-client"
+                "--permissions"
+                "obsidian"
+                "--server-id"
+                "figma-mcp"
+              ];
+            };
+            jira.url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/jira";
+            glean.url = "https://ebay-be.glean.com/mcp/default";
+            airtable.url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/airtable";
+            github.url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/github";
+          };
         };
       };
       opencode = {

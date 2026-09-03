@@ -48,6 +48,7 @@ export type PiWorkingColorMode =
 	(typeof PI_WORKING_COLOR_MODES)[keyof typeof PI_WORKING_COLOR_MODES];
 
 export const PI_STATUS_KEYS = {
+	modes: "modes",
 	permissionSystem: "pi-permission-system",
 	yolo: "yolo",
 } as const;

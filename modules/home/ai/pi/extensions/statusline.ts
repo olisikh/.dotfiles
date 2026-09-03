@@ -14,7 +14,7 @@ import {
 	type ModeChangedEvent,
 	subscribeToModeChanges,
 } from "./lib/mode-events.ts";
-import { PI_MODE_STATUSES } from "./lib/pi-constants.ts";
+import { PI_MODE_STATUSES, PI_STATUS_KEYS } from "./lib/pi-constants.ts";
 import type {
 	PiForegroundTheme,
 	PiNamedThemeColor,
@@ -181,23 +181,16 @@ function renderModeStatus(
 	statuses: ReadonlyMap<string, string>,
 	theme: PiForegroundTheme,
 ): string {
+	// setStatus drives an immediate TUI refresh. Read our mode from that source
+	// instead of waiting for the cross-extension event bus to reach this footer.
+	const localMode = renderLocalModeStatus(statuses, theme);
 	const visibleModes = [...modes.values()]
-		.filter((event) => event.state !== PI_MODE_STATUSES.off)
-		.sort((left, right) => modePriority(left.mode) - modePriority(right.mode));
-	if (visibleModes.length === 0) {
-		return theme.fg(MODE_COLORS[PI_MODE_STATUSES.build], PI_MODE_STATUSES.build);
-	}
-
-	return visibleModes
+		.filter(
+			(event) =>
+				event.source !== "olisikh:modes" && event.state !== PI_MODE_STATUSES.off,
+		)
+		.sort((left, right) => modePriority(left.mode) - modePriority(right.mode))
 		.map((event) => {
-			if (event.source === "olisikh:modes") {
-				if (event.mode === PI_MODE_STATUSES.goal) {
-					return theme.fg(MODE_COLORS[PI_MODE_STATUSES.goal], PI_MODE_STATUSES.goal);
-				}
-				if (event.mode === PI_MODE_STATUSES.plan) {
-					return theme.fg(MODE_COLORS[PI_MODE_STATUSES.plan], PI_MODE_STATUSES.plan);
-				}
-			}
 			const statusKey =
 				event.mode === PI_MODE_STATUSES.plan
 					? PI_MODE_STATUSES.planMode
@@ -208,8 +201,27 @@ function renderModeStatus(
 				text =
 					event.mode === PI_MODE_STATUSES.plan ? status : `${event.mode} ${status}`;
 			return theme.fg(colorForMode(event.mode), text);
-		})
-		.join(" + ");
+		});
+
+	if (!localMode && visibleModes.length === 0) {
+		return theme.fg(MODE_COLORS[PI_MODE_STATUSES.build], PI_MODE_STATUSES.build);
+	}
+
+	return [localMode, ...visibleModes].filter(Boolean).join(" + ");
+}
+
+function renderLocalModeStatus(
+	statuses: ReadonlyMap<string, string>,
+	theme: PiForegroundTheme,
+): string | undefined {
+	const status = statuses.get(PI_STATUS_KEYS.modes)?.trim();
+	if (status?.startsWith("GOAL:")) {
+		return theme.fg(MODE_COLORS[PI_MODE_STATUSES.goal], PI_MODE_STATUSES.goal);
+	}
+	if (status === "PLAN") {
+		return theme.fg(MODE_COLORS[PI_MODE_STATUSES.plan], PI_MODE_STATUSES.plan);
+	}
+	return undefined;
 }
 
 function modePriority(mode: string): number {

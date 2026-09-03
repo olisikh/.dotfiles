@@ -6,9 +6,10 @@ import {
   type ExtensionContext,
 } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
+import { PI_STATUS_KEYS } from "./lib/pi-constants.ts";
 
 const MODE_STATE_ENTRY = "olisikh:modes";
-const MODE_STATUS_KEY = "modes";
+const MODE_STATUS_KEY = PI_STATUS_KEYS.modes;
 const MAX_AUTOMATIC_GOAL_RUNS = 25;
 const MAX_PLAN_LENGTH = 24_000;
 

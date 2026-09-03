@@ -260,6 +260,7 @@ let
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
       "npm:pi-lens"
+      "npm:pi-context"
       "npm:pi-rtk-optimizer"
       "npm:@lumis-sh/lumis@0.7.0"
       "npm:@lumis-sh/wasm-bundle-full@0.1.1"

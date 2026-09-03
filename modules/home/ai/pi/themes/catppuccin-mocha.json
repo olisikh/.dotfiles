@@ -22,7 +22,9 @@
     "overlay0": "#6c7086",
     "subtext0": "#a6adc8",
     "base": "#1e1e2e",
-    "mantle": "#181825"
+    "mantle": "#181825",
+    "diffAdded": "#1f3d32",
+    "diffRemoved": "#482d36"
   },
   "colors": {
     "accent": "mauve",
@@ -57,8 +59,8 @@
     "mdQuoteBorder": "surface0",
     "mdHr": "surface0",
     "mdListBullet": "mauve",
-    "toolDiffAdded": "green",
-    "toolDiffRemoved": "red",
+    "toolDiffAdded": "diffAdded",
+    "toolDiffRemoved": "diffRemoved",
     "toolDiffContext": "overlay0",
     "syntaxComment": "overlay0",
     "syntaxKeyword": "mauve",

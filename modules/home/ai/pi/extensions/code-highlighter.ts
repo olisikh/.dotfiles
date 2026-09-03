@@ -519,13 +519,137 @@ function trimDiffElisionMarkers(diff: string): string {
 	return lines.join("\n");
 }
 
-function backgroundFromForeground(
+function backgroundAnsi(theme: PiTheme, color: PiNamedThemeColor): string {
+	return theme.getFgAnsi(color).replace("\x1b[38;", "\x1b[48;");
+}
+
+function blendedBackgroundAnsi(
 	theme: PiTheme,
-	color: PiNamedThemeColor,
-	text: string,
+	lineColor: PiNamedThemeColor,
+	highlightColor: PiNamedThemeColor,
 ): string {
-	const backgroundAnsi = theme.getFgAnsi(color).replace("\x1b[38;", "\x1b[48;");
-	return `${backgroundAnsi}${text}\x1b[49m`;
+	const rgb = (
+		color: PiNamedThemeColor,
+	): [number, number, number] | undefined => {
+		const match = theme.getFgAnsi(color).match(/^\x1b\[38;2;(\d+);(\d+);(\d+)m$/);
+		return match
+			? [Number(match[1]), Number(match[2]), Number(match[3])]
+			: undefined;
+	};
+	const lineRgb = rgb(lineColor);
+	const highlightRgb = rgb(highlightColor);
+	if (!lineRgb || !highlightRgb) return backgroundAnsi(theme, lineColor);
+
+	const blend = 0.2;
+	const channels = lineRgb.map((channel, index) =>
+		Math.round(channel + (highlightRgb[index] - channel) * blend),
+	);
+	return `\x1b[48;2;${channels.join(";")}m`;
+}
+
+type DiffHighlight = {
+	start: number;
+	end: number;
+};
+
+function changedRange(
+	before: string,
+	after: string,
+): DiffHighlight | undefined {
+	let start = 0;
+	while (
+		start < before.length &&
+		start < after.length &&
+		before[start] === after[start]
+	) {
+		start += 1;
+	}
+
+	let beforeEnd = before.length;
+	let afterEnd = after.length;
+	while (
+		beforeEnd > start &&
+		afterEnd > start &&
+		before[beforeEnd - 1] === after[afterEnd - 1]
+	) {
+		beforeEnd -= 1;
+		afterEnd -= 1;
+	}
+
+	return start === beforeEnd ? undefined : { start, end: beforeEnd };
+}
+
+function inlineDiffHighlights(lines: string[]): Map<number, DiffHighlight> {
+	const highlights = new Map<number, DiffHighlight>();
+
+	for (let index = 0; index < lines.length; ) {
+		const removed: Array<{ index: number; content: string }> = [];
+		while (parseDiffLine(lines[index] ?? "")?.prefix === "-") {
+			removed.push({
+				index,
+				content: replaceTabs(parseDiffLine(lines[index] ?? "")?.content ?? ""),
+			});
+			index += 1;
+		}
+
+		if (removed.length === 0) {
+			index += 1;
+			continue;
+		}
+
+		const added: Array<{ index: number; content: string }> = [];
+		while (parseDiffLine(lines[index] ?? "")?.prefix === "+") {
+			added.push({
+				index,
+				content: replaceTabs(parseDiffLine(lines[index] ?? "")?.content ?? ""),
+			});
+			index += 1;
+		}
+
+		for (
+			let pairIndex = 0;
+			pairIndex < Math.min(removed.length, added.length);
+			pairIndex += 1
+		) {
+			const removedLine = removed[pairIndex];
+			const addedLine = added[pairIndex];
+			const removedHighlight = changedRange(
+				removedLine.content,
+				addedLine.content,
+			);
+			const addedHighlight = changedRange(addedLine.content, removedLine.content);
+			if (removedHighlight) highlights.set(removedLine.index, removedHighlight);
+			if (addedHighlight) highlights.set(addedLine.index, addedHighlight);
+		}
+	}
+
+	return highlights;
+}
+
+function highlightAnsiRange(
+	text: string,
+	highlight: DiffHighlight | undefined,
+	background: string,
+	lineBackground: string,
+): string {
+	if (!highlight) return text;
+
+	let visibleIndex = 0;
+	let result = "";
+	for (let index = 0; index < text.length; ) {
+		const ansi = text.slice(index).match(/^\x1b\[[0-?]*[ -/]*[@-~]/)?.[0];
+		if (ansi) {
+			result += ansi;
+			index += ansi.length;
+			continue;
+		}
+		if (visibleIndex === highlight.start) result += background;
+		result += text[index];
+		visibleIndex += 1;
+		index += 1;
+		if (visibleIndex === highlight.end) result += lineBackground;
+	}
+	return result;
 }
 
 function renderLumisDiff(
@@ -534,9 +658,11 @@ function renderLumisDiff(
 	theme: PiTheme,
 	highlighter: CodeHighlighter,
 ): string {
-	return trimDiffElisionMarkers(diff)
-		.split("\n")
-		.map((line) => {
+	const lines = trimDiffElisionMarkers(diff).split("\n");
+	const highlights = inlineDiffHighlights(lines);
+
+	return lines
+		.map((line, index) => {
 			const parsed = parseDiffLine(line);
 			if (!parsed) {
 				return theme.fg(PI_THEME_COLORS.toolDiffContext, line);
@@ -545,24 +671,28 @@ function renderLumisDiff(
 			const code = language
 				? highlighter(replaceTabs(parsed.content), language, theme)
 				: theme.fg(PI_THEME_COLORS.toolOutput, replaceTabs(parsed.content));
-			let prefixColor: PiNamedThemeColor = PI_THEME_COLORS.toolDiffContext;
-			let codeWithBackground = code;
-			if (parsed.prefix === "+") {
-				prefixColor = PI_THEME_COLORS.toolDiffAdded;
-				codeWithBackground = backgroundFromForeground(
-					theme,
-					PI_THEME_COLORS.toolDiffAdded,
-					code,
+			if (parsed.prefix === "+" || parsed.prefix === "-") {
+				const lineColor =
+					parsed.prefix === "+"
+						? PI_THEME_COLORS.toolDiffAdded
+						: PI_THEME_COLORS.toolDiffRemoved;
+				const highlightColor =
+					parsed.prefix === "+" ? PI_THEME_COLORS.success : PI_THEME_COLORS.error;
+				const prefix = theme.fg(
+					PI_THEME_COLORS.toolDiffContext,
+					`${parsed.prefix}${parsed.lineNum} `,
 				);
-			} else if (parsed.prefix === "-") {
-				prefixColor = PI_THEME_COLORS.toolDiffRemoved;
-				codeWithBackground = backgroundFromForeground(
-					theme,
-					PI_THEME_COLORS.toolDiffRemoved,
+				const lineBackground = backgroundAnsi(theme, lineColor);
+				const renderedCode = highlightAnsiRange(
 					code,
+					highlights.get(index),
+					blendedBackgroundAnsi(theme, lineColor, highlightColor),
+					lineBackground,
 				);
+				// CSI K erases the remaining terminal cells with the active background.
+				return `${prefix}${lineBackground}${renderedCode}\x1b[K\x1b[49m`;
 			}
-			return `${theme.fg(prefixColor, `${parsed.prefix}${parsed.lineNum} `)}${codeWithBackground}`;
+			return `${theme.fg(PI_THEME_COLORS.toolDiffContext, `${parsed.prefix}${parsed.lineNum} `)}${code}`;
 		})
 		.join("\n");
 }
