@@ -11,6 +11,13 @@ let
 
   cfg = config.${namespace}.ai.pi;
 
+  # Herdr embeds this asset in its 0.8.2 binary. Keep the Home Manager copy
+  # pinned to the same release and install it at Herdr's canonical path.
+  herdrPiIntegration = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/herdrdev/herdr/v0.8.2/src/integration/assets/pi/herdr-agent-state.ts";
+    hash = "sha256-mxxBzXJSD8Kr5fKirsmVwSqSbM6ETfRyx/1fyuT02/o=";
+  };
+
   # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
   # The companion extension turns these picker-only -900k IDs back into the
   # real GPT-5.6 IDs immediately before each OpenAI request.
@@ -526,6 +533,9 @@ in
         asyncByDefault = true;
         defaultSubagentContext = "fresh";
       };
+      # This direct path is what `herdr integration status` checks. It can
+      # coexist with the separate Nix-managed olisikh extension directory.
+      ".pi/agent/extensions/herdr-agent-state.ts".source = herdrPiIntegration;
       ".pi/agent/extensions/olisikh".source = ./extensions;
     };
   };
