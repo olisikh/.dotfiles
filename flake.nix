@@ -31,14 +31,17 @@
     };
 
     hermes-agent = {
+      # Supplies the upstream Home Manager service module; the Hermes package
+      # itself comes from the shared llm-agents.nix input.
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     llm-agents = {
       # https://github.com/numtide/llm-agents.nix - AI coding agents & dev tools
+      # Keep llm-agents' own nixpkgs pin: Hermes' Python dependency set is
+      # tested against it and is not compatible with every consumer nixpkgs.
       url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixvim = {

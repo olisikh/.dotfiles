@@ -11,7 +11,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.ai.hermes;
-  defaultPackage = inputs.hermes-agent.packages.${pkgs.system}.messaging;
+  defaultPackage = inputs.llm-agents.packages.${pkgs.system}.hermes-agent;
 
   publicSettings = {
     model = {
