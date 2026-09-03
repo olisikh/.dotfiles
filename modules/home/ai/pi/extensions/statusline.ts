@@ -144,7 +144,7 @@ export default function (pi: ExtensionAPI) {
 						parts.push(theme.fg(PI_THEME_COLORS.muted, `${folder}:${branch ?? "-"}`));
 
 						return [
-							truncateToWidth(parts.join(theme.fg(PI_THEME_COLORS.dim, "   ")), width),
+							truncateToWidth(parts.join(theme.fg(PI_THEME_COLORS.dim, "  ")), width),
 						];
 					},
 				};

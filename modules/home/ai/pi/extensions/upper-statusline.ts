@@ -138,7 +138,7 @@ function renderLine(state: StatusState, theme: PiTheme, width: number): string {
 		...(state.yoloEnabled
 			? [badge(theme, PI_THEME_COLORS.error, "YOLO", true)]
 			: []),
-	].join(theme.fg(PI_THEME_COLORS.dim, "   "));
+	].join(theme.fg(PI_THEME_COLORS.dim, ""));
 	const servers = state.recentMcps;
 	if (servers.length === 0) return truncateToWidth(left, width);
 

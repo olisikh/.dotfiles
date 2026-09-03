@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "installations": {
+    "@ebay/obskills-obsidian-obsidian-local@0.1.3": {
+      "installedAt": "2026-09-03T08:57:22.353Z",
+      "agents": [
+        "claude"
+      ],
+      "scope": "project",
+      "artifacts": [
+        {
+          "type": "skill",
+          "name": "obsidian-local",
+          "targets": {
+            "claude": "/Users/olisikh/.dotfiles/.claude/skills/obsidian-local"
+          },
+          "sourceRef": "@ebay/obskills-obsidian-obsidian-local/artifacts/skills/obsidian-local",
+          "sourceVersion": "0.1.3"
+        }
+      ]
+    }
+  }
+}
