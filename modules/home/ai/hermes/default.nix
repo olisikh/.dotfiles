@@ -12,6 +12,7 @@ let
 
   cfg = config.${namespace}.ai.hermes;
   defaultPackage = inputs.llm-agents.packages.${pkgs.system}.hermes-agent;
+  localeDir = "${inputs.hermes-agent}/locales";
 
   publicSettings = {
     model = {
@@ -176,18 +177,29 @@ in
 {
   options.${namespace}.ai.hermes = defaultConfig;
 
-  config = mkIf cfg.enable {
-    programs.hermes-agent = {
-      enable = true;
-      package = cfg.package;
-    };
+  config = mkIf cfg.enable (lib.mkMerge [
+    {
+      home.sessionVariables.HERMES_BUNDLED_LOCALES = localeDir;
 
-    services.hermes-agent = {
-      enable = true;
-      package = cfg.package;
-      hermesHome = "${config.home.homeDirectory}/.hermes";
-      gateway.enable = cfg.gateway.enable;
-      settings = cfg.settings;
-    };
-  };
+      programs.hermes-agent = {
+        enable = true;
+        package = cfg.package;
+      };
+
+      services.hermes-agent = {
+        enable = true;
+        package = cfg.package;
+        hermesHome = "${config.home.homeDirectory}/.hermes";
+        gateway.enable = cfg.gateway.enable;
+        settings = cfg.settings;
+      };
+    }
+
+    # The upstream module creates this agent only when the gateway is enabled.
+    # Add the catalog path to that generated plist without writing it to the
+    # private .env file or changing the agent's label/command line.
+    (mkIf (pkgs.stdenv.isDarwin && cfg.gateway.enable) {
+      launchd.agents.hermes-agent.config.EnvironmentVariables.HERMES_BUNDLED_LOCALES = localeDir;
+    })
+  ]);
 }
