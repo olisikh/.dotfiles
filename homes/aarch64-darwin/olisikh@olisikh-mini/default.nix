@@ -61,7 +61,10 @@ in
       whisper = enabled;
       gemini = enabled;
       copilot = enabled;
-      hermes = enabled;
+      hermes = {
+        enable = true;
+        gateway.enable = true;
+      };
       herdr = enabled;
       opencode = enabled;
       pi = enabled;

@@ -13,6 +13,9 @@ let
   cfg = config.${namespace}.ai.hermes;
   defaultPackage = inputs.llm-agents.packages.${pkgs.system}.hermes-agent;
   localeDir = "${inputs.hermes-agent}/locales";
+  rtkRewritePlugin = pkgs.runCommand "rtk-rewrite-hermes-plugin" { } ''
+    cp -R ${./plugins/rtk-rewrite}/. "$out"
+  '';
 
   publicSettings = {
     model = {
@@ -44,6 +47,11 @@ let
         api_mode = "chat_completions";
       }
     ];
+
+    gateway = {
+      multiplex_profiles = true;
+      multiplex_profile_allowlist = [ "wife" ];
+    };
 
     toolsets = [ "hermes-cli" ];
 
@@ -168,6 +176,10 @@ let
     enable = mkBoolOpt false "Enable Hermes Agent";
     gateway.enable = mkBoolOpt false "Run the Hermes gateway as a Nix-managed service";
     package = mkOpt types.package defaultPackage "Hermes Agent package to install";
+    extraPlugins = mkOpt (types.listOf types.package) [ ] ''
+      Additional declarative Hermes directory plugins. Each package must expose
+      plugin.yaml and __init__.py at its root.
+    '';
     settings = mkOpt types.attrs publicSettings ''
       Public Hermes settings. Keys not declared here remain in the private
       ~/.hermes/config.yaml and are preserved by the official Home Manager module.
@@ -191,6 +203,8 @@ in
         package = cfg.package;
         hermesHome = "${config.home.homeDirectory}/.hermes";
         gateway.enable = cfg.gateway.enable;
+        extraPackages = [ pkgs.rtk ];
+        extraPlugins = [ rtkRewritePlugin ] ++ cfg.extraPlugins;
         settings = cfg.settings;
       };
     }

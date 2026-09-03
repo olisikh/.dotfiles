@@ -10,7 +10,9 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   herdrPackage = pkgs.llm-agents.herdr;
-  herdrHermesPlugin = "${herdrPackage}/share/herdr/integrations/hermes";
+  herdrHermesPlugin = pkgs.runCommand "herdr-agent-state-hermes-plugin" { } ''
+    cp -R ${herdrPackage}/share/herdr/integrations/hermes/. "$out"
+  '';
   toToml = (pkgs.formats.toml { }).generate;
 
   cfg = config.${namespace}.ai.herdr;
@@ -37,10 +39,10 @@ in
   config = mkIf cfg.enable {
     home.packages = [ herdrPackage ];
 
-    home.file = {
-      ".config/herdr/config.toml".source = toToml "herdr-config.toml" herdrConfig;
-      ".hermes/plugins/herdr-agent-state/plugin.yaml".source = "${herdrHermesPlugin}/plugin.yaml";
-      ".hermes/plugins/herdr-agent-state/__init__.py".source = "${herdrHermesPlugin}/__init__.py";
-    };
+    home.file.".config/herdr/config.toml".source = toToml "herdr-config.toml" herdrConfig;
+
+    # Hermes owns the Nix-managed symlink lifecycle for plugins, including
+    # cleanup when this integration is later removed.
+    ${namespace}.ai.hermes.extraPlugins = [ herdrHermesPlugin ];
   };
 }
