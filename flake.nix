@@ -31,8 +31,6 @@
     };
 
     hermes-agent = {
-      # Supplies the upstream Home Manager service module; the Hermes package
-      # itself comes from the shared llm-agents.nix input.
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };

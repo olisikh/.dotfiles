@@ -11,6 +11,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt mkOpt;
 
   cfg = config.${namespace}.ai.hermes;
+
   defaultPackage = inputs.llm-agents.packages.${pkgs.system}.hermes-agent;
 
   localeDir = "${inputs.hermes-agent}/locales";

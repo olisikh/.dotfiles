@@ -11,9 +11,6 @@ let
 
   cfg = config.${namespace}.ai.pi;
 
-  # Herdr ships this integration in the Nix package; use that copy so the
-  # hook always matches the installed Herdr version.
-  herdrPiIntegration = "${pkgs.llm-agents.herdr}/share/herdr/integrations/pi/herdr-agent-state.ts";
 
   # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
   # The companion extension turns these picker-only -900k IDs back into the
@@ -530,9 +527,7 @@ in
         asyncByDefault = true;
         defaultSubagentContext = "fresh";
       };
-      # This direct path is what `herdr integration status` checks. It can
-      # coexist with the separate Nix-managed olisikh extension directory.
-      ".pi/agent/extensions/herdr-agent-state.ts".source = herdrPiIntegration;
+
       ".pi/agent/extensions/olisikh".source = ./extensions;
     };
   };

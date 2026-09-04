@@ -13,6 +13,8 @@ let
   herdrHermesPlugin = pkgs.runCommand "herdr-agent-state-hermes-plugin" { } ''
     cp -R ${herdrPackage}/share/herdr/integrations/hermes/. "$out"
   '';
+  herdrPiPlugin = "${pkgs.llm-agents.herdr}/share/herdr/integrations/pi/herdr-agent-state.ts";
+
   toToml = (pkgs.formats.toml { }).generate;
 
   cfg = config.${namespace}.ai.herdr;
@@ -39,7 +41,13 @@ in
   config = mkIf cfg.enable {
     home.packages = [ herdrPackage ];
 
-    home.file.".config/herdr/config.toml".source = toToml "herdr-config.toml" herdrConfig;
+    home.file = {
+      ".config/herdr/config.toml".source = toToml "herdr-config.toml" herdrConfig;
+
+      # This direct path is what `herdr integration status` checks. It can
+      # coexist with the separate Nix-managed olisikh extension directory.
+      ".pi/agent/extensions/herdr-agent-state.ts".source = herdrPiPlugin;
+    };
 
     # Hermes owns the Nix-managed symlink lifecycle for plugins, including
     # cleanup when this integration is later removed.
