@@ -203,7 +203,13 @@ in
         package = cfg.package;
         hermesHome = "${config.home.homeDirectory}/.hermes";
         gateway.enable = cfg.gateway.enable;
-        extraPackages = [ pkgs.rtk ];
+        extraPackages = [
+          pkgs.git
+          pkgs.gh
+          pkgs.rtk
+          pkgs.ffmpeg
+          pkgs.${namespace}.qmd
+        ];
         extraPlugins = [ rtkRewritePlugin ] ++ cfg.extraPlugins;
         settings = cfg.settings;
       };
