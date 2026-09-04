@@ -12,7 +12,9 @@ let
 
   cfg = config.${namespace}.ai.hermes;
   defaultPackage = inputs.llm-agents.packages.${pkgs.system}.hermes-agent;
+
   localeDir = "${inputs.hermes-agent}/locales";
+
   rtkRewritePlugin = pkgs.runCommand "rtk-rewrite-hermes-plugin" { } ''
     cp -R ${./plugins/rtk-rewrite}/. "$out"
   '';
@@ -26,25 +28,7 @@ let
     fallback_providers = [
       {
         provider = "ollama-cloud";
-        model = "glm-5.2:cloud";
-      }
-      {
-        provider = "opencode-zen";
-        model = "mimo-v2.5-free";
-        base_url = "https://opencode.ai/zen/v1";
-        api_mode = "chat_completions";
-      }
-      {
-        provider = "opencode-zen";
-        model = "deepseek-v4-flash-free";
-        base_url = "https://opencode.ai/zen/v1";
-        api_mode = "chat_completions";
-      }
-      {
-        provider = "opencode-zen";
-        model = "qwen3.6-plus-free";
-        base_url = "https://opencode.ai/zen/v1";
-        api_mode = "chat_completions";
+        model = "glm-5.3:cloud";
       }
     ];
 
@@ -149,7 +133,7 @@ let
 
     approvals = {
       mode = "smart";
-      timeout = 60;
+      timeout = 300;
       cron_mode = "deny";
       mcp_reload_confirm = false;
       destructive_slash_confirm = false;
@@ -175,11 +159,14 @@ let
   defaultConfig = {
     enable = mkBoolOpt false "Enable Hermes Agent";
     gateway.enable = mkBoolOpt false "Run the Hermes gateway as a Nix-managed service";
+
     package = mkOpt types.package defaultPackage "Hermes Agent package to install";
+
     extraPlugins = mkOpt (types.listOf types.package) [ ] ''
       Additional declarative Hermes directory plugins. Each package must expose
       plugin.yaml and __init__.py at its root.
     '';
+
     settings = mkOpt types.attrs publicSettings ''
       Public Hermes settings. Keys not declared here remain in the private
       ~/.hermes/config.yaml and are preserved by the official Home Manager module.
