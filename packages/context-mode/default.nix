@@ -11,7 +11,7 @@ buildNpmPackage {
 
   src = fetchurl {
     url = "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz";
-    hash = "sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ==";
+    hash = "sha256-CcQeTPd7IVZsdrjqL9vX89gjBV/uLwLCFm/Vu1ddryw=";
   };
 
   # The published npm archive does not include a package-lock.json. Keep a

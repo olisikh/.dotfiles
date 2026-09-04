@@ -108,8 +108,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "JavaHello";
         repo = "spring-boot.nvim";
-        rev = "98c6ff1dcdda943d341bba3c00ae9d190a2e5f7d";
-        hash = "sha256-JkOWlqyVLcwW7hxOGj5jb8BpUge3bUHbSV0o5qOYW1c=";
+        rev = "eea95b752bceb6ca410b3e2d87a1a02d08bd61a6";
+        hash = "sha256-GYer7azYjYWGMTzNDLxHshGYJCl+2zi2+78LjHsuaUc=";
       };
     };
 
@@ -144,8 +144,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-dap";
-        rev = "9e848e09a697ee95302a3ef2dd43fd6eb709e570";
-        hash = "sha256-IHm3CwO7qUTtOZqhljDjSzz4WbaAJ4kPY384MyZZ9ac=";
+        rev = "c9a0738e45f1bd41d792a126941348dce661cf9b";
+        hash = "sha256-VVHXHBKGmDnltHBMcVoBElaKMElXwJwB/7IZROQGCpg=";
       };
       doCheck = false;
     };
@@ -166,8 +166,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-lint";
-        rev = "a219b2c9e5b4765e5c845aba119dad55806fcaf1";
-        hash = "sha256-pABhzTRkcxAT/ELeltz47eCAKCnzdoCtc2QRu3wm0xU=";
+        rev = "3d55c8f67c6ae5c15e1042571e107c7a3d5c5f4e";
+        hash = "sha256-IcV2QgxhGpTs7xTzLMOrqGuFdAaSuC96HQ3cu8+fTFY=";
       };
       doCheck = false;
     };
@@ -187,8 +187,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "nemanjamalesija";
         repo = "smart-paste.nvim";
-        rev = "bb46e9a06a728d65f004ad709ff7ee0249717e5e";
-        hash = "sha256-WuKj0rnh+8lxjXZT4utXNoW169BSG4bVY1xBuUQir3c=";
+        rev = "a81e5511adc6fc145a7a71b08819440fd059af34";
+        hash = "sha256-t8wt46sOcBdRcjpA4ii0EaycLAg3aLDdHapNJvSMyxM=";
       };
     };
 
@@ -197,8 +197,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "fasterius";
         repo = "simple-zoom.nvim";
-        rev = "318aef7c894aab4bc90dfbe82fee01b130540afd";
-        hash = "sha256-rGtWGkIjfkZZF93Ve1VVhq/stZ8TQZ3hE2E9RCW4D8c=";
+        rev = "acead628aa1ce6c2fc4c77bd48d651ce12b8ab85";
+        hash = "sha256-gFI6+65eLNruIpowQustiz71Y/q3GhUXudFxZEp+bLs=";
       };
     };
   };
