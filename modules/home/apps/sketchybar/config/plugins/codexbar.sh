@@ -101,18 +101,18 @@ window_label() {
 	43200) printf '%s\n' "30d" ;;
 	"") printf '%s\n' "$2" ;;
 	*)
-		if (( minutes >= 1440 )); then
-			whole=$(( minutes / 1440 ))
-			rem=$(( minutes % 1440 ))
-			if (( rem * 2 >= 1440 )); then
-				whole=$(( whole + 1 ))
+		if ((minutes >= 1440)); then
+			whole=$((minutes / 1440))
+			rem=$((minutes % 1440))
+			if ((rem * 2 >= 1440)); then
+				whole=$((whole + 1))
 			fi
 			printf '%dd\n' "$whole"
-		elif (( minutes >= 60 )); then
-			whole=$(( minutes / 60 ))
-			rem=$(( minutes % 60 ))
-			if (( rem * 2 >= 60 )); then
-				whole=$(( whole + 1 ))
+		elif ((minutes >= 60)); then
+			whole=$((minutes / 60))
+			rem=$((minutes % 60))
+			if ((rem * 2 >= 60)); then
+				whole=$((whole + 1))
 			fi
 			printf '%dh\n' "$whole"
 		else
@@ -142,9 +142,9 @@ time_until_reset() {
 		return 1
 	fi
 
-	remaining_minutes=$(( (resets_at_epoch - now_epoch) / 60 ))
+	remaining_minutes=$(((resets_at_epoch - now_epoch) / 60))
 
-	if (( remaining_minutes < 0 )); then
+	if ((remaining_minutes < 0)); then
 		remaining_minutes=0
 	fi
 
@@ -249,6 +249,7 @@ format_usage() {
 	local primary_resets_at="${12}"
 	local secondary_resets_at="${13}"
 	local tertiary_resets_at="${14}"
+	local credit_remaining_percent="${15}"
 	local parts=()
 	local balance key_remaining percent
 
@@ -273,6 +274,10 @@ format_usage() {
 		if [[ -n "$primary_percent" ]]; then
 			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")")
 		fi
+	elif [[ "$provider" = "codex" && -n "$credit_remaining_percent" && -z "$primary_percent" && -z "$secondary_percent" && -z "$tertiary_percent" ]]; then
+		# Business accounts can report a credit limit rather than rolling usage windows.
+		# `remainingPercent` is already availability, unlike `usedPercent` above.
+		parts+=("$(format_percent "$credit_remaining_percent")/C")
 	elif [[ "$provider" = "opencodego" ]]; then
 		if [[ -n "$primary_percent" ]]; then
 			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(reset_window_label "$primary_resets_at" "$primary_window" "P")")
@@ -347,9 +352,9 @@ format_popup_usage() {
 remaining_color() {
 	local min_remaining="$1"
 
-	if (( min_remaining <= 10 )); then
+	if ((min_remaining <= 10)); then
 		printf '%s\n' "$RED"
-	elif (( min_remaining <= 30 )); then
+	elif ((min_remaining <= 30)); then
 		printf '%s\n' "$YELLOW"
 	else
 		printf '%s\n' "$GREEN"
@@ -393,7 +398,7 @@ mouse.entered)
 	if [[ -f "$COUNT_FILE" ]]; then
 		provider_count="$(<"$COUNT_FILE")"
 	fi
-	if (( provider_count > 1 )); then
+	if ((provider_count > 1)); then
 		sketchybar --set codexbar popup.drawing=on
 	fi
 	exit 0
@@ -474,7 +479,14 @@ while IFS= read -r provider_json; do
 	openrouter_balance="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.balance // empty')"
 	openrouter_key_limit="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.keyLimit // empty')"
 	openrouter_key_usage="$(printf '%s\n' "$provider_json" | jq -r '.usage.openRouterUsage.keyUsage // empty')"
-	usage="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage" "$primary_resets_at" "$secondary_resets_at" "$tertiary_resets_at")"
+	# CodexBar puts a credit-billed account's available percentage in this optional
+	# top-level snapshot, rather than in usage.primary/secondary/tertiary.
+	credit_remaining_percent="$(printf '%s\n' "$provider_json" | jq -r '.credits.codexCreditLimit.remainingPercent // empty')"
+	credit_display_percent=""
+	if [[ "$provider" = "codex" && -z "$primary" && -z "$secondary" && -z "$tertiary" ]]; then
+		credit_display_percent="$credit_remaining_percent"
+	fi
+	usage="$(format_usage "$provider" "$primary" "$primary_window" "$secondary" "$secondary_window" "$tertiary" "$tertiary_window" "$openrouter_percent" "$openrouter_balance" "$openrouter_key_limit" "$openrouter_key_usage" "$primary_resets_at" "$secondary_resets_at" "$tertiary_resets_at" "$credit_display_percent")"
 	label_line1="${usage%%|*}"
 	label_line2="${usage#*|}"
 	icon="$(provider_icon "$provider")"
@@ -483,12 +495,14 @@ while IFS= read -r provider_json; do
 		-v b="$(remaining_percent "${secondary:-}")" \
 		-v c="$(remaining_percent "${tertiary:-}")" \
 		-v d="$(remaining_percent "${openrouter_percent:-}")" \
+		-v e="$credit_display_percent" \
 		'BEGIN {
 		min = 101
 		if (a != "" && a < min) min = a
 		if (b != "" && b < min) min = b
 		if (c != "" && c < min) min = c
 		if (d != "" && d < min) min = d
+		if (e != "" && e < min) min = e
 		if (min == 101) min = 100
 		printf "%d", min
 	}')"
