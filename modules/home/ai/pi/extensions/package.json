@@ -1,6 +1,9 @@
 {
   "name": "olisikh-pi-runtime",
   "private": true,
+  "scripts": {
+    "test:graphify": "bun test --preload ./lib/graphify-test-preload.ts ./graphify-integration.test.ts ./lib/graphify-tools.test.ts"
+  },
   "pi": {
     "extensions": [
       "./statusline.ts",

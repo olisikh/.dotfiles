@@ -256,7 +256,6 @@ let
       "npm:pi-ollama-cloud"
       "npm:@capyup/pi-auto-compact"
       "npm:@quintinshaw/pi-dynamic-workflows"
-      "npm:@gaodes/pi-graphify"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-mcp-adapter"
       "npm:pi-subagents"
@@ -514,6 +513,7 @@ in
       ".pi/agent/APPEND_SYSTEM.md".source = ./prompts/brain-policy.md;
       ".pi/agent/modes/plan.md".source = ./prompts/plan-mode.md;
       ".pi/agent/modes/goal.md".source = ./prompts/goal-mode.md;
+      ".pi/agent/graphify/session.md".source = ./prompts/graphify-session.md;
 
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
       ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;

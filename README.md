@@ -5,16 +5,56 @@
 3. Run ./uninstall.sh to uninstall
 
 Nix help:
-https://github.com/agilesteel/.dotfiles/blob/master/nix/home-manager/home.nix
+<https://github.com/agilesteel/.dotfiles/blob/master/nix/home-manager/home.nix>
+
+## Graphify in Pi
+
+`/graphify .` runs the installed Graphify skill through the current Pi agent.
+Code is extracted structurally; uncached document/media semantics use native
+`delegate` subagents on the configured model route. No separate DeepSeek/Gemini
+key is needed, and the standalone `graphify extract` CI backend is not used.
+
+- `graphify_build` / `graphify_update` return agent workflow instructions, not a
+  completed graph. The agent owns extraction, validation and publication.
+- `graphify_query`, `graphify_path` and `graphify_explain` traverse a current graph.
+  Their optional `path` selects a corpus; otherwise they use the Git root or cwd.
+- Source edits mark existing graphs stale. They refresh **before next use**, never
+  through a hidden post-task extraction or surprise model continuation.
+- Plan mode does not execute Graphify, including lifecycle hooks and `/graphify`.
+- Builds use staging and preserve the previous graph on failure. A leftover
+  publication backup must be recovered if a crash left `graphify-out` absent.
+- Other operations/exports use the upstream skill. The old npm wrapper's automatic
+  context hints and dedicated upgrade/watch/headless tools are no longer loaded.
+
+The Pi adapter lives in `modules/home/ai/pi/extensions/graphify-integration.ts` and
+`extensions/lib/graphify-tools.ts`; its workflow guide is deployed to
+`~/.pi/agent/graphify/session.md`. The Python installation and upstream skill remain
+managed separately by `~/.llm-harness`. Apply Home Manager through the normal
+Darwin rebuild, then restart/reload Pi to replace the old wrapper. A Nix build
+without switching does not change the running session.
+
+Run the adapter regression tests using Pi's installed TypeBox dependency (no
+installation into the Nix-managed extension directory):
+
+```sh
+cd modules/home/ai/pi/extensions
+bun run test:graphify
+GRAPHIFY_LIVE_TESTS=1 bun run test:graphify  # also verify installed Python isolation
+```
+
+The live check requires the existing Graphify CLI on PATH. Traversal may update
+Graphify's last-query cache stamp; freshness probes do not modify corpus artifacts.
 
 ## Self-signed company cert issues: make sure nix uses proper CA during nix build
 
 1. Configure Determinate Nix daemon to know about cert whereabouts:
+
 ```bash
 sudo vim /Library/LaunchDaemons/systems.determinate.nix-daemon.plist
 ```
 
 add the following environment configuration:
+
 ```xml
 <key>EnvironmentVariables</key>
 <dict>
@@ -31,7 +71,8 @@ add the following environment configuration:
 </dict>
 ```
 
-2. Restart nix daemon:
+1. Restart nix daemon:
+
 ```
 sudo launchctl bootout system /Library/LaunchDaemons/systems.determinate.nix-daemon.plist
 sudo launchctl bootstrap system /Library/LaunchDaemons/systems.determinate.nix-daemon.plist
@@ -70,15 +111,15 @@ sha256-HiIYxTlif5Lbl9BAvPsnXp8WAexL8YuohMDd/eCJVQ8=
 
 Most of the packages have home-manager support, for example \
 wezterm has this page that tells what options you have to configure it: \
-https://home-manager-options.extranix.com/?query=wezterm&release=master
+<https://home-manager-options.extranix.com/?query=wezterm&release=master>
 
 ## Nixvim plugin docs
 
 Nixvim plugin options are documented at:
-https://nix-community.github.io/nixvim/plugins/
+<https://nix-community.github.io/nixvim/plugins/>
 
 For example, `lensline` options:
-https://nix-community.github.io/nixvim/plugins/lensline/index.html
+<https://nix-community.github.io/nixvim/plugins/lensline/index.html>
 
 ## Quick nix-darwin help
 
@@ -90,7 +131,7 @@ darwin-help
 
 This command opens a browser window with documentation about nix-darwin settings
 
-## Available Nix templates:
+## Available Nix templates
 
 | Name      | Description                                       |
 | --------- | ------------------------------------------------- |
@@ -101,8 +142,8 @@ This command opens a browser window with documentation about nix-darwin settings
 | `module`  | A Nix Flake that exports NixOS modules.           |
 | `lib`     | A Nix Flake that exports a custom `lib`           |
 
-
 To generate template files, run:
+
 ```sh
 home template <name>
 ```

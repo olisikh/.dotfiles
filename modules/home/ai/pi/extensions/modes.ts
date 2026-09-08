@@ -74,6 +74,17 @@ export default function modes(pi: ExtensionAPI) {
     pi.setActiveTools(planToolBaseline);
     planToolBaseline = undefined;
   };
+  const syncGoalCompleteTool = () => {
+    const activeTools = pi.getActiveTools();
+    const goalIsActive = state.mode === "goal" && state.goal !== undefined;
+    const goalToolIsActive = activeTools.includes("goal_complete");
+    if (goalIsActive === goalToolIsActive) return;
+    pi.setActiveTools(
+      goalIsActive
+        ? [...activeTools, "goal_complete"]
+        : activeTools.filter((tool) => tool !== "goal_complete"),
+    );
+  };
   const persist = () => pi.appendEntry(MODE_STATE_ENTRY, state);
   const publishMode = (mode: Mode, modeState: string, active: boolean) => {
     pi.events.emit("pi:mode-changed", {
@@ -108,6 +119,7 @@ export default function modes(pi: ExtensionAPI) {
     if (previousMode !== "plan" && next.mode === "plan") restrictPlanTools();
     if (previousMode === "plan" && next.mode !== "plan") restorePlanTools();
     state = next;
+    syncGoalCompleteTool();
     persist();
     if (previousMode !== "build" && previousMode !== next.mode) {
       publishMode(previousMode, "off", false);
@@ -122,6 +134,7 @@ export default function modes(pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
     context = ctx;
     state = restoreState(ctx) ?? initialState();
+    syncGoalCompleteTool();
     if (state.mode === "plan") restrictPlanTools();
     refresh();
   });
@@ -150,6 +163,15 @@ export default function modes(pi: ExtensionAPI) {
   });
 
   pi.on("tool_call", (event) => {
+    if (
+      event.toolName === "goal_complete" &&
+      (state.mode !== "goal" || !state.goal)
+    ) {
+      return {
+        block: true,
+        reason: "goal_complete is only available while a goal is active.",
+      };
+    }
     if (state.mode !== "plan") return;
     if (PLAN_READ_ONLY_TOOLS.has(event.toolName)) return;
     return {

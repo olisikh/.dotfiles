@@ -1,268 +1,317 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { execFile, execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import {
-	captureRepositoryFingerprint,
-	default as graphifyIntegration,
+import graphifyIntegration, {
+  captureRepositoryFingerprint,
+  runProcess,
+  type PiExec,
 } from "./graphify-integration";
 
-type ExecResult = { stdout: string; stderr: string; code: number };
-type ExecOptions = { cwd?: string };
-type Handler = (event: unknown, ctx: { cwd: string; ui: { notify: (...args: string[]) => void } }) => Promise<unknown> | unknown;
-
-type PiStub = {
-	handlers: Map<string, Handler>;
-	calls: Array<{ command: string; args: string[]; options?: ExecOptions }>;
-	notifications: string[];
-	pi: {
-		on: (event: string, handler: Handler) => void;
-		exec: (command: string, args: string[], options?: ExecOptions) => Promise<ExecResult>;
-	};
+const roots: string[] = [];
+const git = (root: string, args: string[]) =>
+  execFileSync("git", args, { cwd: root, encoding: "utf8" });
+function project(code = true) {
+  const root = mkdtempSync(path.join(tmpdir(), "pi-graphify-integration-"));
+  roots.push(root);
+  git(root, ["init", "-q"]);
+  git(root, ["config", "user.email", "fixture@example.com"]);
+  git(root, ["config", "user.name", "Fixture"]);
+  writeFileSync(
+    path.join(root, code ? "service.ts" : "notes.md"),
+    code ? "export const retry = 3;\n" : "Notes only.\n",
+  );
+  git(root, ["add", "."]);
+  git(root, ["commit", "-qm", "initial"]);
+  return root;
+}
+function graph(root: string) {
+  mkdirSync(path.join(root, "graphify-out"));
+  writeFileSync(
+    path.join(root, "graphify-out", "graph.json"),
+    '{"nodes":[{"id":"a"}],"links":[]}\n',
+  );
+}
+const marker = (root: string) =>
+  path.join(root, "graphify-out", ".needs_update");
+type Context = {
+  cwd: string;
+  ui: { notify: (message: string) => void };
+  sessionManager: {
+    getBranch: () => Array<{
+      type: string;
+      customType: string;
+      data: { mode: string };
+    }>;
+  };
 };
-
-const temporaryRoots: string[] = [];
-
-function runGit(root: string, args: string[]): string {
-	return execFileSync("git", args, { cwd: root, encoding: "utf8" });
+type Handler = (event: unknown, ctx: Context) => unknown | Promise<unknown>;
+function harness(root: string, execOverride?: PiExec) {
+  const handlers = new Map<string, Handler>();
+  const channels = new Map<string, (event: unknown) => void>();
+  const calls: string[] = [];
+  const notifications: string[] = [];
+  const messages: unknown[] = [];
+  const exec: PiExec = async (command, args, options) => {
+    calls.push(command);
+    return (execOverride ?? runProcess)(command, args, options);
+  };
+  const pi = {
+    on: (name: string, handler: Handler) => handlers.set(name, handler),
+    registerTool: (_tool: unknown) => {},
+    registerCommand: (_name: string, _command: unknown) => {},
+    sendUserMessage: (text: string) => messages.push(text),
+    events: {
+      on: (name: string, handler: (event: unknown) => void) => {
+        channels.set(name, handler);
+        return () => {
+          channels.delete(name);
+        };
+      },
+    },
+  };
+  graphifyIntegration(pi as never, exec);
+  const ctx: Context = {
+    cwd: root,
+    ui: { notify: (message) => notifications.push(message) },
+    sessionManager: { getBranch: () => [] },
+  };
+  const before = () =>
+    handlers.get("before_agent_start")?.({ systemPrompt: "base" }, ctx);
+  const end = () => handlers.get("agent_end")?.({}, ctx);
+  const mode = (value: string) =>
+    channels.get("pi:mode-changed")?.({
+      version: 1,
+      source: "olisikh:modes",
+      mode: value,
+      state: "active",
+      active: value !== "build",
+    });
+  return { handlers, calls, notifications, messages, ctx, before, end, mode };
 }
-
-function createGitProject(options: { code?: boolean } = {}): string {
-	const root = mkdtempSync(path.join(tmpdir(), "pi-graphify-integration-"));
-	temporaryRoots.push(root);
-	runGit(root, ["init", "-q"]);
-	runGit(root, ["config", "user.email", "pi-graphify-tests@example.com"]);
-	runGit(root, ["config", "user.name", "Pi Graphify Tests"]);
-	if (options.code !== false) {
-		writeFileSync(path.join(root, "package.json"), '{"name":"graphify-test"}\n');
-		mkdirSync(path.join(root, "src"));
-		writeFileSync(path.join(root, "src", "service.ts"), "export const retry = 3;\n");
-	} else {
-		writeFileSync(path.join(root, "README.md"), "Notes only.\n");
-	}
-	runGit(root, ["add", "."]);
-	runGit(root, ["commit", "-qm", "initial"]);
-	return root;
-}
-
-function createPiStub(updateResult: ExecResult = { stdout: "", stderr: "", code: 0 }): PiStub {
-	const handlers = new Map<string, Handler>();
-	const calls: PiStub["calls"] = [];
-	const notifications: string[] = [];
-	const pi = {
-		on(event: string, handler: Handler) {
-			handlers.set(event, handler);
-		},
-		exec(command: string, args: string[], options?: ExecOptions): Promise<ExecResult> {
-			calls.push({ command, args, options });
-			if (command === "graphify") return Promise.resolve(updateResult);
-			return new Promise((resolve) => {
-				execFile(command, args, { cwd: options?.cwd, encoding: "utf8" }, (error, stdout, stderr) => {
-					resolve({
-						stdout: String(stdout),
-						stderr: String(stderr),
-						code: typeof error?.code === "number" ? error.code : error ? 1 : 0,
-					});
-				});
-			});
-		},
-	};
-	return { handlers, calls, notifications, pi };
-}
-
-function createGraph(root: string): void {
-	mkdirSync(path.join(root, "graphify-out"));
-	writeFileSync(path.join(root, "graphify-out", "graph.json"), '{"nodes":[]}\n');
-}
-
-async function runBeforeAndEnd(
-	stub: PiStub,
-	cwd: string,
-	mutate?: () => void,
-): Promise<{ before: unknown; end: unknown }> {
-	const ctx = { cwd, ui: { notify: (...args: string[]) => stub.notifications.push(args.join(" ")) } };
-	const before = await stub.handlers.get("before_agent_start")?.({ systemPrompt: "base prompt" }, ctx);
-	mutate?.();
-	const end = await stub.handlers.get("agent_end")?.({}, ctx);
-	return { before, end };
-}
-
 afterEach(() => {
-	while (temporaryRoots.length > 0) {
-		rmSync(temporaryRoots.pop() as string, { recursive: true, force: true });
-	}
+  for (const root of roots.splice(0))
+    rmSync(root, { recursive: true, force: true });
 });
 
-describe("automatic Graphify integration", () => {
-	it("injects the concise Graphify policy when a code repository has no graph", async () => {
-		const root = createGitProject();
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
+describe("session-owned Graphify lifecycle", () => {
+  it("injects the session guide, not a headless execution route", async () => {
+    const root = project();
+    const h = harness(root);
+    const result = (await h.before()) as { systemPrompt: string };
+    expect(result.systemPrompt).toContain("Graphify is the default mechanism");
+    expect(result.systemPrompt).toContain("graphify/session.md");
+    expect(result.systemPrompt).toContain(
+      "only supplies the workflow briefing",
+    );
+    expect(result.systemPrompt).toContain(
+      "Graph state at this run's start: absent",
+    );
+    await h.end();
+    expect(h.calls.every((name) => name === "git")).toBe(true);
+    expect(h.messages).toEqual([]);
+  });
 
-		const { before } = await runBeforeAndEnd(stub, root);
-		const prompt = (before as { systemPrompt: string }).systemPrompt;
+  it("marks source changes stale without running Graphify or queuing a turn", async () => {
+    const root = project();
+    graph(root);
+    const original = readFileSync(
+      path.join(root, "graphify-out/graph.json"),
+      "utf8",
+    );
+    const h = harness(root);
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "export const retry = 5;\n");
+    await h.end();
+    expect(existsSync(marker(root))).toBe(true);
+    expect(
+      readFileSync(path.join(root, "graphify-out/graph.json"), "utf8"),
+    ).toBe(original);
+    expect(h.calls.every((name) => name === "git")).toBe(true);
+    expect(h.messages).toEqual([]);
+  });
 
-		expect(prompt).toContain("Graphify is the default mechanism");
-		expect(prompt).toContain("graphify-out/graph.json");
-		expect(prompt).toContain("installed `graphify` skill");
-		expect(prompt).toContain("graphify_build");
-		expect(prompt).toContain("graphify_query");
-		expect(prompt).toContain("Graph state at this run's start: absent.");
-		expect(stub.calls.filter(({ command }) => command === "graphify")).toHaveLength(0);
-	});
+  for (const scenario of ["unchanged", "restored", "generated"] as const) {
+    it(`does not mark ${scenario} source state stale`, async () => {
+      const root = project();
+      graph(root);
+      const h = harness(root);
+      await h.before();
+      if (scenario === "restored") {
+        writeFileSync(path.join(root, "service.ts"), "temporary\n");
+        writeFileSync(
+          path.join(root, "service.ts"),
+          "export const retry = 3;\n",
+        );
+      }
+      if (scenario === "generated")
+        writeFileSync(path.join(root, "graphify-out/report.md"), "generated\n");
+      await h.end();
+      expect(existsSync(marker(root))).toBe(false);
+    });
+  }
 
-	it("tells the agent to query an existing graph before broad exploration", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
+  for (const scenario of ["untracked", "staged", "deleted"] as const) {
+    it(`marks ${scenario} changes stale`, async () => {
+      const root = project();
+      graph(root);
+      const h = harness(root);
+      await h.before();
+      if (scenario === "untracked")
+        writeFileSync(path.join(root, "new.ts"), "export const x = 1;\n");
+      if (scenario === "staged") {
+        writeFileSync(
+          path.join(root, "service.ts"),
+          "export const retry = 7;\n",
+        );
+        git(root, ["add", "service.ts"]);
+      }
+      if (scenario === "deleted") git(root, ["rm", "-f", "service.ts"]);
+      await h.end();
+      expect(existsSync(marker(root))).toBe(true);
+    });
+  }
 
-		const { before } = await runBeforeAndEnd(stub, root);
-		const prompt = (before as { systemPrompt: string }).systemPrompt;
+  it("uses the Git root from a nested cwd", async () => {
+    const root = project();
+    graph(root);
+    const nested = path.join(root, "nested");
+    mkdirSync(nested);
+    const h = harness(nested);
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    await h.end();
+    expect(existsSync(marker(root))).toBe(true);
+    expect(existsSync(path.join(nested, "graphify-out"))).toBe(false);
+  });
 
-		expect(prompt).toContain("If the graph exists, consult Graphify before broad");
-		expect(prompt).toContain("graphify_query");
-		expect(prompt).toContain("graphify_path");
-		expect(prompt).toContain("Graph state at this run's start: present.");
-	});
+  it("does not create a graph or marker when no graph exists", async () => {
+    const root = project();
+    const h = harness(root);
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    await h.end();
+    expect(existsSync(path.join(root, "graphify-out"))).toBe(false);
+  });
 
-	it("updates an existing graph after an unstaged tracked source change", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
+  it("does not follow a symlinked output directory", async () => {
+    const root = project();
+    const outside = project();
+    graph(outside);
+    symlinkSync(
+      path.join(outside, "graphify-out"),
+      path.join(root, "graphify-out"),
+    );
+    const h = harness(root);
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    await h.end();
+    expect(existsSync(marker(outside))).toBe(false);
+    expect(h.calls.every((name) => name === "git")).toBe(true);
+  });
 
-		await runBeforeAndEnd(stub, root, () => {
-			writeFileSync(path.join(root, "src", "service.ts"), "export const retry = 5;\n");
-		});
+  it("does not follow an existing marker symlink", async () => {
+    const root = project();
+    graph(root);
+    const outside = path.join(project(), "protected.txt");
+    writeFileSync(outside, "preserve me");
+    symlinkSync(outside, marker(root));
+    const h = harness(root);
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    await h.end();
+    expect(readFileSync(outside, "utf8")).toBe("preserve me");
+    expect(h.notifications.join("\n")).toContain("Could not mark graph stale");
+  });
 
-		expect(stub.calls.filter(({ command }) => command === "graphify")).toEqual([
-			expect.objectContaining({
-				command: "graphify",
-				args: ["update", "."],
-				options: expect.objectContaining({ cwd: realpathSync(root) }),
-			}),
-		]);
-	});
+  it("preserves the result if marking stale fails", async () => {
+    const root = project();
+    graph(root);
+    mkdirSync(marker(root));
+    const h = harness(root);
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    await expect(Promise.resolve(h.end())).resolves.toBeUndefined();
+    expect(h.notifications.join("\n")).toContain("Could not mark graph stale");
+  });
 
-	it("does not update when the final source state is unchanged", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
+  it("Plan mode suppresses all probing and maintenance", async () => {
+    const root = project();
+    graph(root);
+    const h = harness(root);
+    h.mode("plan");
+    await h.before();
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    await h.end();
+    expect(h.calls).toEqual([]);
+    expect(existsSync(marker(root))).toBe(false);
+    h.mode("build");
+    await h.before();
+    expect(h.calls.length).toBeGreaterThan(0);
+  });
 
-		await runBeforeAndEnd(stub, root);
+  it("restores Plan mode from session state before hooks run", async () => {
+    const root = project();
+    const h = harness(root);
+    h.ctx.sessionManager.getBranch = () => [
+      { type: "custom", customType: "olisikh:modes", data: { mode: "plan" } },
+    ];
+    await h.handlers.get("session_start")?.({}, h.ctx);
+    await h.before();
+    await h.end();
+    expect(h.calls).toEqual([]);
+  });
 
-		expect(stub.calls.filter(({ command }) => command === "graphify")).toHaveLength(0);
-	});
+  it("cancels an in-flight probe on shutdown", async () => {
+    const root = project();
+    let observedSignal: AbortSignal | undefined;
+    let started!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const h = harness(root, async (_command, _args, options) => {
+      observedSignal = options?.signal;
+      started();
+      await new Promise<void>((resolve) =>
+        options?.signal?.addEventListener("abort", () => resolve(), {
+          once: true,
+        }),
+      );
+      return { code: 1, killed: true };
+    });
+    const pending = h.before();
+    await ready;
+    await h.handlers.get("session_shutdown")?.({}, h.ctx);
+    await pending;
+    expect(observedSignal?.aborted).toBe(true);
+    expect(h.calls).toHaveLength(1);
+    expect(existsSync(marker(root))).toBe(false);
+  });
 
-	it("does not update when a changed file is restored exactly", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
+  it("keeps non-code and non-repository directories passive", async () => {
+    const docs = harness(project(false));
+    expect(await docs.before()).toBeUndefined();
+    const root = mkdtempSync(path.join(tmpdir(), "pi-graphify-plain-"));
+    roots.push(root);
+    expect(await harness(root).before()).toBeUndefined();
+  });
 
-		await runBeforeAndEnd(stub, root, () => {
-			writeFileSync(path.join(root, "src", "service.ts"), "temporary change\n");
-			writeFileSync(path.join(root, "src", "service.ts"), "export const retry = 3;\n");
-		});
-
-		expect(stub.calls.filter(({ command }) => command === "graphify")).toHaveLength(0);
-	});
-
-	it("ignores changes under graphify-out", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
-
-		await runBeforeAndEnd(stub, root, () => {
-			writeFileSync(path.join(root, "graphify-out", "GRAPH_REPORT.md"), "generated\n");
-			writeFileSync(path.join(root, "graphify-out", "graph.json"), '{"nodes":[{"id":"generated"}]}\n');
-		});
-
-		expect(stub.calls.filter(({ command }) => command === "graphify")).toHaveLength(0);
-	});
-
-	it("updates for a newly created untracked source file", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
-
-		await runBeforeAndEnd(stub, root, () => {
-			writeFileSync(path.join(root, "src", "new-service.ts"), "export const newService = true;\n");
-		});
-
-		expect(stub.calls.filter(({ command }) => command === "graphify")).toHaveLength(1);
-	});
-
-	it("detects staged changes and deletions in the repository fingerprint", async () => {
-		const root = createGitProject();
-		const stub = createPiStub();
-		const before = await captureRepositoryFingerprint(stub.pi.exec, root);
-
-		writeFileSync(path.join(root, "src", "service.ts"), "export const retry = 4;\n");
-		runGit(root, ["add", "src/service.ts"]);
-		const staged = await captureRepositoryFingerprint(stub.pi.exec, root);
-		expect(staged).not.toBe(before);
-
-		runGit(root, ["rm", "-fq", "src/service.ts"]);
-		const deleted = await captureRepositoryFingerprint(stub.pi.exec, root);
-		expect(deleted).not.toBe(staged);
-	});
-
-	it("runs update from the repository root when Pi starts in a nested directory", async () => {
-		const root = createGitProject();
-		const nested = path.join(root, "packages", "payments");
-		mkdirSync(nested, { recursive: true });
-		createGraph(root);
-		const stub = createPiStub();
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
-
-		await runBeforeAndEnd(stub, nested, () => {
-			writeFileSync(path.join(root, "src", "service.ts"), "export const retry = 6;\n");
-		});
-
-		const update = stub.calls.find(({ command }) => command === "graphify");
-		expect(update?.options?.cwd).toBe(realpathSync(root));
-	});
-
-	it("preserves the agent result and reports a concise warning when update fails", async () => {
-		const root = createGitProject();
-		createGraph(root);
-		const stub = createPiStub({ stdout: "", stderr: "graphify unavailable", code: 127 });
-		graphifyIntegration(stub.pi as never, stub.pi.exec);
-
-		await expect(
-			runBeforeAndEnd(stub, root, () => {
-				writeFileSync(path.join(root, "src", "service.ts"), "export const retry = 7;\n");
-			}),
-		).resolves.toBeDefined();
-		expect(stub.notifications.join("\n")).toContain("Graphify update skipped");
-		expect(stub.notifications.join("\n")).toContain("graphify unavailable");
-	});
-
-	it("does not activate in a non-code repository or a non-repository directory", async () => {
-		const docsRoot = createGitProject({ code: false });
-		const docsStub = createPiStub();
-		graphifyIntegration(docsStub.pi as never);
-		const docsBefore = await docsStub.handlers.get("before_agent_start")?.(
-			{ systemPrompt: "base prompt" },
-			{ cwd: docsRoot, ui: { notify: () => undefined } },
-		);
-		expect(docsBefore).toBeUndefined();
-
-		const plainRoot = mkdtempSync(path.join(tmpdir(), "pi-graphify-plain-"));
-		temporaryRoots.push(plainRoot);
-		writeFileSync(path.join(plainRoot, "notes.txt"), "not source code\n");
-		const plainStub = createPiStub();
-		graphifyIntegration(plainStub.pi as never);
-		const plainBefore = await plainStub.handlers.get("before_agent_start")?.(
-			{ systemPrompt: "base prompt" },
-			{ cwd: plainRoot, ui: { notify: () => undefined } },
-		);
-		expect(plainBefore).toBeUndefined();
-	});
+  it("fingerprints index changes independently of the graph", async () => {
+    const root = project();
+    const before = await captureRepositoryFingerprint(runProcess, root);
+    writeFileSync(path.join(root, "service.ts"), "changed\n");
+    git(root, ["add", "."]);
+    expect(await captureRepositoryFingerprint(runProcess, root)).not.toBe(
+      before,
+    );
+  });
 });

@@ -1,5 +1,8 @@
 // @ts-ignore Pi provides this module at runtime.
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type {
+	ExtensionAPI,
+	ExtensionContext,
+} from "@earendil-works/pi-coding-agent";
 // @ts-ignore Pi provides node at runtime.
 import { execFile } from "node:child_process";
 // @ts-ignore Pi provides node at runtime.
@@ -11,13 +14,20 @@ import {
 	readFile,
 	readlink,
 	readdir,
+	writeFile,
 } from "node:fs/promises";
 // @ts-ignore Pi provides node at runtime.
 import path from "node:path";
+import { subscribeToModeChanges } from "./lib/mode-events.ts";
+import {
+	agentDirectory,
+	graphOutputState,
+	registerGraphifyTools,
+	STALE_MARKER,
+} from "./lib/graphify-tools.ts";
 
 const GRAPHIFY_OUTPUT_DIR = "graphify-out";
 const GRAPHIFY_GRAPH = `${GRAPHIFY_OUTPUT_DIR}/graph.json`;
-const GRAPHIFY_UPDATE_ARGS = ["update", "."] as const;
 const MAX_WARNING_DETAIL_LENGTH = 240;
 
 const CODE_EXTENSIONS = new Set([
@@ -121,12 +131,13 @@ const GRAPHIFY_POLICY = [
 	"Graphify is the default mechanism for understanding and navigating an existing codebase.",
 	"",
 	"Before broad source-code exploration, check whether `graphify-out/graph.json` exists at the repository root.",
-	"If it is absent, proactively invoke the installed `graphify` skill or `graphify_build` tool to build the graph for this repository; do not wait for the user to request Graphify.",
-	"If the graph exists, consult Graphify before broad Grep/Glob/find/file-tree exploration.",
+	"If it is absent, use the installed `graphify` skill with the Pi session guide to build it in the current agent session. `graphify_build` only supplies the workflow briefing; it does not build a graph.",
+	"If the graph exists, consult Graphify before broad Grep/Glob/find/file-tree exploration. A stale graph must be refreshed by the current agent before use, not by an automatic post-task process.",
+	"Semantic extraction belongs to the current Pi agent or native configured subagents. The Pi session guide overrides the upstream skill's external API and Claude-style Agent instructions. Headless extraction is not the Pi workflow.",
 	"",
 	"Prefer Graphify queries (`graphify_query`, `graphify_path`, and `graphify_explain`) for where a feature is implemented, which components participate in a flow, what calls or depends on a symbol, how codebase parts connect, and which files are likely relevant.",
 	"Use Graphify to narrow the search space, then read relevant source files normally. Direct reads/searches remain appropriate when the exact file or symbol is known, the search is cheaper, the files were already identified, or Graphify cannot answer.",
-	"Do not blindly replace every grep/read with Graphify. The installed Graphify skill is the source of truth; reuse it rather than recreating its workflow. The user should never need to request Graphify.",
+	"Do not blindly replace every grep/read with Graphify. Reuse the installed skill's graph algorithms with the Pi session guide's execution rules. In read-only/Plan tasks, use source inspection instead; never build, refresh, or delegate merely to answer a planning question.",
 ].join("\n");
 
 export type PiExecResult = {
@@ -141,6 +152,7 @@ export type PiExecOptions = {
 	cwd?: string;
 	signal?: AbortSignal;
 	timeout?: number;
+	maxBuffer?: number;
 };
 
 export type PiExec = (
@@ -157,7 +169,7 @@ type ExecFileError = Error & {
 const PROCESS_MAX_BUFFER = 8 * 1024 * 1024;
 
 /** Run a direct argv process with an explicit cwd; no shell is involved. */
-function runProcess(
+export function runProcess(
 	command: string,
 	args: string[],
 	options: PiExecOptions = {},
@@ -169,7 +181,12 @@ function runProcess(
 			{
 				cwd: options.cwd,
 				encoding: "utf8",
-				maxBuffer: PROCESS_MAX_BUFFER,
+				maxBuffer: options.maxBuffer ?? PROCESS_MAX_BUFFER,
+				env: {
+					...process.env,
+					GRAPHIFY_OUT: GRAPHIFY_OUTPUT_DIR,
+					GRAPHIFY_GOOGLE_WORKSPACE: "0",
+				},
 				signal: options.signal,
 				timeout: options.timeout,
 			},
@@ -181,7 +198,8 @@ function runProcess(
 						: processError
 							? 127
 							: 0;
-				const diagnostic = String(stderr ?? "").trim() || processError?.message || "";
+				const diagnostic =
+					String(stderr ?? "").trim() || processError?.message || "";
 				resolve({
 					stdout: String(stdout ?? ""),
 					stderr: diagnostic,
@@ -211,7 +229,6 @@ type PathSnapshot = {
 
 type RunState = RepositoryContext & {
 	initialFingerprint: string;
-	maintenanceStarted: boolean;
 };
 
 type BeforeAgentStartEvent = {
@@ -230,18 +247,28 @@ function normalizeRepoPath(value: string): string {
 
 function isGraphifyOutputPath(relativePath: string): boolean {
 	const normalized = normalizeRepoPath(relativePath);
-	return normalized === GRAPHIFY_OUTPUT_DIR || normalized.startsWith(`${GRAPHIFY_OUTPUT_DIR}/`);
-}
-
-function isTransientUntrackedPath(relativePath: string, status: string): boolean {
-	if (!status.includes("?")) return false;
-	const normalized = normalizeRepoPath(relativePath);
-	return TRANSIENT_UNTRACKED_PREFIXES.some(
-		(prefix) => normalized === prefix.slice(0, -1) || normalized.startsWith(prefix),
+	return (
+		normalized === GRAPHIFY_OUTPUT_DIR ||
+		normalized.startsWith(`${GRAPHIFY_OUTPUT_DIR}/`)
 	);
 }
 
-function isIgnoredFingerprintPath(relativePath: string, status: string): boolean {
+function isTransientUntrackedPath(
+	relativePath: string,
+	status: string,
+): boolean {
+	if (!status.includes("?")) return false;
+	const normalized = normalizeRepoPath(relativePath);
+	return TRANSIENT_UNTRACKED_PREFIXES.some(
+		(prefix) =>
+			normalized === prefix.slice(0, -1) || normalized.startsWith(prefix),
+	);
+}
+
+function isIgnoredFingerprintPath(
+	relativePath: string,
+	status: string,
+): boolean {
 	return (
 		isGraphifyOutputPath(relativePath) ||
 		normalizeRepoPath(relativePath).startsWith(".git/") ||
@@ -284,7 +311,10 @@ function parseIndexEntries(output: string): string[] {
 		.sort();
 }
 
-async function snapshotPath(root: string, relativePath: string): Promise<string> {
+async function snapshotPath(
+	root: string,
+	relativePath: string,
+): Promise<string> {
 	const absolutePath = path.resolve(root, relativePath);
 	try {
 		const stats = await lstat(absolutePath);
@@ -306,7 +336,7 @@ async function snapshotPath(root: string, relativePath: string): Promise<string>
 
 /** Build the exact policy appended to the current Pi system prompt. */
 export function buildGraphifyPolicy(graphExists: boolean): string {
-	return `${GRAPHIFY_POLICY}\nGraph state at this run's start: ${graphExists ? "present" : "absent"}.`;
+	return `${GRAPHIFY_POLICY}\nPi session guide: ${path.join(agentDirectory(), "graphify", "session.md")}\nGraph state at this run's start: ${graphExists ? "present" : "absent"}.`;
 }
 
 /**
@@ -322,7 +352,8 @@ export async function detectRepositoryContext(
 		cwd,
 		timeout: 5_000,
 	});
-	if (resultCode(rootResult) !== 0 || !rootResult.stdout?.trim()) return undefined;
+	if (resultCode(rootResult) !== 0 || !rootResult.stdout?.trim())
+		return undefined;
 
 	const root = path.resolve(rootResult.stdout.trim());
 	const filesResult = await exec(
@@ -336,12 +367,18 @@ export async function detectRepositoryContext(
 		.map(normalizeRepoPath)
 		.filter((file) => !isIgnoredFingerprintPath(file, "??"));
 
-	const hasCodeFile = repositoryFiles.some((file) => CODE_EXTENSIONS.has(path.extname(file).toLowerCase()));
-	let hasProjectMarker = repositoryFiles.some((file) => PROJECT_MARKERS.has(path.basename(file)));
+	const hasCodeFile = repositoryFiles.some((file) =>
+		CODE_EXTENSIONS.has(path.extname(file).toLowerCase()),
+	);
+	let hasProjectMarker = repositoryFiles.some((file) =>
+		PROJECT_MARKERS.has(path.basename(file)),
+	);
 	if (!hasProjectMarker) {
 		try {
 			const entries = await readdir(root, { withFileTypes: true });
-			hasProjectMarker = entries.some((entry) => entry.isFile() && PROJECT_MARKERS.has(entry.name));
+			hasProjectMarker = entries.some(
+				(entry) => entry.isFile() && PROJECT_MARKERS.has(entry.name),
+			);
 		} catch {
 			// A repository that cannot be read is not a safe Graphify target.
 		}
@@ -378,11 +415,15 @@ export async function captureRepositoryFingerprint(
 			status: record.status,
 			paths: record.paths
 				.map(normalizeRepoPath)
-				.filter((relativePath) => !isIgnoredFingerprintPath(relativePath, record.status))
+				.filter(
+					(relativePath) => !isIgnoredFingerprintPath(relativePath, record.status),
+				)
 				.sort(),
 		}))
 		.filter((record) => record.paths.length > 0)
-		.sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
+		.sort((left, right) =>
+			JSON.stringify(left).localeCompare(JSON.stringify(right)),
+		);
 
 	const pathSnapshots: PathSnapshot[] = [];
 	for (const record of records) {
@@ -396,8 +437,11 @@ export async function captureRepositoryFingerprint(
 	}
 
 	const indexEntries =
-		resultCode(indexResult) === 0 ? parseIndexEntries(indexResult.stdout ?? "") : ["index-unavailable"];
-	const head = resultCode(headResult) === 0 ? headResult.stdout?.trim() ?? "" : "NO_HEAD";
+		resultCode(indexResult) === 0
+			? parseIndexEntries(indexResult.stdout ?? "")
+			: ["index-unavailable"];
+	const head =
+		resultCode(headResult) === 0 ? (headResult.stdout?.trim() ?? "") : "NO_HEAD";
 	return createHash("sha256")
 		.update(
 			JSON.stringify({
@@ -435,69 +479,132 @@ async function fileExists(filePath: string): Promise<boolean> {
 	}
 }
 
+async function markGraphStale(root: string): Promise<void> {
+	const marker = path.join(root, GRAPHIFY_OUTPUT_DIR, STALE_MARKER);
+	try {
+		// Exclusive creation cannot follow an existing marker symlink.
+		await writeFile(
+			marker,
+			"Source edits observed by Pi; verify the manifest and refresh before next use.\n",
+			{ encoding: "utf8", flag: "wx" },
+		);
+	} catch (error) {
+		if (error instanceof Error && "code" in error && error.code === "EEXIST") {
+			const entry = await lstat(marker);
+			if (entry.isFile() && !entry.isSymbolicLink()) return;
+		}
+		throw error;
+	}
+}
+
 export default function graphifyIntegration(
 	pi: ExtensionAPI,
 	processExecutor: PiExec = runProcess,
 ): void {
 	let runState: RunState | undefined;
-	const exec: PiExec = processExecutor;
-
-	pi.on("before_agent_start", async (event: BeforeAgentStartEvent, ctx: ExtensionContext) => {
-		runState = undefined;
-		try {
-			const repository = await detectRepositoryContext(exec, ctx.cwd);
-			if (!repository) return;
-
-			const initialFingerprint = await captureRepositoryFingerprint(exec, repository.root);
-			if (!initialFingerprint) return;
-
-			runState = {
-				...repository,
-				initialFingerprint,
-				maintenanceStarted: false,
-			};
-
-			const graphExists = await fileExists(repository.graphPath);
-			const currentPrompt = event.systemPrompt ?? "";
-			return {
-				systemPrompt: currentPrompt ? `${currentPrompt}\n\n${buildGraphifyPolicy(graphExists)}` : buildGraphifyPolicy(graphExists),
-			};
-		} catch {
-			// Repository probing is advisory and must never break a Pi run.
+	let planMode = false;
+	let stopped = false;
+	let lifecycle = new AbortController();
+	const isPlan = (_ctx: ExtensionContext) => planMode || stopped;
+	const exec: PiExec = (command, args, options = {}) => {
+		if (planMode || stopped)
+			throw new Error(
+				"Graphify execution is unavailable in Plan mode or after shutdown.",
+			);
+		const signal = options.signal
+			? AbortSignal.any([options.signal, lifecycle.signal])
+			: lifecycle.signal;
+		return processExecutor(command, args, { ...options, signal });
+	};
+	const unsubscribe = subscribeToModeChanges(pi, (event) => {
+		if (event.source !== "olisikh:modes") return;
+		const nextPlan = event.mode === "plan" && event.active;
+		if (nextPlan) {
+			lifecycle.abort();
 			runState = undefined;
-			return undefined;
-		}
+		} else if (planMode) lifecycle = new AbortController();
+		planMode = nextPlan;
 	});
+	registerGraphifyTools(pi, { exec, isPlan });
+
+	pi.on("session_start", (_event, ctx) => {
+		stopped = false;
+		// Restore before hooks run, even when the modes extension loads later.
+		const entries = ctx.sessionManager.getBranch();
+		const mode = [...entries]
+			.reverse()
+			.find(
+				(entry) => entry.type === "custom" && entry.customType === "olisikh:modes",
+			);
+		planMode =
+			mode?.type === "custom" &&
+			(mode.data as { mode?: string } | undefined)?.mode === "plan";
+		if (planMode) lifecycle.abort();
+	});
+
+	pi.on(
+		"before_agent_start",
+		async (event: BeforeAgentStartEvent, ctx: ExtensionContext) => {
+			runState = undefined;
+			if (isPlan(ctx)) return;
+			const generation = lifecycle;
+			try {
+				const repository = await detectRepositoryContext(exec, ctx.cwd);
+				if (!repository || isPlan(ctx) || generation.signal.aborted) return;
+				const initialFingerprint = await captureRepositoryFingerprint(
+					exec,
+					repository.root,
+				);
+				if (!initialFingerprint || isPlan(ctx) || generation.signal.aborted) return;
+				runState = { ...repository, initialFingerprint };
+				const graphExists =
+					(await graphOutputState(repository.root)) === "directory" &&
+					(await fileExists(repository.graphPath));
+				if (isPlan(ctx) || generation.signal.aborted) return;
+				return {
+					systemPrompt: `${event.systemPrompt ?? ""}\n\n${buildGraphifyPolicy(graphExists)}`,
+				};
+			} catch {
+				// Probing is advisory; ordinary source inspection must remain usable.
+				runState = undefined;
+			}
+		},
+	);
 
 	pi.on("agent_end", async (_event: unknown, ctx: ExtensionContext) => {
 		const state = runState;
-		if (!state || state.maintenanceStarted) return;
-		state.maintenanceStarted = true;
-
+		runState = undefined;
+		if (!state || isPlan(ctx)) return;
+		const generation = lifecycle;
 		try {
-			const finalFingerprint = await captureRepositoryFingerprint(exec, state.root);
-			if (!finalFingerprint || finalFingerprint === state.initialFingerprint) return;
-			if (!(await fileExists(state.graphPath))) return;
-
-			const result = await exec("graphify", [...GRAPHIFY_UPDATE_ARGS], {
-				cwd: state.root,
-				timeout: 120_000,
-			});
-			if (resultCode(result) !== 0) {
+			const finalFingerprint = await captureRepositoryFingerprint(
+				exec,
+				state.root,
+			);
+			if (!finalFingerprint || finalFingerprint === state.initialFingerprint)
+				return;
+			if (
+				(await graphOutputState(state.root)) !== "directory" ||
+				!(await fileExists(state.graphPath)) ||
+				isPlan(ctx) ||
+				generation.signal.aborted
+			)
+				return;
+			// Metadata only: no graph rebuild, subprocess extraction, or queued turn.
+			await markGraphStale(state.root);
+		} catch (error) {
+			if (!isPlan(ctx) && !generation.signal.aborted)
 				notifyUpdateWarning(
 					ctx,
-					`Graphify update skipped: \`graphify update .\` failed (exit ${resultCode(result)}): ${result.stderr || result.stdout || "no diagnostic output"}`,
+					`Could not mark graph stale; the next query will verify its manifest: ${error instanceof Error ? error.message : String(error)}`,
 				);
-			}
-		} catch (error) {
-			notifyUpdateWarning(
-				ctx,
-				`Graphify update skipped: \`graphify update .\` is unavailable or not executable: ${error instanceof Error ? error.message : String(error)}`,
-			);
 		}
 	});
 
 	pi.on("session_shutdown", () => {
+		stopped = true;
+		lifecycle.abort();
+		unsubscribe();
 		runState = undefined;
 	});
 }
