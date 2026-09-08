@@ -277,7 +277,7 @@ format_usage() {
 	elif [[ "$provider" = "codex" && -n "$credit_remaining_percent" && -z "$primary_percent" && -z "$secondary_percent" && -z "$tertiary_percent" ]]; then
 		# Business accounts can report a credit limit rather than rolling usage windows.
 		# `remainingPercent` is already availability, unlike `usedPercent` above.
-		parts+=("$(format_percent "$credit_remaining_percent")/C")
+		parts+=("$(format_percent "$credit_remaining_percent")")
 	elif [[ "$provider" = "opencodego" ]]; then
 		if [[ -n "$primary_percent" ]]; then
 			parts+=("$(format_percent "$(remaining_percent "$primary_percent")")/$(reset_window_label "$primary_resets_at" "$primary_window" "P")")
