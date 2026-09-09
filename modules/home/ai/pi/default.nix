@@ -348,6 +348,7 @@ let
       plan_ready = "allow";
       "graphify_*" = "allow";
       "subagent_*" = "allow";
+      context_checkpoint = "allow";
 
       resolve-library-id = "allow";
       query-docs = "allow";
