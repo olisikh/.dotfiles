@@ -183,19 +183,41 @@ let
 
   finalModels = recursiveUpdate baseModels cfg.models;
 
+  subagentRoleNames = [
+    "delegate"
+    "oracle"
+    "researcher"
+    "reviewer"
+    "scout"
+    "worker"
+  ];
+
+  effectiveSubagentModelScope =
+    if cfg.subagentModelScope != [ ] then
+      cfg.subagentModelScope
+    else
+      lib.unique (
+        lib.filter (model: model != null) (map (role: cfg.subagentModels.${role}) subagentRoleNames)
+      );
+
+  renderSubagent =
+    role:
+    builtins.replaceStrings
+      [ "@MODEL@" ]
+      [
+        (lib.optionalString (cfg.subagentModels.${role} != null) "model: ${cfg.subagentModels.${role}}")
+      ]
+      (builtins.readFile (./agents + "/${role}.md.in"));
+
   basicConfig = {
     defaultProvider = "openai-codex";
     defaultModel = "gpt-5.6-luna";
     defaultThinkingLevel = "max";
 
-    # @tintinweb/pi-subagents validates its subagent model scope against Pi's
-    # enabledModels list. Keep the configured Codex catalog available to the
-    # parent and the migrated custom roles alike.
-    enabledModels = [
-      "openai-codex/gpt-5.6-sol-900k"
-      "openai-codex/gpt-5.6-terra-900k"
-      "openai-codex/gpt-5.6-luna-900k"
-    ];
+    # @tintinweb/pi-subagents validates subagent models against Pi's
+    # enabledModels list. Derive it from the per-system role mapping unless a
+    # host explicitly provides a broader runtime allowlist.
+    enabledModels = effectiveSubagentModelScope;
 
     smartCompact = {
       autoTrigger = true;
@@ -411,6 +433,29 @@ in
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
     models = mkOpt types.attrs { } "Pi models.json configuration, including built-in model overrides";
+    subagentModels = {
+      delegate =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+          "Model for the delegate role; null inherits the parent session model";
+      oracle =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+          "Model for the oracle role; null inherits the parent session model";
+      researcher =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+          "Model for the researcher role; null inherits the parent session model";
+      reviewer =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+          "Model for the reviewer role; null inherits the parent session model";
+      scout =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+          "Model for the scout role; null inherits the parent session model";
+      worker =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+          "Model for the worker role; null inherits the parent session model";
+    };
+    subagentModelScope =
+      mkOpt (types.listOf types.str) [ ]
+        "Exact Pi model IDs permitted for subagents; defaults to the configured role models";
     permissions =
       mkOpt types.attrs { }
         "Pi permission-system config merged into the module's base policy";
@@ -462,6 +507,15 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = lib.all (model: builtins.elem model effectiveSubagentModelScope) (
+          lib.filter (model: model != null) (map (role: cfg.subagentModels.${role}) subagentRoleNames)
+        );
+        message = "Every configured Pi subagent model must appear in ai.pi.subagentModelScope.";
+      }
+    ];
+
     home.packages = [
       pkgs.llm-agents.pi
       pkgs.rtk
@@ -491,12 +545,12 @@ in
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
 
       ".pi/agent/APPEND_SYSTEM.md".source = ./prompts/brain-policy.md;
-      ".pi/agent/agents/delegate.md".source = ./agents/delegate.md;
-      ".pi/agent/agents/oracle.md".source = ./agents/oracle.md;
-      ".pi/agent/agents/researcher.md".source = ./agents/researcher.md;
-      ".pi/agent/agents/reviewer.md".source = ./agents/reviewer.md;
-      ".pi/agent/agents/scout.md".source = ./agents/scout.md;
-      ".pi/agent/agents/worker.md".source = ./agents/worker.md;
+      ".pi/agent/agents/delegate.md".text = renderSubagent "delegate";
+      ".pi/agent/agents/oracle.md".text = renderSubagent "oracle";
+      ".pi/agent/agents/researcher.md".text = renderSubagent "researcher";
+      ".pi/agent/agents/reviewer.md".text = renderSubagent "reviewer";
+      ".pi/agent/agents/scout.md".text = renderSubagent "scout";
+      ".pi/agent/agents/worker.md".text = renderSubagent "worker";
       ".pi/agent/subagents.json".text = builtins.toJSON {
         backgroundByDefault = true;
         scopeModels = true;
