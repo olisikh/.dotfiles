@@ -80,7 +80,7 @@ sync_harness() {
     repo_root="$(cd "$repo_root" && pwd -P)"
 
     echo "==> $(basename "$repo_root") skills"
-    if ! (cd "$repo_root" && ./harness.py update-repo); then
+    if ! (cd "$repo_root" && ./harness.py update-skills --commit --push); then
         echo "Error: failed to update harness skills" >&2
         return 1
     fi
@@ -93,6 +93,7 @@ cmd_sync() {
     notes_remote="$(notes_repository)"
 
     if ! sync_repo "$HOME/.dotfiles" \
+        || ! sync_repo "$harness_repo" \
         || ! sync_harness "$harness_repo" \
         || ! ensure_repo "$notes_repo" "$notes_remote" \
         || ! sync_repo "$notes_repo"; then

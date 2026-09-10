@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  extraPlugins = with pkgs.vimPlugins; [ nvim-metals ];
+  extraPlugins = with pkgs.vimPlugins; [ nvim-metals scala-hints ];
 
   extraConfigLua = ''
     local metals = require("metals")

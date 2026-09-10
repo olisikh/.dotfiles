@@ -11,6 +11,7 @@ in
 {
   options.${namespace}.dev.jvm = {
     enable = mkBoolOpt false "Enable JVM toolchain (jdk, scala, kotlin, gradle, sbt, metals, bloop, maven)";
+
   };
 
   config = mkIf cfg.enable {

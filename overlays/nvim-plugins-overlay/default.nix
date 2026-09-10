@@ -17,6 +17,18 @@ final: prev: {
       );
     };
 
+    scala-hints = final.vimUtils.buildVimPlugin {
+      name = "scala-hints";
+      src = final.fetchFromGitHub {
+        owner = "olisikh";
+        repo = "scala-hints.nvim";
+        rev = "edc0e443b752d1b643fa0abd8b97a6aadb816749";
+        hash = "sha256-iszFu8c8DjJ3+y3i8jE2q5NVrKzXOAzWl+nascXJOVQ=";
+      };
+      doCheck = false;
+      dependencies = with final.vimPlugins; [ plenary-nvim nvim-treesitter nvim-metals ];
+    };
+
     "99" = final.vimUtils.buildVimPlugin {
       name = "99";
       src = final.fetchFromGitHub {
