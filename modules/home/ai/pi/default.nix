@@ -11,7 +11,6 @@ let
 
   cfg = config.${namespace}.ai.pi;
 
-
   # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
   # The companion extension turns these picker-only -900k IDs back into the
   # real GPT-5.6 IDs immediately before each OpenAI request.
@@ -189,34 +188,14 @@ let
     defaultModel = "gpt-5.6-luna";
     defaultThinkingLevel = "max";
 
-    subagents = {
-      defaultModel = "openai-codex/gpt-5.6-luna";
-      defaultThinking = "max";
-      modelScope = {
-        enforce = true;
-        allow = [ "openai-codex/gpt-5.6-luna" ];
-      };
-      agentOverrides = {
-        scout = {
-          thinking = "max";
-        };
-        researcher = {
-          thinking = "max";
-        };
-        worker = {
-          thinking = "max";
-        };
-        reviewer = {
-          thinking = "max";
-        };
-        oracle = {
-          thinking = "max";
-        };
-        delegate = {
-          thinking = "max";
-        };
-      };
-    };
+    # @tintinweb/pi-subagents validates its subagent model scope against Pi's
+    # enabledModels list. Keep the configured Codex catalog available to the
+    # parent and the migrated custom roles alike.
+    enabledModels = [
+      "openai-codex/gpt-5.6-sol-900k"
+      "openai-codex/gpt-5.6-terra-900k"
+      "openai-codex/gpt-5.6-luna-900k"
+    ];
 
     smartCompact = {
       autoTrigger = true;
@@ -258,7 +237,7 @@ let
       "npm:@quintinshaw/pi-dynamic-workflows"
       "npm:@gotgenes/pi-permission-system"
       "npm:pi-mcp-adapter"
-      "npm:pi-subagents"
+      "npm:@tintinweb/pi-subagents"
       "npm:pi-lens"
       "npm:pi-context"
       "npm:pi-rtk-optimizer"
@@ -512,6 +491,16 @@ in
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
 
       ".pi/agent/APPEND_SYSTEM.md".source = ./prompts/brain-policy.md;
+      ".pi/agent/agents/delegate.md".source = ./agents/delegate.md;
+      ".pi/agent/agents/oracle.md".source = ./agents/oracle.md;
+      ".pi/agent/agents/researcher.md".source = ./agents/researcher.md;
+      ".pi/agent/agents/reviewer.md".source = ./agents/reviewer.md;
+      ".pi/agent/agents/scout.md".source = ./agents/scout.md;
+      ".pi/agent/agents/worker.md".source = ./agents/worker.md;
+      ".pi/agent/subagents.json".text = builtins.toJSON {
+        backgroundByDefault = true;
+        scopeModels = true;
+      };
       ".pi/agent/modes/plan.md".source = ./prompts/plan-mode.md;
       ".pi/agent/modes/goal.md".source = ./prompts/goal-mode.md;
       ".pi/agent/graphify/session.md".source = ./prompts/graphify-session.md;
@@ -524,10 +513,6 @@ in
         lsp.enabled = true;
       };
       ".pi/agent/extensions/pi-permission-system/config.json".text = builtins.toJSON permissionConfig;
-      ".pi/agent/extensions/subagent/config.json".text = builtins.toJSON {
-        asyncByDefault = true;
-        defaultSubagentContext = "fresh";
-      };
 
       ".pi/agent/extensions/olisikh".source = ./extensions;
     };

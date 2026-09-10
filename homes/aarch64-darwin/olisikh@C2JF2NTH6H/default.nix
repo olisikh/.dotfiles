@@ -179,19 +179,6 @@ in
           defaultModel = "gpt-5.6-terra-900k";
           defaultProvider = "openai-codex";
           defaultThinkingLevel = "high";
-          subagents = {
-            modelScope.allow = [ "openai-codex/*" ];
-            agentOverrides = {
-              reviewer = {
-                model = "openai-codex/gpt-5.6-terra";
-                thinking = "medium";
-              };
-              oracle = {
-                model = "openai-codex/gpt-5.6-terra-900k";
-                thinking = "medium";
-              };
-            };
-          };
         };
 
         mcps = {
