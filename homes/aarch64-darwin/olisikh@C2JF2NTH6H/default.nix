@@ -12,6 +12,9 @@ in
     core = {
       user = {
         enable = true;
+
+        notesRepository = "git@github.corp.ebay.com:olisikh/notes.git";
+
         sessionVariables = {
           METALS_OPTS = lib.concatStringsSep " " [
             "-Djavax.net.ssl.trustStore=/opt/jdk17/lib/security/cacerts"

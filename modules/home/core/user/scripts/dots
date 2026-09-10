@@ -18,9 +18,35 @@ Commands:
   rb                    Roll back to a previous generation
   gc                    Run Nix garbage collection
   secrets               Edit the home sops secrets file
-  sync                  Pull latest main for ~/.dotfiles, ~/.llm-harness, ~/notes
+  sync                  Sync my repos (dotfiles, harness, notes)
   help                  Show this help
 EOF
+}
+
+notes_repository() {
+    printf '%s\n' @notesRepository@
+}
+
+ensure_repo() {
+    local repo_path="$1"
+    local remote_url="$2"
+    local configured_remote
+
+    if [[ -e "$repo_path" || -L "$repo_path" ]]; then
+        if ! configured_remote="$(git -C "$repo_path" remote get-url origin 2>/dev/null)"; then
+            echo "Error: $repo_path has no origin remote" >&2
+            return 1
+        fi
+        if [[ "$configured_remote" != "$remote_url" ]]; then
+            echo "Error: $repo_path origin is $configured_remote; expected $remote_url" >&2
+            return 1
+        fi
+        return 0
+    fi
+
+    echo "==> cloning $(basename "$repo_path")"
+    mkdir -p "$(dirname "$repo_path")"
+    git clone --recurse-submodules "$remote_url" "$repo_path"
 }
 
 sync_repo() {
@@ -43,21 +69,38 @@ sync_repo() {
     fi
 }
 
+sync_harness() {
+    local repo_path="$1"
+    local repo_root
+
+    if ! repo_root="$(git -C "$repo_path" rev-parse --show-toplevel 2>/dev/null)"; then
+        echo "Error: $repo_path is not inside a git repository" >&2
+        return 1
+    fi
+    repo_root="$(cd "$repo_root" && pwd -P)"
+
+    echo "==> $(basename "$repo_root") skills"
+    if ! (cd "$repo_root" && ./harness.py update-repo); then
+        echo "Error: failed to update harness skills" >&2
+        return 1
+    fi
+}
+
 cmd_sync() {
-    local repos=(
-        "$HOME/.dotfiles"
-        "$HOME/.llm-harness"
-        "$HOME/notes"
-    )
+    local harness_repo="$HOME/.llm-harness"
+    local notes_repo="$HOME/notes"
+    local notes_remote
+    notes_remote="$(notes_repository)"
 
-    for repo in "${repos[@]}"; do
-        if ! sync_repo "$repo"; then
-            echo "Sync cancelled." >&2
-            exit 1
-        fi
-    done
+    if ! sync_repo "$HOME/.dotfiles" \
+        || ! sync_harness "$harness_repo" \
+        || ! ensure_repo "$notes_repo" "$notes_remote" \
+        || ! sync_repo "$notes_repo"; then
+        echo "Sync cancelled." >&2
+        exit 1
+    fi
 
-    echo "All repositories synced."
+    echo "All repositories and harness skills synced."
 }
 
 main() {

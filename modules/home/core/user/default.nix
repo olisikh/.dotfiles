@@ -10,7 +10,8 @@ let
 
   scriptsDir = ./scripts;
   scripts = builtins.readDir scriptsDir;
-  excludedScripts = [ "lib.sh" ];
+  dotsScript = builtins.replaceStrings [ "@notesRepository@" ] [ (lib.escapeShellArg cfg.notesRepository) ] (builtins.readFile "${scriptsDir}/dots");
+  excludedScripts = [ "lib.sh" "dots" ];
   pathScripts = lib.filter
     (name: scripts.${name} == "regular" && !(builtins.elem name excludedScripts))
     (builtins.attrNames scripts);
@@ -22,6 +23,7 @@ in
     homeDirectory = mkOpt str defaultHomeDir "The user's home directory";
 
     sessionVariables = mkOpt types.attrs { } "Extra home-manager session variables for the user";
+    notesRepository = mkOpt str "git@github.com:olisikh/notes.git" "Git remote cloned by dots sync for ~/notes";
 
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
@@ -41,6 +43,10 @@ in
       sessionPath = [ "$HOME/.local/bin" ];
 
       file = {
+        ".local/bin/dots" = {
+          text = dotsScript;
+          executable = true;
+        };
         ".local/bin/lib.sh" = {
           source = "${scriptsDir}/lib.sh";
           executable = false;
