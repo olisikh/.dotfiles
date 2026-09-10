@@ -24,9 +24,9 @@ A skill is useful for teaching Hermes this policy, but a skill alone is not enfo
 - Hermes default profile: `gpt-5.6-luna-900k` via `openai-codex`.
 - Current Hermes delegation settings: `model=gpt-5.6-luna`, `provider=openai-codex`, `max_concurrent_children=2`, `max_spawn_depth=1`, `max_iterations=15`, `child_timeout_seconds=600`, `worktree_isolation` absent/false, `orchestrator_enabled=true`.
 - Pi: `0.84.4`, installed through `/etc/profiles/per-user/olisikh/bin/pi`.
-- Pi packages include `pi-subagents`, `pi-context`, `pi-lens`, `@gaodes/pi-graphify`, and other local extensions.
+- Pi packages include `@tintinweb/pi-subagents`, `pi-context`, `pi-lens`, `@gaodes/pi-graphify`, and other local extensions.
 - Pi's model catalog exposes `gpt-5.6-sol-900k`, `gpt-5.6-terra-900k`, and `gpt-5.6-luna-900k` at 900K context for `openai-codex`.
-- Pi's Nix configuration currently defaults to `gpt-5.6-luna` and enforces an allowlist containing only `openai-codex/gpt-5.6-luna` for subagents.
+- Pi's Nix configuration defaults to `gpt-5.6-luna`; `@tintinweb/pi-subagents` scopes custom roles to the configured `openai-codex` Sol, Terra, and Luna 900K models.
 - Herdr: `0.8.2`, protocol `20`, running as a persistent server at `/Users/olisikh/.config/herdr/herdr.sock`.
 - Herdr exposes workspace, tab, pane, agent, worktree, wait, event, and socket-API primitives. It officially recognizes both Pi and Hermes.
 - Herdr's native integrations are currently not installed for Pi or Hermes; current operation relies on process/screen detection rather than native lifecycle/session hooks.
@@ -67,7 +67,7 @@ Pi is a good executor because it has a small core and explicit integration surfa
 - extensions, skills, prompt templates, packages, and custom providers;
 - existing Graphify, context-management, lens, and subagent packages in this setup.
 
-The installed `pi-subagents` package is Pi-to-Pi orchestration. It is not a Hermes bridge. It does, however, provide useful patterns for roles, worktrees, async runs, receipts, and controlled fanout.
+The installed `@tintinweb/pi-subagents` package is Pi-to-Pi orchestration. It is not a Hermes bridge. It does, however, provide useful patterns for roles, worktrees, async runs, receipts, and controlled fanout.
 
 Pi's own docs explicitly describe it as intentionally minimal and recommend extensions/packages for subagents, workflows, and background execution. That makes Pi a good worker runtime but a poor place to put the global authority policy if Hermes is meant to remain the brain.
 
