@@ -105,6 +105,7 @@ const LUMIS_LANGUAGE_PROFILE = [
 	"javascript",
 	"kotlin",
 	"lua",
+	"luadoc",
 	"nix",
 	"php",
 	"python",
