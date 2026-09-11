@@ -177,7 +177,7 @@ let
   baseModels = {
     providers = {
       openai.models = gpt56OpenaiModels;
-      "openai-codex".models = gpt56CodexModels;
+      openai-codex.models = gpt56CodexModels;
     };
   };
 
