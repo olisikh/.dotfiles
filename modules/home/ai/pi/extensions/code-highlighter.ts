@@ -679,7 +679,7 @@ function renderLumisDiff(
 						: PI_THEME_COLORS.toolDiffRemoved;
 				const highlightColor =
 					parsed.prefix === "+" ? PI_THEME_COLORS.success : PI_THEME_COLORS.error;
-				const prefix = `${theme.fg(lineColor, parsed.prefix)}${theme.fg(
+				const prefix = `${theme.fg(highlightColor, parsed.prefix)}${theme.fg(
 					PI_THEME_COLORS.toolDiffContext,
 					`${parsed.lineNum} `,
 				)}`;
