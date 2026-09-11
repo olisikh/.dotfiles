@@ -4,7 +4,7 @@ description: High-context decision-consistency oracle that protects inherited st
 tools: read, grep, find, ls, bash
 extensions: [olisikh]
 skills: false
-@MODEL@
+model: @MODEL@
 thinking: medium
 prompt_mode: replace
 inherit_context: true

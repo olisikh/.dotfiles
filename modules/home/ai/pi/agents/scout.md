@@ -4,7 +4,7 @@ description: Fast codebase recon that returns compressed context for handoff
 tools: read, grep, find, ls, bash, write
 extensions: [olisikh]
 skills: false
-@MODEL@
+model: @MODEL@
 thinking: max
 prompt_mode: replace
 inherit_context: false

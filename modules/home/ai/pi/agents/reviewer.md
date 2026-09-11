@@ -4,7 +4,7 @@ description: Versatile review specialist for code diffs, plans, proposed solutio
 tools: read, grep, find, ls
 extensions: [olisikh]
 skills: false
-@MODEL@
+model: @MODEL@
 thinking: medium
 prompt_mode: replace
 inherit_context: false

@@ -205,9 +205,9 @@ let
     builtins.replaceStrings
       [ "@MODEL@" ]
       [
-        (lib.optionalString (cfg.subagentModels.${role} != null) "model: ${cfg.subagentModels.${role}}")
+        (lib.optionalString (cfg.subagentModels.${role} != null) "${cfg.subagentModels.${role}}")
       ]
-      (builtins.readFile (./agents + "/${role}.md.in"));
+      (builtins.readFile (./agents + "/${role}.md"));
 
   basicConfig = {
     defaultProvider = "openai-codex";
@@ -435,22 +435,22 @@ in
     models = mkOpt types.attrs { } "Pi models.json configuration, including built-in model overrides";
     subagentModels = {
       delegate =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
           "Model for the delegate role; null inherits the parent session model";
       oracle =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
           "Model for the oracle role; null inherits the parent session model";
       researcher =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
           "Model for the researcher role; null inherits the parent session model";
       reviewer =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
           "Model for the reviewer role; null inherits the parent session model";
       scout =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
           "Model for the scout role; null inherits the parent session model";
       worker =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna-900k"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
           "Model for the worker role; null inherits the parent session model";
     };
     subagentModelScope =

@@ -4,7 +4,7 @@ description: Implementation agent for normal tasks and approved oracle handoffs
 tools: read, grep, find, ls, bash, edit, write
 extensions: [olisikh]
 skills: false
-@MODEL@
+model: @MODEL@
 thinking: max
 prompt_mode: replace
 inherit_context: true

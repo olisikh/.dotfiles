@@ -121,21 +121,22 @@
 
     local ok, scala_hints = pcall(require, "scala-hints")
     if ok then
-    scala_hints.setup({
-      type_definition = {
-        timeouts_ms = { "800", "2000", "5000" },
-        max_inflight = 8,
-      },
-      actions = {
-        excluded_libs = {},
-      },
-      diagnostics = {
-        excluded_libs = {},
-      },
-      logging = {
-        level = "INFO",
-      },
-    })
+      scala_hints.setup({
+        workspace_diagnostics = { enabled = true },
+        type_definition = {
+          timeouts_ms = { "800", "2000", "5000" },
+          max_inflight = 8,
+        },
+        actions = {
+          excluded_libs = {},
+        },
+        diagnostics = {
+          excluded_libs = {},
+        },
+        logging = {
+          level = "INFO",
+        },
+      })
     end
   '';
 }

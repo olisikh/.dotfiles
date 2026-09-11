@@ -4,7 +4,7 @@ description: Lightweight subagent that inherits the parent model with no default
 tools: read, grep, find, ls, bash, edit, write
 extensions: [olisikh]
 skills: false
-@MODEL@
+model: @MODEL@
 thinking: max
 prompt_mode: append
 inherit_context: false

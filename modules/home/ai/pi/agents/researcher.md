@@ -4,7 +4,7 @@ description: Autonomous web researcher — searches, evaluates, and synthesizes 
 tools: read, write
 extensions: true
 skills: false
-@MODEL@
+model: @MODEL@
 thinking: max
 prompt_mode: replace
 inherit_context: false
