@@ -95,9 +95,22 @@ let
     compression = {
       enabled = true;
       threshold = 0.8;
-      provider = "ollama-cloud";
-      model = "nemotron-3-nano:30b";
+      provider = "openai-codex";
+      model = "gpt-5.6-luna";
       timeout = 120;
+    };
+
+    auxiliary.compression = {
+      provider = "openai-codex";
+      model = "gpt-5.6-luna";
+      timeout = 120;
+      fallback_chain = [
+        {
+          provider = "ollama-cloud";
+          model = "nemotron-3-nano:30b";
+          timeout = 120;
+        }
+      ];
     };
 
     prompt_caching = {
