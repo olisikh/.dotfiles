@@ -36,6 +36,19 @@ in
 
     homebrew.casks = [ "obsidian" ];
 
+    # nix-darwin does not remove a user LaunchAgent when its declaration is
+    # later removed with mkIf. Clean up the old backend job when disabled.
+    system.activationScripts.extraActivation.text = mkIf (!cfg.backend.enable) (lib.mkAfter ''
+      uid="$(id -u -- ${userCfg.username})"
+      agent="${userCfg.home}/Library/LaunchAgents/com.olisikh.obsidian.plist"
+
+      launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
+        launchctl bootout "gui/$uid/com.olisikh.obsidian" 2>/dev/null || true
+      launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
+        launchctl unload "$agent" 2>/dev/null || true
+      sudo --user=${userCfg.username} -- rm -f "$agent"
+    '');
+
     launchd.user.agents.obsidian = mkIf cfg.backend.enable {
       path = [ config.environment.systemPath ];
 

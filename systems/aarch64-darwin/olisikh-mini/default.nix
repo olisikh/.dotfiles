@@ -1,6 +1,6 @@
 { lib, namespace, pkgs, ... }:
 let
-  inherit (lib.${namespace}) enabled;
+  inherit (lib.${namespace}) enabled disabled;
 
   username = "olisikh";
   hostName = "olisikh-mini";
@@ -29,7 +29,7 @@ in
     apps = {
       macmon = enabled;
       jankyborders = enabled;
-      yabai = enabled;
+      yabai = disabled;
       skhd = enabled;
       handy = enabled;
       sketchybar = enabled;
@@ -42,7 +42,7 @@ in
       telegram = enabled;
       obsidian = {
         enable = true;
-        backend.enable = true;
+        backend.enable = false;
       };
     };
 

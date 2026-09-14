@@ -42,7 +42,7 @@ in
       telegram = enabled;
       obsidian = {
         enable = true;
-        backend.enable = true;
+        backend.enable = false;
       };
     };
 

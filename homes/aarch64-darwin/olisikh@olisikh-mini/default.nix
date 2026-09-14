@@ -166,6 +166,8 @@ in
       nixvim = {
         enable = true;
         plugins = {
+          # NOTE: Temporarily disable copilot since it can't build
+          copilot.enable = false;
           obsidian.vaults = [
             {
               name = "default";
