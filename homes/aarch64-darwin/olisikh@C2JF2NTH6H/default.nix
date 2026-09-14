@@ -179,8 +179,8 @@ in
         # stronger work-machine route; all other roles inherit the module's
         # cheaper Luna default. Other hosts can override any role the same way.
         subagentModels = {
-          oracle = "openai-codex/gpt-5.6-terra-900k";
-          reviewer = "openai-codex/gpt-5.6-terra-900k";
+          oracle = "openai-codex/gpt-5.6-terra";
+          reviewer = "openai-codex/gpt-5.6-terra";
         };
         config = {
           defaultModel = "gpt-5.6-terra-900k";
