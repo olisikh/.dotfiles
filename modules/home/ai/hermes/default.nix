@@ -12,7 +12,7 @@ let
 
   cfg = config.${namespace}.ai.hermes;
 
-  defaultPackage = inputs.llm-agents.packages.${pkgs.system}.hermes-agent;
+  defaultPackage = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-agent;
 
   localeDir = "${inputs.hermes-agent}/locales";
 
@@ -219,7 +219,7 @@ in
     # The upstream module creates this agent only when the gateway is enabled.
     # Add the catalog path to that generated plist without writing it to the
     # private .env file or changing the agent's label/command line.
-    (mkIf (pkgs.stdenv.isDarwin && cfg.gateway.enable) {
+    (mkIf (pkgs.stdenv.hostPlatform.isDarwin && cfg.gateway.enable) {
       launchd.agents.hermes-agent.config.EnvironmentVariables.HERMES_BUNDLED_LOCALES = localeDir;
     })
   ]);
