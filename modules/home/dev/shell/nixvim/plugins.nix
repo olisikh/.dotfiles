@@ -63,7 +63,10 @@
     friendly-snippets.enable = true;
     helm.enable = true;
     crates.enable = true;
-    fidget.enable = true;
+    fidget = {
+      enable = true;
+      settings.progress.ignore_empty_message = true;
+    };
     nvim-surround.enable = true;
     lazydev.enable = true;
   };
