@@ -1,6 +1,6 @@
 { lib, namespace, ... }:
 let
-  inherit (lib.${namespace}) enabled;
+  inherit (lib.${namespace}) enabled disabled;
 in
 {
   olisikh = {
@@ -26,8 +26,6 @@ in
       aws = enabled;
       terraform = enabled;
     };
-
-    browser.brave = enabled;
 
     apps = {
       wezterm = enabled;
@@ -167,7 +165,7 @@ in
         enable = true;
         plugins = {
           # NOTE: Temporarily disable copilot since it can't build
-          copilot.enable = false;
+          copilot = enabled;
           obsidian.vaults = [
             {
               name = "default";

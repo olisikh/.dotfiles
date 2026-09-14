@@ -95,10 +95,6 @@ in
       pulumi = enabled;
     };
 
-    browser = {
-      brave = enabled;
-    };
-
     apps = {
       wezterm = enabled;
       sketchybar = enabled;

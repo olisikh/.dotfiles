@@ -38,6 +38,7 @@ in
       codexbar = enabled;
       repobar = enabled;
       bitwarden = enabled;
+      brave = enabled;
       peekaboo = enabled;
       telegram = enabled;
       obsidian = {

@@ -105,8 +105,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "nvim-java";
         repo = "nvim-java";
-        rev = "9e8b842ea9eff3ebf25fb7360908ed4d4f87c56a";
-        hash = "sha256-IPeuAlXiBZhAHlac/e/2oPpSnptovZ7kxIuzF+AAeQs=";
+        rev = "db5536b4cb3da153084e50016596fd0e3a319aae";
+        hash = "sha256-nL0H1fTRcJ/C0/6y4HQM/Z8gGbEcrhSYrfW6Bogd6oY=";
       };
       dependencies = with final.vimPlugins; [
         nui-nvim
@@ -156,8 +156,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "mfussenegger";
         repo = "nvim-dap";
-        rev = "c9a0738e45f1bd41d792a126941348dce661cf9b";
-        hash = "sha256-VVHXHBKGmDnltHBMcVoBElaKMElXwJwB/7IZROQGCpg=";
+        rev = "cfa2d58f4537aca6ca83e2de1a0d9f1491121264";
+        hash = "sha256-9T6EL8mZ1rddDXBNvkh68jQSKK1bhi73IvyD6v464x8=";
       };
       doCheck = false;
     };
