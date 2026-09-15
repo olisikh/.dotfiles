@@ -553,6 +553,7 @@ in
       ".pi/agent/agents/worker.md".text = renderSubagent "worker";
       ".pi/agent/subagents.json".text = builtins.toJSON {
         backgroundByDefault = true;
+        reportUsage = true;
         scopeModels = true;
       };
       ".pi/agent/modes/plan.md".source = ./prompts/plan-mode.md;

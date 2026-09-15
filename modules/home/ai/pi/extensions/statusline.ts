@@ -71,11 +71,14 @@ function collectCostTotals(entries: BranchEntries): CostTotals {
 	let available = false;
 
 	for (const entry of entries) {
-		if (entry.type !== "message" || entry.message.role !== "assistant") {
+		if (
+			entry.type !== "message" ||
+			(entry.message.role !== "assistant" && entry.message.role !== "toolResult")
+		) {
 			continue;
 		}
 
-		const cost = Number(entry.message.usage.cost.total);
+		const cost = Number(entry.message.usage?.cost.total);
 		if (Number.isFinite(cost) && cost > 0) {
 			value += cost;
 			available = true;
@@ -163,17 +166,9 @@ export default function (pi: ExtensionAPI) {
 		requestRender = null;
 	});
 
-	pi.on("turn_end", (event: TurnEndEvent) => {
-		if (event.message.role !== "assistant") {
-			return;
-		}
-
-		const cost = Number(event.message.usage.cost.total);
-		if (Number.isFinite(cost) && cost > 0) {
-			costTotals.value += cost;
-			costTotals.available = true;
-		}
-	});
+	pi.on("turn_end", (_event: TurnEndEvent, ctx: ExtensionContext) =>
+		syncCostTotals(ctx),
+	);
 }
 
 function renderModeStatus(
