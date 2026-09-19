@@ -7,6 +7,38 @@
 Nix help:
 <https://github.com/agilesteel/.dotfiles/blob/master/nix/home-manager/home.nix>
 
+## Configuration profiles
+
+`dots build` uses the `default` profile unless another profile is selected. The
+profile is part of the generated flake configuration, so switching profiles is
+pure and does not change the machine hostname.
+
+```sh
+dots build                       # default profile
+dots build --profile default    # explicit default profile
+dots build --profile boring     # boring profile
+dots build -p boring             # short form
+dots build -p boring --skip-gc   # skip generation pruning
+```
+
+All systems currently provide the `default` profile. The Mac mini
+(`olisikh-mini`) also provides the paired `boring` system and home profiles:
+
+| System | `default` | `boring` |
+| --- | --- | --- |
+| `olisikh-mini` | yabai, skhd, jankyborders | skhd, jankyborders |
+
+The `boring` mini profile is the previous mini baseline: yabai is disabled while
+skhd and jankyborders remain enabled. Its activation explicitly boots out the
+stale `org.nixos.yabai` LaunchAgent and removes its plist during
+`postActivation`. Other systems reject
+`boring` rather than falling back to another configuration.
+
+Before rebuilding, `dots build` and `install.sh` print the selected profile plus
+the exact Darwin and Home Manager flake references they will use. Home Manager
+writes the active profile to `~/.config/dotfiles/.env`; later `dots build` calls
+use that managed state unless `-p`/`--profile` explicitly overrides it.
+
 ## Graphify in Pi
 
 `/graphify .` runs the installed Graphify skill through the current Pi agent.
