@@ -9,7 +9,7 @@ usage() {
 Usage: $(basename "$0") <command> [args...]
 
 Commands:
-  build, make           Build and switch this nix-darwin system (pass --skip-gc to skip generation pruning)
+  build, make           Build and switch this nix-darwin system (use -p/--profile PROFILE; pass --skip-gc to skip generation pruning)
   update                Update flake inputs and pinned source hashes
   upgrade               Update, then build and switch
   tpl                   Instantiate a template from this flake
@@ -20,6 +20,12 @@ Commands:
   secrets               Edit the home sops secrets file
   sync                  Sync my repos (dotfiles, harness, notes)
   help                  Show this help
+
+Profile examples:
+  $(basename "$0") build
+  $(basename "$0") build --profile default
+  $(basename "$0") build --profile boring
+  $(basename "$0") build -p boring
 EOF
 }
 

@@ -6,13 +6,14 @@ set -euo pipefail
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [system] [--skip-gc] [darwin-rebuild args...]
+Usage: $(basename "$0") [system] [-p|--profile PROFILE] [--skip-gc] [darwin-rebuild args...]
 
 Build and switch a nix-darwin system from this flake.
 
 Examples:
   $(basename "$0")
-  $(basename "$0") C2JF2NTH6H
+  $(basename "$0") --profile default
+  $(basename "$0") -p boring
   $(basename "$0") olisikh-mini --show-trace
   $(basename "$0") --skip-gc
 EOF
@@ -41,25 +42,110 @@ main() {
     check_command darwin-rebuild
 
     local system=""
+    local profile=""
+    local profile_source=""
     local skip_gc=false
+
     if [[ $# -gt 0 && "$1" != -* ]]; then
         system="$1"
         shift
-    else
-        system="$(default_system)"
     fi
 
     local -a rebuild_args=()
-    for arg in "$@"; do
-        if [[ "$arg" == "--skip-gc" ]]; then
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -p | --profile)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --profile requires a profile name." >&2
+                exit 1
+            fi
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Error: --profile requires a profile name." >&2
+                exit 1
+            fi
+            profile="$2"
+            profile_source="command line"
+            shift 2
+            ;;
+        --profile=*)
+            profile="${1#*=}"
+            profile_source="command line"
+            if [[ -z "$profile" ]]; then
+                echo "Error: --profile requires a profile name." >&2
+                exit 1
+            fi
+            shift
+            ;;
+        --skip-gc)
             skip_gc=true
-        else
-            rebuild_args+=("$arg")
-        fi
+            shift
+            ;;
+        --)
+            shift
+            rebuild_args+=("$@")
+            break
+            ;;
+        *)
+            rebuild_args+=("$1")
+            shift
+            ;;
+        esac
     done
 
+    if [[ -z "$profile" ]]; then
+        local profile_state="$HOME/.config/dotfiles/.env"
+        if [[ -r "$profile_state" ]]; then
+            profile="$(sed -n -E 's/^DOTFILES_PROFILE=([[:alnum:]_-]+)$/\1/p' "$profile_state")"
+            if [[ -z "$profile" ]]; then
+                echo "Error: invalid profile state in $profile_state." >&2
+                exit 1
+            fi
+            profile_source="$profile_state"
+        else
+            profile="default"
+            profile_source="default (no state file at $profile_state)"
+        fi
+    fi
+    export DOTFILES_PROFILE="$profile"
+
+    if [[ -z "$system" ]]; then
+        system="$(default_system)"
+    fi
+
+    if [[ -z "$system" ]]; then
+        echo "Error: could not determine the local system name." >&2
+        exit 1
+    fi
+
+    if [[ ! "$profile" =~ ^[[:alnum:]_-]+$ ]]; then
+        echo "Error: invalid profile name '$profile'." >&2
+        exit 1
+    fi
+
+    local flake_system="$system"
+    if [[ "$profile" != default ]]; then
+        flake_system="${system}-${profile}"
+    fi
+
+    local entrypoint="$NIX_DOTFILES_ROOT/systems/aarch64-darwin/$flake_system/default.nix"
+    if [[ ! -f "$entrypoint" ]]; then
+        echo "Error: profile '$profile' is not available for system '$system'." >&2
+        echo "Expected Snowfall entrypoint: $entrypoint" >&2
+        exit 1
+    fi
+
+    local username="${SUDO_USER:-${USER:-$(id -un)}}"
+    echo "==> Profile: $profile"
+    echo "==> Profile source: $profile_source"
+    echo "==> System reference: .#darwinConfigurations.$flake_system"
+    echo "==> Home reference: .#homeConfigurations.\"$username@$flake_system\""
+
     sudo "$NIX_DOTFILES_SCRIPT_DIR/nix-build-privileged" \
-        "$NIX_DOTFILES_ROOT" "$system" "$NIX_DOTFILES_SCRIPT_DIR" "$skip_gc" "${rebuild_args[@]}"
+        "$NIX_DOTFILES_ROOT" "$flake_system" "$NIX_DOTFILES_SCRIPT_DIR" "$skip_gc" "$profile" "${rebuild_args[@]}"
 }
 
 main "$@"

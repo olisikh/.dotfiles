@@ -6,12 +6,17 @@ dotfiles_root="$1"
 system="$2"
 script_dir="$3"
 skip_gc="$4"
-shift 4
+profile="$5"
+shift 5
 
 darwin-rebuild switch --flake "$dotfiles_root#$system" "$@"
 
 if [[ "$skip_gc" != true ]]; then
     "$script_dir/nix-prune-system-generations"
+fi
+
+if [[ "$profile" != default ]]; then
+    exit 0
 fi
 
 if ! command -v yabai >/dev/null 2>&1; then
