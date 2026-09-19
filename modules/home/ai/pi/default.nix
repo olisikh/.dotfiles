@@ -433,6 +433,14 @@ in
     enable = mkBoolOpt false "Enable pi terminal coding agent";
     config = mkOpt types.attrs { } "Pi settings attrset merged into the module's base config";
     models = mkOpt types.attrs { } "Pi models.json configuration, including built-in model overrides";
+    compaction = {
+      defaultModel =
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+          "First model Pi tries to use for manual and automatic compaction; null uses the session model";
+      fallbackModels =
+        mkOpt (types.listOf types.str) [ ]
+          "Ordered compaction-model fallbacks attempted before Pi uses the active session model";
+    };
     subagentModels = {
       delegate =
         mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
@@ -541,6 +549,9 @@ in
     home.file = {
       ".pi/agent/settings.json".text = builtins.toJSON finalConfig;
       ".pi/agent/models.json".text = builtins.toJSON finalModels;
+      ".pi/agent/compaction-models.json".text = builtins.toJSON {
+        inherit (cfg.compaction) defaultModel fallbackModels;
+      };
       ".pi/agent/auto-compact-settings.json".text = builtins.toJSON {
         autoCompactPercent = 80;
       };

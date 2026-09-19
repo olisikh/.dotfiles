@@ -182,6 +182,10 @@ in
           oracle = "openai-codex/gpt-5.6-terra";
           reviewer = "openai-codex/gpt-5.6-terra";
         };
+        compaction = {
+          defaultModel = "openai-codex/gpt-5.6-luna";
+          fallbackModels = [ "openai-codex/gpt-5.6-terra" ];
+        };
         config = {
           defaultModel = "gpt-5.6-terra-900k";
           defaultProvider = "openai-codex";

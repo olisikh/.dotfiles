@@ -17,7 +17,8 @@
       "./yolo-mode.ts",
       "./vim-editor.ts",
       "./modes.ts",
-      "./openai-context-variants.ts"
+      "./openai-context-variants.ts",
+      "./compaction-model-routing.ts"
     ]
   }
 }
