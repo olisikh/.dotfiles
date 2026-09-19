@@ -32,6 +32,7 @@ in
       yabai = enabled;
       skhd = enabled;
       handy = enabled;
+      instant-space-switcher = enabled;
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;

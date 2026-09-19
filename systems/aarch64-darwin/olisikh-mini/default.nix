@@ -14,11 +14,13 @@ let
     default = {
       apps = {
         yabai = enabled;
+        instant-space-switcher = enabled;
       };
     };
     boring = {
       apps = {
         yabai = disabled;
+        instant-space-switcher = disabled;
       };
     };
   };

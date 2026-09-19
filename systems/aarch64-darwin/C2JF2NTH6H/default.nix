@@ -32,6 +32,7 @@ in
       yabai = enabled;
       skhd = enabled;
       handy = enabled;
+      instant-space-switcher = enabled;
       xcodesapp = enabled;
       sketchybar = enabled;
       raycast = enabled;
