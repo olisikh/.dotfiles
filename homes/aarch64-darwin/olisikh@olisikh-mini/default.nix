@@ -1,185 +1,211 @@
-{ lib, namespace, ... }:
+{
+  lib,
+  namespace,
+  profile,
+  ...
+}:
 let
   inherit (lib.${namespace}) enabled disabled;
-in
-{
-  olisikh = {
-    core.user = enabled;
 
-    fonts = enabled;
-
-    dev = {
-      k8s = enabled;
-      kafka = enabled;
-      node = enabled;
-      jvm = enabled;
-      docker = enabled;
-      python = enabled;
-      git = enabled;
-
-      http = {
-        bruno = enabled;
-      };
-    };
-
-    cloud = {
-      aws = enabled;
-      terraform = enabled;
-    };
-
-    apps = {
-      wezterm = enabled;
-      sketchybar = enabled;
-      obsidian = enabled;
-    };
-
-    editor = {
-      vscode = enabled;
-      intellij-idea = {
-        enable = true;
-        plugins = [
-          "com.apollographql.ijplugin"
-          "com.anthropic.code.plugin"
-          "com.github.copilot"
-          "com.github.catppuccin.jetbrains"
-          "com.github.catppuccin.jetbrains_icons"
-          "nix-idea"
-          "org.intellij.scala"
-          "org.jetbrains.kotlin"
-          "org.intellij.plugins.hcl"
-          "Docker"
-          "IdeaVIM"
-          "Lombook Plugin"
-          "youngstead.relative-line-numbers"
+  # Profile-specific Home Manager overrides will live here when needed.
+  profiles = {
+    default = { };
+    boring = { };
+  };
+  base = {
+    # Both profiles intentionally share this closure today. Keep the profile
+    # assertion here so future mini-only Home Manager differences have an
+    # explicit, matched profile boundary.
+    assertions = [
+      {
+        assertion = builtins.elem profile [
+          "default"
+          "boring"
         ];
-      };
-    };
+        message = "Unsupported profile '${profile}' for olisikh-mini home configuration.";
+      }
+    ];
 
-    ai = {
-      whisper = enabled;
-      gemini = enabled;
-      copilot = enabled;
-      hermes = {
-        enable = true;
-        gateway.enable = true;
-      };
-      herdr = enabled;
-      opencode = enabled;
-      pi = enabled;
+    olisikh = {
+      core.user = enabled;
 
-    };
+      fonts = enabled;
 
-    security = {
-      crypto = enabled;
-      sops = {
-        enable = true;
-        secrets = {
-          elevenlabs = {
-            key = "ai/elevenlabs";
-            name = "ai/elevenlabs";
-          };
+      dev = {
+        k8s = enabled;
+        kafka = enabled;
+        node = enabled;
+        jvm = enabled;
+        docker = enabled;
+        python = enabled;
+        git = enabled;
 
-          telegramBotToken = {
-            key = "openclaw/telegramBotToken";
-            name = "openclaw/telegramBotToken";
-          };
-          openclawGatewayToken = {
-            key = "openclaw/gatewayToken";
-            name = "openclaw/gatewayToken";
-          };
-          openclawOpencode = {
-            key = "openclaw/opencode";
-            name = "openclaw/opencode";
-          };
-          openclawGemini = {
-            key = "openclaw/gemini";
-            name = "openclaw/gemini";
-          };
-          openclawOllama = {
-            key = "openclaw/ollama";
-            name = "openclaw/ollama";
-          };
-
-          hermesGithub = {
-            key = "hermes/github";
-            name = "hermes/github";
-          };
-          hermesGemini = {
-            key = "hermes/gemini";
-            name = "hermes/gemini";
-          };
-          hermesOpencode = {
-            key = "hermes/opencode";
-            name = "hermes/opencode";
-          };
-          hermesOllama = {
-            key = "hermes/ollama";
-            name = "hermes/ollama";
-          };
-
-          vikunjaDatabasePassword = {
-            key = "vikunja/database-password";
-            name = "vikunja/database-password";
-          };
-          vikunjaServiceSecret = {
-            key = "vikunja/service-secret";
-            name = "vikunja/service-secret";
-          };
-          vikunjaMcpApiToken = {
-            key = "vikunja/mcp-api-token";
-            name = "vikunja/mcp-api-token";
-          };
-          vikunjaHermesOwnerPassword = {
-            key = "vikunja/hermes-owner-password";
-            name = "vikunja/hermes-owner-password";
-          };
-          vikunjaHermesBotApiToken = {
-            key = "vikunja/hermes-bot-api-token";
-            name = "vikunja/hermes-bot-api-token";
-          };
-          vikunjaHermesWebhookSecret = {
-            key = "vikunja/hermes-webhook-secret";
-            name = "vikunja/hermes-webhook-secret";
-          };
-
-          tailscaleGolinkAuthKey = {
-            key = "tailscale/golinkAuthKey";
-            name = "tailscale/golink-auth-key";
-          };
+        http = {
+          bruno = enabled;
         };
       };
-    };
 
-    media.tools = enabled;
-    utils = enabled;
+      cloud = {
+        aws = enabled;
+        terraform = enabled;
+      };
 
-    dev.shell = {
-      zsh = enabled;
-      antidote = enabled;
-      direnv = enabled;
-      fzf = enabled;
-      ripgrep = enabled;
-      starship = enabled;
-      yazi = enabled;
-      nixvim = {
-        enable = true;
-        plugins = {
-          obsidian.vaults = [
-            {
-              name = "default";
-              path = "~/notes";
-            }
+      apps = {
+        wezterm = enabled;
+        sketchybar = enabled;
+        obsidian = enabled;
+      };
+
+      editor = {
+        vscode = enabled;
+        intellij-idea = {
+          enable = true;
+          plugins = [
+            "com.apollographql.ijplugin"
+            "com.anthropic.code.plugin"
+            "com.github.copilot"
+            "com.github.catppuccin.jetbrains"
+            "com.github.catppuccin.jetbrains_icons"
+            "nix-idea"
+            "org.intellij.scala"
+            "org.jetbrains.kotlin"
+            "org.intellij.plugins.hcl"
+            "Docker"
+            "IdeaVIM"
+            "Lombook Plugin"
+            "youngstead.relative-line-numbers"
           ];
         };
       };
-      fd = enabled;
-      eza = enabled;
-      jq = enabled;
-      yq = enabled;
-      just = enabled;
-      bat = enabled;
-      pay-respects = enabled;
-      zoxide = enabled;
+
+      ai = {
+        whisper = enabled;
+        gemini = enabled;
+        copilot = enabled;
+        hermes = {
+          enable = true;
+          gateway.enable = true;
+        };
+        herdr = enabled;
+        opencode = enabled;
+        pi = enabled;
+      };
+
+      security = {
+        crypto = enabled;
+        sops = {
+          enable = true;
+          secrets = {
+            elevenlabs = {
+              key = "ai/elevenlabs";
+              name = "ai/elevenlabs";
+            };
+
+            telegramBotToken = {
+              key = "openclaw/telegramBotToken";
+              name = "openclaw/telegramBotToken";
+            };
+            openclawGatewayToken = {
+              key = "openclaw/gatewayToken";
+              name = "openclaw/gatewayToken";
+            };
+            openclawOpencode = {
+              key = "openclaw/opencode";
+              name = "openclaw/opencode";
+            };
+            openclawGemini = {
+              key = "openclaw/gemini";
+              name = "openclaw/gemini";
+            };
+            openclawOllama = {
+              key = "openclaw/ollama";
+              name = "openclaw/ollama";
+            };
+
+            hermesGithub = {
+              key = "hermes/github";
+              name = "hermes/github";
+            };
+            hermesGemini = {
+              key = "hermes/gemini";
+              name = "hermes/gemini";
+            };
+            hermesOpencode = {
+              key = "hermes/opencode";
+              name = "hermes/opencode";
+            };
+            hermesOllama = {
+              key = "hermes/ollama";
+              name = "hermes/ollama";
+            };
+
+            vikunjaDatabasePassword = {
+              key = "vikunja/database-password";
+              name = "vikunja/database-password";
+            };
+            vikunjaServiceSecret = {
+              key = "vikunja/service-secret";
+              name = "vikunja/service-secret";
+            };
+            vikunjaMcpApiToken = {
+              key = "vikunja/mcp-api-token";
+              name = "vikunja/mcp-api-token";
+            };
+            vikunjaHermesOwnerPassword = {
+              key = "vikunja/hermes-owner-password";
+              name = "vikunja/hermes-owner-password";
+            };
+            vikunjaHermesBotApiToken = {
+              key = "vikunja/hermes-bot-api-token";
+              name = "vikunja/hermes-bot-api-token";
+            };
+            vikunjaHermesWebhookSecret = {
+              key = "vikunja/hermes-webhook-secret";
+              name = "vikunja/hermes-webhook-secret";
+            };
+
+            tailscaleGolinkAuthKey = {
+              key = "tailscale/golinkAuthKey";
+              name = "tailscale/golink-auth-key";
+            };
+          };
+        };
+      };
+
+      media.tools = enabled;
+      utils = enabled;
+
+      dev.shell = {
+        zsh = enabled;
+        antidote = enabled;
+        direnv = enabled;
+        fzf = enabled;
+        ripgrep = enabled;
+        starship = enabled;
+        yazi = enabled;
+        nixvim = {
+          enable = true;
+          plugins = {
+            obsidian.vaults = [
+              {
+                name = "default";
+                path = "~/notes";
+              }
+            ];
+          };
+        };
+        fd = enabled;
+        eza = enabled;
+        jq = enabled;
+        yq = enabled;
+        just = enabled;
+        bat = enabled;
+        pay-respects = enabled;
+        zoxide = enabled;
+      };
     };
   };
+in
+lib.recursiveUpdate base {
+  olisikh = profiles.${profile};
 }
