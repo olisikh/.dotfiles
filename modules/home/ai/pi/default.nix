@@ -483,6 +483,8 @@ in
       # pi-vim owns the prompt; Ctrl+D/U scroll the session transcript a
       # half-page (vim-style) instead of exiting pi or deleting a line.
       # Requires tuiMode = "fullscreen" (tui.altScreen.* target the viewport).
+      # Ctrl+L is reserved by WezTerm for moving to the right pane.
+      "app.model.select" = [ "ctrl+alt+l" ];
       "app.exit" = [ ];
       "tui.editor.deleteCharForward" = [ "delete" ];
       "tui.editor.deleteToLineStart" = [ ];
