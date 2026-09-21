@@ -58,7 +58,8 @@
         custom_highlights = lib.nixvim.mkRaw ''
           function(colors)
             return {
-              WinSeparator = { fg = colors.overlay0 } -- make window borders more visible
+              WinSeparator = { fg = colors.overlay0 }, -- make window borders more visible
+              FidgetNormal = { fg = colors.text, bg = colors.crust },
             }
           end
         '';

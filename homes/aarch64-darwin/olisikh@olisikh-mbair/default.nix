@@ -77,7 +77,6 @@ in
         yq = enabled;
         just = enabled;
         bat = enabled;
-        pay-respects = enabled;
         zoxide = enabled;
       };
       http = {

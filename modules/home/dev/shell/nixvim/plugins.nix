@@ -65,7 +65,15 @@
     crates.enable = true;
     fidget = {
       enable = true;
-      settings.progress.ignore_empty_message = true;
+      settings = {
+        progress.ignore_empty_message = true;
+        # NOTE: in case if I want a black bordered fidget experience, but that would overlap with the code in the buffer
+        # notification.window = {
+        #   winblend = 0;
+        #   normal_hl = "FidgetNormal";
+        #   border = "rounded";
+        # };
+      };
     };
     nvim-surround.enable = true;
     lazydev.enable = true;

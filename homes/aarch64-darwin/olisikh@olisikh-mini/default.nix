@@ -77,6 +77,7 @@ let
           ];
         };
       };
+<<<<<<< HEAD
 
       ai = {
         whisper = enabled;
@@ -203,6 +204,15 @@ let
         pay-respects = enabled;
         zoxide = enabled;
       };
+=======
+      fd = enabled;
+      eza = enabled;
+      jq = enabled;
+      yq = enabled;
+      just = enabled;
+      bat = enabled;
+      zoxide = enabled;
+>>>>>>> 5078a7b (chore(apps): remove pay-respects)
     };
   };
 in
