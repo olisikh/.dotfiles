@@ -38,6 +38,8 @@ let
         jvm = enabled;
         docker = enabled;
         python = enabled;
+        rust = enabled;
+        go = enabled;
         git = enabled;
 
         http = {
@@ -77,7 +79,6 @@ let
           ];
         };
       };
-<<<<<<< HEAD
 
       ai = {
         whisper = enabled;
@@ -201,18 +202,8 @@ let
         yq = enabled;
         just = enabled;
         bat = enabled;
-        pay-respects = enabled;
         zoxide = enabled;
       };
-=======
-      fd = enabled;
-      eza = enabled;
-      jq = enabled;
-      yq = enabled;
-      just = enabled;
-      bat = enabled;
-      zoxide = enabled;
->>>>>>> 5078a7b (chore(apps): remove pay-respects)
     };
   };
 in

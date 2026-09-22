@@ -24,6 +24,8 @@ in
       jvm = enabled;
       docker = enabled;
       python = enabled;
+      rust = enabled;
+      go = enabled;
       git = enabled;
       shell = {
         zsh = enabled;

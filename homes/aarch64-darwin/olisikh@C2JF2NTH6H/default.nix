@@ -51,6 +51,8 @@ in
       node = enabled;
       jvm = enabled;
       python = enabled;
+      rust = enabled;
+      go = enabled;
       git = enabled;
       kafka = enabled;
       shell = {
