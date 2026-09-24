@@ -19,7 +19,7 @@ in
 
       # Formatting and code generation
       gofumpt
-      (lib.lowPrio gotools)
+      (lib.lowPrio gotools) # low priority to avoid collision with `stress` package
       gomodifytags
       impl
       gotests

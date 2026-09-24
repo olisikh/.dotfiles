@@ -1,6 +1,6 @@
 { lib, namespace, ... }:
 let
-  inherit (lib.${namespace}) enabled;
+  inherit (lib.${namespace}) enabled disabled;
 
   username = "olisikh";
 in
@@ -64,7 +64,7 @@ in
       ollama = enabled;
       cursor = enabled;
       codex = enabled;
-      chatgpt = enabled;
+      chatgpt = disabled;
     };
   };
 

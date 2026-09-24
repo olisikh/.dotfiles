@@ -48,6 +48,7 @@ in
     fonts = enabled;
 
     dev = {
+      k8s = enabled;
       node = enabled;
       jvm = enabled;
       python = enabled;
