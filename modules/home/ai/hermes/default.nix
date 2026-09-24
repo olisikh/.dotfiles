@@ -22,7 +22,9 @@ let
 
   publicSettings = {
     model = {
-      default = "gpt-5.6-luna-900k";
+      # Hermes does not yet recognize GPT-6 Sol/Luna `-900k` aliases;
+      # use the provider's real model ID until upstream adds wire stripping.
+      default = "gpt-6-luna";
       provider = "openai-codex";
     };
 
@@ -58,7 +60,7 @@ let
       image_input_mode = "auto";
       disabled_toolsets = [ ];
       reasoning_overrides = {
-        "gpt-5.6-luna" = "max";
+        "gpt-6-luna" = "max";
         "deepseek-v4-flash:0731" = "max";
       };
       reasoning_effort = "max";
@@ -96,13 +98,13 @@ let
       enabled = true;
       threshold = 0.8;
       provider = "openai-codex";
-      model = "gpt-5.6-luna";
+      model = "gpt-6-luna";
       timeout = 120;
     };
 
     auxiliary.compression = {
       provider = "openai-codex";
-      model = "gpt-5.6-luna";
+      model = "gpt-6-luna";
       timeout = 120;
       fallback_chain = [
         {
@@ -133,7 +135,7 @@ let
     };
 
     delegation = {
-      model = "gpt-5.6-luna";
+      model = "gpt-6-luna";
       provider = "openai-codex";
       inherit_mcp_toolsets = true;
       max_iterations = 15;

@@ -1,5 +1,8 @@
 # Hermes + Pi + Herdr orchestration study
 
+> [!NOTE]
+> This is a historical baseline from before the 2026-09-24 GPT-6 migration. The current declarative configuration uses GPT-6 Luna for routine Hermes/Pi work and GPT-6 Sol for stronger Pi roles. Pi provides local `-900k` picker aliases for Sol and Luna; the pinned Hermes release does not yet recognize those aliases and therefore uses the base GPT-6 Luna ID.
+
 ## Executive conclusion
 
 Use Hermes as the reasoning, planning, arbitration, and acceptance authority. Use Pi as a coding executor. Use Herdr as the persistent process/terminal runtime and operational visibility layer. Use Hermes Kanban as the durable task graph, lifecycle, handoff, and audit layer.
@@ -280,30 +283,30 @@ The clean target is a `pi` worker-lane plugin that supplies the external spawn a
 
 ### Hermes
 
-- Delegation: https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation
-- Delegation patterns: https://hermes-agent.nousresearch.com/docs/guides/delegation-patterns
-- Kanban: https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban
-- Kanban worker lanes: https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban-worker-lanes
-- Plugins: https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins
-- Plugin development: https://hermes-agent.nousresearch.com/docs/developer-guide/plugins
-- Toolsets: https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference
+- Delegation: <https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation>
+- Delegation patterns: <https://hermes-agent.nousresearch.com/docs/guides/delegation-patterns>
+- Kanban: <https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban>
+- Kanban worker lanes: <https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban-worker-lanes>
+- Plugins: <https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins>
+- Plugin development: <https://hermes-agent.nousresearch.com/docs/developer-guide/plugins>
+- Toolsets: <https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference>
 
 ### Pi
 
-- Usage: https://pi.dev/docs/latest/usage
-- JSON mode: https://pi.dev/docs/latest/json
-- RPC mode: https://pi.dev/docs/latest/rpc
-- SDK: https://pi.dev/docs/latest/sdk
-- Extensions: https://pi.dev/docs/latest/extensions
-- Skills: https://pi.dev/docs/latest/skills
+- Usage: <https://pi.dev/docs/latest/usage>
+- JSON mode: <https://pi.dev/docs/latest/json>
+- RPC mode: <https://pi.dev/docs/latest/rpc>
+- SDK: <https://pi.dev/docs/latest/sdk>
+- Extensions: <https://pi.dev/docs/latest/extensions>
+- Skills: <https://pi.dev/docs/latest/skills>
 
 ### Herdr
 
-- Documentation index: https://herdr.dev/llms.txt
-- Agent automation: https://raw.githubusercontent.com/herdrdev/herdr/v0.8.2/docs/next/website/src/content/docs/agent-automation.mdx
-- Integrations: https://herdr.dev/docs/integrations
-- Socket API: https://herdr.dev/docs/socket-api
-- CLI reference: https://raw.githubusercontent.com/herdrdev/herdr/v0.8.2/docs/next/website/src/content/docs/cli-reference.mdx
+- Documentation index: <https://herdr.dev/llms.txt>
+- Agent automation: <https://raw.githubusercontent.com/herdrdev/herdr/v0.8.2/docs/next/website/src/content/docs/agent-automation.mdx>
+- Integrations: <https://herdr.dev/docs/integrations>
+- Socket API: <https://herdr.dev/docs/socket-api>
+- CLI reference: <https://raw.githubusercontent.com/herdrdev/herdr/v0.8.2/docs/next/website/src/content/docs/cli-reference.mdx>
 
 ### Local evidence
 

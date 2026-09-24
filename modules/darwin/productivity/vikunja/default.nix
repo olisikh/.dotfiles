@@ -272,7 +272,7 @@ in
 
       hermesModel = mkOption {
         type = types.str;
-        default = "gpt-5.6-terra";
+        default = "gpt-6-sol";
         description = "Default model for bot turns; model aliases in comments are intentionally unsupported for now.";
       };
     };

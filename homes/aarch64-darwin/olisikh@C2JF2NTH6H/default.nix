@@ -181,15 +181,15 @@ in
         # stronger work-machine route; all other roles inherit the module's
         # cheaper Luna default. Other hosts can override any role the same way.
         subagentModels = {
-          oracle = "openai-codex/gpt-5.6-terra";
-          reviewer = "openai-codex/gpt-5.6-terra";
+          oracle = "openai-codex/gpt-6-sol";
+          reviewer = "openai-codex/gpt-6-sol";
         };
         compaction = {
-          defaultModel = "openai-codex/gpt-5.6-luna";
-          fallbackModels = [ "openai-codex/gpt-5.6-terra" ];
+          defaultModel = "openai-codex/gpt-6-luna";
+          fallbackModels = [ "openai-codex/gpt-6-sol" ];
         };
         config = {
-          defaultModel = "gpt-5.6-terra-900k";
+          defaultModel = "gpt-6-sol-900k";
           defaultProvider = "openai-codex";
           defaultThinkingLevel = "high";
         };

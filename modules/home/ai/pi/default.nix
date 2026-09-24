@@ -13,47 +13,14 @@ let
 
   # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
   # The companion extension turns these picker-only -900k IDs back into the
-  # real GPT-5.6 IDs immediately before each OpenAI request.
-  gpt56OpenaiModels = [
+  # real GPT-6 IDs immediately before each OpenAI request.
+  gpt6OpenaiModels = [
     {
-      id = "gpt-5.6-sol-900k";
-      name = "GPT-5.6 Sol (900k)";
+      id = "gpt-6-sol-900k";
+      name = "GPT-6 Sol (900k)";
       api = "openai-responses";
       reasoning = true;
-      # GPT-5.6 exposes `max` for the provider's highest effort. Keep Pi's
-      # `xhigh` option available by mapping it to that provider value.
-      thinkingLevelMap = {
-        max = "max";
-        xhigh = "max";
-      };
-      input = [
-        "text"
-        "image"
-      ];
-      contextWindow = 900000;
-      maxTokens = 128000;
-      cost = {
-        input = 4;
-        output = 20;
-        cacheRead = 0.4;
-        cacheWrite = 5;
-        tiers = [
-          {
-            inputTokensAbove = 272000;
-            input = 8;
-            output = 30;
-            cacheRead = 0.8;
-            cacheWrite = 10;
-          }
-        ];
-      };
-    }
-    {
-      id = "gpt-5.6-terra-900k";
-      name = "GPT-5.6 Terra (900k)";
-      api = "openai-responses";
-      reasoning = true;
-      # GPT-5.6 exposes `max` for the provider's highest effort. Keep Pi's
+      # GPT-6 exposes `max` for the provider's highest effort. Keep Pi's
       # `xhigh` option available by mapping it to that provider value.
       thinkingLevelMap = {
         max = "max";
@@ -67,14 +34,14 @@ let
       maxTokens = 128000;
       cost = {
         input = 2;
-        output = 12;
+        output = 10;
         cacheRead = 0.2;
         cacheWrite = 2.5;
         tiers = [
           {
             inputTokensAbove = 272000;
             input = 4;
-            output = 18;
+            output = 15;
             cacheRead = 0.4;
             cacheWrite = 5;
           }
@@ -82,11 +49,11 @@ let
       };
     }
     {
-      id = "gpt-5.6-luna-900k";
-      name = "GPT-5.6 Luna (900k)";
+      id = "gpt-6-luna-900k";
+      name = "GPT-6 Luna (900k)";
       api = "openai-responses";
       reasoning = true;
-      # GPT-5.6 exposes `max` for the provider's highest effort. Keep Pi's
+      # GPT-6 exposes `max` for the provider's highest effort. Keep Pi's
       # `xhigh` option available by mapping it to that provider value.
       thinkingLevelMap = {
         max = "max";
@@ -99,85 +66,70 @@ let
       contextWindow = 900000;
       maxTokens = 128000;
       cost = {
-        input = 0.2;
-        output = 1.2;
-        cacheRead = 0.02;
-        cacheWrite = 0.25;
+        input = 0.1;
+        output = 0.5;
+        cacheRead = 0.01;
+        cacheWrite = 0.125;
         tiers = [
           {
             inputTokensAbove = 272000;
-            input = 0.4;
-            output = 1.8;
-            cacheRead = 0.04;
-            cacheWrite = 0.5;
+            input = 0.2;
+            output = 0.75;
+            cacheRead = 0.02;
+            cacheWrite = 0.25;
           }
         ];
       };
     }
   ];
 
-  # The Codex catalog uses a separate subscription price card.
-  codexGpt56Costs = {
-    "gpt-5.6-sol-900k" = {
-      input = 5;
-      output = 30;
-      cacheRead = 0.5;
-      cacheWrite = 6.25;
-      tiers = [
-        {
-          inputTokensAbove = 272000;
-          input = 10;
-          output = 45;
-          cacheRead = 1;
-          cacheWrite = 12.5;
-        }
-      ];
-    };
-    "gpt-5.6-terra-900k" = {
+  # Keep Codex model metadata aligned with Pi's provider catalog.
+  codexGpt6Costs = {
+    "gpt-6-sol-900k" = {
       input = 2;
-      output = 12;
+      output = 10;
       cacheRead = 0.2;
       cacheWrite = 2.5;
       tiers = [
         {
           inputTokensAbove = 272000;
           input = 4;
-          output = 18;
+          output = 15;
           cacheRead = 0.4;
           cacheWrite = 5;
         }
       ];
     };
-    "gpt-5.6-luna-900k" = {
-      input = 0.2;
-      output = 1.2;
-      cacheRead = 0.02;
-      cacheWrite = 0.25;
+    "gpt-6-luna-900k" = {
+      input = 0.1;
+      output = 0.5;
+      cacheRead = 0.01;
+      cacheWrite = 0.125;
       tiers = [
         {
           inputTokensAbove = 272000;
-          input = 0.4;
-          output = 1.8;
-          cacheRead = 0.04;
-          cacheWrite = 0.5;
+          input = 0.2;
+          output = 0.75;
+          cacheRead = 0.02;
+          cacheWrite = 0.25;
         }
       ];
     };
   };
 
-  gpt56CodexModels = map (
+  gpt6CodexModels = map (
     model:
     model
     // {
       api = "openai-codex-responses";
-      cost = builtins.getAttr model.id codexGpt56Costs;
+      cost = builtins.getAttr model.id codexGpt6Costs;
     }
-  ) gpt56OpenaiModels;
+  ) gpt6OpenaiModels;
 
   baseModels = {
     providers = {
-      openai.models = gpt56OpenaiModels;
-      openai-codex.models = gpt56CodexModels;
+      openai.models = gpt6OpenaiModels;
+      openai-codex.models = gpt6CodexModels;
     };
   };
 
@@ -211,7 +163,7 @@ let
 
   basicConfig = {
     defaultProvider = "openai-codex";
-    defaultModel = "gpt-5.6-luna";
+    defaultModel = "gpt-6-luna";
     defaultThinkingLevel = "max";
 
     # @tintinweb/pi-subagents validates subagent models against Pi's
@@ -435,7 +387,7 @@ in
     models = mkOpt types.attrs { } "Pi models.json configuration, including built-in model overrides";
     compaction = {
       defaultModel =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "First model Pi tries to use for manual and automatic compaction; null uses the session model";
       fallbackModels =
         mkOpt (types.listOf types.str) [ ]
@@ -443,22 +395,22 @@ in
     };
     subagentModels = {
       delegate =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "Model for the delegate role; null inherits the parent session model";
       oracle =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "Model for the oracle role; null inherits the parent session model";
       researcher =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "Model for the researcher role; null inherits the parent session model";
       reviewer =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "Model for the reviewer role; null inherits the parent session model";
       scout =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "Model for the scout role; null inherits the parent session model";
       worker =
-        mkOpt (types.nullOr types.str) "openai-codex/gpt-5.6-luna"
+        mkOpt (types.nullOr types.str) "openai-codex/gpt-6-luna"
           "Model for the worker role; null inherits the parent session model";
     };
     subagentModelScope =

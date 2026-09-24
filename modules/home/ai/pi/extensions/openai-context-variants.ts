@@ -14,7 +14,7 @@ type ProviderRequestContext = {
 
 const CONTEXT_VARIANT_SUFFIX = "-900k";
 const SUPPORTED_PROVIDERS = new Set(["openai", "openai-codex"]);
-const GPT56_MODELS = new Set(["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"]);
+const GPT6_MODELS = new Set(["gpt-6-sol", "gpt-6-luna"]);
 
 export default function openaiContextVariants(pi: ExtensionAPI): void {
   pi.on(
@@ -25,7 +25,7 @@ export default function openaiContextVariants(pi: ExtensionAPI): void {
       if (!model.id.endsWith(CONTEXT_VARIANT_SUFFIX)) return;
 
       const baseModel = model.id.slice(0, -CONTEXT_VARIANT_SUFFIX.length);
-      if (!GPT56_MODELS.has(baseModel)) return;
+      if (!GPT6_MODELS.has(baseModel)) return;
 
       return { ...event.payload, model: baseModel };
     },

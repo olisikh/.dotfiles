@@ -26,7 +26,7 @@
     end
 
     function OpenCodeProvider._get_default_model()
-      return "openai/gpt-5.6-luna"
+      return "openai/gpt-6-luna"
     end
 
     function OpenCodeProvider.fetch_models(callback)
@@ -49,7 +49,7 @@
 
     _99.setup({
       provider = OpenCodeProvider,
-      model = "openai/gpt-5.6-luna",
+      model = "openai/gpt-6-luna",
       logger = {
             level = _99.DEBUG,
             path = "/tmp/" .. basename .. ".99.debug",
