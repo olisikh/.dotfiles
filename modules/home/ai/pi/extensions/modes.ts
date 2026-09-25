@@ -1,5 +1,6 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, realpathSync } from "node:fs";
+import { homedir } from "node:os";
+import { join, resolve, sep } from "node:path";
 import {
   getAgentDir,
   type ExtensionAPI,
@@ -42,8 +43,11 @@ type GoalState = {
 
 type PlanState = {
   objective: string;
+  instructions?: string;
   content?: string;
   feedback?: string;
+  revisionAuthorized?: boolean;
+  reminded?: boolean;
 };
 
 type ModeState = {
@@ -62,7 +66,7 @@ export default function modes(pi: ExtensionAPI) {
 
   const restrictPlanTools = () => {
     const activeTools = pi.getActiveTools();
-    planToolBaseline ??= activeTools;
+    planToolBaseline ??= activeTools.filter((tool) => tool !== "plan_ready");
     const permitted = activeTools.filter((tool) =>
       PLAN_READ_ONLY_TOOLS.has(tool),
     );
@@ -73,6 +77,16 @@ export default function modes(pi: ExtensionAPI) {
     if (!planToolBaseline) return;
     pi.setActiveTools(planToolBaseline);
     planToolBaseline = undefined;
+  };
+  const syncPlanReadyTool = () => {
+    const activeTools = pi.getActiveTools();
+    const planIsActive = state.mode === "plan" && state.plan !== undefined;
+    if (activeTools.includes("plan_ready") === planIsActive) return;
+    pi.setActiveTools(
+      planIsActive
+        ? [...activeTools, "plan_ready"]
+        : activeTools.filter((tool) => tool !== "plan_ready"),
+    );
   };
   const syncGoalCompleteTool = () => {
     const activeTools = pi.getActiveTools();
@@ -119,6 +133,7 @@ export default function modes(pi: ExtensionAPI) {
     if (previousMode !== "plan" && next.mode === "plan") restrictPlanTools();
     if (previousMode === "plan" && next.mode !== "plan") restorePlanTools();
     state = next;
+    syncPlanReadyTool();
     syncGoalCompleteTool();
     persist();
     if (previousMode !== "build" && previousMode !== next.mode) {
@@ -136,6 +151,7 @@ export default function modes(pi: ExtensionAPI) {
     state = restoreState(ctx) ?? initialState();
     syncGoalCompleteTool();
     if (state.mode === "plan") restrictPlanTools();
+    syncPlanReadyTool();
     refresh();
   });
 
@@ -154,15 +170,58 @@ export default function modes(pi: ExtensionAPI) {
     }
     if (state.mode === "plan" && state.plan) {
       const feedback = state.plan.feedback
-        ? `\nLatest user feedback:\n${state.plan.feedback}\nUse plan_ready with implement: true only when you are 100% certain this feedback explicitly authorizes implementation after revision. If there is any ambiguity, revise the plan and call plan_ready without implement so the user receives the two choices again.`
+        ? `\nLatest user feedback:\n${state.plan.feedback}\nRevise the plan and submit it with plan_ready. The extension handles any user authorization to implement.`
         : "";
       return {
-        systemPrompt: `${event.systemPrompt}\n\n<plan_mode>\nObjective: ${state.plan.objective}\nYou are in read-only planning mode. Explore and ask questions when needed. Before calling plan_ready, present the complete implementation plan in ordinary assistant Markdown so the user can read it before any approval UI appears; never use plan_ready in a tool-only response. Then call plan_ready with that same concrete plan. Do not attempt file changes or shell commands.${feedback}\n</plan_mode>`,
+        systemPrompt: `${event.systemPrompt}\n\n<plan_mode>\nObjective: ${state.plan.objective}\n${state.plan.instructions ?? "Plan this objective without modifying files. Present the complete plan in ordinary assistant Markdown, then call plan_ready with the same plan."}\nBefore calling plan_ready, present the complete implementation plan in ordinary assistant Markdown so the user can read it before any approval UI appears. Never use plan_ready in a tool-only response. Do not attempt file changes or shell commands.${feedback}\n</plan_mode>`,
       };
     }
   });
 
-  pi.on("tool_call", (event) => {
+  // Old sessions included instructions in the kickoff user message. Custom
+  // state is not model context; only the legacy message needs filtering.
+  pi.on("context", (event) => {
+    if (state.mode === "plan") return;
+    return {
+      messages: event.messages.map((message) => {
+        if (message.role !== "user") return message;
+        const strip = (text: string) =>
+          text.startsWith("Plan this work without modifying files: ")
+            ? text.replace(/\n\n<personal_plan_instructions>\n[\s\S]*?\n<\/personal_plan_instructions>/, "")
+            : text;
+        return {
+          ...message,
+          content: typeof message.content === "string"
+            ? strip(message.content)
+            : message.content.map((part: { type: string; text?: string }) =>
+                part.type === "text" ? { ...part, text: strip(part.text ?? "") } : part,
+              ),
+        };
+      }),
+    };
+  });
+
+  pi.on("tool_call", (event, ctx) => {
+    if (isProtectedPromptRequest(event.toolName, event.input, ctx.cwd)) {
+      return {
+        block: true,
+        reason: "Plan instructions are loaded only by the user-invoked /plan command; model file access is blocked.",
+      };
+    }
+    if (event.toolName === "plan_ready") {
+      if (state.mode !== "plan" || !state.plan) {
+        return {
+          block: true,
+          reason: "plan_ready is only available while Plan mode is active.",
+        };
+      }
+      if (!hasVisiblePlan(ctx, isRecord(event.input) ? event.input.plan : undefined)) {
+        return {
+          block: true,
+          reason: "Present the complete plan in assistant text before calling plan_ready with that same plan.",
+        };
+      }
+    }
     if (
       event.toolName === "goal_complete" &&
       (state.mode !== "goal" || !state.goal)
@@ -180,7 +239,55 @@ export default function modes(pi: ExtensionAPI) {
     };
   });
 
-  pi.on("agent_settled", (_event, ctx) => {
+  pi.on("tool_result", (event, ctx) => {
+    if (!["grep", "bash", "powershell", "ast_grep_search"].includes(event.toolName)) return;
+    const text = event.content
+      .filter((part: { type: string }) => part.type === "text")
+      .map((part: { text: string }) => part.text)
+      .join("\n");
+    const filenameFreeSearch = ["grep", "ast_grep_search"].includes(event.toolName)
+      && text.length > 0
+      && searchScopeIncludesPrompt(event.input, ctx.cwd)
+      && !/^No (?:matches|results) found\.?$/i.test(text.trim())
+      && !hasSearchResultFilenames(text);
+    if (!containsProtectedPromptPath(text) && !filenameFreeSearch) return;
+    return {
+      content: [{ type: "text", text: "Search results that may expose the protected Plan prompt were withheld. Narrow the search to other files." }],
+      details: { redacted: true },
+    };
+  });
+
+  pi.on("input", (event, ctx) => {
+    if (state.mode !== "plan" || !state.plan || !state.plan.content) return;
+    if (event.source !== "interactive" && event.source !== "rpc") return;
+    if (isDirectApproval(event.text)) {
+      startImplementation(ctx, state.plan.content);
+      return { action: "handled" };
+    }
+    // Ordinary typed feedback is genuine user input; extension messages are not.
+    setState({ ...state, plan: {
+      ...state.plan,
+      feedback: event.text,
+      revisionAuthorized: authorizesRevision(event.text),
+      reminded: false,
+    } });
+  });
+
+  pi.on("agent_settled", async (_event, ctx) => {
+    if (state.mode === "plan" && state.plan) {
+      const text = latestFinalAssistantText(ctx);
+      if (!text || text === state.plan.content) return;
+      if (looksLikeFinishedPlan(text)) {
+        const result = await offerPlan(ctx, text);
+        if (result.action === "feedback") {
+          pi.sendUserMessage(`Revise the plan according to this user feedback: ${result.feedback}`, { deliverAs: "followUp" });
+        }
+      } else if (!state.plan.reminded && !text.endsWith("?")) {
+        setState({ ...state, plan: { ...state.plan, reminded: true } });
+        pi.sendUserMessage("If the plan is ready, present it in ordinary assistant text and call plan_ready with the same plan. If you need clarification, ask the user and stop.", { deliverAs: "followUp" });
+      }
+      return;
+    }
     if (state.mode !== "goal" || !state.goal || state.goal.paused) return;
     const providerError = latestAssistantProviderError(ctx);
     if (providerError) {
@@ -253,14 +360,10 @@ export default function modes(pi: ExtensionAPI) {
     label: "Plan Ready",
     description:
       "After presenting the complete plan in ordinary assistant text, submit that same plan for user approval before switching to build mode.",
+    promptSnippet: "Submit a fully presented Plan-mode plan for user approval; unavailable outside Plan mode",
+    promptGuidelines: ["In Plan mode, show the complete plan in ordinary assistant text, then call plan_ready with that same plan."],
     parameters: Type.Object({
       plan: Type.String({ minLength: 1, maxLength: MAX_PLAN_LENGTH }),
-      implement: Type.Optional(
-        Type.Boolean({
-          description:
-            "Set true only when typed user feedback unambiguously authorizes implementation after revision. If there is any doubt, omit it so plan_ready asks the user again.",
-        }),
-      ),
     }),
     async execute(_id, params, _signal, _update, ctx) {
       if (state.mode !== "plan" || !state.plan) {
@@ -268,74 +371,28 @@ export default function modes(pi: ExtensionAPI) {
           "plan_ready is only available while plan mode is active",
         );
       }
-      const plan = params.plan.trim();
-      setState({ ...state, plan: { ...state.plan, content: plan } });
-      if (params.implement) {
-        const feedback = state.plan?.feedback;
-        if (!feedback) {
-          throw new Error(
-            "plan_ready with implement: true requires typed user feedback authorizing implementation",
-          );
-        }
-        startImplementation(ctx, plan);
-        return {
-          content: [
-            { type: "text", text: "Plan revised and switched to build mode." },
-          ],
-          details: { approved: true, feedback },
-          terminate: true,
-        };
+      if (!hasVisiblePlan(ctx, params.plan)) {
+        throw new Error("Present the complete plan in assistant text before calling plan_ready.");
       }
-      if (!ctx.hasUI) {
-        return savedPlanResult();
-      }
-      const choice = await ctx.ui.select("Plan ready", [
-        "Implement",
-        "Type your answer",
-      ]);
-      if (choice === "Implement") {
-        startImplementation(ctx, plan);
+      const decision = await offerPlan(ctx, params.plan.trim());
+      if (decision.action === "implement") {
         return {
-          content: [
-            { type: "text", text: "Plan approved. Switched to build mode." },
-          ],
+          content: [{ type: "text", text: "Plan approved. Switched to build mode." }],
           details: { approved: true },
           terminate: true,
         };
       }
-      if (choice !== "Type your answer") return savedPlanResult();
-
-      const feedback = await ctx.ui.input(
-        "Plan feedback",
-        "What should change?",
-      );
-      if (!feedback?.trim()) return savedPlanResult();
-      setState({
-        ...state,
-        plan: { ...state.plan, feedback: feedback.trim() },
-      });
-      return {
-        content: [
-          {
-            type: "text",
-            text: `User feedback:\n${feedback.trim()}\n\nRevise the plan while remaining in Plan mode. Call plan_ready with implement: true only when you are 100% certain this feedback explicitly authorizes implementation after revision. If you have any doubt, call plan_ready without implement so the user receives the two choices again.`,
-          },
-        ],
-        details: { approved: false, feedback: feedback.trim() },
-      };
-
-      function savedPlanResult() {
+      if (decision.action === "feedback") {
         return {
-          content: [
-            {
-              type: "text",
-              text: "Plan saved. Use /plan implement when you are ready to build it.",
-            },
-          ],
-          details: { approved: false },
-          terminate: true,
+          content: [{ type: "text", text: `User feedback:\n${decision.feedback}\n\nRevise the plan while remaining in Plan mode. Present the revision, then call plan_ready again.` }],
+          details: { approved: false, feedback: decision.feedback },
         };
       }
+      return {
+        content: [{ type: "text", text: "Plan saved. Use /plan implement when you are ready to build it." }],
+        details: { approved: false },
+        terminate: true,
+      };
     },
   });
 
@@ -419,13 +476,45 @@ export default function modes(pi: ExtensionAPI) {
   }
 
   function startPlan(objective: string) {
-    setState({ version: 1, mode: "plan", plan: { objective } });
-    pi.sendUserMessage(
-      withModePrompt(
-        "plan",
-        `Plan this work without modifying files: ${objective}`,
-      ),
-    );
+    // Only the user-invoked command enters here. Keep these instructions out of
+    // user messages, which remain in context after returning to Build mode.
+    setState({ version: 1, mode: "plan", plan: {
+      objective,
+      instructions: readModePrompt("plan"),
+    } });
+    pi.sendUserMessage(`Plan this work without modifying files: ${objective}`);
+  }
+
+  async function offerPlan(ctx: ExtensionContext, plan: string): Promise<
+    { action: "implement" | "saved" } | { action: "feedback"; feedback: string }
+  > {
+    if (state.mode !== "plan" || !state.plan) return { action: "saved" };
+    const previous = state.plan;
+    setState({ ...state, plan: { ...previous, content: plan } });
+    if (previous.revisionAuthorized && previous.content && previous.content !== plan) {
+      startImplementation(ctx, plan);
+      return { action: "implement" };
+    }
+    if (!ctx.hasUI) return { action: "saved" };
+    const choice = await ctx.ui.select("Plan ready", ["Implement", "Type your answer"]);
+    if (choice === "Implement") {
+      startImplementation(ctx, plan);
+      return { action: "implement" };
+    }
+    if (choice !== "Type your answer") return { action: "saved" };
+    const feedback = (await ctx.ui.input("Plan feedback", "What should change?"))?.trim();
+    if (!feedback) return { action: "saved" };
+    if (isDirectApproval(feedback)) {
+      startImplementation(ctx, plan);
+      return { action: "implement" };
+    }
+    setState({ ...state, plan: {
+      ...state.plan!,
+      feedback,
+      revisionAuthorized: authorizesRevision(feedback),
+      reminded: false,
+    } });
+    return { action: "feedback", feedback };
   }
 
   function startImplementation(ctx: ExtensionContext, plan: string) {
@@ -476,6 +565,9 @@ function parseState(value: unknown): ModeState | undefined {
       mode: "plan",
       plan: {
         objective: value.plan.objective,
+        instructions: typeof value.plan.instructions === "string" ? value.plan.instructions : undefined,
+        revisionAuthorized: value.plan.revisionAuthorized === true,
+        reminded: value.plan.reminded === true,
         content:
           typeof value.plan.content === "string"
             ? value.plan.content
@@ -507,7 +599,7 @@ function latestAssistantProviderError(
   return undefined;
 }
 
-function withModePrompt(mode: "goal" | "plan", kickoff: string): string {
+function withModePrompt(mode: "goal", kickoff: string): string {
   const instructions = readModePrompt(mode);
   if (!instructions) return kickoff;
   return `${kickoff}\n\n<personal_${mode}_instructions>\n${instructions}\n</personal_${mode}_instructions>`;
@@ -523,6 +615,115 @@ function readModePrompt(mode: "goal" | "plan"): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+function latestFinalAssistantText(ctx: ExtensionContext): string | undefined {
+  for (const entry of [...ctx.sessionManager.getBranch()].reverse()) {
+    if (entry.type !== "message" || entry.message.role !== "assistant") continue;
+    if (entry.message.stopReason !== "stop") return undefined;
+    return entry.message.content
+      .filter((part: { type: string }) => part.type === "text")
+      .map((part: { text: string }) => part.text)
+      .join("\n")
+      .trim();
+  }
+  return undefined;
+}
+
+function looksLikeFinishedPlan(text: string): boolean {
+  return text.length >= 120 && /(?:^|\n)#{1,4}\s+.*\bplan\b/i.test(text)
+    && (text.match(/(?:^|\n)\s*\d+[.)]\s+\S/g) ?? []).length >= 2
+    && !text.endsWith("?");
+}
+
+function isDirectApproval(text: string): boolean {
+  const answer = text.trim();
+  return /^(?:(?:yes|looks good)[,.! ]*)?(?:(?:go ahead(?: and)?|please)\s+)?(?:implement|build|apply)(?:\s+(?:it|this|the(?:\s+(?:approved|current))?\s+plan))?[.! ]*$/i.test(answer)
+    || /^(?:yes[,! ]*)?go ahead[.! ]*$/i.test(answer)
+    || /^(?:yes[,! ]*)?(?:i (?:want you to|would like you to)|you can)\s+(?:go ahead and\s+)?(?:implement|build|apply)(?:\s+(?:it|this|the(?:\s+(?:approved|current))?\s+plan))?[.! ]*$/i.test(answer);
+}
+
+function authorizesRevision(text: string): boolean {
+  return /\b(?:revise|change|update|adjust|fix|make)\b/i.test(text)
+    && /\b(?:then|after(?:ward|wards)?(?:\s+that)?)\s+(?:please\s+)?(?:implement|build|apply)\b/i.test(text);
+}
+
+function containsProtectedPromptPath(text: string): boolean {
+  return /(?:^|[^\w.])plan-mode\.md\b|(?:^|[/\\])modes[/\\]plan\.md\b/i.test(text);
+}
+
+function hasVisiblePlan(ctx: ExtensionContext, plan: unknown): boolean {
+  if (typeof plan !== "string" || !plan.trim()) return false;
+  const latest = [...ctx.sessionManager.getBranch()].reverse().find(
+    (entry) => entry.type === "message" && entry.message.role === "assistant",
+  );
+  if (!latest || latest.type !== "message" || latest.message.role !== "assistant") return false;
+  const visible = latest.message.content
+    .filter((part: { type: string }) => part.type === "text")
+    .map((part: { text: string }) => part.text)
+    .join("\n");
+  return visible.includes(plan.trim());
+}
+
+function searchScopeIncludesPrompt(input: unknown, cwd: string): boolean {
+  if (!isRecord(input)) return false;
+  const scopes = Array.isArray(input.paths) ? input.paths : [input.path ?? cwd];
+  const protectedPaths = [
+    resolve(homedir(), ".dotfiles/modules/home/ai/pi/prompts/plan-mode.md"),
+    resolve(getAgentDir(), "modes/plan.md"),
+  ];
+  return scopes.some((scope) => {
+    if (typeof scope !== "string") return false;
+    const raw = scope.replace(/^@/, "");
+    const absolute = raw.startsWith("~/") ? resolve(homedir(), raw.slice(2)) : resolve(cwd, raw);
+    let canonical = absolute;
+    try { canonical = realpathSync(absolute); } catch { /* Missing paths cannot contain the prompt. */ }
+    return protectedPaths.some((protectedPath) => {
+      let target = protectedPath;
+      try { target = realpathSync(protectedPath); } catch { /* Use the configured path. */ }
+      return target === canonical || target.startsWith(canonical + sep);
+    });
+  });
+}
+
+function hasSearchResultFilenames(text: string): boolean {
+  // Directory-scoped grep normally identifies each matching file. A custom
+  // search that omits filenames is withheld if its scope includes the prompt.
+  return /(?:^|\n)\s*(?:>\s*)?\S+\.\w+(?::\d+|\s+\(\d+\s+matches?\))/m.test(text);
+}
+
+function isProtectedPromptRequest(toolName: string, input: unknown, cwd: string): boolean {
+  if (!isRecord(input)) return false;
+  const protectedPaths = [
+    resolve(getAgentDir(), "modes", "plan.md"),
+    resolve(homedir(), ".dotfiles", "modules/home/ai/pi/prompts/plan-mode.md"),
+  ];
+  const isProtected = (value: unknown): boolean => {
+    if (typeof value !== "string") return false;
+    const raw = value.replace(/^@/, "");
+    const path = raw.startsWith("~/")
+      ? resolve(homedir(), raw.slice(2))
+      : resolve(cwd, raw);
+    if (protectedPaths.includes(path) || path.endsWith("/modules/home/ai/pi/prompts/plan-mode.md")) return true;
+    try {
+      const actual = realpathSync(path);
+      return protectedPaths.some((protectedPath) => {
+        try { return actual === realpathSync(protectedPath); }
+        catch { return false; }
+      });
+    } catch {
+      return false;
+    }
+  };
+  if (["read", "head", "tail", "grep", "find", "ls", "read_symbol", "read_enclosing", "ast_grep_search"].includes(toolName)) {
+    if (isProtected(input.path) || isProtected(input.file)) return true;
+    if (Array.isArray(input.paths) && input.paths.some(isProtected)) return true;
+  }
+  // Direct shell requests are covered, but arbitrary shell indirection needs
+  // a sandbox rather than an extension-level path check.
+  return ["bash", "powershell"].includes(toolName)
+    && typeof input.command === "string"
+    && containsProtectedPromptPath(input.command);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
