@@ -49,6 +49,13 @@ in
 
             nvim-java = {
               enable = true;
+              jvmArgs = [
+                "-Xmx4G"
+                "-XX:+UseG1GC"
+                "-XX:+ParallelRefProcEnabled"
+                "-XX:+UseStringDeduplication"
+                "-XX:InitiatingHeapOccupancyPercent=30"
+              ];
               runtimes = [
                 {
                   name = "jdk17";

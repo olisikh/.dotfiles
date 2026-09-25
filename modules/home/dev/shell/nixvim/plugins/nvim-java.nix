@@ -16,6 +16,14 @@ in
     ];
 
     extraConfigLua = ''
+      local jdtls_cmd = require("java-core.ls.servers.jdtls.cmd")
+      local get_jvm_args = jdtls_cmd.get_jvm_args
+      jdtls_cmd.get_jvm_args = function(java_config)
+        return get_jvm_args(java_config):concat({
+          ${lib.concatMapStringsSep ",\n          " builtins.toJSON cfg.jvmArgs}
+        })
+      end
+
       require("java").setup({
         experimental = {
           fix_generated_sources = true,
@@ -62,8 +70,12 @@ in
       enable = true;
       settings = {
         java = {
-          referencesCodeLens.enabled = false;
-          implementationsCodeLens.enabled = false;
+          referencesCodeLens = {
+            enabled = false;
+          };
+          implementationsCodeLens = {
+            enabled = false;
+          };
           format = {
             enabled = true;
             settings = {

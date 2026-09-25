@@ -15,6 +15,7 @@ in
     plugins = {
       nvim-java = {
         enable = mkBoolOpt true "Enable nvim-java plugin";
+        jvmArgs = mkOpt (lib.types.listOf lib.types.str) [ ] "Additional JVM arguments for the JDTLS process";
 
         runtimes = mkOpt
           (lib.types.listOf (lib.types.submodule {
