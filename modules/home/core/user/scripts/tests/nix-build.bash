@@ -35,16 +35,6 @@ printf 'sudo %s\n' "$*" >> "$TEST_LOG"
 "$@"
 EOF
 
-cat > "$mock_bin/csrutil" <<'EOF'
-#!/usr/bin/env bash
-
-cat <<'STATUS'
-System Integrity Protection status: enabled.
-Filesystem Protections: disabled
-Debugging Restrictions: disabled
-STATUS
-EOF
-
 cat > "$mock_bin/yabai" <<'EOF'
 #!/usr/bin/env bash
 
@@ -89,7 +79,11 @@ assert_output_contains "$build_output" "==> Profile source: default (no state fi
 assert_output_contains "$build_output" "==> System reference: .#darwinConfigurations.olisikh-mini"
 assert_output_contains "$build_output" '==> Home reference: .#homeConfigurations."olisikh@olisikh-mini"'
 assert_log_contains "darwin-rebuild switch --flake $repo_root#olisikh-mini --show-trace"
-assert_log_contains "yabai --load-sa"
+if grep -Fq -- "yabai" "$log_file"; then
+    echo "The default mini profile must not load yabai's scripting addition." >&2
+    cat "$log_file" >&2
+    exit 1
+fi
 
 explicit_home="$test_dir/explicit-home"
 mkdir -p "$explicit_home"

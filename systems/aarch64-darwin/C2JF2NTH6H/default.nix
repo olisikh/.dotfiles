@@ -29,8 +29,9 @@ in
       macmon = enabled;
       android-studio = enabled;
       jankyborders = enabled;
-      yabai = enabled;
-      skhd = enabled;
+      yabai = disabled;
+      skhd = disabled;
+      aerospace = enabled;
       handy = enabled;
       instant-space-switcher = enabled;
       xcodesapp = enabled;

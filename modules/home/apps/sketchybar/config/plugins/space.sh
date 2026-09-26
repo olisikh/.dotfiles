@@ -3,6 +3,31 @@
 source "$HOME/.config/sketchybar/variables.sh"
 source "$HOME/.config/sketchybar/helpers/icon_map.sh"
 
+if command -v aerospace >/dev/null 2>&1; then
+	ACTIVE_SPACE=$(aerospace list-workspaces --focused 2>/dev/null)
+	WINDOWS=$(aerospace list-windows --all --format '%{workspace}|%{app-name}' 2>/dev/null)
+
+	for sid in {1..10}; do
+		ICON_STRING=""
+		ICON_COUNT=0
+		while IFS='|' read -r workspace app_name; do
+			[ "$workspace" = "$sid" ] || continue
+			[ -n "$app_name" ] || continue
+			__icon_map "$app_name"
+			ICON_STRING="${ICON_STRING}${icon_result}"
+			ICON_COUNT=$((ICON_COUNT + 1))
+			[ "$ICON_COUNT" -ge "${MAX_SPACE_ICONS:-4}" ] && break
+		done <<<"$WINDOWS"
+
+		if [ "$sid" = "$ACTIVE_SPACE" ]; then
+			sketchybar --set "space.$sid" icon.color="$RED" label.color="$WHITE" label="$ICON_STRING"
+		else
+			sketchybar --set "space.$sid" icon.color="$COMMENT" label.color="$COMMENT" label="$ICON_STRING"
+		fi
+	done
+	exit 0
+fi
+
 # Query yabai once for spaces and windows
 SPACES_JSON=$(yabai -m query --spaces 2>/dev/null)
 WINDOWS_JSON=$(yabai -m query --windows 2>/dev/null)

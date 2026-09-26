@@ -12,16 +12,10 @@ let
   # feature overrides here rather than creating independent per-option maps.
   profiles = {
     default = {
-      apps = {
-        yabai = enabled;
-        instant-space-switcher = enabled;
-      };
+      apps.instant-space-switcher = enabled;
     };
     boring = {
-      apps = {
-        yabai = disabled;
-        instant-space-switcher = disabled;
-      };
+      apps.instant-space-switcher = disabled;
     };
   };
 
@@ -51,7 +45,9 @@ let
       apps = {
         macmon = enabled;
         jankyborders = enabled;
-        skhd = enabled;
+        yabai = disabled;
+        skhd = disabled;
+        aerospace = disabled;
         handy = enabled;
         sketchybar = enabled;
         raycast = enabled;

@@ -10,8 +10,17 @@ sketchybar --add item spacer.1 left \
 
 for i in {0..9}; do
 	sid=$((i + 1))
-	sketchybar --add space space.$sid left \
-		--set space.$sid associated_space=$sid \
+	if command -v aerospace >/dev/null 2>&1; then
+		space_type=item
+		space_settings=()
+		click_script="aerospace workspace $sid"
+	else
+		space_type=space
+		space_settings=("associated_space=$sid")
+		click_script="yabai -m space --focus $sid"
+	fi
+	sketchybar --add "$space_type" "space.$sid" left \
+		--set "space.$sid" "${space_settings[@]}" \
 		icon="${SPACE_ICONS[$i]}" \
 		icon.font="$FONT:Bold:$FONT_SIZE" \
 		icon.color="$COMMENT" \
@@ -25,7 +34,7 @@ for i in {0..9}; do
 		icon.y_offset=0 \
 		background.padding_left=-5 \
 		background.padding_right=-5 \
-		click_script="yabai -m space --focus $sid"
+		click_script="$click_script"
 done
 
 sketchybar --add item spacer.2 left \
@@ -51,18 +60,21 @@ sketchybar --add item separator left \
 	icon.color="$YELLOW"
 
 # Hidden controller item that updates all spaces on events
+sketchybar --add event space_update
 sketchybar --add item space_controller left \
 	--set space_controller drawing=off \
 	updates=on \
 	script="$PLUGIN_DIR/space.sh" \
 	--subscribe space_controller space_change front_app_switched space_update
 
-# Yabai signals to trigger updates on window changes
-yabai -m signal --add label=sketchybar_space event=window_created \
-	action="sketchybar --trigger space_update" 2>/dev/null
-yabai -m signal --add label=sketchybar_space event=window_destroyed \
-	action="sketchybar --trigger space_update" 2>/dev/null
-yabai -m signal --add label=sketchybar_space event=window_minimized \
-	action="sketchybar --trigger space_update" 2>/dev/null
-yabai -m signal --add label=sketchybar_space event=window_deminimized \
-	action="sketchybar --trigger space_update" 2>/dev/null
+if ! command -v aerospace >/dev/null 2>&1; then
+	# Yabai signals to trigger updates on window changes
+	yabai -m signal --add label=sketchybar_space event=window_created \
+		action="sketchybar --trigger space_update" 2>/dev/null
+	yabai -m signal --add label=sketchybar_space event=window_destroyed \
+		action="sketchybar --trigger space_update" 2>/dev/null
+	yabai -m signal --add label=sketchybar_space event=window_minimized \
+		action="sketchybar --trigger space_update" 2>/dev/null
+	yabai -m signal --add label=sketchybar_space event=window_deminimized \
+		action="sketchybar --trigger space_update" 2>/dev/null
+fi

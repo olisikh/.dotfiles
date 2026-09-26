@@ -29,10 +29,11 @@ in
     apps = {
       macmon = enabled;
       jankyborders = enabled;
-      yabai = enabled;
-      skhd = enabled;
+      yabai = disabled;
+      skhd = disabled;
+      aerospace = enabled;
       handy = enabled;
-      instant-space-switcher = enabled;
+      instant-space-switcher = enabled; # Keep installed during the trial; Homebrew cleanup would zap it.
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;

@@ -37,7 +37,10 @@ sketchybar --bar height=30 \
 # Left
 
 # source "$ITEM_DIR/apple.sh"
-source "$ITEM_DIR/spaces.sh"
+# Without a window manager, leave macOS Spaces to Mission Control.
+if command -v aerospace >/dev/null 2>&1 || command -v yabai >/dev/null 2>&1; then
+	source "$ITEM_DIR/spaces.sh"
+fi
 source "$ITEM_DIR/front_app.sh"
 
 # Left
