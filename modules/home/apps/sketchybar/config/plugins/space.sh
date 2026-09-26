@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# The mini has no window manager and no workspace items to update.
+if ! command -v aerospace >/dev/null 2>&1 && ! command -v yabai >/dev/null 2>&1; then
+	exit 0
+fi
+
 source "$HOME/.config/sketchybar/variables.sh"
 source "$HOME/.config/sketchybar/helpers/icon_map.sh"
 
