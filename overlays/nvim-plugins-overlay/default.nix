@@ -120,8 +120,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "JavaHello";
         repo = "spring-boot.nvim";
-        rev = "eea95b752bceb6ca410b3e2d87a1a02d08bd61a6";
-        hash = "sha256-GYer7azYjYWGMTzNDLxHshGYJCl+2zi2+78LjHsuaUc=";
+        rev = "9880be48170a21d97444b1eba75853fd3bad33c3";
+        hash = "sha256-+zgi9Jhh5f3kPr5VC2KZ3x7OEXdTao5gQM48y5NlGo4=";
       };
     };
 
@@ -209,8 +209,8 @@ final: prev: {
       src = final.fetchFromGitHub {
         owner = "fasterius";
         repo = "simple-zoom.nvim";
-        rev = "acead628aa1ce6c2fc4c77bd48d651ce12b8ab85";
-        hash = "sha256-gFI6+65eLNruIpowQustiz71Y/q3GhUXudFxZEp+bLs=";
+        rev = "f1de8b5f8bf301c6dd58ecb04935fad2b71f9626";
+        hash = "sha256-TaxivW45tL7kbDOpgFmP8RuT3dHafmvBxftGO67qCzU=";
       };
     };
   };
