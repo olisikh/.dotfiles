@@ -125,15 +125,13 @@ in
         nil_ls = {
           enable = true;
           settings = {
-            nil = {
-              formatting = {
-                command = [ "nixfmt" ];
-              };
-              nix = {
-                flake = {
-                  autoArchive = true;
-                  autoEvalInputs = true;
-                };
+            formatting = {
+              command = [ "nixfmt" ];
+            };
+            nix = {
+              flake = {
+                autoArchive = true;
+                autoEvalInputs = true;
               };
             };
           };
