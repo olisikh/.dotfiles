@@ -131,7 +131,8 @@ in
             nix = {
               flake = {
                 autoArchive = true;
-                autoEvalInputs = true;
+                # Evaluates flake inputs for richer completion; can be slow and memory hungry.
+                autoEvalInputs = false;
               };
             };
           };
