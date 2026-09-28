@@ -1,7 +1,7 @@
 # GPT-5.6 context windows in Codex, Hermes, and pi
 
 > [!NOTE]
-> Historical research retained for the GPT-5.6 implementation. The current configuration migrated on 2026-09-24 to GPT-6 Sol and Luna. GPT-6 has no Terra model. Pi keeps explicit local `-900k` aliases for Sol/Luna, while the pinned Hermes release uses the base GPT-6 Luna ID because it does not yet strip those newer aliases.
+> Historical research retained for the GPT-5.6 implementation. The current configuration migrated on 2026-09-24 to GPT-6 Sol and Luna. GPT-6 has no Terra model. Pi keeps explicit local `-large` aliases for Sol/Luna. Hermes has separate, native `-900k` aliases; this repository's Hermes module selects `gpt-6-luna-900k`.
 
 **Research date:** 2026-08-24
 

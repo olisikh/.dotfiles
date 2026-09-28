@@ -1,7 +1,7 @@
 # Hermes + Pi + Herdr orchestration study
 
 > [!NOTE]
-> This is a historical baseline from before the 2026-09-24 GPT-6 migration. The current declarative configuration uses GPT-6 Luna for routine Hermes/Pi work and GPT-6 Sol for stronger Pi roles. Pi provides local `-900k` picker aliases for Sol and Luna; the pinned Hermes release does not yet recognize those aliases and therefore uses the base GPT-6 Luna ID.
+> This is a historical baseline from before the 2026-09-24 GPT-6 migration. The current declarative configuration uses GPT-6 Luna for routine Hermes/Pi work and GPT-6 Sol for stronger Pi roles. Pi provides local `-large` picker aliases for Sol and Luna. Hermes has its own `-900k` aliases; this repository's Hermes module selects `gpt-6-luna-900k`.
 
 ## Executive conclusion
 

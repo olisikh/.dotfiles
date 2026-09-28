@@ -12,12 +12,12 @@ let
   cfg = config.${namespace}.ai.pi;
 
   # Pi has no model-alias field: custom model IDs are sent to the provider as-is.
-  # The companion extension turns these picker-only -900k IDs back into the
+  # The companion extension turns these picker-only -large IDs back into the
   # real GPT-6 IDs immediately before each OpenAI request.
   gpt6OpenaiModels = [
     {
-      id = "gpt-6-sol-900k";
-      name = "GPT-6 Sol (900k)";
+      id = "gpt-6-sol-large";
+      name = "GPT-6 Sol (large)";
       api = "openai-responses";
       reasoning = true;
       # GPT-6 exposes `max` for the provider's highest effort. Keep Pi's
@@ -49,8 +49,8 @@ let
       };
     }
     {
-      id = "gpt-6-luna-900k";
-      name = "GPT-6 Luna (900k)";
+      id = "gpt-6-luna-large";
+      name = "GPT-6 Luna (large)";
       api = "openai-responses";
       reasoning = true;
       # GPT-6 exposes `max` for the provider's highest effort. Keep Pi's
@@ -85,7 +85,7 @@ let
 
   # Keep Codex model metadata aligned with Pi's provider catalog.
   codexGpt6Costs = {
-    "gpt-6-sol-900k" = {
+    "gpt-6-sol-large" = {
       input = 2;
       output = 10;
       cacheRead = 0.2;
@@ -100,7 +100,7 @@ let
         }
       ];
     };
-    "gpt-6-luna-900k" = {
+    "gpt-6-luna-large" = {
       input = 0.1;
       output = 0.5;
       cacheRead = 0.01;

@@ -196,7 +196,7 @@ in
           fallbackModels = [ "openai-codex/gpt-6-sol" ];
         };
         config = {
-          defaultModel = "gpt-6-sol-900k";
+          defaultModel = "gpt-6-sol-large";
           defaultProvider = "openai-codex";
           defaultThinkingLevel = "high";
         };

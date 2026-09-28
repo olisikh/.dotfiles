@@ -22,9 +22,8 @@ let
 
   publicSettings = {
     model = {
-      # Hermes does not yet recognize GPT-6 Sol/Luna `-900k` aliases;
-      # use the provider's real model ID until upstream adds wire stripping.
-      default = "gpt-6-luna";
+      # Hermes uses its own `-900k` alias; Pi's `-large` alias is separate.
+      default = "gpt-6-luna-900k";
       provider = "openai-codex";
     };
 

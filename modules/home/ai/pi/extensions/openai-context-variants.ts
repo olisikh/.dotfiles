@@ -12,9 +12,9 @@ type ProviderRequestContext = {
   } | null;
 };
 
-const CONTEXT_VARIANT_SUFFIX = "-900k";
+const CONTEXT_VARIANT_SUFFIX = "-large";
 const SUPPORTED_PROVIDERS = new Set(["openai", "openai-codex"]);
-const GPT6_MODELS = new Set(["gpt-6-sol", "gpt-6-luna"]);
+const GPT6_MODELS = new Set(["gpt-6-terra", "gpt-6-sol", "gpt-6-luna"]);
 
 export default function openaiContextVariants(pi: ExtensionAPI): void {
   pi.on(
