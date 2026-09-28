@@ -43,7 +43,7 @@
           sh = [ "shfmt" ];
           terraform = [ "terraform_fmt" ];
           kotlin = [ "ktlint" ];
-          nix = [ "nixpkgs_fmt" ];
+          nix = [ "nixfmt" ];
         };
       };
     };

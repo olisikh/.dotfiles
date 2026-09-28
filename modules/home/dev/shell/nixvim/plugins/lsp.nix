@@ -122,7 +122,22 @@ in
         # pylyzer.enable = true;
         terraformls.enable = true;
         marksman.enable = true;
-        nil_ls.enable = true;
+        nil_ls = {
+          enable = true;
+          settings = {
+            nil = {
+              formatting = {
+                command = [ "nixfmt" ];
+              };
+              nix = {
+                flake = {
+                  autoArchive = true;
+                  autoEvalInputs = true;
+                };
+              };
+            };
+          };
+        };
         nixd.enable = true;
 
         helm_ls = {
