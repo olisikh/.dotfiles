@@ -11,11 +11,12 @@ let
   # Profile-specific overrides stay under the project namespace. Add whole
   # feature overrides here rather than creating independent per-option maps.
   profiles = {
-    default = {
-      apps.instant-space-switcher = enabled;
-    };
+    default = { };
     boring = {
-      apps.instant-space-switcher = disabled;
+      apps = {
+        instant-space-switcher = disabled;
+        aerospace = disabled;
+      };
     };
   };
 
@@ -47,7 +48,8 @@ let
         jankyborders = enabled;
         yabai = disabled;
         skhd = disabled;
-        aerospace = disabled;
+        instant-space-switcher = enabled;
+        aerospace = enabled;
         handy = enabled;
         sketchybar = enabled;
         raycast = enabled;
