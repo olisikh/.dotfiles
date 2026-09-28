@@ -526,7 +526,7 @@ in
       ".pi/agent/graphify/session.md".source = ./prompts/graphify-session.md;
 
       ".pi/agent/keybindings.json".text = builtins.toJSON cfg.keybindings;
-      ".pi/agent/mcp.json".text = builtins.toJSON mcpConfig;
+      ".pi/agent/mcp-adapter.json".text = builtins.toJSON mcpConfig;
 
       ".pi-lens/config.json".text = builtins.toJSON {
         widget.visible = false;
