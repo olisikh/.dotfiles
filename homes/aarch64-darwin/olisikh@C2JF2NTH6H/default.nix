@@ -203,6 +203,8 @@ in
 
         mcps = {
           mcpServers = {
+            # Deferred exposure preserves the adapter's discover-on-demand
+            # behavior without putting the full tool catalog in every prompt.
             sherlockio = {
               command = "npx";
               args = [
@@ -213,6 +215,7 @@ in
                 "--server-id"
                 "sherlockio"
               ];
+              exposure = "deferred";
             };
             compass = {
               command = "npx";
@@ -224,6 +227,7 @@ in
                 "--server-id"
                 "compass-mcp"
               ];
+              exposure = "deferred";
             };
             vector = {
               command = "npx";
@@ -235,6 +239,7 @@ in
                 "--server-id"
                 "obsidian-compass-vector"
               ];
+              exposure = "deferred";
             };
             deepsights = {
               command = "npx";
@@ -246,6 +251,7 @@ in
                 "--server-id"
                 "deepsights-mcp"
               ];
+              exposure = "deferred";
             };
             figma = {
               command = "npx";
@@ -257,11 +263,24 @@ in
                 "--server-id"
                 "figma-mcp"
               ];
+              exposure = "deferred";
             };
-            jira.url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/jira";
-            glean.url = "https://ebay-be.glean.com/mcp/default";
-            airtable.url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/airtable";
-            github.url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/github";
+            jira = {
+              url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/jira";
+              exposure = "deferred";
+            };
+            glean = {
+              url = "https://ebay-be.glean.com/mcp/default";
+              exposure = "deferred";
+            };
+            airtable = {
+              url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/airtable";
+              exposure = "deferred";
+            };
+            github = {
+              url = "https://mcp.aigateway.vip.ebay.com/mcp/backends/github";
+              exposure = "deferred";
+            };
           };
         };
       };
