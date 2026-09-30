@@ -31,7 +31,16 @@ in
       jankyborders = enabled;
       yabai = disabled;
       skhd = disabled;
-      aerospace = enabled;
+      aerospace = {
+        enable = true;
+        app-workspaces = [
+          [ "WezTerm" ]
+          [ "Brave" "Chrome" ]
+          [ "Telegram" ]
+          [ "Outlook" ]
+          [ "Spotify" "Bruno" "Android Emulator" ]
+        ];
+      };
       handy = enabled;
       instant-space-switcher = disabled;
       sketchybar = enabled;

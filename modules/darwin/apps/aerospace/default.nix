@@ -6,6 +6,37 @@ let
   cfg = config.${namespace}.apps.aerospace;
   sketchybar = "${pkgs.sketchybar}/bin/sketchybar";
 
+  # Keep the existing exact-match defaults, including Settings and emulator variants.
+  defaultFloatingAppPatterns = [
+    "System (Preferences|Settings)"
+    "Finder"
+    "Activity Monitor"
+    "Archive Utility"
+    "Creative Cloud"
+    "Login Options"
+    "ClearVPN"
+    "balenaEtcher"
+    "Transmission"
+    "PSI Bridge Secure Browser"
+    "Android Emulator.*"
+  ];
+  floatingAppsRegex = "^(${lib.concatStringsSep "|" (
+    defaultFloatingAppPatterns
+    ++ map (app: ".*${lib.escapeRegex app}.*") cfg.extra-floating-apps
+  )})$";
+
+  # Dock assignments target macOS Spaces, not AeroSpace workspaces.
+  appWorkspaceRules = lib.concatLists (
+    lib.imap1 (
+      workspace: apps:
+      lib.optional (apps != []) {
+        "if".app-name-regex-substring = lib.concatStringsSep "|" (map lib.escapeRegex apps);
+        check-further-callbacks = true;
+        run = "move-node-to-workspace ${toString workspace}";
+      }
+    ) cfg.app-workspaces
+  );
+
   workspaceBindings = lib.listToAttrs (lib.concatMap (index:
     let
       key = if index == 10 then "0" else toString index;
@@ -17,7 +48,19 @@ let
     ]) (lib.range 1 10));
 in
 {
-  options.${namespace}.apps.aerospace.enable = mkBoolOpt false "Enable AeroSpace window manager";
+  options.${namespace}.apps.aerospace = {
+    enable = mkBoolOpt false "Enable AeroSpace window manager";
+    app-workspaces = lib.mkOption {
+      type = lib.types.listOf (lib.types.listOf lib.types.nonEmptyStr);
+      default = [];
+      description = "One-based workspace lists of app-name substrings, escaped and combined into AeroSpace match rules.";
+    };
+    extra-floating-apps = lib.mkOption {
+      type = lib.types.listOf lib.types.nonEmptyStr;
+      default = [];
+      description = "Additional app-name substrings to float alongside the default floating apps.";
+    };
+  };
 
   config = mkIf cfg.enable {
     assertions = [{
@@ -47,14 +90,18 @@ in
 
         exec-on-workspace-change = [ "/bin/bash" "-c" "${sketchybar} --trigger space_update" ];
         on-focus-changed = [ "exec-and-forget ${sketchybar} --trigger space_update" ];
-        on-window-detected = [
-          {
-            "if".app-name-regex-substring = "^(System (Preferences|Settings)|Finder|Activity Monitor|Archive Utility|Creative Cloud|Login Options|ClearVPN|balenaEtcher|Transmission|PSI Bridge Secure Browser|Android Emulator.*)$";
-            check-further-callbacks = true;
-            run = "layout floating";
-          }
-          { run = "exec-and-forget ${sketchybar} --trigger space_update"; }
-        ];
+        on-window-detected =
+          [
+            {
+              "if".app-name-regex-substring = floatingAppsRegex;
+              check-further-callbacks = true;
+              run = "layout floating";
+            }
+          ]
+          ++ appWorkspaceRules
+          ++ [
+            { run = "exec-and-forget ${sketchybar} --trigger space_update"; }
+          ];
 
         mode.main.binding = workspaceBindings // {
           ctrl-shift-h = "focus left";
