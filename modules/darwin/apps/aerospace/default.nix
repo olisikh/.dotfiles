@@ -81,8 +81,8 @@ in
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = !config.${namespace}.apps.yabai.enable && !config.${namespace}.apps.skhd.enable;
-        message = "AeroSpace must not run alongside yabai or skhd's yabai keybindings";
+        assertion = !config.${namespace}.apps.yabai.enable;
+        message = "AeroSpace must not run alongside yabai";
       }
     ];
 
