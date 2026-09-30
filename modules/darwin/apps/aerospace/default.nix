@@ -28,6 +28,10 @@ in
     services.aerospace = {
       enable = true;
       settings = {
+        config-version = 2;
+        # In config version 2, workspaces are not persistent unless listed explicitly.
+        persistent-workspaces = map toString (lib.range 1 10);
+
         start-at-login = false; # nix-darwin's launch agent starts AeroSpace
         default-root-container-layout = "tiles";
         default-root-container-orientation = "auto";
