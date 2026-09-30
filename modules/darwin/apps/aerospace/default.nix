@@ -85,7 +85,7 @@ in
           outer.left = 12;
           outer.right = 12;
           outer.bottom = 12;
-          outer.top = 12; # Match the other edges; don't reserve yabai's external bar again.
+          outer.top = 42; # Clear SketchyBar's 30px height plus the 12px gap.
         };
 
         exec-on-workspace-change = [ "/bin/bash" "-c" "${sketchybar} --trigger space_update" ];
