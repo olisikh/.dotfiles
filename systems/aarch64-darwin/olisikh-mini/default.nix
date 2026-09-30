@@ -14,6 +14,8 @@ let
     default = { };
     boring = {
       apps = {
+        yabai = disabled;
+        skhd = disabled;
         instant-space-switcher = disabled;
         aerospace = disabled;
       };

@@ -11,17 +11,18 @@ in
   networking.hostName = lib.mkForce "olisikh-mini";
   networking.localHostName = lib.mkForce "olisikh-mini";
 
-  # nix-darwin can leave a removed user LaunchAgent loaded. A boring rebuild
-  # explicitly stops yabai and removes its declaration before exam use.
+  # The disabled yabai/skhd modules remove their agents on every host.
+  # Also stop AeroSpace when switching from the normal mini to boring.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     uid="$(id -u -- ${userCfg.username})"
-    agent="${userCfg.home}/Library/LaunchAgents/org.nixos.yabai.plist"
+    label="org.nixos.aerospace"
+    agent="${userCfg.home}/Library/LaunchAgents/$label.plist"
 
-    echo "==> Boring profile cleanup: unloading org.nixos.yabai"
+    echo "==> Boring profile cleanup: unloading $label"
     launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
-      launchctl bootout "gui/$uid/org.nixos.yabai" 2>/dev/null || true
+      launchctl bootout "gui/$uid/$label" 2>/dev/null || true
     launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
       launchctl unload "$agent" 2>/dev/null || true
-    sudo --user=${userCfg.username} -- rm -f "$agent"
+    rm -f "$agent"
   '';
 }

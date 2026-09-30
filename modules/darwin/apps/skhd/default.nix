@@ -5,6 +5,7 @@ let
 
   cfg = config.${namespace}.apps.skhd;
   yabaiCfg = config.${namespace}.apps.yabai;
+  userCfg = config.${namespace}.core.user;
   # handyCfg = config.${namespace}.apps.handy;
 
   # Yabai keymaps - only included when yabai is enabled
@@ -99,8 +100,8 @@ in
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
-    {
+  config = mkMerge [
+    (mkIf cfg.enable {
       services.skhd = {
         enable = true;
         skhdConfig = lib.concatStringsSep "\n" [
@@ -109,6 +110,21 @@ in
           cfg.extraConfig
         ];
       };
-    }
-  ]);
+    })
+    (mkIf (!config.services.skhd.enable && userCfg.enable) {
+      # A removed user LaunchAgent can stay loaded after disabling the service.
+      system.activationScripts.postActivation.text = lib.mkAfter ''
+        uid="$(id -u -- ${userCfg.username})"
+        label="org.nixos.skhd"
+        agent="${userCfg.home}/Library/LaunchAgents/$label.plist"
+
+        echo "==> Removing disabled $label LaunchAgent"
+        launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
+          launchctl bootout "gui/$uid/$label" 2>/dev/null || true
+        launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
+          launchctl unload "$agent" 2>/dev/null || true
+        rm -f "$agent"
+      '';
+    })
+  ];
 }

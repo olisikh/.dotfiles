@@ -4,6 +4,7 @@ let
   inherit (lib.${namespace}) mkBoolOpt;
 
   cfg = config.${namespace}.apps.yabai;
+  userCfg = config.${namespace}.core.user;
 in
 {
   options.${namespace}.apps.yabai = {
@@ -15,8 +16,8 @@ in
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
-    {
+  config = mkMerge [
+    (mkIf cfg.enable {
       services.yabai = {
         enable = true;
         config = {
@@ -83,6 +84,21 @@ in
       };
 
       environment.systemPath = [ "${cfg.package}/bin" ];
-    }
-  ]);
+    })
+    (mkIf (!config.services.yabai.enable && userCfg.enable) {
+      # A removed user LaunchAgent can stay loaded after disabling the service.
+      system.activationScripts.postActivation.text = lib.mkAfter ''
+        uid="$(id -u -- ${userCfg.username})"
+        label="org.nixos.yabai"
+        agent="${userCfg.home}/Library/LaunchAgents/$label.plist"
+
+        echo "==> Removing disabled $label LaunchAgent"
+        launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
+          launchctl bootout "gui/$uid/$label" 2>/dev/null || true
+        launchctl asuser "$uid" sudo --user=${userCfg.username} -- \
+          launchctl unload "$agent" 2>/dev/null || true
+        rm -f "$agent"
+      '';
+    })
+  ];
 }
