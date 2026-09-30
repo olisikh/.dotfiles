@@ -22,7 +22,6 @@ let
 
   publicSettings = {
     model = {
-      # Hermes uses its own `-900k` alias; Pi's `-large` alias is separate.
       default = "gpt-6-luna-900k";
       provider = "openai-codex";
     };
@@ -60,7 +59,7 @@ let
       disabled_toolsets = [ ];
       reasoning_overrides = {
         "gpt-6-luna" = "max";
-        "deepseek-v4-flash:0731" = "max";
+        "deepseek-v4-flash" = "max";
       };
       reasoning_effort = "max";
     };

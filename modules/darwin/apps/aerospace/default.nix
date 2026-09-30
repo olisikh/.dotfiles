@@ -49,7 +49,7 @@ in
         on-focus-changed = [ "exec-and-forget ${sketchybar} --trigger space_update" ];
         on-window-detected = [
           {
-            "if".app-name-regex-substring = "^(System (Preferences|Settings)|Finder|Activity Monitor|Archive Utility|Creative Cloud|Login Options|ClearVPN|balenaEtcher|Transmission|PSI Bridge Secure Browser|IntelliJ IDEA|Android Emulator.*|Google Chrome|Brave Browser)$";
+            "if".app-name-regex-substring = "^(System (Preferences|Settings)|Finder|Activity Monitor|Archive Utility|Creative Cloud|Login Options|ClearVPN|balenaEtcher|Transmission|PSI Bridge Secure Browser|Android Emulator.*)$";
             check-further-callbacks = true;
             run = "layout floating";
           }

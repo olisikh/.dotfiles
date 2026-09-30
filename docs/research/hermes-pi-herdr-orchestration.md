@@ -28,7 +28,7 @@ A skill is useful for teaching Hermes this policy, but a skill alone is not enfo
 - Current Hermes delegation settings: `model=gpt-5.6-luna`, `provider=openai-codex`, `max_concurrent_children=2`, `max_spawn_depth=1`, `max_iterations=15`, `child_timeout_seconds=600`, `worktree_isolation` absent/false, `orchestrator_enabled=true`.
 - Pi: `0.84.4`, installed through `/etc/profiles/per-user/olisikh/bin/pi`.
 - Pi packages include `@tintinweb/pi-subagents`, `pi-context`, `pi-lens`, `@gaodes/pi-graphify`, and other local extensions.
-- Pi's model catalog exposes `gpt-5.6-sol-900k`, `gpt-5.6-terra-900k`, and `gpt-5.6-luna-900k` at 900K context for `openai-codex`.
+- Pi's model catalog exposes `gpt-5.6-sol-large` and `gpt-5.6-luna-large` at 900K context for `openai-codex`.
 - Pi's Nix configuration defaults to `gpt-5.6-luna`; `@tintinweb/pi-subagents` scopes custom roles to the configured `openai-codex` Sol, Terra, and Luna 900K models.
 - Herdr: `0.8.2`, protocol `20`, running as a persistent server at `/Users/olisikh/.config/herdr/herdr.sock`.
 - Herdr exposes workspace, tab, pane, agent, worktree, wait, event, and socket-API primitives. It officially recognizes both Pi and Hermes.
