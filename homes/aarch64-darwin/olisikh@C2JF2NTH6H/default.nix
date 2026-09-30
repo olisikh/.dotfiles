@@ -126,7 +126,7 @@ in
     };
 
     cloud = {
-      terraform = enabled;
+      terraform.enable = false;
     };
 
     apps = {
