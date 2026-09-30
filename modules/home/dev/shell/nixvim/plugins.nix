@@ -37,7 +37,6 @@
     ./plugins/harpoon.nix
     ./plugins/nvim-metals.nix
     ./plugins/cellular-automaton.nix
-    ./plugins/guess-indent.nix
     ./plugins/neogen.nix
     ./plugins/99.nix
     ./plugins/faaah.nix
