@@ -505,7 +505,7 @@ in
         inherit (cfg.compaction) defaultModel fallbackModels;
       };
       ".pi/agent/auto-compact-settings.json".text = builtins.toJSON {
-        autoCompactPercent = 80;
+        autoCompactPercent = 90;
       };
       ".pi/agent/themes/catppuccin-mocha.json".source = ./themes/catppuccin-mocha.json;
 
