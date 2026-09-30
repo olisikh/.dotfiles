@@ -33,7 +33,7 @@ in
       skhd = disabled;
       aerospace = enabled;
       handy = enabled;
-      instant-space-switcher = enabled;
+      instant-space-switcher = disabled;
       xcodesapp = enabled;
       sketchybar = enabled;
       raycast = enabled;

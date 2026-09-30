@@ -48,7 +48,7 @@ let
         jankyborders = enabled;
         yabai = disabled;
         skhd = disabled;
-        instant-space-switcher = enabled;
+        instant-space-switcher = disabled;
         aerospace = enabled;
         handy = enabled;
         sketchybar = enabled;

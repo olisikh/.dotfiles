@@ -33,7 +33,7 @@ in
       skhd = disabled;
       aerospace = enabled;
       handy = enabled;
-      instant-space-switcher = enabled; # Keep installed during the trial; Homebrew cleanup would zap it.
+      instant-space-switcher = disabled;
       sketchybar = enabled;
       raycast = enabled;
       betterdisplay = enabled;
