@@ -16,6 +16,37 @@ let
   # real GPT-6 IDs immediately before each OpenAI request.
   gpt6OpenaiModels = [
     {
+      id = "gpt-6.1-sol-large";
+      name = "GPT-6.1 Sol (large)";
+      api = "openai-responses";
+      reasoning = true;
+      thinkingLevelMap = {
+        max = "max";
+        xhigh = "max";
+      };
+      input = [
+        "text"
+        "image"
+      ];
+      contextWindow = 1050000;
+      maxTokens = 128000;
+      cost = {
+        input = 2;
+        output = 10;
+        cacheRead = 0.1;
+        cacheWrite = 2.5;
+        tiers = [
+          {
+            inputTokensAbove = 272000;
+            input = 4;
+            output = 15;
+            cacheRead = 0.2;
+            cacheWrite = 5;
+          }
+        ];
+      };
+    }
+    {
       id = "gpt-6-sol-large";
       name = "GPT-6 Sol (large)";
       api = "openai-responses";
@@ -85,6 +116,21 @@ let
 
   # Keep Codex model metadata aligned with Pi's provider catalog.
   codexGpt6Costs = {
+    "gpt-6.1-sol-large" = {
+      input = 2;
+      output = 10;
+      cacheRead = 0.1;
+      cacheWrite = 2.5;
+      tiers = [
+        {
+          inputTokensAbove = 272000;
+          input = 4;
+          output = 15;
+          cacheRead = 0.2;
+          cacheWrite = 5;
+        }
+      ];
+    };
     "gpt-6-sol-large" = {
       input = 2;
       output = 10;
